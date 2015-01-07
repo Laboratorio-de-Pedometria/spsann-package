@@ -90,8 +90,8 @@
 #' observed over all lag distance classes.
 #' }
 #' @return
-#' \code{optimPPL} returns a data.frame with the coordinates of the optimized
-#' sample pattern.
+#' \code{optimPPL} returns a matrix: the optimized sample pattern with 
+#' the evolution of the energy state during the optimization as an attribute.
 #' 
 #' \code{pointsPerLag} and \code{pairsPerLag} return a data.frame with three 
 #' columns: a) the lower and b) upper limits of each lag distance class, and 

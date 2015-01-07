@@ -1,26 +1,5 @@
 /*******************************************************************************
-file pedometrics/src/updateMSSDCpp.cpp
-
-This program is free software; you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation; either version 2 or 3 of the License
-(at your option).
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-A copy of the GNU General Public License is available at
-http://www.r-project.org/Licenses/
-
-Purpose        : Update the matrix of distances used in the optimization of 
-                 spatial samples using the mean squared shortest distance as 
-                 criterion
-Author         : A. Samuel-Rosa <alessandrosamuelrosa at gmail.com>
-Contributions  : Joshua French <joshua.french at ucdenver.edu>
-
-Arguments:
+Update the matrix of distances
 x1: coordinates of the prediction points
 x2: coordinates of the new point
 dm: matrix of distances

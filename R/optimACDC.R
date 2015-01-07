@@ -2,7 +2,7 @@
 #' 
 #' Optimize a sample pattern for trend estimaton using spatial simulated
 #' annealing. The criterion used is matching the association/correlation and
-#' marginal distribution of the covariates (ACDC).
+#' marginal distribution of the covariates (\code{optimACDC}).
 #' 
 #' @template spJitter_doc
 #' @template spSANN_doc
@@ -25,8 +25,9 @@
 #' 
 #' @details
 #' 
-#' @return A matrix (the optimized sample points) with attributes (the evolution
-#' of the energy state and the running time).
+#' @return
+#' \code{optimACDC} returns a matrix: the optimized sample pattern with 
+#' the evolution of the energy state during the optimization as an attribute.
 #' 
 #' @references
 #' Minasny, B.; McBratney, A. B. A conditioned Latin hypercube method for
@@ -44,8 +45,8 @@
 #' and Geoinformation}, v. 21, p. 301-310, 2013.
 #' 
 #' Roudier, P.; Beaudette, D.; Hewitt, A. A conditioned Latin hypercube sampling
-#' algorithm incorporating operational constraints. 5th Global Workshop on
-#' Digital Soil Mapping. Sydney: p. 227-231, 2012.
+#' algorithm incorporating operational constraints. \emph{5th Global Workshop on
+#' Digital Soil Mapping}. Sydney: p. 227-231, 2012.
 #' 
 #' @author
 #' Alessandro Samuel-Rosa \email{alessandrosamuelrosa@@gmail.com}
