@@ -1,7 +1,7 @@
 #' Optimization of spatial samples for spatial interpolation
 #' 
-#' Optimize a spatial samples for spatial interpolation using spatial simulated
-#' annealing. The criterion used is the mean squared shortest distance (MSSD).
+#' Optimize a spatial sample pattern for spatial interpolation (kriging). The
+#' criterion used is the mean squared shortest distance (MSSD).
 #'  
 #' @template spJitter_doc
 #' @template spSANN_doc
@@ -87,13 +87,13 @@
 #' with contributions of Gerard Heuvelink \email{gerard.heuvelink@@wur.nl}
 #' 
 #' @note
-#' Some of the solutions used to build this function were found in the source 
-#' code of the R-packages \strong{intamapInteractive} and \pkg{SpatialTools}.
-#' As such, the authors of those packages (Edzer Pebesma 
+#' Some of the solutions used here were found in the source code of the 
+#' R-packages \strong{intamapInteractive} and \pkg{SpatialTools}. As such, the
+#' authors of those packages (Edzer Pebesma 
 #' <\email{edzer.pebesma@@uni-muenster.de}>, Jon Skoien 
 #' <\email{jon.skoien@@gmail.com}>, Joshua French 
 #' <\email{joshua.french@@ucdenver.edu}>) are entitled \sQuote{contributors} to
-#' the R-package \pkg{pedometrics}.
+#' the R-package \pkg{spsann}.
 #' 
 #' @seealso
 #' \code{\link[raster]{distanceFromPoints}}, \code{\link[spcosa]{stratify}}.
@@ -131,7 +131,7 @@ spsannMSSD <-
     # Calculate the initial energy state. The distance matrix is calculated
     # using the fields::rdist(). The function .calcMSSDCpp() does the squaring 
     # internaly.
-    # ASR: I should probably write my own distance function.
+    # ASR: write own distance function
     dist_mat <- fields::rdist(candidates[, 2:3], sys_config0[, 2:3])
     energy_state0 <- .calcMSSDCpp(dist_mat)
     
