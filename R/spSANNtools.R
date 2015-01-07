@@ -1,24 +1,3 @@
-#  file pedometrics/R/spSANN.R
-#
-#  This program is free software; you can redistribute it and/or modify
-#  it under the terms of the GNU General Public License as published by
-#  the Free Software Foundation; either version 2 or 3 of the License
-#  (at your option).
-#
-#  This program is distributed in the hope that it will be useful,
-#  but WITHOUT ANY WARRANTY; without even the implied warranty of
-#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-#  GNU General Public License for more details.
-#
-#  A copy of the GNU General Public License is available at
-#  http://www.r-project.org/Licenses/
-#
-#  Purpose        : spatial simulated annealing
-#  Author         : A. Samuel-Rosa (alessandrosamuelrosa@gmail.com)
-#  Contributions  : G. Heuvelink (gerard.heuvelink@wur.nl)
-#                   E. Pebesma (edzer.pebesma@uni-muenster.de)
-#                   J. Skoien (jon.skoien@gmail.com)
-#
 # INTERNAL FUNCTION - PLOTTING #################################################
 .spSANNplot <-
   function (energy_state0, energy_states, k, acceptance, accept_probs, 
@@ -72,7 +51,7 @@
     y <- bb[2, 1] + (bb[2, 2] - bb[2, 1]) / 2
     text(y = y, x = x, srt = 90, labels = "maximum shift in the Y axis")
   }
-# INTERNAL FUNCTION - RESULTS ##################################################
+# INTERNAL FUNCTION - PREPARE RESULTS ##########################################
 .spSANNout <-
   function (new_sys_config, energy_state0, energy_states, time0) {
     res <- new_sys_config

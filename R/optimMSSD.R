@@ -1,7 +1,7 @@
-#' Optimization of spatial samples for spatial interpolation
+#' Optimization of sample patterns for spatial interpolation
 #' 
-#' Optimize a spatial samples for spatial interpolation using spatial simulated
-#' annealing. The criterion used is the mean squared shortest distance (MSSD).
+#' Optimize a sample pattern for spatial interpolation. The criterion used is
+#' the mean squared shortest distance (MSSD).
 #'  
 #' @template spJitter_doc
 #' @template spSANN_doc
@@ -65,7 +65,7 @@
 #' \code{objMSSD} returns a numeric value: the mean squared shortest distance
 #' between a set of points and all grid cells.
 #' 
-#' \code{spsannMSSD} returns a matrix: the optimized sample points with 
+#' \code{optimMSSD} returns a matrix: the optimized sample points with 
 #' the evolution of the energy state during the optimization as an attribute.
 #' 
 #' @references
@@ -83,22 +83,10 @@
 #' 
 #' @author
 #' Alessandro Samuel-Rosa \email{alessandrosamuelrosa@@gmail.com}
-#' 
-#' with contributions of Gerard Heuvelink \email{gerard.heuvelink@@wur.nl}
-#' 
-#' @note
-#' Some of the solutions used to build this function were found in the source 
-#' code of the R-packages \strong{intamapInteractive} and \pkg{SpatialTools}.
-#' As such, the authors of those packages (Edzer Pebesma 
-#' <\email{edzer.pebesma@@uni-muenster.de}>, Jon Skoien 
-#' <\email{jon.skoien@@gmail.com}>, Joshua French 
-#' <\email{joshua.french@@ucdenver.edu}>) are entitled \sQuote{contributors} to
-#' the R-package \pkg{pedometrics}.
-#' 
 #' @seealso
 #' \code{\link[raster]{distanceFromPoints}}, \code{\link[spcosa]{stratify}}.
 #' @keywords spatial optimize
-#' @aliases spsannMSSD objMSSD
+#' @aliases optimMSSD objMSSD
 #' @concept simulated annealing
 #' @export
 #' @examples
@@ -111,7 +99,7 @@
 #' objMSSD(meuse.grid, points)
 #' 
 # FUNCTION - MAIN ##############################################################
-spsannMSSD <-
+optimMSSD <-
   function (points, candidates, x.max, x.min, y.max, y.min, iterations = 10000,
             acceptance = list(initial = 0.99, cooling = iterations / 10),
             stopping = list(max.count = iterations / 10), plotit = TRUE,
@@ -131,7 +119,7 @@ spsannMSSD <-
     # Calculate the initial energy state. The distance matrix is calculated
     # using the fields::rdist(). The function .calcMSSDCpp() does the squaring 
     # internaly.
-    # ASR: I should probably write my own distance function.
+    # ASR: write own distance function
     dist_mat <- fields::rdist(candidates[, 2:3], sys_config0[, 2:3])
     energy_state0 <- .calcMSSDCpp(dist_mat)
     
@@ -243,7 +231,7 @@ spsannMSSD <-
     return (res)
   }
 # FUNCTION - CALCULATE THE CRITERION VALUE #####################################
-#' @rdname spsannMSSD
+#' @rdname optimMSSD
 #' @export
 objMSSD <-
   function (candidates, points) {

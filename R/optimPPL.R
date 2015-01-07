@@ -1,8 +1,10 @@
-#' Optimization of spatial samples for variogram estimation
+#' Optimization of sample patterns for for variogram estimation
 #' 
-#' Optimize spatial samples for variogram estimation using spatial
+#' Optimize a sample pattern for variogram estimation using spatial
 #' simulated annealing. The criterion used is the number of
-#' points per lag distance class. Functions to counts the number of points or 
+#' points (or point-pairs) per lag distance class (PPL).
+#' 
+#' Functions to counts the number of points or 
 #' point pairs per lag distance class. Functions to compute the deviation of 
 #' the observed distribution of counts from a pre-specified distribution. 
 #' Functions to compute the minimum number of points or point pairs observed 
@@ -205,9 +207,6 @@
 #' 
 #' @author
 #' Alessandro Samuel-Rosa \email{alessandrosamuelrosa@@gmail.com}
-#' 
-#' with contributions of Gerard Heuvelink \email{gerard.heuvelink@@wur.nl}
-#' 
 #' @note
 #' Use \code{lags = 1} with \code{pointsPerLag} and \code{pairsPerLag} to check
 #' that the functions are working correctly. They should return the total number 
@@ -223,7 +222,7 @@
 #' the R-package \pkg{pedometrics}.
 #' 
 #' @seealso \code{\link[stats]{dist}}.
-#' @aliases spsannPPL pointsPerLag objPoints pairsPerLag objPairs
+#' @aliases optimPPL pointsPerLag objPoints pairsPerLag objPairs
 #' @keywords spatial optimize
 #' @concept simulated annealing
 #' @export
@@ -236,7 +235,7 @@
 #' objPoints(meuse, cutoff = 1000)
 #' 
 # FUNCTION - MAIN ##############################################################
-spsannPPL <-
+optimPPL <-
   function (points, candidates, lags = 7, lags.type = "exponential", 
             lags.base = 2, cutoff = NULL, criterion = "distribution", 
             pre.distri = NULL, x.max, x.min, y.max, y.min, iterations = 10000,
@@ -370,7 +369,7 @@ spsannPPL <-
     return (res)
   }
 # FUNCTION - CALCULATE THE CRITERION VALUE #####################################
-#' @rdname spsannPPL
+#' @rdname optimPPL
 #' @export
 objPoints <-
   function (points, lags = 7, lags.type = "exponential", lags.base = 2, 
@@ -384,7 +383,7 @@ objPoints <-
     return (res)
   }
 # FUNCTION - POINTS PER LAG DISTANCE CLASS #####################################
-#' @rdname spsannPPL
+#' @rdname optimPPL
 #' @export
 pointsPerLag <-
   function (points, lags = 7, lags.type = "exponential", lags.base = 2, 

@@ -1,8 +1,6 @@
-#' @title Random perturbation of spatial points
+#' Random perturbation of spatial points
 #' 
-#' @description
-#' This function perturbs the coordinates of spatial points. This is also known
-#' as \sQuote{jittering}.
+#' Perturbation of the coordinates of spatial points (\sQuote{jittering}).
 #' 
 #' @template spJitter_doc
 #' @param which.point Integer values defining which point should be perturbed. 
@@ -51,22 +49,20 @@
 #' @author 
 #' Alessandro Samuel-Rosa \email{alessandrosamuelrosa@@gmail.com}
 #' 
-#' Gerard Heuvelink \email{gerard.heuvelink@@wur.nl}
+#' with contributions of Gerard Heuvelink \email{gerard.heuvelink@@wur.nl}
 #' 
 #' @note
-#' This function is under construction! The current version does not accept 
-#' using an infinite set of candidate locations or to perturb 
-#' more than one point at a time.
+#' The current version does not accept using an infinite set of candidate
+#' locations or to perturb more than one point at a time.
 #' 
-#' Some of the solutions used to build this function were found in the source 
-#' code of the R-package \strong{intamapInteractive}. As such, the authors of 
-#' that package, Edzer Pebesma <\email{edzer.pebesma@@uni-muenster.de}> and Jon
-#' Skoien <\email{jon.skoien@@gmail.com}>, are entitled \sQuote{contributors} to
-#' the R-package \pkg{pedometrics}.
+#' Some of the solutions used here were found in the source code of the 
+#' R-package \strong{intamapInteractive}. As such, the authors of that package,
+#' Edzer Pebesma <\email{edzer.pebesma@@uni-muenster.de}> and Jon Skoien
+#' <\email{jon.skoien@@gmail.com}>, are entitled \sQuote{contributors} to
+#' the R-package \pkg{spsann}.
 #' 
 #' @seealso \code{ssaOptim}, \code{\link[sp]{zerodist}}, 
-#' \code{\link[base]{jitter}}, \code{\link[geoR]{jitter2d}},
-#' \code{\link[rgeos]{gContains}}.
+#' \code{\link[base]{jitter}}, \code{\link[geoR]{jitter2d}}.
 #' @keywords iteration spatial
 #' @concept jitter perturb
 #' @export

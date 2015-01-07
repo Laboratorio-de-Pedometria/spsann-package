@@ -1,7 +1,8 @@
-#' Optimization of spatial samples for trend estimation
+#' Optimization of sample patterns for trend estimation
 #' 
-#' Optimize spatial samples for trend estimaton using spatial simulated
-#' annealing.
+#' Optimize a sample pattern for trend estimaton using spatial simulated
+#' annealing. The criterion used is matching the association/correlation and
+#' marginal distribution of the covariates (ACDC).
 #' 
 #' @template spJitter_doc
 #' @template spSANN_doc
@@ -48,18 +49,6 @@
 #' 
 #' @author
 #' Alessandro Samuel-Rosa \email{alessandrosamuelrosa@@gmail.com}
-#' 
-#' with contributions of Gerard Heuvelink \email{gerard.heuvelink@@wur.nl} and
-#' Dick Brus \email{dick.brus@@wur.nl}
-#' 
-#' @note
-#' Some of the solutions used here were found in the source code of other
-#' R-packages. As such, the authors of those packages (\pkg{intamapInteractive}
-#' - Edzer Pebesma <\email{edzer.pebesma@@uni-muenster.de}> and Jon Skoien
-#' <\email{jon.skoien@@gmail.com}>; \pkg{clhs} - Pierre Roudier
-#' <\email{roudierp@@landcareresearch.co.nz}>) are entitled 
-#' \sQuote{contributors} to the R-package \pkg{pedometrics}.
-#' 
 #' @seealso
 #' \code{\link[clhs]{clhs}}
 #' @keywords spatial optimize
@@ -80,12 +69,12 @@
 #' x.max <- diff(bbox(boundary)[1, ])
 #' y.min <- x.min <- 40
 #' y.max <- diff(bbox(boundary)[2, ])
-#' res <- spsannTrend(points, candidates, covars, x.max = x.max, 
-#'                    x.min = x.min, y.max = y.max, y.min = y.min, 
-#'                    boundary = boundary, sim.nadir = 1000)
+#' res <- optimACDC(points, candidates, covars, x.max = x.max, 
+#'                  x.min = x.min, y.max = y.max, y.min = y.min, 
+#'                  boundary = boundary, sim.nadir = 1000)
 #' 
 # MAIN FUNCTION ################################################################
-spsannCLHS <-
+optimACDC <-
   function (points, candidates, covars, continuous = TRUE,
             weights = list(strata = 0.5, correl = 0.5), use.coords = FALSE,
             strata.type = "equal.area", sim.nadir = 1000,
