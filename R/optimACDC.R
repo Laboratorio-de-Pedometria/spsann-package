@@ -84,7 +84,7 @@
   function (covars, continuous, weights, use.coords, strata.type) {
     
     # covars
-    if (ncol(covars) < 2) {
+    if (ncol(covars) < 2 && use.coords == FALSE) {
       res <- paste("'covars' must have two or more columns")
       return (res)
     }
@@ -107,7 +107,7 @@
     # strata.type
     st <- c("equal.area", "equal.range")
     st <- is.na(any(match(st, strata.type)))
-    if (lt) {
+    if (st) {
       res <- paste("'strata.type = ", strata.type, "' is not supported", 
                    sep = "")
       return (res)
@@ -153,7 +153,7 @@ optimACDC <-
       if (!continuous) {
         coords <- data.frame(candidates[, 2:3])
         breaks <- .contStrata(n_pts, coords, strata.type)[[1]]
-        coords <- .cont2cat(coords, breaks)
+        coords <- cont2cat(coords, breaks)
         covars <- data.frame(covars, coords)
       } else {
         covars <- data.frame(covars, candidates[, 2:3])
@@ -161,7 +161,6 @@ optimACDC <-
     }
     n_cov <- ncol(covars)
     sm <- covars[points[, 1], ]
-    if (n_cov == 1) sm <- data.frame(sm)
     
     # Base data and initial energy state (energy)
     if (continuous) { # Continuous covariates
