@@ -55,8 +55,15 @@ optimMSSD <-
             stopping = list(max.count = iterations / 10), plotit = TRUE,
             boundary, progress = TRUE, verbose = TRUE) {
     
-    if (ncol(candidates) != 3) stop ("'candidates' must have three columns")
-    if (plotit) par0 <- par() # ASR: put on.exit()
+    check <- .spSANNcheck(points, candidates, x.max, x.min, y.max, y.min,
+                          iterations, acceptance, stopping, plotit, boundary,
+                          progress, verbose)
+    if (!is.null(check)) stop (check, call. = FALSE)
+    
+    if (plotit) {
+      par0 <- par()
+      on.exit(suppressWarnings(par(par0)))
+    }
     if (is.integer(points)) {
       n_pts <- points
       points <- sample(c(1:dim(candidates)[1]), n_pts)

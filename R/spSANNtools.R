@@ -1,3 +1,24 @@
+# INTERNAL FUNCTION - CHECK ARGUMENTS ##########################################
+.spSANNcheck <-
+  function (points, candidates, x.max, x.min, y.max, y.min, iterations,
+            acceptance, stopping, plotit, boundary, progress, verbose) {
+    
+    # Look for missing arguments
+    arg <- c("points", "candidates", "x.max", "x.min", "y.max", "y.min")
+    mis <- c(missing(points), missing(candidates), missing(x.max), 
+             missing(x.min), missing(y.max), missing(y.min))
+    if (any(mis)) {
+      i <- which(mis == TRUE)
+      res <- paste("missing argument: ", arg[i], "\n", sep = "")
+      return (res)
+    }
+    
+    # Candidates
+    if (ncol(candidates) != 3) {
+      res <- paste("'candidates' must have three columns")
+      return (res)
+    }
+  }
 # INTERNAL FUNCTION - PLOTTING #################################################
 .spSANNplot <-
   function (energy_state0, energy_states, k, acceptance, accept_probs, 
