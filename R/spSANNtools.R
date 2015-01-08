@@ -18,6 +18,36 @@
       res <- paste("'candidates' must have three columns")
       return (res)
     }
+    
+    # iterations
+    if (!is.numint(iterations) || length(iterations) > 1) {
+      res <- paste("'iterations' must be an integer value")
+      return (res)
+    }
+    
+    # acceptance
+    if (!is.list(acceptance) || length(acceptance) != 2) {
+      res <- paste("'acceptance' must be a list with two sub-arguments")
+      return (res)
+    }
+    
+    # stopping
+    if (!is.list(stopping) || length(stopping) != 1) {
+      res <- paste("'stopping' must be a list with one sub-argument")
+      return (res)
+    }
+    
+    # boundary
+    if (plotit) {
+      if (missing(boundary)) {
+        res <- paste("'boundary' is mandatory when 'plotit = TRUE'")
+        return (res)
+      }
+      if (inherits(boundary, "SpatialPolygon")) {
+        res <- paste("'boundary' must be a SpatialPolygon")
+        return (res)
+      }
+    }    
   }
 # INTERNAL FUNCTION - PLOTTING #################################################
 .spSANNplot <-

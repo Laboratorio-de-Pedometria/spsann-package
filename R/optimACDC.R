@@ -74,6 +74,42 @@
 #' res <- optimACDC(points, candidates, covars, x.max = x.max, 
 #'                  x.min = x.min, y.max = y.max, y.min = y.min, 
 #'                  boundary = boundary, sim.nadir = 1000)
+# INTERNAL FUNCTION - CHECK ARGUMENTS ##########################################
+.optimACDCcheck <-
+  function (covars, continuous = TRUE,
+            weights = list(strata = 0.5, correl = 0.5), use.coords = FALSE,
+            strata.type) {
+    
+    # covars
+    if (ncol(covars) < 2) {
+      res <- paste("'covars' must have two or more columns")
+      return (res)
+    }
+    if (nrow(candidates) != nrow(covars)) {
+      res <- 
+        paste("'candidates' and 'covars' must have the same number of rows")
+      return (res)
+    }
+    
+    # weights
+    if (!is.list(weights) || length(weights) != 2) {
+      res <- paste("'weights' must be a list with two sub-arguments")
+      return (res)
+    }
+    if (sum(unlist(weights)) != 1) {
+     res <- paste("the 'weights' must sum to 1")
+     return (res)
+    }
+    
+    # strata.type
+    st <- c("equal.area", "equal.range")
+    st <- is.na(any(match(st, strata.type)))
+    if (lt) {
+      res <- paste("'strata.type = ", strata.type, "' is not supported", 
+                   sep = "")
+      return (res)
+    }
+  }
 # MAIN FUNCTION ################################################################
 optimACDC <-
   function (points, candidates, covars, continuous = TRUE,
@@ -84,16 +120,11 @@ optimACDC <-
             stopping = list(max.count = iterations / 10), plotit = TRUE,
             boundary, progress = TRUE, verbose = TRUE) {
     
+    if (!is.data.frame(covars)) covars <- as.data.frame(covars)
     check <- .spSANNcheck(points, candidates, x.max, x.min, y.max, y.min,
                           iterations, acceptance, stopping, plotit, boundary,
                           progress, verbose)
     if (!is.null(check)) stop (check, call. = FALSE)
-    
-    if (ncol(covars) < 2) stop ("'covars' must have two or more columns")
-    if (!is.data.frame(covars)) covars <- as.data.frame(covars)
-    if (nrow(candidates) != nrow(covars))
-      stop ("'candidates' and 'covars' must have the same number of rows")
-    if (sum(unlist(weights)) != 1) stop ("the 'weights' must sum to 1")
     
     if (plotit) {
       par0 <- par()

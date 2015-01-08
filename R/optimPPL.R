@@ -141,55 +141,6 @@
 # that the functions are working correctly. They should return the total number 
 # of points in \code{points} and the total possible number of point-pairs 
 # \eqn{n \times (n - 1) / 2}, respectively.
-# INTERNAL FUNCTION - CHECK ARGUMENTS ##########################################
-.optimPPLcheck <-
-  function (lags, lags.type, lags.base, cutoff, criterion, pre.distri) {
-    
-    # lags and cutoff
-    if (length(lags) == 1 && is.null(cutoff)) {
-      res <- paste("'cutoff' is mandatory when the lag intervals are not set")
-      return (res)
-    }
-    if (length(lags) > 1 && !is.null(cutoff)) {
-      res <- paste("'cutoff' cannot be used when the lag intervals are set")
-      return (res)
-    }
-    
-    # lags.type
-    lt <- c("equidistant", "exponential")
-    lt <- is.na(any(match(lt, lags.type)))
-    if (lt) {
-      res <- paste("'lags.type = ", lags.type, "' is not supported", sep = "")
-      return (res)
-    }
-    
-    # criterion
-    cr <- c("distribution", "minimum")
-    cr <- is.na(any(match(lt, lags.type)))
-    if (cr) {
-      res <- paste("'criterion = ", criterion, "' is not supported", sep = "")
-      return (res)
-    }
-    
-    # pre.distri
-    if (!is.numeric(pre.distri)) {
-      res <- paste("'pre.distri' must be a numeric vector")
-      return (res)
-    }
-    if (length(lags) == 1) {
-      if (length(pre.distri) != lags) {
-        res <- paste("'pre.distri' must be of length ", lags, sep = "")
-        return (res)
-      }
-    }
-    if (length(lags) > 2) {
-      nl <- length(lags) - 1
-      if (length(pre.distri) != nl) {
-        res <- paste("'pre.distri' must be of length ", nl, sep = "")
-        return (res)
-      }
-    }
-  }
 # FUNCTION - MAIN ##############################################################
 optimPPL <-
   function (points, candidates, lags = 7, lags.type = "exponential", 
@@ -402,6 +353,61 @@ pointsPerLag <-
     res <- data.frame(lag.lower = lags[-length(lags)], points = res, 
                       lag.upper = lags[-1])
     return (res)
+  }
+# INTERNAL FUNCTION - CHECK ARGUMENTS ##########################################
+.optimPPLcheck <-
+  function (lags, lags.type, lags.base, cutoff, criterion, pre.distri) {
+    
+    # lags and cutoff
+    if (length(lags) == 1 && is.null(cutoff)) {
+      res <- paste("'cutoff' is mandatory when the lag intervals are not set")
+      return (res)
+    }
+    if (length(lags) > 1 && !is.null(cutoff)) {
+      res <- paste("'cutoff' cannot be used when the lag intervals are set")
+      return (res)
+    }
+    
+    # lags.type
+    lt <- c("equidistant", "exponential")
+    lt <- is.na(any(match(lt, lags.type)))
+    if (lt) {
+      res <- paste("'lags.type = ", lags.type, "' is not supported", sep = "")
+      return (res)
+    }
+    
+    # lags.base
+    if (!is.numeric(lags.base) || length(lags.base) > 1) {
+      res <- paste("'lags.base' must be a numeric value")
+      return (res)
+    }
+    
+    # criterion
+    cr <- c("distribution", "minimum")
+    cr <- is.na(any(match(lt, lags.type)))
+    if (cr) {
+      res <- paste("'criterion = ", criterion, "' is not supported", sep = "")
+      return (res)
+    }
+    
+    # pre.distri
+    if (!is.numeric(pre.distri)) {
+      res <- paste("'pre.distri' must be a numeric vector")
+      return (res)
+    }
+    if (length(lags) == 1) {
+      if (length(pre.distri) != lags) {
+        res <- paste("'pre.distri' must be of length ", lags, sep = "")
+        return (res)
+      }
+    }
+    if (length(lags) > 2) {
+      nl <- length(lags) - 1
+      if (length(pre.distri) != nl) {
+        res <- paste("'pre.distri' must be of length ", nl, sep = "")
+        return (res)
+      }
+    }
   }
 # INTERNAL FUNCTION - CALCULATE THE CRITERION VALUE ############################
 .objPointsPerLag <-
