@@ -1,5 +1,5 @@
-# Version 0.0.0 (2015-01-07)
+# Version 0.0.0.9000 (2015-01-08)
 
-* functions are being copyed from the R-package pedometrics
+* in-development package
+* importing functions from the package `pedometrics`
 * preparing documentation
-* preparing for release (abstract submited to EGU2015)
