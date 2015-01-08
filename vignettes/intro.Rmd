@@ -1,5 +1,192 @@
 # Introduction to the spsann package
 
+## Spatial simulated annealing
+
+### Search graph
+
+The search graph corresponds to the set of effective candidate locations for
+a point being jittered in a given iteration. The size of the search graph, 
+i.e. the maximum distance that a point can be moved around, is correlated 
+with the concept of **temperature**. A larger search graph is equivalent
+to higher temperatures, which potentially result in more movement or 
+"agitation"" of the set of points or "particles".
+
+The current implementation of spatial simulated annealing uses a 
+**linear cooling schedule** depending upon the number of iterations to 
+control the size of the search graph. The equations are as follows:
+
+```
+x.max.b <- x.max.a - k / iterations * (x.max.a - x.min)
+y.max.b <- y.max.a - k / iterations * (y.max.a - y.min)
+```
+
+where `x.max.a` and `y.max.a` are the maximum allowed shift in the
+x and y coordinates in the current iteration, `x.min` and `y.min` 
+are the minimum required shift in the x and y coordinates, and `x.max.b`
+and `y.max.b` are the maximum allowed shift in the x and y coordinates
+in the next iteration. `iterations` is the total number of iterations 
+and `k` is the current iteration.
+
+### Acceptance probability
+
+The acceptance probability is the chance of accepting a new system 
+configuration that is worse than the current system configuration. The 
+concept of acceptance probability is related with that of 
+**temperature**. A higher acceptance probability is equivalent to higher
+temperatures, which potentially result in more movement or 
+"agitation"" of the set of points or "particles".
+
+Using a low initial acceptance probability turns the spatial simulated 
+annealing into a *greedy* algorithm. It will converge in a shorter time,
+but the solution found is likely to be a local optimum instead of the global 
+optimum. Using a high initial acceptance probability ($>0.8$) usually is
+the wisest choice.
+
+An **exponential cooling schedule** depending upon the number of 
+iterations is used in the current implementation of the spatial simulated
+annealing to control the acceptance probability. The acceptance probability
+at each iteration is calculates as follows:
+
+```
+actual_prob <- acceptance$initial * exp(-k / acceptance$cooling)
+```
+
+where `actual_prob` is the acceptance probability at the `k`-th 
+iteration, `acceptance$initial` is the initial acceptance probability, 
+and `acceptance$cooling` is the exponential cooling factor.
+
+### Starting system configuration
+
+Unidimensional criterion such as the number of points per lag distance class
+are dependent on the starting system configuration by definition. This means
+that, depending on the parameters passed to the spatial simulated annealing 
+algorithm, many points will likely to stay close to their starting positions.
+It would be reasonable to use a starting system configuration that is close 
+to the global optimal, but such thing is not feasible.
+
+Increasing the initial acceptance probability does not guarantee the 
+independence from the starting system configuration. The most efficient 
+option in the current implementation of the spatial simulated annealing
+algorithm is to start using the entire spatial domain as search graph. This 
+is set using the interval of the x and y coodinates to set `x.max` 
+and `y.max` (See above).
+
+An alternative is to start jittering (randomly perturbing) several points at
+a time and use a cooling schedule to **exponentially** decrease the 
+number of points jittered at each iteration. The current implementation of 
+the spatial simulated annealing does not explore such alternative. The 
+cooling schedule would be as follows:
+
+```
+new.size <- round(c(old.size - 1) * exp(-k / size.factor) + 1)
+```
+
+where `old.size` and `new.size` are the number of points jittered
+in the previous and next iterations, `size.factor` is the cooling 
+parameter, and `k` is the number of the current iteration. The larger 
+the difference between the starting system configuration and the global 
+optimum, the larger the number of points that would need to be jittered in
+the first iterations. This will usually increase the time spent on the first
+iterations.
+
+### Number of iterations
+
+The number of iterations has a large influence on the performance of the 
+spatial simulated annealing algorithm. The larger the number of possible 
+system configurations, the higher should the number of iterations be.
+
+The number of possible system configurations increases with:
+
+* a high initial acceptance probability
+* the use of an infinite set of candidate locations
+* the use of a very dense finite set of candidate locations
+
+## Random perturbation (jittering)
+
+This function perturbs the coordinates of spatial points adding random noise,
+a process also known as 'jittering'. There are two ways of jittering 
+the coordinates. They differ on how the the set of candidate locations is 
+defined.
+
+### Finite set of candidate locations
+
+**NOTE**: The current implementation does not enable to define the direction of 
+the perturbation, nor to perturb more than one point at a time.
+
+The first method uses a finite set of candidate locations for the perturbed 
+points. This method usually is the fastest because it does not require the 
+use of complex routines to check if the perturbed point falls inside the 
+spatial domain. Since the candidate locations is a finite set, any perturbed 
+point will inexorably fall inside the spatial domain. This is a very 
+important feature in optimization exercises with complex objective functions
+such as simulated annealing when repetitive perturbation is required.
+
+The arguments `x.min`, `y.min`, `x.max`, and `y.max` are used to define a 
+rectangular window containing the set of effective candidate locations for the 
+point defined with the argument `which.point`. The new location is then 
+randomly sampled from the set of effective candidate locations and checked 
+against existing points to avoid duplicates.
+
+### Infinite set of candidate locations
+
+**NOTE**: The current version does not accept using an infinite set of 
+candidate locations.
+
+The second method can be much slower than the first depending on the number of
+points, on the shape of the area and on how the other arguments are set. This
+method does not use a finite set of candidate locations. Instead, the number of
+candidate locations is infinite. Its domain can be defined using the argument
+`where`. The reason for the larger amount of time demanded is that the method 
+has two internal steps to 1) check if the perturbed point falls inside the
+spatial domain, and b) check if two of more points have coincident coordinates
+(set using argument `zero`). Using an infinite set of candidate locations will
+usually allow obtaining better results in optimization exercises such as 
+spatial simulated annealing. However, the amount of time may be prohibitive
+depending on the complexity of the problem.
+
+The sub-argument `max` in both arguments `x.coord` and `y.coord` defines the
+lower and upper limits of a uniform distribution:
+
+```
+runif(n, min = -max, max = max)
+```
+
+The quantity of noise added to the coordinates of the point being perturbed is
+sampled from this uniform distribution. By default, the maximum quantity of
+random noise added to the x and y coordinates is, respectively, equal to half 
+the width and height of the bounding box of the set of points. This is 
+equivalent to a vector **h** of length equal to half the diagonal of the 
+bounding box. Therefore, a larger jittering is allowed in the longer coordinate
+axis (x or y).
+
+The direction of the perturbation is defined by the sign of the values sampled
+from the uniform distribution. This means that the perturbation can assume any
+direction from 0 to 360 degrees. By contrast, the function `jitter2d()` in the 
+R-package **geoR** samples from a uniform distribution a value for the length 
+of the vector **h** and a value for the direction of the perturbation.
+
+`spJitter()` allows to set the minimum quantity of random noise added to a
+coordinate with the sub-argument `min`. The absolute difference between the
+original coordinate value and the jittered coordinate value is used to evaluate
+this constraint. If the constraint is not met, `min` receives the sign of the
+value sample from the uniform distribution and is added to the original 
+coordinate value. This does not guarantee that the perturbation will be in the
+same direction, but in the same quadrant.
+
+When a spatial domain is defined, `spJitter()` evaluates if the perturbed 
+points fall inside it using the function \code{\link[rgeos]{gContains}} from 
+the R-package **rgeos**. All points falling outside the spatial domain are
+identified and have their original coordinates jittered one again. Every new
+coordinate falling inside the spatial domain is accepted. Every point falling
+outside the spatial domain has its coordinates jittered till it falls inside 
+the spatial domain. The number of iterations necessary to meet this constraint
+depends on the complexity of the shape of the spatial domain. `spJitter()` 
+tries to speed up the process by linearly decreasing the maximum quantity of
+noise added to the coordinates at each iteration. If the number of iterations 
+was not enough to guarantee all points inside the spatial domain, `spJitter()`
+returns the jittered SpatialPoints with a warning message informing how many
+points do not meet the constraint.
+
 ## Objective functions
 
 Here we provide a description of the implementation of the objective functions 

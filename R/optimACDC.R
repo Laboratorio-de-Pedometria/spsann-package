@@ -2,7 +2,8 @@
 #' 
 #' Optimize a sample pattern for trend estimaton using spatial simulated
 #' annealing. The criterion used is matching the association/correlation and
-#' marginal distribution of the covariates (\code{optimACDC}).
+#' marginal distribution of the covariates (\code{optimACDC}). This is also
+#' known as the conditioned Latin Hypercube of Minasny and McBratney (2006).
 #' 
 #' @template spJitter_doc
 #' @template spSANN_doc
