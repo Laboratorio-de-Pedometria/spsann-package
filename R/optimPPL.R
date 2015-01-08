@@ -141,6 +141,55 @@
 # that the functions are working correctly. They should return the total number 
 # of points in \code{points} and the total possible number of point-pairs 
 # \eqn{n \times (n - 1) / 2}, respectively.
+# INTERNAL FUNCTION - CHECK ARGUMENTS ##########################################
+.optimPPLcheck <-
+  function (lags, lags.type, lags.base, cutoff, criterion, pre.distri) {
+    
+    # lags and cutoff
+    if (length(lags) == 1 && is.null(cutoff)) {
+      res <- paste("'cutoff' is mandatory when the lag intervals are not set")
+      return (res)
+    }
+    if (length(lags) > 1 && !is.null(cutoff)) {
+      res <- paste("'cutoff' cannot be used when the lag intervals are set")
+      return (res)
+    }
+    
+    # lags.type
+    lt <- c("equidistant", "exponential")
+    lt <- is.na(any(match(lt, lags.type)))
+    if (lt) {
+      res <- paste("'lags.type = ", lags.type, "' is not supported", sep = "")
+      return (res)
+    }
+    
+    # criterion
+    cr <- c("distribution", "minimum")
+    cr <- is.na(any(match(lt, lags.type)))
+    if (cr) {
+      res <- paste("'criterion = ", criterion, "' is not supported", sep = "")
+      return (res)
+    }
+    
+    # pre.distri
+    if (!is.numeric(pre.distri)) {
+      res <- paste("'pre.distri' must be a numeric vector")
+      return (res)
+    }
+    if (length(lags) == 1) {
+      if (length(pre.distri) != lags) {
+        res <- paste("'pre.distri' must be of length ", lags, sep = "")
+        return (res)
+      }
+    }
+    if (length(lags) > 2) {
+      nl <- length(lags) - 1
+      if (length(pre.distri) != nl) {
+        res <- paste("'pre.distri' must be of length ", nl, sep = "")
+        return (res)
+      }
+    }
+  }
 # FUNCTION - MAIN ##############################################################
 optimPPL <-
   function (points, candidates, lags = 7, lags.type = "exponential", 
@@ -150,9 +199,22 @@ optimPPL <-
             stopping = list(max.count = iterations / 10), plotit = TRUE,
             boundary, progress = TRUE, verbose = TRUE) {
     
-    # ASR: check lags... can be a vector with lower and upper limits
-    if (ncol(candidates) != 3) stop ("'candidates' must have three columns")
-    if (plotit) par0 <- par() # ASR: put on.exit()
+    # Check arguments
+    check <- .spSANNcheck(points, candidates, x.max, x.min, y.max, y.min,
+                          iterations, acceptance, stopping, plotit, boundary,
+                          progress, verbose)
+    if (!is.null(check)) stop (check, call. = FALSE)
+    check <- .optimPPLcheck(lags, lags.type, lags.base, cutoff, criterion, 
+                            pre.distri)
+    if (!is.null(check)) stop (check, call. = FALSE)
+    
+    
+    if (plotit) {
+      par0 <- par()
+      on.exit(suppressWarnings(par(par0)))
+    }
+    
+    # Prepare points
     if (is.integer(points)) {
       n_pts <- points
       points <- sample(c(1:dim(candidates)[1]), n_pts)
@@ -160,8 +222,15 @@ optimPPL <-
     } else {
       n_pts <- nrow(points)
     }
-    n_lags <- lags
-    lags <- .getLagBreaks(lags, lags.type, cutoff, lags.base)
+    
+    # Prepare lags
+    if (length(lags) >= 3) {
+      n_lags <- length(lags) - 1
+    } else {
+      n_lags <- lags
+      lags <- .getLagBreaks(lags, lags.type, cutoff, lags.base) 
+    }
+    
     sys_config0 <- points
     old_sys_config <- sys_config0
     
@@ -281,11 +350,27 @@ optimPPL <-
 #' @rdname optimPPL
 #' @export
 objPoints <-
-  function (points, lags = 7, lags.type = "exponential", lags.base = 2, 
-            cutoff = NULL, criterion = "distribution", pre.distri = NULL) {
-    n_pts <- dim(points)[1]
-    n_lags <- lags
-    lags <- .getLagBreaks(lags, lags.type, cutoff, lags.base)
+  function (points, candidates, lags = 7, lags.type = "exponential",
+            lags.base = 2, cutoff = NULL, criterion = "distribution",
+            pre.distri = NULL) {
+    
+    # Prepare points
+    if (is.integer(points)) {
+      n_pts <- points
+      points <- sample(c(1:dim(candidates)[1]), n_pts)
+      points <- candidates[points, ]
+    } else {
+      n_pts <- nrow(points)
+    }
+    
+    # Prepare lags
+    if (length(lags) >= 3) {
+      n_lags <- length(lags) - 1
+    } else {
+      n_lags <- lags
+      lags <- .getLagBreaks(lags, lags.type, cutoff, lags.base) 
+    }
+    
     dm <- as.matrix(dist(points[, 2:3], method = "euclidean"))
     ppl <- .getPointsPerLag(lags, dm)
     res <- .objPointsPerLag(ppl, n_lags, n_pts, criterion, pre.distri)
@@ -295,9 +380,23 @@ objPoints <-
 #' @rdname optimPPL
 #' @export
 pointsPerLag <-
-  function (points, lags = 7, lags.type = "exponential", lags.base = 2, 
-            cutoff = NULL) {
-    lags <- .getLagBreaks(lags, lags.type, cutoff, lags.base)
+  function (points, candidates, lags = 7, lags.type = "exponential",
+            lags.base = 2, cutoff = NULL) {
+    
+    # Prepare points
+    if (is.integer(points)) {
+      n_pts <- points
+      points <- sample(c(1:dim(candidates)[1]), n_pts)
+      points <- candidates[points, ]
+    } else {
+      n_pts <- nrow(points)
+    }
+    
+    # Prepare lags
+    if (length(lags) == 1) {
+      lags <- .getLagBreaks(lags, lags.type, cutoff, lags.base)
+    }
+    
     dm <- as.matrix(dist(points[, 2:3], method = "euclidean"))
     res <- .getPointsPerLag(lags, dm)
     res <- data.frame(lag.lower = lags[-length(lags)], points = res, 

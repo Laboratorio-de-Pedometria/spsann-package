@@ -74,7 +74,6 @@
 #' res <- optimACDC(points, candidates, covars, x.max = x.max, 
 #'                  x.min = x.min, y.max = y.max, y.min = y.min, 
 #'                  boundary = boundary, sim.nadir = 1000)
-#' 
 # MAIN FUNCTION ################################################################
 optimACDC <-
   function (points, candidates, covars, continuous = TRUE,
@@ -85,13 +84,17 @@ optimACDC <-
             stopping = list(max.count = iterations / 10), plotit = TRUE,
             boundary, progress = TRUE, verbose = TRUE) {
     
-    # Initial checks
+    check <- .spSANNcheck(points, candidates, x.max, x.min, y.max, y.min,
+                          iterations, acceptance, stopping, plotit, boundary,
+                          progress, verbose)
+    if (!is.null(check)) stop (check, call. = FALSE)
+    
     if (ncol(covars) < 2) stop ("'covars' must have two or more columns")
-    if (ncol(candidates) != 3) stop ("'candidates' must have three columns")
     if (!is.data.frame(covars)) covars <- as.data.frame(covars)
     if (nrow(candidates) != nrow(covars))
       stop ("'candidates' and 'covars' must have the same number of rows")
     if (sum(unlist(weights)) != 1) stop ("the 'weights' must sum to 1")
+    
     if (plotit) {
       par0 <- par()
       on.exit(suppressWarnings(par(par0)))
