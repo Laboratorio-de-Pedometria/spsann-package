@@ -1,28 +1,33 @@
 #' Optimization of sample patterns for trend estimation
 #' 
-#' Optimize a sample pattern for trend estimaton using spatial simulated
-#' annealing. The criterion used is matching the association/correlation and
-#' marginal distribution of the covariates (\code{optimACDC}). This is also
-#' known as the conditioned Latin Hypercube of Minasny and McBratney (2006).
+#' Optimize a sample pattern for trend estimaton. The criterion used is 
+#' matching the association/correlation and marginal distribution of the 
+#' covariates (\code{optimACDC}). This is also known as the conditioned Latin 
+#' Hypercube of Minasny and McBratney (2006).
 #' 
 #' @template spJitter_doc
 #' @template spSANN_doc
+#' 
 #' @param covars Data frame or matrix with the covariates in the columns.
-#' @param continuous Logical informing if the covariates are of type 
-#' \sQuote{continuous} or \sQuote{categorical}. Defaults to 
-#' \code{continuous = TRUE}.
-#' @param weights List with two components setting the weights assigned to the
-#' sampling strata/classes and the correlation/association measure. The weights
-#' must sum to unity. Defaults to 
-#' \code{weights = list(strata = 0.5, correl = 0.5)}.
-#' @param use.coords Logical for using the geographic coordinates as covariates.
+#' 
+#' @param continuous Logical. Are the covariates \sQuote{continuous} or 
+#' \sQuote{categorical}. Defaults to \code{continuous = TRUE}.
+#' 
+#' @param weights List with two sub-arguments. The weights assigned to the
+#' sampling strata/classes and the correlation/association measure. They must 
+#' sum to unity. Defaults to \code{weights = list(strata = 0.5, correl = 0.5)}.
+#' 
+#' @param use.coords Logical. Should the coordinates be used as covariates?
 #' Defaults to \code{use.coords = FALSE}.
-#' @param strata.type Character setting the type of strata to be used with 
+#' 
+#' @param strata.type Character. The type of strata to be used with 
 #' continuous covariates. Available options are \code{"equal.area"} and 
 #' \code{"equal.range"}. Defaults to \code{strata.type = "equal.area"}. See
 #' \sQuote{Details} for more information.
-#' @param sim.nadir Number of random realizations to estimate the nadir point.
-#' Defaults to \code{sim.nadir = 1000}. \sQuote{Details} for more information.
+#' 
+#' @param sim.nadir Integer. Number of random realizations to estimate the 
+#' nadir point. Defaults to \code{sim.nadir = 1000}. \sQuote{Details} for more
+#' information.
 #' 
 #' @details
 #' 
@@ -76,9 +81,7 @@
 #'                  boundary = boundary, sim.nadir = 1000)
 # INTERNAL FUNCTION - CHECK ARGUMENTS ##########################################
 .optimACDCcheck <-
-  function (covars, continuous = TRUE,
-            weights = list(strata = 0.5, correl = 0.5), use.coords = FALSE,
-            strata.type) {
+  function (covars, continuous, weights, use.coords, strata.type) {
     
     # covars
     if (ncol(covars) < 2) {
@@ -125,6 +128,9 @@ optimACDC <-
                           iterations, acceptance, stopping, plotit, boundary,
                           progress, verbose)
     if (!is.null(check)) stop (check, call. = FALSE)
+    check <- .optimACDCcheck(covars, continuous, weights, use.coords,
+                             strata.type)
+    if (!is.null(check)) stop (check, call. = FALSE)
     
     if (plotit) {
       par0 <- par()
@@ -160,7 +166,7 @@ optimACDC <-
     # Base data and initial energy state (energy)
     if (continuous) { # Continuous covariates
       # ASR: we should compute the true population correlation matrix (pcm)
-      #      and the compare it with the sample correlation matrix (scm)
+      #      and then compare it with the sample correlation matrix (scm)
       pcm <- cor(covars, use = "complete.obs")
       strata <- .contStrata(n_pts, covars, strata.type)
       nadir <- .contNadir(n_pts, pcm, sim.nadir, candidates, covars, strata)

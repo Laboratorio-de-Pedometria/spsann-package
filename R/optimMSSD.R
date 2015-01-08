@@ -2,8 +2,7 @@
 #' 
 #' Optimize a sample pattern for spatial interpolation. The criterion used is
 #' the mean squared shortest distance (\code{optimMSSD}). \code{objMSSD} 
-#' computes the mean squared shortest distance between a set of points and all
-#' grid cells.
+#' computes the MSSD between a set of points and all grid cells.
 #'  
 #' @template spJitter_doc
 #' @template spSANN_doc
@@ -13,8 +12,8 @@
 #' the coordinates to be projected. The user is responsible for making sure that
 #' this requirement is attained.
 #' @return
-#' \code{objMSSD} returns a numeric value: the mean squared shortest distance
-#' between a set of points and all grid cells.
+#' \code{objMSSD} returns a numeric value: the MSSD between a set of points and
+#' all grid cells.
 #' 
 #' \code{optimMSSD} returns a matrix: the optimized sample pattern with 
 #' the evolution of the energy state during the optimization as an attribute.
