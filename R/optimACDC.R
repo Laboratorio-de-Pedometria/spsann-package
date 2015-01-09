@@ -78,40 +78,6 @@
 #' res <- optimACDC(points, candidates, covars, x.max = x.max, 
 #'                  x.min = x.min, y.max = y.max, y.min = y.min, 
 #'                  boundary = boundary, sim.nadir = 1000)
-# INTERNAL FUNCTION - CHECK ARGUMENTS ##########################################
-.optimACDCcheck <-
-  function (covars, continuous, weights, use.coords, strata.type) {
-    
-    # covars
-    if (ncol(covars) < 2 && use.coords == FALSE) {
-      res <- paste("'covars' must have two or more columns")
-      return (res)
-    }
-    if (nrow(candidates) != nrow(covars)) {
-      res <- 
-        paste("'candidates' and 'covars' must have the same number of rows")
-      return (res)
-    }
-    
-    # weights
-    if (!is.list(weights) || length(weights) != 2) {
-      res <- paste("'weights' must be a list with two sub-arguments")
-      return (res)
-    }
-    if (sum(unlist(weights)) != 1) {
-     res <- paste("the 'weights' must sum to 1")
-     return (res)
-    }
-    
-    # strata.type
-    st <- c("equal.area", "equal.range")
-    st <- is.na(any(match(st, strata.type)))
-    if (st) {
-      res <- paste("'strata.type = ", strata.type, "' is not supported", 
-                   sep = "")
-      return (res)
-    }
-  }
 # MAIN FUNCTION ################################################################
 optimACDC <-
   function (points, candidates, covars, continuous = TRUE,
@@ -297,38 +263,99 @@ optimACDC <-
     res <- .spSANNout(new_conf, energy0, energies, time0)
     return (res)
   }
+# INTERNAL FUNCTION - CHECK ARGUMENTS ##########################################
+.optimACDCcheck <-
+  function (covars, continuous, weights, use.coords, strata.type) {
+    
+    # covars
+    if (ncol(covars) < 2 && use.coords == FALSE) {
+      res <- paste("'covars' must have two or more columns")
+      return (res)
+    }
+    if (nrow(candidates) != nrow(covars)) {
+      res <- 
+        paste("'candidates' and 'covars' must have the same number of rows")
+      return (res)
+    }
+    
+    # weights
+    if (!is.list(weights) || length(weights) != 2) {
+      res <- paste("'weights' must be a list with two sub-arguments")
+      return (res)
+    }
+    if (sum(unlist(weights)) != 1) {
+      res <- paste("the 'weights' must sum to 1")
+      return (res)
+    }
+    
+    # strata.type
+    st <- c("equal.area", "equal.range")
+    st <- is.na(any(match(st, strata.type)))
+    if (st) {
+      res <- paste("'strata.type = ", strata.type, "' is not supported", 
+                   sep = "")
+      return (res)
+    }
+  }
 # INTERNAL FUNCTION - BREAKS FOR CONTINUOUS COVARIATES #########################
 # Now we define the breaks and the distribution, and return it as a list
 # Quantiles now honour the fact that the data are discontinuous
+# NOTE: there is a problem when the number of unique values is small (3)
+n.pts <- 5
+covars <- data.frame(x = 1:15)
+covars <- data.frame(x = c(1, 5, 1, 3, 4, 1, 2, 3, 2, 1, 8, 9, 9, 9, 9))
+covars <- data.frame(x = c(1, 5, 1, 3, 4, 9, 2, 3, 2, 9, 8, 9, 9, 9, 9))
+covars <- data.frame(x = c(1, 5, 1, 5, 4, 5, 2, 3, 2, 5, 8, 5, 5, 9, 9))
+
 .contStrata <-
   function (n.pts, covars, strata.type) {
+    
+    # equal area strata
     if (strata.type == "equal.area") {
-      probs <- seq(0, 1, length.out = n.pts + 1)
-      breaks <- lapply(covars, quantile, probs, na.rm = TRUE, type = 1)
-      count <- lapply(breaks, table)
-      breaks <- lapply(count, function(x) as.double(names(x)))
-      count <- lapply(count, as.integer)
-      count <- lapply(count, function(x) x[-1L])
-      strata <- list(breaks, count)
-    }
-    if (strata.type == "equal.range") {
       n_cov <- ncol(covars)
-      breaks <- lapply(1:n_cov, function(i) 
-        seq(min(covars[, i]), max(covars[, i]), length.out = n.pts + 1))
+      probs <- seq(0, 1, length.out = n.pts + 1)
+      breaks <- lapply(covars, quantile, probs, na.rm = TRUE, type = 3)
+      #count <- lapply(breaks, table)
+      #count <- lapply(count, as.integer)
+      #count <- lapply(count, function(x) {x[2] <- x[2] + x[1] - 1; x[-1L]})      
+      breaks <- lapply(breaks, unique)
       count <- lapply(1:n_cov, function (i)
         hist(covars[, i], breaks[[i]], plot = FALSE)$counts)
-      zero <- sapply(1:n_cov, function (i) any(count[[i]] == 0))
-      zero <- which(zero)
-      for (i in zero) {
-        wz <- which(count[[i]] == 0)
-        breaks[[i]] <- breaks[[i]][-(wz + 1)]
-      }
-      for (i in 1:n_cov) {
-        mini <- min(covars[, i])
-        maxi <- max(covars[, i])
-        count[[i]] <- diff(breaks[[i]]) / ((maxi - mini) / n.pts)
-      }
+      count <- lapply(1:n_cov, function(i) count[[i]] / sum(count[[i]]) * n.pts)
       strata <- list(breaks, count)
+      
+    } else {
+      # equal range strata
+      if (strata.type == "equal.range") {
+        n_cov <- ncol(covars)
+        breaks <- lapply(1:n_cov, function(i)
+          seq(min(covars[, i]), max(covars[, i]), length.out = n.pts + 1))
+        d <- lapply(1:n_cov, function(i)
+          dist2(matrix(breaks[[i]]), matrix(covars[, i])))
+        d <- lapply(1:n_cov, function(i) apply(d[[i]], 1, which.min))
+        breaks <- lapply(1:n_cov, function(i) breaks[[i]] <- covars[d[[i]], i])
+        breaks <- lapply(breaks, unique)
+        count <- lapply(1:n_cov, function (i)
+          hist(covars[, i], breaks[[i]], plot = FALSE)$counts)
+        count <- lapply(1:n_cov, function(i) 
+          count[[i]] / sum(count[[i]]) * n.pts)
+        # This was an option to merge null strata
+        #breaks <- lapply(breaks, unique)
+        #count <- lapply(1:n_cov, function (i)
+        #  hist(covars[, i], breaks[[i]], plot = FALSE)$counts)
+        #zero <- sapply(1:n_cov, function (i) any(count[[i]] == 0))
+        #zero <- which(zero)
+        #for (i in zero) {
+        #  wz <- which(count[[i]] == 0)
+        #  breaks[[i]] <- breaks[[i]][-(wz + 1)]
+        #}
+        #for (i in 1:n_cov) {
+        #  mini <- min(covars[, i])
+        #  maxi <- max(covars[, i])
+        #  count[[i]] <- diff(breaks[[i]]) / ((maxi - mini) / n.pts)
+        #}
+        strata <- list(breaks, count)
+      }
     }
     return (strata)
   }
