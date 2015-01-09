@@ -4,6 +4,7 @@ gc()
 require(pedometrics)
 require(sp)
 require(rgeos)
+require(Hmisc)
 source('~/PROJECTS/r-packages/spsann/R/optimACDC.R')
 source('~/PROJECTS/r-packages/spsann/R/spSANNtools.R')
 source('~/PROJECTS/r-packages/pedometrics/cooking/utils.R')
@@ -59,7 +60,7 @@ tmp <- optimACDC(points = points, candidates = candidates, covars = covars,
                  weights = weights, acceptance = acceptance, 
                  sim.nadir = sim.nadir)
 #
-# 2) CATEGORICAL COVARIATES USING THE COORDINATES ##############################
+# 3) CATEGORICAL COVARIATES USING THE COORDINATES ##############################
 # The following error appeared when the number of points is small (n = 5, 
 # seed = 2001):
 # Error in chisq.test(x[, i], x[, j], correct = FALSE) : 
@@ -86,3 +87,28 @@ verbose <- TRUE
 set.seed(2001)
 tmp <- optimACDC(points = points, candidates = candidates, covars = covars, continuous = continuous, use.coords = use.coords, x.max = x.max, x.min = x.min, y.max = y.max, y.min = y.min, boundary = boundary, iterations = iterations, weights = weights, acceptance = acceptance, sim.nadir = sim.nadir, stopping = stopping, plotit = plotit, progress = progress, verbose = verbose, strata.type = strata.type)
 
+# 4) CATEGORICAL COVARIATES WITH MANY COVARIATES ##############################
+# The functions "cramer" and "chisq.test" are the ones taking most of the time
+# to run. Can we implement it in C++?
+covars <- meuse.grid[, rep(c(6, 7), 10)]
+points <- 10
+x.max <- diff(bbox(boundary)[1, ])
+y.min <- x.min <- 40
+y.max <- diff(bbox(boundary)[2, ])
+iterations <- 1
+acceptance <- list(initial = 0.99, cooling = iterations / 10)
+weights <- list(strata = 0.5, correl = 0.5)
+continuous <- FALSE
+use.coords <- FALSE
+stopping <- list(max.count = iterations / 10)
+sim.nadir <- 1
+strata.type <- "equal.area"
+plotit <- FALSE
+progress <- TRUE
+verbose <- TRUE
+set.seed(2001)
+Rprof(tmp <- tempfile())
+tmp <- optimACDC(points = points, candidates = candidates, covars = covars, continuous = continuous, use.coords = use.coords, x.max = x.max, x.min = x.min, y.max = y.max, y.min = y.min, boundary = boundary, iterations = iterations, weights = weights, acceptance = acceptance, sim.nadir = sim.nadir, stopping = stopping, plotit = plotit, progress = progress, verbose = verbose, strata.type = strata.type)
+Rprof()
+summaryRprof(tmp)
+unlink(tmp)
