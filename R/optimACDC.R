@@ -54,12 +54,11 @@
 #' algorithm incorporating operational constraints. \emph{5th Global Workshop on
 #' Digital Soil Mapping}. Sydney: p. 227-231, 2012.
 #' 
-#' @author
-#' Alessandro Samuel-Rosa \email{alessandrosamuelrosa@@gmail.com}
-#' @seealso
-#' \code{\link[clhs]{clhs}}
+#' @author Alessandro Samuel-Rosa \email{alessandrosamuelrosa@@gmail.com}
+#' @seealso \code{\link[clhs]{clhs}}
 #' @keywords spatial optimize
 #' @concept simulated annealing
+#' @import pedometrics
 #' @examples
 #' require(sp)
 #' require(rgeos)
@@ -417,9 +416,6 @@ optimACDC <-
     for (i in 1:sim.nadir) {
       pts <- sample(c(1:nrow(candi)), n.pts)
       sm <- covars[pts, ]
-      if (ncol(covars) == 1) {
-        sm <- data.frame(sm)
-      }
       scm <- cramer(sm)
       samp_prop <- lapply(sm, function(x) table(x) / n.pts)
       samp_prop <- sapply(1:ncol(covars), function (i)

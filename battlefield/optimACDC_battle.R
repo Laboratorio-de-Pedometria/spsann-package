@@ -8,6 +8,7 @@ source('~/PROJECTS/r-packages/spsann/R/optimACDC.R')
 source('~/PROJECTS/r-packages/spsann/R/spSANNtools.R')
 source('~/PROJECTS/r-packages/pedometrics/cooking/utils.R')
 source('~/PROJECTS/r-packages/pedometrics/pkg/pedometrics/R/cramer.R')
+source('~/PROJECTS/r-packages/pedometrics/pkg/pedometrics/R/cont2cat.R')
 # PREPARE DATA #################################################################
 data(meuse.grid)
 candidates <- meuse.grid[, 1:2]
@@ -59,37 +60,29 @@ tmp <- optimACDC(points = points, candidates = candidates, covars = covars,
                  sim.nadir = sim.nadir)
 #
 # 2) CATEGORICAL COVARIATES USING THE COORDINATES ##############################
-# Error in breaks[, i] : incorrect number of dimensions
+# The following error appeared when the number of points is small (n = 5, 
+# seed = 2001):
+# Error in chisq.test(x[, i], x[, j], correct = FALSE) : 
+#  'x' and 'y' must have at least 2 levels
+# This error occurs because all points lie in the same class for one or more
+# covariates.
 #
-cont2cat <-
-  function (covars, breaks) {
-    for (i in 1:ncol(covars)) {
-      covars[, i] <- cut2(covars[, i], breaks[[i]])
-    }
-    return (covars)
-  }
 covars <- meuse.grid[, c(6, 7)]
-points <- 5
+points <- 10
 x.max <- diff(bbox(boundary)[1, ])
 y.min <- x.min <- 40
 y.max <- diff(bbox(boundary)[2, ])
-iterations <- 1000
+iterations <- 100
 acceptance <- list(initial = 0.99, cooling = iterations / 10)
 weights <- list(strata = 0.5, correl = 0.5)
 continuous <- FALSE
 use.coords <- TRUE
 stopping <- list(max.count = iterations / 10)
-sim.nadir <- 1000
+sim.nadir <- 10
 strata.type <- "equal.area"
 plotit <- TRUE
 progress <- TRUE
 verbose <- TRUE
 set.seed(2001)
-tmp <- optimACDC(points = points, candidates = candidates, covars = covars, 
-                 continuous = continuous, use.coords = use.coords, 
-                 x.max = x.max, x.min = x.min, y.max = y.max, y.min = y.min, 
-                 boundary = boundary, iterations = iterations, 
-                 weights = weights, acceptance = acceptance, 
-                 sim.nadir = sim.nadir, stopping = stopping, plotit = plotit,
-                 progress = progress, verbose = verbose, 
-                 strata.type = strata.type)
+tmp <- optimACDC(points = points, candidates = candidates, covars = covars, continuous = continuous, use.coords = use.coords, x.max = x.max, x.min = x.min, y.max = y.max, y.min = y.min, boundary = boundary, iterations = iterations, weights = weights, acceptance = acceptance, sim.nadir = sim.nadir, stopping = stopping, plotit = plotit, progress = progress, verbose = verbose, strata.type = strata.type)
+
