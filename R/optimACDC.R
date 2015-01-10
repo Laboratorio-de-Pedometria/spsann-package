@@ -301,6 +301,15 @@ optimACDC <-
 # Now we define the breaks and the distribution, and return it as a list
 # Quantiles now honour the fact that the data are discontinuous
 # NOTE: there is a problem when the number of unique values is small (3)
+<<<<<<< HEAD
+=======
+n.pts <- 5
+covars <- data.frame(x = 1:15)
+covars <- data.frame(x = c(1, 5, 1, 3, 4, 1, 2, 3, 2, 1, 8, 9, 9, 9, 9))
+covars <- data.frame(x = c(1, 5, 1, 3, 4, 9, 2, 3, 2, 9, 8, 9, 9, 9, 9))
+covars <- data.frame(x = c(1, 5, 1, 5, 4, 5, 2, 3, 2, 5, 8, 5, 5, 9, 9))
+
+>>>>>>> 96ea109d77d7ed85ac1473a0689d3806ee47f07d
 .contStrata <-
   function (n.pts, covars, strata.type) {
     
