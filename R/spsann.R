@@ -30,8 +30,7 @@
 #' @author Author and Maintainer: Alessandro Samuel-Rosa
 #' \email{alessandrosamuelrosa@@gmail.com}
 #' 
-#' @section Origin and support
-#' 
+#' @section Support:
 #' The \strong{spsann} package was initially developed as part of the PhD
 #' research project entitled \sQuote{Contribution to the Construction of Models
 #' for Predicting Soil Properties}, developed by Alessandro Samuel-Rosa
@@ -42,8 +41,7 @@
 #' 2016 by the CAPES Foundation, Ministry of Education of Brazil, and the CNPq
 #' Foundation, Ministry of Science and Technology of Brazil.
 #' 
-#' @section Contributors
-#' 
+#' @section Contributors:
 #' Some of the solutions used to build the \strong{spsann} functions were found 
 #' in the source code of other R-packages. The skeleton of the optimization
 #' functions was adopted from the \pkg{intamapInteractive}, authored by

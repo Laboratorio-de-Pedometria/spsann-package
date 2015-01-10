@@ -60,7 +60,8 @@
 #' @seealso \code{\link[clhs]{clhs}}
 #' @keywords spatial optimize
 #' @concept simulated annealing
-#' @import pedometrics
+#' @import pedometrics SpatialTools
+#' @export
 #' @examples
 #' require(sp)
 #' require(rgeos)

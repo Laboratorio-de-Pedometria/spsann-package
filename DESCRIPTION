@@ -5,11 +5,13 @@ Version: 0.0.0.9000
 Date: 2015-01-08
 Author: Alessandro Samuel-Rosa
 Maintainer: Alessandro Samuel-Rosa <alessandrosamuelrosa@gmail.com>
-Description: spsann offers many optimizing criteria for sampling for variogram 
-estimation (PPL), trend estimation (ACDC), and spatial interpolation (MSSD). 
-spsann also includes an optimizing criterion for when the model of spatial 
-variation is known (MUKV). PPL, ACDC and MSSD were combined (PAN) for sampling
-when we are ignorant about the model of spatial variation.
+Description: spsann offers many optimizing criteria for sampling for variogram
+    estimation (PPL), trend estimation (ACDC), and spatial
+    interpolation (MSSD). spsann also includes an optimizing criterion
+    for when the model of spatial variation is known (MUKV). PPL, ACDC
+    and MSSD were combined (PAN) for sampling when we are ignorant
+    about the model of spatial variation.
 License: GPL (>= 2)
-Imports: Rcpp (>= 0.11.3)
+Imports:
+    Rcpp (>= 0.11.3)
 LinkingTo: Rcpp

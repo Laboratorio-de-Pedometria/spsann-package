@@ -5,14 +5,71 @@
 
 using namespace Rcpp;
 
-// rcpp_hello_world
-List rcpp_hello_world();
-RcppExport SEXP spsann_rcpp_hello_world() {
+// calcMSSDCpp
+double calcMSSDCpp(NumericMatrix x);
+RcppExport SEXP spsann_calcMSSDCpp(SEXP xSEXP) {
 BEGIN_RCPP
     SEXP __sexp_result;
     {
         Rcpp::RNGScope __rngScope;
-        List __result = rcpp_hello_world();
+        Rcpp::traits::input_parameter< NumericMatrix >::type x(xSEXP );
+        double __result = calcMSSDCpp(x);
+        PROTECT(__sexp_result = Rcpp::wrap(__result));
+    }
+    UNPROTECT(1);
+    return __sexp_result;
+END_RCPP
+}
+// spJitterCpp
+IntegerVector spJitterCpp(NumericMatrix x, NumericMatrix y, double xmax, double xmin, double ymax, double ymin, int idx);
+RcppExport SEXP spsann_spJitterCpp(SEXP xSEXP, SEXP ySEXP, SEXP xmaxSEXP, SEXP xminSEXP, SEXP ymaxSEXP, SEXP yminSEXP, SEXP idxSEXP) {
+BEGIN_RCPP
+    SEXP __sexp_result;
+    {
+        Rcpp::RNGScope __rngScope;
+        Rcpp::traits::input_parameter< NumericMatrix >::type x(xSEXP );
+        Rcpp::traits::input_parameter< NumericMatrix >::type y(ySEXP );
+        Rcpp::traits::input_parameter< double >::type xmax(xmaxSEXP );
+        Rcpp::traits::input_parameter< double >::type xmin(xminSEXP );
+        Rcpp::traits::input_parameter< double >::type ymax(ymaxSEXP );
+        Rcpp::traits::input_parameter< double >::type ymin(yminSEXP );
+        Rcpp::traits::input_parameter< int >::type idx(idxSEXP );
+        IntegerVector __result = spJitterCpp(x, y, xmax, xmin, ymax, ymin, idx);
+        PROTECT(__sexp_result = Rcpp::wrap(__result));
+    }
+    UNPROTECT(1);
+    return __sexp_result;
+END_RCPP
+}
+// updateMSSDCpp
+NumericMatrix updateMSSDCpp(NumericMatrix x1, NumericMatrix x2, NumericMatrix dm, int idx);
+RcppExport SEXP spsann_updateMSSDCpp(SEXP x1SEXP, SEXP x2SEXP, SEXP dmSEXP, SEXP idxSEXP) {
+BEGIN_RCPP
+    SEXP __sexp_result;
+    {
+        Rcpp::RNGScope __rngScope;
+        Rcpp::traits::input_parameter< NumericMatrix >::type x1(x1SEXP );
+        Rcpp::traits::input_parameter< NumericMatrix >::type x2(x2SEXP );
+        Rcpp::traits::input_parameter< NumericMatrix >::type dm(dmSEXP );
+        Rcpp::traits::input_parameter< int >::type idx(idxSEXP );
+        NumericMatrix __result = updateMSSDCpp(x1, x2, dm, idx);
+        PROTECT(__sexp_result = Rcpp::wrap(__result));
+    }
+    UNPROTECT(1);
+    return __sexp_result;
+END_RCPP
+}
+// updatePPLCpp
+NumericMatrix updatePPLCpp(NumericMatrix x, NumericMatrix dm, int idx);
+RcppExport SEXP spsann_updatePPLCpp(SEXP xSEXP, SEXP dmSEXP, SEXP idxSEXP) {
+BEGIN_RCPP
+    SEXP __sexp_result;
+    {
+        Rcpp::RNGScope __rngScope;
+        Rcpp::traits::input_parameter< NumericMatrix >::type x(xSEXP );
+        Rcpp::traits::input_parameter< NumericMatrix >::type dm(dmSEXP );
+        Rcpp::traits::input_parameter< int >::type idx(idxSEXP );
+        NumericMatrix __result = updatePPLCpp(x, dm, idx);
         PROTECT(__sexp_result = Rcpp::wrap(__result));
     }
     UNPROTECT(1);
