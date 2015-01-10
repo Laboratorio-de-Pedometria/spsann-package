@@ -68,7 +68,7 @@ Increasing the initial acceptance probability does not guarantee the
 independence from the starting system configuration. The most efficient
 option in the current implementation of the spatial simulated annealing
 algorithm is to start using the entire spatial domain as search graph. This
-is set using the interval of the x and y coodinates to set `x.max`
+is set using the interval of the x and y coordinates to set `x.max`
 and `y.max` (See above).
 
 An alternative is to start jittering (randomly perturbing) several points at
@@ -277,7 +277,7 @@ distribution:
 resulting <- c(5, 2, 5, 10, 10)
 ```
 
-Now the objective will be to increse the number of points in the second lag
+Now the objective will be to increase the number of points in the second lag
 ($n = 2$). The optimization continues until it is not possible to increase the
 number of points in any of the lags, that is, when:
 
@@ -289,7 +289,7 @@ This shows that the result of using `criterion = "minimum"` is similar to using
 `criterion = "distribution"`. However, the resulting sample pattern can be
 significantly different. The running time of each iteration can be a bit longer
 when using `criterion = "distribution"`, but since it is a more sensitive
-criteriom (it takes all lags into account), convergence is likely to be
+criterion (it takes all lags into account), convergence is likely to be
 attained with a smaller number of iterations. Note that this also depends on
 the other parameters passed to the optimization algorithm.
 
@@ -297,7 +297,7 @@ It is important to note that using the first criterion (`"distribution"`) in
 simulated annealing corresponds to a **minimization** problem. On the other
 hand, using the second criterion (`"minimum"`) would correspond to a
 **maximization** problem. We solve this inconsistency substituting the criterion
-that has to be maximized by its inverse. For conveninence we multiply the
+that has to be maximized by its inverse. For convenience we multiply the
 resulting value by a constant (i.e. $c / x + 1$, where $c$ is the number of
 points and $x$ is the criterion value). This procedure allows us to define both
 problems as minimization problems.
@@ -338,10 +338,11 @@ $f^{max}_{i} = n / 0 + 1 = n$.
 
 ### Association/correlation and marginal distribution of the covariates - ACDC
 
-`optimACDC()` can deal with both *numeric* and *factor* covariates. We define
-the covariates as *numeric* and *factor* covariates instead of *continuous* and
-*categorical* covariates because the last is not an appropriate definition. We
-show bellow that this is specially important for *numeric* covariates.
+The current version of `optimACDC()` accepts either *numeric* or *factor*
+covariates. We define the covariates as *numeric* and *factor* covariates
+instead of *continuous* and *categorical* covariates because the last is not an
+appropriate definition. We show bellow that this is specially important for
+*numeric* covariates.
 
 #### Numeric covariates
 
@@ -372,31 +373,25 @@ the covariate. The example bellow shows that although we can estimate 5 sampling
 strata for a covariate composed of 15 values, many of the break points do not
 exist in the covariate, such as 2.6 and 4.4:
 
- ```
- > n.pts <- 5
- > covars <- data.frame(x = c(1, 5, 1, 3, 4, 1, 2, 3, 2, 1, 8, 9, 9, 9, 9))
- > probs <- seq(0, 1, length.out = n.pts + 1)
- > breaks <- lapply(covars, quantile, probs, na.rm = TRUE)
- > breaks
- $x
- 0%  20%  40%  60%  80% 100%
- 1.0  1.0  2.6  4.4  9.0  9.0
- ```
+```{r, message=FALSE}
+n.pts <- 5
+covars <- data.frame(x = c(1, 5, 1, 3, 4, 1, 2, 3, 2, 1, 8, 9, 9, 9, 9))
+probs <- seq(0, 1, length.out = n.pts + 1)
+breaks <- lapply(covars, quantile, probs, na.rm = TRUE)
+breaks
+```
 
 `optimACDC()` solves this problem using a discontinuous function to calculate
-the quantiles - see *Definition 3* of Hyndman & Fan (1996), which is implemented
-in the function `quantile(..., type = 3)`. This function was chosen because it
-produced the best break points for a set of covariates with different
-distributions. It was the only one to produce the exact break points for a
-uniformly distributed variable. For the example above, the quantiles
+the quantiles - see *Definition 3* of Hyndman & Fan (1996), which is 
+implemented in the function `quantile(..., type = 3)`. This function was chosen 
+because it produced the best break points for a set of covariates with 
+different distributions. It was the only one to produce the exact break points  
+for a uniformly distributed variable. For the example above, the quantiles
 now honour the fact that the covariate is numeric but discontinuous:
 
-```
-> breaks <- lapply(covars, quantile, probs, na.rm = TRUE, type = 3)
-> breaks
-$x
-0%  20%  40%  60%  80% 100%
-1    1    2    4    9    9
+```{r, message=FALSE}
+breaks <- lapply(covars, quantile, probs, na.rm = TRUE, type = 3)
+breaks
 ```
 
 We also see that the *equal area* method has an inherent problem. Because we
@@ -405,83 +400,169 @@ break point may be repeated if that value has a high probability density
 in the covariate. This is what happens with the values 1 and 9. The result is
 that we can only have three strata instead of five:
 
-```
-> breaks <- lapply(breaks, unique)
-> breaks
-$x
-[1] 1 2 4 9
+```{r, message=FALSE}
+breaks <- lapply(breaks, unique)
+breaks
 ```
 
 Because we want to have five sample points while matching the marginal
 distribution of the covariate, the number of points per strata will be
-nonuniform. We solve this counting the number of points of the covariate that
+non-uniform. We solve this counting the number of points of the covariate that
 fall in each of the new strata:
 
-```
-> count <- lapply(1:n_cov, function (i)
-+ hist(covars[, i], breaks[[i]], plot = FALSE)$counts)
-> count <- lapply(1:n_cov, function(i) count[[i]] / sum(count[[i]]) * n.pts)
-> count
-[[1]]
-[1] 2 1 2
+```{r, message=FALSE}
+n_cov <- ncol(covars)
+count <- lapply(1:n_cov, function (i)
+  hist(covars[, i], breaks[[i]], plot = FALSE)$counts)
+count <- lapply(1:n_cov, function(i) count[[i]] / sum(count[[i]]) * n.pts)
+count
 ```
 
 The *equal range* method also has limitations when the covariate is
 discontinuous. Like the *equal area* method, the lower and upper limits of the
-various strata can assume values that do not exist in the covariate. It also may
-create strata containing values that do not exist in the covariate. We see both
-problems bellow:
+various strata can assume values that do not exist in the covariate. It also 
+may create strata containing values that do not exist in the covariate. We see 
+both problems bellow:
 
-```
-> n_cov <- ncol(covars)
-> breaks <- lapply(1:n_cov, function(i)
-+ seq(min(covars[, i]), max(covars[, i]), length.out = n.pts + 1))
-> breaks
-[[1]]
-[1] 1.0 2.6 4.2 5.8 7.4 9.0
-
-> count <- lapply(1:n_cov, function (i)
-+ hist(covars[, i], breaks[[i]], plot = FALSE)$counts)
-> count
-[[1]]
-[1] 6 3 1 0 5
+```{r, message=FALSE}
+n_cov <- ncol(covars)
+breaks <- lapply(1:n_cov, function(i)
+  seq(min(covars[, i]), max(covars[, i]), length.out = n.pts + 1))
+breaks
+count <- lapply(1:n_cov, function (i)
+  hist(covars[, i], breaks[[i]], plot = FALSE)$counts)
+count
 ```
 
 It is clear that the break points calculated are inappropriate for our
 covariate. The fourth strata accommodates values that do not exist in the
-covariate. The current version of `optimACDC()` solves the first problem finding
-the nearest neighbour to each calculated break point. Next we check for possible
-duplicates as it is done for the *equal area* method. Duplicates are likely to
-appear when the number of sample points is larger than the number unique values
-in the covariate.
+covariate. The current version of `optimACDC()` solves the first problem 
+finding the nearest neighbour to each calculated break point. Next we check for 
+possible duplicates as it is done for the *equal area* method. Duplicates are 
+likely to appear when the number of sample points is larger than the number 
+unique values in the covariate.
 
-```
-> d <- lapply(1:n_cov, function(i)
-+ dist2(matrix(breaks[[i]]), matrix(covars[, i])))
-> d <- lapply(1:n_cov, function(i) apply(d[[i]], 1, which.min))
-> breaks <- lapply(1:n_cov, function(i) breaks[[i]] <- covars[d[[i]], i])
-> breaks <- lapply(breaks, unique)
-> breaks
-[[1]]
-[1] 1 3 4 5 8 9
+```{r, message=FALSE}
+require(SpatialTools)
+d <- lapply(1:n_cov, function(i)
+  dist2(matrix(breaks[[i]]), matrix(covars[, i])))
+d <- lapply(1:n_cov, function(i) apply(d[[i]], 1, which.min))
+breaks <- lapply(1:n_cov, function(i) breaks[[i]] <- covars[d[[i]], i])
+breaks <- lapply(breaks, unique)
+breaks
 ```
 
 We use the same strategy used with the *equal area* method to calculate the
 distribution of sample points per strata. The resulting distribution is exactly
-proportional to the existing distribution of points per strata in the covariate.
-As such, non-integer values are commonly obtained:
+proportional to the existing distribution of points per strata in the 
+covariate. As such, non-integer values are commonly obtained:
 
+```{r, message=FALSE}
+count <- lapply(1:n_cov, function (i)
+  hist(covars[, i], breaks[[i]], plot = FALSE)$counts)
+count <- lapply(1:n_cov, function(i)
+  count[[i]] / sum(count[[i]]) * n.pts)
+count
 ```
-> count <- lapply(1:n_cov, function (i)
-+ hist(covars[, i], breaks[[i]], plot = FALSE)$counts)
-> count <- lapply(1:n_cov, function(i)
-+ count[[i]] / sum(count[[i]]) * n.pts)
-> count
-[[1]]
-[1] 2.6666667 0.3333333 0.3333333 0.3333333 1.3333333
+
+##### Geographic coordinates
+
+The geographic coordinates can also be used to optimize the sample pattern
+setting `use.coords = TRUE`. Each of them is taken as a numeric covariate as
+any other numeric covariate passed to `optimACDC()`. If the used wishes to use
+only the geographic coordinates, then they should be passed using the argument
+`covars`.
+
+One must bear in mind that using the geographic coordinates as covariates is 
+not the same as optimizing a sample pattern minimizing the mean squared 
+shortest distance (MSSD) implemented in `optimMSSD()`. The claim of Minasny & 
+McBratney (2006) that their method (cLHS) could take the geographic space into
+account seem to have been the responsible for the misunderstanding. ACDC (and 
+cLHS) is an optimizing criterion concerned with the marginal distribution of 
+the covariates, while MSSD is close to the joint distribution of the 
+covariates. The first aims at trend estimation, the second at spatial 
+interpolation. Using the geographic coordinates with `optimACDC()` will result 
+in a sample pattern that is sub-optimal for spatial interpolation. For a square 
+study area, one possible solution of `optimACDC()` is to locate all sample 
+points in the diagonal.
+
+```{r cLHS, message=FALSE, fig.width=4, fig.height=4}
+# Using geographic coordinates as covariates
+# Possible solution given by optimACDC()
+require(ggplot2)
+x <- y <- 1:5
+qplot(x, y, asp = 1, main = "Coordinates as covariates")
 ```
+
+We recommend that the geographic coordinates be used to optimize the sample
+pattern only if they are to be included in trend estimation. This is useful if 
+there is an evident geographic trend in the data. Use `optimMSSD()` to optimize
+a sample pattern for spatial interpolation.
+
+##### Correlation
+
+We should compute the true population correlation matrix (pcm) and
+then compare it with the sample correlation matrix (scm). Currently, we 
+calculate both correlation matrices as being sample correlation matrices.
 
 #### Factor covariates
+
+*Factor* covariates are commonly known as categorical covariates. We prefer to 
+use the term *factor* because this is the term used in R. Factor covariates 
+include area-class soil maps, geological maps, land use maps, etc.. The user 
+must bear in mind that the current version of `optimACDC()` does not accept 
+numeric and factor covariates for the optimization. This can be seen as a 
+weakness, since the original method of Minasny and McBratney (2006) that was 
+implemented by Roudier et al. (2012) in the R-package **clhs** accepts both 
+numeric and factor covariates. We explain bellow the reason for the change.
+
+The original method of Minasny and McBratney (2006) was formulated as a 
+multi-objective optimization problem. Three objective functions were set. The
+first (O1) was defined so that the sample would reproduce the marginal 
+distribution of the numeric covariates. The second (O2) was concerned with the 
+factor covariates. The goal was to obtain a sample that would reproduce the 
+class proportions. The third (O3) was defined to guarantee that the linear 
+structure present in the population would be reproduced in the sample. The 
+Pearson correlation coefficient was used as a measure of this linear structure.
+
+Two of the objective functions (O1 and O3) were designed to guarantee that the 
+sample would reproduce the features of the numeric covariates. This means that 
+the method inherently gives a larger weight to the numeric covariates. One 
+could view this feature as positive, claiming that the numeric covariates have 
+more information that the factor covariates. We disagree with this view because 
+"information content" is not related with explanatory power: the factor
+covariates might be better predictors than the numeric ones. As such, we see 
+this as a bias. This cannot be corrected by choosing proper weights because the 
+information available usually is insuficient to do so.
+
+The best solution would be to use a measure of association among factor
+covariates as the linear correlation is used for the numeric covariates. The 
+Cramér's *V* can be used for this purpose. The Cramér's *V* is a measure of 
+association between factor covariates that ranges from 0 to 1: the closer to 1, 
+the larger the association between two factor covariates. The Cramér's *V* is 
+given by (Cramér, 1946):
+
+$$V = \sqrt{\frac{\chi^{2}/n}{min(c-1, r-1)}}$$
+
+where $r$ and $c$ are the number of rows and columns of the contingency table, $n$ is the number of observations, and $\chi^{2}$ is the chi-squared statistic.
+
+We do not have a solution to measure the association/correlation among the 
+numeric and factor covariates. As such, we choose to transform any numeric 
+covariate into a factor covariate, and then use the Cramér's *V* is a measure 
+of association. The numeric covariates are categorized using the sampling 
+strata defined above (equal area or equal range). This solution is not without 
+losses. While the Pearson's correlation coefficient shows the degree and 
+direction of the association between two covariates (negative or positive), the 
+Cramér's *V* only measures the degree (weak or strong). We did not make any 
+test to check if there is any negative consequence deriving from our choice. If 
+any, they might become lew important as the number of sample points increases.
+
+#### Utopia and nadir points
+
+The utopia and nadir points can be easily calculated if there is only one 
+covariate. For the (more commom) case in which there are many covariates, the 
+utopia and nadir points have to be estimated using expert knowledge or 
+simulations.
 
 ### Mean squared shortest distance - MSSD
 
@@ -501,7 +582,7 @@ sample point and all prediction locations is calculated. This numeric vector is
 used to replace the column of the matrix of distances which contained the
 distances between the old jittered sample point and all prediction locations.
 The mean squared shortest distance of the new system configuration is then
-calculated using the updated matrix of distances. The whole proceedure is done
+calculated using the updated matrix of distances. The whole procedure is done
 at the C++-level to speed-up the computation.
 
 #### Utopia and nadir points

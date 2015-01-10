@@ -2,8 +2,7 @@
 #' 
 #' Optimize a sample pattern for trend estimaton. The criterion used is 
 #' matching the association/correlation and marginal distribution of the 
-#' covariates (\code{optimACDC}). This is also known as the conditioned Latin 
-#' Hypercube of Minasny and McBratney (2006).
+#' covariates (\code{optimACDC}).
 #' 
 #' @template spJitter_doc
 #' @template spSANN_doc
@@ -30,6 +29,9 @@
 #' information.
 #' 
 #' @details
+#' This method is also known as the conditioned Latin Hypercube of Minasny and
+#' McBratney (2006). Visit the package manual to see the corrections that we
+#' have made in that method.
 #' 
 #' @return
 #' \code{optimACDC} returns a matrix: the optimized sample pattern with 
@@ -88,6 +90,7 @@ optimACDC <-
             stopping = list(max.count = iterations / 10), plotit = TRUE,
             boundary, progress = TRUE, verbose = TRUE) {
     
+    # Check arguments
     if (!is.data.frame(covars)) covars <- as.data.frame(covars)
     check <- .spSANNcheck(points, candidates, x.max, x.min, y.max, y.min,
                           iterations, acceptance, stopping, plotit, boundary,
@@ -101,6 +104,11 @@ optimACDC <-
       par0 <- par()
       on.exit(suppressWarnings(par(par0)))
     }
+    
+    # ASR: this will be used to avoid calculating one of the measures in case
+    #      its weight is equal to zero
+    #use_strata <- ifelse(weights[[1]] == 0, "no", "yes")
+    #use_correl <- ifelse(weights[[2]] == 0, "no", "yes")
     
     # Prepare sample points
     if (length(points) == 1 && is.numint(points)) {
@@ -135,12 +143,11 @@ optimACDC <-
       strata <- .contStrata(n_pts, covars, strata.type)
       nadir <- .contNadir(n_pts, pcm, sim.nadir, candidates, covars, strata)
       scm <- cor(sm, use = "complete.obs")
-      energy0 <- .objCont(sm, strata, pcm, scm, nadir, weights)
+      energy0 <- .objCont(sm, strata, pcm, scm, nadir, weights) 
       
     } else { # Categorical covariates
       pcm <- cramer(covars)
       pop_prop <- lapply(covars, function(x) table(x) / nrow(covars))
-      
       nadir <- .catNadir(sim.nadir, candidates, n_pts, covars, pop_prop, pcm)
       scm <- cramer(sm)
       energy0 <- .objCat(sm, pop_prop, nadir, weights, pcm, scm, n_pts)
@@ -301,15 +308,7 @@ optimACDC <-
 # Now we define the breaks and the distribution, and return it as a list
 # Quantiles now honour the fact that the data are discontinuous
 # NOTE: there is a problem when the number of unique values is small (3)
-<<<<<<< HEAD
-=======
-n.pts <- 5
-covars <- data.frame(x = 1:15)
-covars <- data.frame(x = c(1, 5, 1, 3, 4, 1, 2, 3, 2, 1, 8, 9, 9, 9, 9))
-covars <- data.frame(x = c(1, 5, 1, 3, 4, 9, 2, 3, 2, 9, 8, 9, 9, 9, 9))
-covars <- data.frame(x = c(1, 5, 1, 5, 4, 5, 2, 3, 2, 5, 8, 5, 5, 9, 9))
-
->>>>>>> 96ea109d77d7ed85ac1473a0689d3806ee47f07d
+# TODO: build a function is pedometrics
 .contStrata <-
   function (n.pts, covars, strata.type) {
     
