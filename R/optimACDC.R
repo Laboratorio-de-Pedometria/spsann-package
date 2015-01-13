@@ -280,7 +280,7 @@ optimACDC <-
   }
 # INTERNAL FUNCTION - CHECK ARGUMENTS ##########################################
 .optimACDCcheck <-
-  function (candidates, covars, continuous, weights, use.coords, strata.type) {
+  function (candidates, covars, covar.type, weights, use.coords, strata.type) {
     
     # covars
     if (ncol(covars) < 2 && use.coords == FALSE) {
@@ -387,10 +387,9 @@ optimACDC <-
 #   }
 # INTERNAL FUNCTION - NADIR FOR CONTINUOUS COVARIATES ##########################
 .contNadir <-
-  function (n.pts, pop.cor.mat, nadir, candi, covars, strata) {
+  function (n.pts, pcm, nadir, candi, covars, strata) {
     
-    if (!is.null(nadir[[1]])) {
-      # Simulate the nadir point
+    if (!is.null(nadir[[1]])) { # Simulate the nadir point
       message(paste("simulating ", nadir[[1]], " nadir values...", sep = ""))
       strata_nadir <- vector()
       correl_nadir <- vector()
@@ -403,7 +402,7 @@ optimACDC <-
         counts <- sapply(1:ncol(covars), function (i)
           sum(abs(counts[[i]] - strata[[2]][[i]])))
         strata_nadir[i] <- sum(counts)
-        correl_nadir[i] <- sum(abs(pop.cor.mat - scm))
+        correl_nadir[i] <- sum(abs(pcm - scm))
       }
       res <- list(strata = strata_nadir, correl = correl_nadir)
       a <- attributes(res)
@@ -431,7 +430,7 @@ optimACDC <-
         #         strata_nadir <- strata_nadir * n.cov / 100
         #       }
         #     }
-        #     cor_nadir <- (2 * n.cov) + sum(abs(pop.cor.mat - diag(n.cov)))
+        #     cor_nadir <- (2 * n.cov) + sum(abs(pcm - diag(n.cov)))
         #     cor_nadir <- cor_nadir / 100
       }
     }
