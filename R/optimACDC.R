@@ -24,9 +24,12 @@
 #' \code{"equal.range"}. Defaults to \code{strata.type = "equal.area"}. See
 #' \sQuote{Details} for more information.
 #' 
-#' @param sim.nadir Integer. Number of random realizations to estimate the 
-#' nadir point. Defaults to \code{sim.nadir = 1000}. \sQuote{Details} for more
-#' information.
+#' @param nadir List with three subarguments: \code{sim} -- the number of 
+#' random realizations to estimate the nadir point; \code{user} -- a 
+#' user-defined value; \code{abs} -- logical for calculating the nadir point 
+#' internally. Only simulations are implemented in the current version.
+#' Defaults to \code{nadir = list(sim = 1000, user = NULL, abs = NULL}. See 
+#' \sQuote{Details} for more information.
 #' 
 #' @details
 #' This method is also known as the conditioned Latin Hypercube of Minasny and
@@ -83,12 +86,13 @@
 #' y.max <- diff(bbox(boundary)[2, ])
 #' res <- optimACDC(points, candidates, covars, x.max = x.max, 
 #'                  x.min = x.min, y.max = y.max, y.min = y.min, 
-#'                  boundary = boundary, sim.nadir = 10, iterations = 100)
+#'                  boundary = boundary, nadir = list(10), iterations = 100)
 # MAIN FUNCTION ################################################################
 optimACDC <-
   function (points, candidates, covars, continuous = TRUE,
             weights = list(strata = 0.5, correl = 0.5), use.coords = FALSE,
-            strata.type = "equal.area", sim.nadir = 1000,
+            strata.type = "equal.area",
+            nadir = list(sim = 1000, user = NULL, abs = NULL),
             x.max, x.min, y.max, y.min, iterations,
             acceptance = list(initial = 0.99, cooling = iterations / 10),
             stopping = list(max.count = iterations / 10), plotit = TRUE,
@@ -145,14 +149,14 @@ optimACDC <-
       #      and then compare it with the sample correlation matrix (scm)
       pcm <- cor(covars, use = "complete.obs")
       strata <- .contStrata(n_pts, covars, strata.type)
-      nadir <- .contNadir(n_pts, pcm, sim.nadir, candidates, covars, strata)
+      nadir <- .contNadir(n_pts, pcm, nadir, candidates, covars, strata)      
       scm <- cor(sm, use = "complete.obs")
       energy0 <- .objCont(sm, strata, pcm, scm, nadir, weights) 
       
     } else { # Categorical covariates
       pcm <- pedometrics::cramer(covars)
       pop_prop <- lapply(covars, function(x) table(x) / nrow(covars))
-      nadir <- .catNadir(sim.nadir, candidates, n_pts, covars, pop_prop, pcm)
+      nadir <- .catNadir(nadir, candidates, n_pts, covars, pop_prop, pcm)
       scm <- pedometrics::cramer(sm)
       energy0 <- .objCat(sm, pop_prop, nadir, weights, pcm, scm, n_pts, n_cov)
     }
@@ -382,47 +386,55 @@ optimACDC <-
 #     return (pre.distri)
 #   }
 # INTERNAL FUNCTION - NADIR FOR CONTINUOUS COVARIATES ##########################
-# We now always simulate the nadir point
 .contNadir <-
-  function (n.pts, pop.cor.mat, sim.nadir, candi, covars, strata) {
-    # Maximum absolute value: upper bound is equal to 100
-    # For a single covariate, the lower bound is equal to 0
-    # For the correlation matrix, the lower bound is always equal to 0
-    #     # Absolute nadir point
-    #     if (pre.distri == 1) {
-    #       strata_nadir <- (2 * (n.pts - 1)) * n.cov / 100
-    #     } else {
-    #       if (pre.distri == 0.5) {
-    #         strata_nadir <- 2 * n.pts * n.cov / 100
-    #       } else {
-    #         strata_nadir <- rep(0, n.pts)
-    #         strata_nadir[which.min(pre.distri)] <- n.pts
-    #         strata_nadir <- sum(abs(strata_nadir - pre.distri))*n.cov/100
-    #       }
-    #     }
-    #     cor_nadir <- (2 * n.cov) + sum(abs(pop.cor.mat - diag(n.cov)))
-    #     cor_nadir <- cor_nadir / 100
+  function (n.pts, pop.cor.mat, nadir, candi, covars, strata) {
     
-    # Simulate the nadir point
-    message(paste("simulating ", sim.nadir, " nadir values...", sep = ""))
-    strata_nadir <- vector()
-    correl_nadir <- vector()
-    for (i in 1:sim.nadir) {
-      pts <- sample(c(1:nrow(candi)), n.pts)
-      sm <- covars[pts, ]
-      scm <- cor(sm, use = "complete.obs")
-      counts <- lapply(1:ncol(covars), function (i)
-        hist(sm[, i], strata[[1]][[i]], plot = FALSE)$counts)
-      counts <- sapply(1:ncol(covars), function (i)
-        sum(abs(counts[[i]] - strata[[2]][[i]])))
-      strata_nadir[i] <- sum(counts)
-      correl_nadir[i] <- sum(abs(pop.cor.mat - scm))
+    if (!is.null(nadir[[1]])) {
+      # Simulate the nadir point
+      message(paste("simulating ", nadir[[1]], " nadir values...", sep = ""))
+      strata_nadir <- vector()
+      correl_nadir <- vector()
+      for (i in 1:nadir[[1]]) {
+        pts <- sample(c(1:nrow(candi)), n.pts)
+        sm <- covars[pts, ]
+        scm <- cor(sm, use = "complete.obs")
+        counts <- lapply(1:ncol(covars), function (i)
+          hist(sm[, i], strata[[1]][[i]], plot = FALSE)$counts)
+        counts <- sapply(1:ncol(covars), function (i)
+          sum(abs(counts[[i]] - strata[[2]][[i]])))
+        strata_nadir[i] <- sum(counts)
+        correl_nadir[i] <- sum(abs(pop.cor.mat - scm))
+      }
+      res <- list(strata = strata_nadir, correl = correl_nadir)
+      a <- attributes(res)
+      a$strata_nadir <- mean(strata_nadir) / 100
+      a$correl_nadir <- mean(correl_nadir) / 100
+      attributes(res) <- a
+    } else {
+      if (!is.null(nadir[[2]])) {
+        message("sorry but you cannot set the nadir point")
+      } else {
+        message("sorry but the nadir point cannot be calculated")
+        # Maximum absolute value: upper bound is equal to 100
+        # For a single covariate, the lower bound is equal to 0
+        # For the correlation matrix, the lower bound is always equal to 0
+        #     # Absolute nadir point
+        #     if (pre.distri == 1) {
+        #       strata_nadir <- (2 * (n.pts - 1)) * n.cov / 100
+        #     } else {
+        #       if (pre.distri == 0.5) {
+        #         strata_nadir <- 2 * n.pts * n.cov / 100
+        #       } else {
+        #         strata_nadir <- rep(0, n.pts)
+        #         strata_nadir[which.min(pre.distri)] <- n.pts
+        #         strata_nadir <- sum(abs(strata_nadir - pre.distri))
+        #         strata_nadir <- strata_nadir * n.cov / 100
+        #       }
+        #     }
+        #     cor_nadir <- (2 * n.cov) + sum(abs(pop.cor.mat - diag(n.cov)))
+        #     cor_nadir <- cor_nadir / 100
+      }
     }
-    res <- list(strata = strata_nadir, correl = correl_nadir)
-    a <- attributes(res)
-    a$strata_nadir <- mean(strata_nadir) / 100
-    a$correl_nadir <- mean(correl_nadir) / 100
-    attributes(res) <- a
     return (res)
   }
 # INTERNAL FUNCTION - CRITERION FOR CONTINUOUS COVARIATES ######################
@@ -441,26 +453,34 @@ optimACDC <-
   }
 # INTERNAL FUNCTION - NADIR FOR CATEGORICAL COVARIATES #########################
 .catNadir <-
-  function (sim.nadir, candi, n.pts, covars, pop.prop, pcm) {
-    message("simulating nadir values...")
-    strata_nadir <- vector()
-    correl_nadir <- vector()
-    for (i in 1:sim.nadir) {
-      pts <- sample(c(1:nrow(candi)), n.pts)
-      sm <- covars[pts, ]
-      scm <- pedometrics::cramer(sm)
-      samp_prop <- lapply(sm, function(x) table(x) / n.pts)
-      samp_prop <- sapply(1:ncol(covars), function (i)
-        sum(abs(samp_prop[[i]] - pop.prop[[i]])))
-      strata_nadir[i] <- sum(samp_prop)
-      correl_nadir[i] <- sum(abs(pcm - scm))
+  function (nadir, candi, n.pts, covars, pop.prop, pcm) {
+    if (!is.null(nadir[[1]])) {    
+      message("simulating nadir values...")
+      strata_nadir <- vector()
+      correl_nadir <- vector()
+      for (i in 1:nadir[[1]]) {
+        pts <- sample(c(1:nrow(candi)), n.pts)
+        sm <- covars[pts, ]
+        scm <- pedometrics::cramer(sm)
+        samp_prop <- lapply(sm, function(x) table(x) / n.pts)
+        samp_prop <- sapply(1:ncol(covars), function (i)
+          sum(abs(samp_prop[[i]] - pop.prop[[i]])))
+        strata_nadir[i] <- sum(samp_prop)
+        correl_nadir[i] <- sum(abs(pcm - scm))
+      }
+      res <- list(strata = strata_nadir, correl = correl_nadir)
+      a <- attributes(res)
+      a$strata_nadir <- mean(strata_nadir) / 100
+      a$correl_nadir <- mean(correl_nadir) / 100
+      attributes(res) <- a
+    } else {
+      if (!is.null(nadir[[2]])) {
+        message("sorry but you cannot set the nadir point")
+        } else {
+          message("sorry but the nadir point cannot be calculated")
+        }
     }
-    res <- list(strata = strata_nadir, correl = correl_nadir)
-    a <- attributes(res)
-    a$strata_nadir <- mean(strata_nadir) / 100
-    a$correl_nadir <- mean(correl_nadir) / 100
-    attributes(res) <- a
-    return (res) 
+    return (res)
   }
 # INTERNAL FUNCTION - CRITERION FOR CATEGORICAL COVARIATES #####################
 .objCat <-

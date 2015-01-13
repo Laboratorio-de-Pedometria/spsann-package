@@ -9,6 +9,8 @@ require(Hmisc)
 source('~/PROJECTS/r-packages/spsann/R/optimACDC.R')
 source('~/PROJECTS/r-packages/spsann/R/spSANNtools.R')
 source('~/PROJECTS/r-packages/pedometrics/cooking/utils.R')
+source('~/PROJECTS/r-packages/spsann/R/spJitter.R')
+Rcpp::sourceCpp('src/spJitterCpp.cpp')
 # PREPARE DATA #################################################################
 data(meuse.grid)
 candidates <- meuse.grid[, 1:2]
@@ -30,9 +32,9 @@ acceptance <- list(initial = 0.99, cooling = iterations / 10)
 weights <- list(strata = 0.5, correl = 0.5)
 continuous <- TRUE
 use.coords <- TRUE
-sim.nadir <- 100
+nadir <- list(100)
 set.seed(2001)
-tmp <- optimACDC(points = points, candidates = candidates, covars = covars, continuous = continuous, use.coords = use.coords, x.max = x.max, x.min = x.min, y.max = y.max, y.min = y.min, boundary = boundary, iterations = iterations, weights = weights, acceptance = acceptance, sim.nadir = sim.nadir)
+tmp <- optimACDC(points = points, candidates = candidates, covars = covars, continuous = continuous, use.coords = use.coords, x.max = x.max, x.min = x.min, y.max = y.max, y.min = y.min, boundary = boundary, iterations = iterations, weights = weights, acceptance = acceptance, nadir = nadir)
 # 2) CATEGORICAL COVARIATES ####################################################
 covars <- meuse.grid[, c(6, 7)]
 points <- 100
