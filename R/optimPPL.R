@@ -133,35 +133,6 @@
 # that the functions are working correctly. They should return the total number 
 # of points in \code{points} and the total possible number of point-pairs 
 # \eqn{n \times (n - 1) / 2}, respectively.
-#
-# .pplNadir <-
-#   function (n.pts, n.candi, candi, n.lags, lags, criterion, pre.distri, nadir) {
-#     if (!is.null(nadir[[1]])) {
-#       m <- paste("simulating ", nadir[[1]], " nadir values...", sep = "")
-#       message(m)
-#       res <- vector()
-#       for (i in 1:nadir[[1]]) {
-#         pts <- sample(c(1:n.candi), n.pts)
-#         pts <- candi[pts, ]
-#         dm <- as.matrix(dist(pts[, 2:3], method = "euclidean"))
-#         ppl <- .getPointsPerLag(lags, dm)
-#         if (criterion == "distribution") {
-#           if (is.null(pre.distri)) {
-#             pre.distri <- rep(n.pts, n.lags)
-#           }
-#           res[i] <- sum(pre.distri - ppl)
-#         } else {
-#           if (criterion == "minimum") {
-#             res[i] <- n.pts / (min(ppl) + 1)
-#           }
-#         }
-#       }
-#       a <- attributes(res)
-#       a$ppl <- mean(res) / 100
-#       attributes(res) <- a
-#     }
-#     return (res)
-#   }
 # FUNCTION - MAIN ##############################################################
 optimPPL <-
   function (points, candidates, lags = 7, lags.type = "exponential", 
@@ -186,14 +157,14 @@ optimPPL <-
     }
     
     # Prepare points
+    n_candi <- nrow(candidates)
     if (is.integer(points) || is.numint(points)) {
       n_pts <- points
-      points <- sample(c(1:dim(candidates)[1]), n_pts)
+      points <- sample(c(1:n_candi), n_pts)
       points <- candidates[points, ]
     } else {
       n_pts <- nrow(points)
     }
-    n_candi <- nrow(candidates)
     
     # Prepare lags
     if (length(lags) >= 3) {
@@ -202,7 +173,6 @@ optimPPL <-
       n_lags <- lags
       lags <- .getLagBreaks(lags, lags.type, cutoff, lags.base) 
     }
-    
     sys_config0 <- points
     old_sys_config <- sys_config0
     
@@ -434,25 +404,17 @@ pointsPerLag <-
   }
 # INTERNAL FUNCTION - CALCULATE THE CRITERION VALUE ############################
 .objPointsPerLag <-
-  function (points.per.lag, n.lags, n.pts, criterion = "minimum",
-            pre.distri = NULL) {
+  function (points.per.lag, n.lags, n.pts, criterion, pre.distri = NULL) {
     if (criterion == "distribution") {
-      if (!is.null(pre.distri)) {
-        if (!is.numeric(pre.distri)) {
-          stop ("pre.distri should be of class numeric")
-        }
-        if (length(pre.distri) != n.lags) {
-          stop ("the length of 'pre.distri' should match the number of lags")
-        }
-      } else {
+      if (is.null(pre.distri)) {
         pre.distri <- rep(n.pts, n.lags)
       }
       res <- sum(pre.distri - points.per.lag)
-    } else {
-      if (criterion == "minimum") {
-        res <- n.pts / (min(points.per.lag) + 1)
+      } else {
+        if (criterion == "minimum") {
+          res <- n.pts / (min(points.per.lag) + 1)
+        }
       }
-    }
     return (res)
   }
 # INTERNAL FUNCTION - NUMBER OF POINTS PER LAG DISTANCE CLASS ##################
