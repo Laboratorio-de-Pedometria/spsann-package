@@ -6,3 +6,4 @@ NEWS\.md
 .RData
 battlefield
 build-packages.R
+Rprof.out

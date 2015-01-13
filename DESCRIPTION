@@ -13,5 +13,11 @@ Description: spsann offers many optimizing criteria for sampling for variogram
     about the model of spatial variation.
 License: GPL (>= 2)
 Imports:
-    Rcpp (>= 0.11.3)
+    fields,
+    pedometrics,
+    Rcpp (>= 0.11.3),
+    rgeos,
+    sp,
+    SpatialTools
 LinkingTo: Rcpp
+Encoding: UTF-8

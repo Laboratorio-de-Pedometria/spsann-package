@@ -1,6 +1,7 @@
 # Initial settings
 rm(list = ls())
 gc()
+require(ASRtools)
 require(pedometrics)
 require(sp)
 require(rgeos)
@@ -8,8 +9,6 @@ require(Hmisc)
 source('~/PROJECTS/r-packages/spsann/R/optimACDC.R')
 source('~/PROJECTS/r-packages/spsann/R/spSANNtools.R')
 source('~/PROJECTS/r-packages/pedometrics/cooking/utils.R')
-source('~/PROJECTS/r-packages/pedometrics/pkg/pedometrics/R/cramer.R')
-source('~/PROJECTS/r-packages/pedometrics/pkg/pedometrics/R/cont2cat.R')
 # PREPARE DATA #################################################################
 data(meuse.grid)
 candidates <- meuse.grid[, 1:2]

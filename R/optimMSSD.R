@@ -38,6 +38,7 @@
 #' @keywords spatial optimize
 #' @aliases optimMSSD objMSSD
 #' @concept simulated annealing
+#' @importFrom fields rdist
 #' @export
 #' @examples
 #' require(sp)

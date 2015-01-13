@@ -1,3 +1,4 @@
+#' @importFrom sp bbox
 # INTERNAL FUNCTION - CHECK ARGUMENTS ##########################################
 .spSANNcheck <-
   function (points, candidates, x.max, x.min, y.max, y.min, iterations,

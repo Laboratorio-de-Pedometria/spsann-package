@@ -60,7 +60,10 @@
 #' @seealso \code{\link[clhs]{clhs}}
 #' @keywords spatial optimize
 #' @concept simulated annealing
-#' @import pedometrics SpatialTools
+#' @importFrom pedometrics cramer
+#' @importFrom pedometrics is.numint
+#' @importFrom pedometrics cont2cat
+#' @importFrom SpatialTools dist2
 #' @export
 #' @examples
 #' require(sp)
@@ -80,7 +83,7 @@
 #' y.max <- diff(bbox(boundary)[2, ])
 #' res <- optimACDC(points, candidates, covars, x.max = x.max, 
 #'                  x.min = x.min, y.max = y.max, y.min = y.min, 
-#'                  boundary = boundary, sim.nadir = 1000)
+#'                  boundary = boundary, sim.nadir = 10, iterations = 100)
 # MAIN FUNCTION ################################################################
 optimACDC <-
   function (points, candidates, covars, continuous = TRUE,
@@ -97,8 +100,8 @@ optimACDC <-
                           iterations, acceptance, stopping, plotit, boundary,
                           progress, verbose)
     if (!is.null(check)) stop (check, call. = FALSE)
-    check <- .optimACDCcheck(covars, continuous, weights, use.coords,
-                             strata.type)
+    check <- .optimACDCcheck(candidates, covars, continuous, weights, 
+                             use.coords, strata.type)
     if (!is.null(check)) stop (check, call. = FALSE)
     
     if (plotit) {
@@ -112,7 +115,7 @@ optimACDC <-
     #use_correl <- ifelse(weights[[2]] == 0, "no", "yes")
     
     # Prepare sample points
-    if (length(points) == 1 && is.numint(points)) {
+    if (length(points) == 1 && pedometrics::is.numint(points)) {
       n_pts <- points
       points <- sample(1:nrow(candidates), n_pts)
       points <- candidates[points, ]
@@ -147,11 +150,11 @@ optimACDC <-
       energy0 <- .objCont(sm, strata, pcm, scm, nadir, weights) 
       
     } else { # Categorical covariates
-      pcm <- cramer(covars)
+      pcm <- pedometrics::cramer(covars)
       pop_prop <- lapply(covars, function(x) table(x) / nrow(covars))
       nadir <- .catNadir(sim.nadir, candidates, n_pts, covars, pop_prop, pcm)
-      scm <- cramer(sm)
-      energy0 <- .objCat(sm, pop_prop, nadir, weights, pcm, scm, n_pts)
+      scm <- pedometrics::cramer(sm)
+      energy0 <- .objCat(sm, pop_prop, nadir, weights, pcm, scm, n_pts, n_cov)
     }
     
     # Other settings for the simulated annealing algorithm
@@ -188,9 +191,9 @@ optimACDC <-
       } else { # Categorical covariates
         new_row <- covars[new_conf[wp, 1], ]
         new_sm[wp, ] <- new_row
-        new_scm <- cramer(new_sm)
-        new_energy <- .objCat(new_sm, pop_prop, nadir, weights, pcm, new_scm,
-                              n_pts)
+        new_scm <- pedometrics::cramer(new_sm)
+        new_energy <- .objCat(new_sm, pop_prop, nadir, weights, pcm,
+                              new_scm, n_pts, n_cov)
       }
       
       # Evaluate the new system configuration
@@ -273,7 +276,7 @@ optimACDC <-
   }
 # INTERNAL FUNCTION - CHECK ARGUMENTS ##########################################
 .optimACDCcheck <-
-  function (covars, continuous, weights, use.coords, strata.type) {
+  function (candidates, covars, continuous, weights, use.coords, strata.type) {
     
     # covars
     if (ncol(covars) < 2 && use.coords == FALSE) {
@@ -334,7 +337,7 @@ optimACDC <-
         breaks <- lapply(1:n_cov, function(i)
           seq(min(covars[, i]), max(covars[, i]), length.out = n.pts + 1))
         d <- lapply(1:n_cov, function(i)
-          dist2(matrix(breaks[[i]]), matrix(covars[, i])))
+          SpatialTools::dist2(matrix(breaks[[i]]), matrix(covars[, i])))
         d <- lapply(1:n_cov, function(i) apply(d[[i]], 1, which.min))
         breaks <- lapply(1:n_cov, function(i) breaks[[i]] <- covars[d[[i]], i])
         breaks <- lapply(breaks, unique)
@@ -407,7 +410,6 @@ optimACDC <-
     for (i in 1:sim.nadir) {
       pts <- sample(c(1:nrow(candi)), n.pts)
       sm <- covars[pts, ]
-      if (ncol(covars) == 1) sm <- data.frame(sm)
       scm <- cor(sm, use = "complete.obs")
       counts <- lapply(1:ncol(covars), function (i)
         hist(sm[, i], strata[[1]][[i]], plot = FALSE)$counts)
@@ -446,7 +448,7 @@ optimACDC <-
     for (i in 1:sim.nadir) {
       pts <- sample(c(1:nrow(candi)), n.pts)
       sm <- covars[pts, ]
-      scm <- cramer(sm)
+      scm <- pedometrics::cramer(sm)
       samp_prop <- lapply(sm, function(x) table(x) / n.pts)
       samp_prop <- sapply(1:ncol(covars), function (i)
         sum(abs(samp_prop[[i]] - pop.prop[[i]])))
@@ -462,9 +464,9 @@ optimACDC <-
   }
 # INTERNAL FUNCTION - CRITERION FOR CATEGORICAL COVARIATES #####################
 .objCat <-
-  function (sm, pop.prop, nadir, weights, pcm, scm, n.pts) {
+  function (sm, pop.prop, nadir, weights, pcm, scm, n.pts, n.cov) {
     samp_prop <- lapply(sm, function(x) table(x) / n.pts)
-    samp_prop <- sapply(1:ncol(covars), function (i)
+    samp_prop <- sapply(1:n.cov, function (i)
       sum(abs(samp_prop[[i]] - pop.prop[[i]])))
     obj_cat <- sum(samp_prop) / attr(nadir, "strata")
     obj_cat <- obj_cat * weights[[1]]
