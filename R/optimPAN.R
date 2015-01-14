@@ -1,104 +1,30 @@
-# INTERNAL FUNCTION - CALCULATE NADIR ##########################################
-.panNadir <-
-  function (n.pts, n.candi, candi, n.lags, lags, ppl.criterion, pre.distri,
-            nadir, n.cov, covars, covars.type, pop.prop, pcm, strata) {
-    
-    if (!is.null(nadir[[1]]) && !is.null(nadir[[2]])) { # Simulate the nadir
-      m <- paste("simulating ", nadir[[1]], " nadir values...", sep = "")
-      message(m)
-      
-      # SET VARIABLES
-      ppl_nadir <- vector()
-      strata_nadir <- vector()
-      correl_nadir <- vector()
-      mssd_nadir <- vector()
-      
-      # BEGIN THE SIMULATION
-      for (i in 1:nadir[[1]]) {
-        pts <- sample(1:n.candi, n.pts)
-        sm <- covars[pts, ]
-        pts <- candi[pts, ]
-        
-        # ppl
-        dm_ppl <- as.matrix(dist(pts[, 2:3], method = "euclidean"))
-        ppl <- .getPointsPerLag(lags, dm_ppl)
-        if (ppl.criterion == "distribution") {
-          if (is.null(pre.distri)) {
-            pre.distri <- rep(n.pts, n.lags)
-          }
-          ppl_nadir[i] <- sum(pre.distri - ppl)
-        } else {
-          if (ppl.criterion == "minimum") {
-            ppl_nadir[i] <- n.pts / (min(ppl) + 1)
-          }
-        }
-        
-        # acdc
-        if (covars.type == "numeric") { # numeric covariates
-          scm <- cor(sm, use = "complete.obs",  method = "pearson")
-          counts <- lapply(1:n.cov, function (i)
-            hist(sm[, i], strata[[1]][[i]], plot = FALSE)$counts)
-          counts <- sapply(1:n.cov, function (i)
-            sum(abs(counts[[i]] - strata[[2]][[i]])))
-          strata_nadir[i] <- sum(counts)
-          correl_nadir[i] <- sum(abs(pcm - scm))
-          
-        } else { # factor covariates
-          if (covars.type == "factor") {
-            scm <- pedometrics::cramer(sm)
-            samp_prop <- lapply(sm, function(x) table(x) / n.pts)
-            samp_prop <- sapply(1:n.cov, function (i)
-              sum(abs(samp_prop[[i]] - pop.prop[[i]])))
-            strata_nadir[i] <- sum(samp_prop)
-            correl_nadir[i] <- sum(abs(pcm - scm))
-          }
-        }
-        
-        # mssd
-        dm_mssd <- fields::rdist(candi[, 2:3], pts[, 2:3])
-        mssd_nadir[i] <- .calcMSSDCpp(dm_mssd)
-      }
-      
-      # SHOULD WE SAVE AND RETURN THE SIMULATED VALUES?
-      # ASR: We compute the mean simulated value and return it as an attribute
-      #      because we want to explore the simulated values in the future.
-      if (nadir[[2]]) {
-        res <- list(ppl = ppl_nadir, strata = strata_nadir, 
-                    correl = correl_nadir, mssd_nadir = mssd_nadir)
-      } else {
-        res <- list(ppl = "ppl_nadir", strata = "strata_nadir", 
-                    correl = "correl_nadir", mssd_nadir = "mssd_nadir")
-      }
-      a <- attributes(res)
-      a$ppl_nadir <- mean(ppl_nadir) / 100
-      a$strata_nadir <- mean(strata_nadir) / 100
-      a$correl_nadir <- mean(correl_nadir) / 100
-      a$mssd_nadir <- mean(mssd_nadir) / 100
-      attributes(res) <- a
-      
-      # ASR: Other options are not available yet.
-    } else {
-      if (!is.null(nadir[[3]])) {
-        } else {
-        }
-    }
-    return (res)
-  }
+#' Optimization of sample patterns for variogram and trend estimation,
+#' and spatial interpolation
+#' 
+#' Optimize a sample pattern for variogram and trend estimation, and spatial
+#' interpolation. The criteria used are the number of points or point-pairs per
+#' lag distance class (PPL), matching the association/correlation and marginal
+#' distribution of the covariates (ACDC), and the mean squared shortest 
+#' distance (MSSD).
+#' 
+#' @template spJitter_doc
+#' @template spSANN_doc
+#' 
+#' 
 # MAIN FUNCTION ################################################################
 optimPAN <-
   function (points, candidates, x.max, x.min, y.max, y.min, iterations = 10000,
             acceptance = list(initial = 0.99, cooling = iterations / 10),
             stopping = list(max.count = iterations / 10),
-            # PPL arguments
-            lags = 7, lags.type = "exponential", lags.base = 2, cutoff = NULL,
-            ppl.criterion = "distribution", pre.distri = NULL,
-            # ACDC arguments
-            covars, covars.type = "numeric", strata.type = "equal.area", 
-            use.coords = FALSE, weights.ACDC = list(strata = 0.5, correl = 0.5),
-            # PAN arguments
-            weights.PAN = list(PPL = 1/3, ACDC = 1/3, MSSD = 1/3),
-            nadir = list(sim = 1000, save.sim = TRUE, user = NULL, abs = NULL), 
-            # Other
+            PPL = list(lags = 7, lags.type = "exponential", lags.base = 2,
+                        cutoff = NULL, criterion = "distribution", 
+                        pre.distri = NULL),
+            ACDC = list(covars, covars.type = "numeric", 
+                        strata.type = "equal.area", use.coords = FALSE, 
+                        weights = list(strata = 0.5, correl = 0.5)),
+            PAN = list(weights = list(PPL = 1/3, ACDC = 1/3, MSSD = 1/3),
+                       nadir = list(sim = 1000, save.sim = TRUE, user = NULL,
+                                    abs = NULL)),
             plotit = TRUE, boundary, progress = TRUE, verbose = TRUE) {
     
     # Check arguments
@@ -107,13 +33,13 @@ optimPAN <-
                           iterations, acceptance, stopping, plotit, boundary,
                           progress, verbose)
     if (!is.null(check)) stop (check, call. = FALSE)
-    check <- .optimPPLcheck(lags, lags.type, lags.base, cutoff, ppl.criterion, 
-                            pre.distri)
+    check <- .optimPPLcheck(PPL$lags, PPL$lags.type, PPL$lags.base, PPL$cutoff,
+                            PPL$criterion, PPL$pre.distri)
     if (!is.null(check)) stop (check, call. = FALSE)    
-    check <- .optimACDCcheck(candidates, covars, covars.type, weights.ACDC, 
-                             use.coords, strata.type)
+    check <- .optimACDCcheck(candidates, ACDC$covars, ACDC$covars.type, 
+                             ACDC$weights, ACDC$use.coords, ACDC$strata.type)
     if (!is.null(check)) stop (check, call. = FALSE)
-    check <- .optimPANcheck(weights.PAN, nadir)
+    check <- .optimPANcheck(PAN$weights, PAN$nadir)
     if (!is.null(check)) stop (check, call. = FALSE)
     
     if (plotit) {
@@ -133,8 +59,13 @@ optimPAN <-
     conf0 <- points
     old_conf <- conf0
     
-    # CALCULATE BASE DATASETS, NADIR POINT AND INITIAL ENERGY STATE
+    # BASE VARIABLES AND DATASETS, NADIR POINT AND INITIAL ENERGY STATE
     # ppl
+    lags      <- PPL$lags
+    lags.type <- PPL$lags.type
+    cutoff    <- PPL$cutoff
+    lags.base <- PPL$lags.base
+    criterion <- PPL$criterion
     if (length(lags) >= 3) {
       n_lags <- length(lags) - 1
     } else {
@@ -143,13 +74,13 @@ optimPAN <-
     }
     dm_ppl <- as.matrix(dist(conf0[, 2:3], method = "euclidean"))
     ppl <- .getPointsPerLag(lags, dm_ppl)
-    energy0_ppl <- .objPointsPerLag(points.per.lag = ppl, n.lags = n_lags, 
-                                    n.pts = n_pts, criterion = ppl.criterion,
-                                    pre.distri = pre.distri)
+    energy0_ppl <- .objPointsPerLag(ppl, n_lags, n_pts, criterion, pre.distri)
+    
     # mssd
     dm_mssd <- fields::rdist(candidates[, 2:3], conf0[, 2:3])
     
     # acdc
+    
     if (use.coords) {
       if (covars.type == "factor") {
         coords <- data.frame(candidates[, 2:3])
@@ -369,7 +300,6 @@ optimPAN <-
     res <- .spSANNout(new_conf, energy0, energies, time0)
     return (res)
   }
-
 # INTERNAL FUNCTION - CHECK ARGUMENTS ##########################################
 .optimPANcheck <-
   function (weights.PAN, nadir) {
@@ -410,4 +340,90 @@ optimPAN <-
        return (res)
       }
     }
+  }
+# INTERNAL FUNCTION - CALCULATE NADIR ##########################################
+.panNadir <-
+  function (n.pts, n.candi, candi, n.lags, lags, ppl.criterion, pre.distri,
+            nadir, n.cov, covars, covars.type, pop.prop, pcm, strata) {
+    
+    if (!is.null(nadir[[1]]) && !is.null(nadir[[2]])) { # Simulate the nadir
+      m <- paste("simulating ", nadir[[1]], " nadir values...", sep = "")
+      message(m)
+      
+      # SET VARIABLES
+      ppl_nadir <- vector()
+      strata_nadir <- vector()
+      correl_nadir <- vector()
+      mssd_nadir <- vector()
+      
+      # BEGIN THE SIMULATION
+      for (i in 1:nadir[[1]]) {
+        pts <- sample(1:n.candi, n.pts)
+        sm <- covars[pts, ]
+        pts <- candi[pts, ]
+        
+        # ppl
+        dm_ppl <- as.matrix(dist(pts[, 2:3], method = "euclidean"))
+        ppl <- .getPointsPerLag(lags, dm_ppl)
+        if (ppl.criterion == "distribution") {
+          if (is.null(pre.distri)) {
+            pre.distri <- rep(n.pts, n.lags)
+          }
+          ppl_nadir[i] <- sum(pre.distri - ppl)
+        } else {
+          if (ppl.criterion == "minimum") {
+            ppl_nadir[i] <- n.pts / (min(ppl) + 1)
+          }
+        }
+        
+        # acdc
+        if (covars.type == "numeric") { # numeric covariates
+          scm <- cor(sm, use = "complete.obs",  method = "pearson")
+          counts <- lapply(1:n.cov, function (i)
+            hist(sm[, i], strata[[1]][[i]], plot = FALSE)$counts)
+          counts <- sapply(1:n.cov, function (i)
+            sum(abs(counts[[i]] - strata[[2]][[i]])))
+          strata_nadir[i] <- sum(counts)
+          correl_nadir[i] <- sum(abs(pcm - scm))
+          
+        } else { # factor covariates
+          if (covars.type == "factor") {
+            scm <- pedometrics::cramer(sm)
+            samp_prop <- lapply(sm, function(x) table(x) / n.pts)
+            samp_prop <- sapply(1:n.cov, function (i)
+              sum(abs(samp_prop[[i]] - pop.prop[[i]])))
+            strata_nadir[i] <- sum(samp_prop)
+            correl_nadir[i] <- sum(abs(pcm - scm))
+          }
+        }
+        
+        # mssd
+        dm_mssd <- fields::rdist(candi[, 2:3], pts[, 2:3])
+        mssd_nadir[i] <- .calcMSSDCpp(dm_mssd)
+      }
+      
+      # SHOULD WE SAVE AND RETURN THE SIMULATED VALUES?
+      # ASR: We compute the mean simulated value and return it as an attribute
+      #      because we want to explore the simulated values in the future.
+      if (nadir[[2]]) {
+        res <- list(ppl = ppl_nadir, strata = strata_nadir, 
+                    correl = correl_nadir, mssd_nadir = mssd_nadir)
+      } else {
+        res <- list(ppl = "ppl_nadir", strata = "strata_nadir", 
+                    correl = "correl_nadir", mssd_nadir = "mssd_nadir")
+      }
+      a <- attributes(res)
+      a$ppl_nadir <- mean(ppl_nadir) / 100
+      a$strata_nadir <- mean(strata_nadir) / 100
+      a$correl_nadir <- mean(correl_nadir) / 100
+      a$mssd_nadir <- mean(mssd_nadir) / 100
+      attributes(res) <- a
+      
+      # ASR: Other options are not available yet.
+    } else {
+      if (!is.null(nadir[[3]])) {
+      } else {
+      }
+    }
+    return (res)
   }
