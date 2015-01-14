@@ -28,7 +28,7 @@ optimPAN <-
             plotit = TRUE, boundary, progress = TRUE, verbose = TRUE) {
     
     # Check arguments
-    if (!is.data.frame(covars)) covars <- as.data.frame(covars)
+    if (!is.data.frame(ACDC$covars)) ACDC$covars <- as.data.frame(ACDC$covars)
     check <- .spSANNcheck(points, candidates, x.max, x.min, y.max, y.min,
                           iterations, acceptance, stopping, plotit, boundary,
                           progress, verbose)
@@ -60,12 +60,14 @@ optimPAN <-
     old_conf <- conf0
     
     # BASE VARIABLES AND DATASETS, NADIR POINT AND INITIAL ENERGY STATE
+    nadir <- PAN$nadir
     # ppl
-    lags      <- PPL$lags
-    lags.type <- PPL$lags.type
-    cutoff    <- PPL$cutoff
-    lags.base <- PPL$lags.base
-    criterion <- PPL$criterion
+    lags       <- PPL$lags
+    lags.type  <- PPL$lags.type
+    cutoff     <- PPL$cutoff
+    lags.base  <- PPL$lags.base
+    criterion  <- PPL$criterion
+    pre.distri <- PPL$pre.distri
     if (length(lags) >= 3) {
       n_lags <- length(lags) - 1
     } else {
@@ -80,47 +82,49 @@ optimPAN <-
     dm_mssd <- fields::rdist(candidates[, 2:3], conf0[, 2:3])
     
     # acdc
-    
+    use.coords  <- ACDC$use.coords
+    covars.type <- ACDC$covars.type
+    strata.type <- ACDC$strata.type
     if (use.coords) {
       if (covars.type == "factor") {
         coords <- data.frame(candidates[, 2:3])
         breaks <- .contStrata(n_pts, coords, strata.type)[[1]]
         coords <- pedometrics::cont2cat(coords, breaks)
-        covars <- data.frame(covars, coords)
+        ACDC$covars <- data.frame(ACDC$covars, coords)
       } else {
         if (covars.type == "numeric")
-        covars <- data.frame(covars, candidates[, 2:3])
+          ACDC$covars <- data.frame(ACDC$covars, candidates[, 2:3])
       }
     }
-    n_cov <- ncol(covars)
-    sm <- covars[points[, 1], ]
+    n_cov <- ncol(ACDC$covars)
+    sm <- ACDC$covars[points[, 1], ]
     if (covars.type == "numeric") { # Numeric covariates
-      pcm <- cor(covars, use = "complete.obs")
-      strata <- .contStrata(n_pts, covars, strata.type)
+      pcm <- cor(ACDC$covars, use = "complete.obs")
+      strata <- .contStrata(n_pts, ACDC$covars, strata.type)
       nadir <- .panNadir(n_pts, n_candi, candidates, n_lags, lags, 
-                         ppl.criterion, pre.distri, nadir, n_cov, covars, 
+                         criterion, pre.distri, nadir, n_cov, ACDC$covars, 
                          covars.type, pcm, strata)
       scm <- cor(sm, use = "complete.obs")
-      energy0_acdc <- .objCont(sm, n_cov, strata, pcm, scm, nadir, weights.ACDC)
+      energy0_acdc <- .objCont(sm, n_cov, strata, pcm, scm, nadir, ACDC$weights)
     } else { # Factor covariates
-      pcm <- pedometrics::cramer(covars)
-      pop_prop <- lapply(covars, function(x) table(x) / nrow(covars))
+      pcm <- pedometrics::cramer(ACDC$covars)
+      pop_prop <- lapply(ACDC$covars, function(x) table(x) / nrow(covars))
       nadir <- .panNadir(n_pts, n_candi, candidates, n_lags, lags, 
-                         ppl.criterion, pre.distri, nadir, n_cov, covars, 
+                         criterion, pre.distri, nadir, n_cov, ACDC$covars, 
                          covars.type, pcm, pop.prop)
       scm <- pedometrics::cramer(sm)
-      energy0_acdc <- .objCat(sm, pop_prop, nadir, weights.ACDC, pcm, scm, 
+      energy0_acdc <- .objCat(sm, pop_prop, nadir, ACDC$weights, pcm, scm, 
                               n_pts, n_cov)
     }
     energy0_ppl <- energy0_ppl / attr(nadir, "ppl")
     energy0_mssd <- .calcMSSDCpp(dm_mssd) / attr(nadir, "mssd")
     
     # WEIGHTED SUM METHOD
-    # The sub-arguments of 'weights.PAN' must be named so that we have a
+    # The sub-arguments of 'PAN$weights' must be named so that we have a
     # guarantee that the correct weights are used.
-    energy0_ppl  <- energy0_ppl * weights.PAN$PPL
-    energy0_acdc <- energy0_acdc * weights.PAN$ACDC
-    energy0_mssd <- energy0_mssd * weights.PAN$MSSD
+    energy0_ppl  <- energy0_ppl * PAN$weights$PPL
+    energy0_acdc <- energy0_acdc * PAN$weights$ACDC
+    energy0_mssd <- energy0_mssd * PAN$weights$MSSD
     energy0      <- energy0_ppl + energy0_acdc + energy0_mssd
     
     # OTHER SETTINGS FOR THE SIMULATED ANNEALING ALGORITHM
@@ -156,7 +160,7 @@ optimPAN <-
       # ppl: distance matrix
       new_dm_ppl <- .updatePPLCpp(new_conf[, 2:3], old_dm_ppl, wp)
       ppl <- .getPointsPerLag(lags, new_dm_ppl)
-      new_energy_ppl <- .objPointsPerLag(ppl, n_lags, n_pts, ppl.criterion, 
+      new_energy_ppl <- .objPointsPerLag(ppl, n_lags, n_pts, criterion, 
                                          pre.distri)
       new_energy_ppl <- new_energy_ppl / attr(nadir, "ppl")
       
@@ -164,16 +168,16 @@ optimPAN <-
       if (continuous) { # Numeric covariates
         #new_row <- covars[new_conf[wp, 1], ]
         #new_sm[wp, ] <- new_row
-        new_sm[wp, ] <- covars[new_conf[wp, 1], ]
+        new_sm[wp, ] <- ACDC$covars[new_conf[wp, 1], ]
         new_scm <- cor(new_sm, use = "complete.obs")
         new_energy_acdc <- .objCont(new_sm, n_cov, strata, pcm, new_scm, nadir, 
-                                    weights.ACDC)
+                                    ACDC$weights)
       } else { # Categorical covariates
         #new_row <- covars[new_conf[wp, 1], ]
         #new_sm[wp, ] <- new_row
-        new_sm[wp, ] <- covars[new_conf[wp, 1], ]
+        new_sm[wp, ] <- ACDC$covars[new_conf[wp, 1], ]
         new_scm <- pedometrics::cramer(new_sm)
-        new_energy_acdc <- .objCat(new_sm, pop_prop, nadir, weights.ACDC, pcm,
+        new_energy_acdc <- .objCat(new_sm, pop_prop, nadir, ACDC$weights, pcm,
                                    new_scm, n_pts, n_cov)
       }
       
@@ -183,11 +187,11 @@ optimPAN <-
       new_energy_mssd <- .calcMSSDCpp(new_dm_mssd) / attr(nadir, "mssd")      
       
       # WEIGHTED SUM METHOD
-      # The sub-arguments of 'weights.PAN' must be named so that we have a
+      # The sub-arguments of 'PAN$weights' must be named so that we have a
       # guarantee that the correct weights are used.
-      new_energy_ppl  <- new_energy_ppl * weights.PAN$PPL
-      new_energy_acdc <- new_energy_acdc * weights.PAN$ACDC
-      new_energy_mssd <- new_energy_mssd * weights.PAN$MSSD
+      new_energy_ppl  <- new_energy_ppl * PAN$weights$PPL
+      new_energy_acdc <- new_energy_acdc * PAN$weights$ACDC
+      new_energy_mssd <- new_energy_mssd * PAN$weights$MSSD
       new_energy      <- new_energy_ppl + new_energy_acdc + new_energy_mssd
       
       # Evaluate the new system configuration
@@ -302,16 +306,16 @@ optimPAN <-
   }
 # INTERNAL FUNCTION - CHECK ARGUMENTS ##########################################
 .optimPANcheck <-
-  function (weights.PAN, nadir) {
+  function (weights, nadir) {
     
-    # weights.PAN
-    if (!is.list(weights.PAN) || length(weights.PAN) != 3 || 
-          is.null(names(weights.PAN))) {
-      res <- paste("'weights.PAN' must be a list with 3 named sub-arguments")
+    # PAN$weights
+    if (!is.list(weights) || length(weights) != 3 || 
+          is.null(names(weights))) {
+      res <- paste("'PAN$weights' must be a list with 3 named sub-arguments")
       return (res)
     }
-    if (sum(unlist(weights.PAN)) != 1) {
-      res <- paste("the 'weights.PAN' must sum to 1")
+    if (sum(unlist(weights)) != 1) {
+      res <- paste("the 'PAN$weights' must sum to 1")
       return (res)
     }
     
@@ -343,7 +347,7 @@ optimPAN <-
   }
 # INTERNAL FUNCTION - CALCULATE NADIR ##########################################
 .panNadir <-
-  function (n.pts, n.candi, candi, n.lags, lags, ppl.criterion, pre.distri,
+  function (n.pts, n.candi, candi, n.lags, lags, criterion, pre.distri,
             nadir, n.cov, covars, covars.type, pop.prop, pcm, strata) {
     
     if (!is.null(nadir[[1]]) && !is.null(nadir[[2]])) { # Simulate the nadir
@@ -365,13 +369,13 @@ optimPAN <-
         # ppl
         dm_ppl <- as.matrix(dist(pts[, 2:3], method = "euclidean"))
         ppl <- .getPointsPerLag(lags, dm_ppl)
-        if (ppl.criterion == "distribution") {
+        if (criterion == "distribution") {
           if (is.null(pre.distri)) {
             pre.distri <- rep(n.pts, n.lags)
           }
           ppl_nadir[i] <- sum(pre.distri - ppl)
         } else {
-          if (ppl.criterion == "minimum") {
+          if (criterion == "minimum") {
             ppl_nadir[i] <- n.pts / (min(ppl) + 1)
           }
         }

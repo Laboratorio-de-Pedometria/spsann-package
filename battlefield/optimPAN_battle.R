@@ -34,20 +34,18 @@ stopping <- list(max.count = iterations / 10)
 plotit <- TRUE
 progress <- TRUE
 verbose <- TRUE
-# PPL
-lags.type <- "exponential"
-ppl.criterion <- "distribution"
-lags <- 7
-lags.base <- 2
-pre.distri <- NULL
-cutoff <- sqrt((x.max * x.max) + (y.max * y.max))
-# ACDC
-covars <- meuse.grid[, 1]
-covars.type <- "numeric"
-use.coords <- TRUE
-strata.type <- "equal.area"
-weights.ACDC <- list(strata = 0.5, correl = 0.5)
-# MOOP
-weights.PAN <- list(PPL = 1/3, ACDC = 1/3, MSSD = 1/3)
-nadir <- list(sim = 100, save.sim = FALSE, user = NULL, abs = NULL)
+PPL <- list(lags.type  = "exponential",
+            criterion  = "distribution",
+            lags       = 7,
+            lags.base  = 2,
+            pre.distri = NULL,
+            cutoff     = sqrt((x.max * x.max) + (y.max * y.max)))
+ACDC <- list(covars      = meuse.grid[, 1],
+             covars.type = "numeric",
+             use.coords  = TRUE,
+             strata.type = "equal.area",
+             weights     = list(strata = 0.5, correl = 0.5))
+PAN <- list(weights = list(PPL = 1/3, ACDC = 1/3, MSSD = 1/3),
+            nadir   = list(sim = 100, save.sim = FALSE, user = NULL, 
+                           abs = NULL))
 
