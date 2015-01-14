@@ -1,18 +1,27 @@
+# INTERNAL FUNCTION - CALCULATE NADIR ##########################################
 .panNadir <-
   function (n.pts, n.candi, candi, n.lags, lags, ppl.criterion, pre.distri,
-            nadir, n.cov, covars, covar.type, pop.prop, pcm, strata) {
+            nadir, n.cov, covars, covars.type, pop.prop, pcm, strata) {
     
-    if (!is.null(nadir[[1]])) { # Simulate the nadir point
+    if (!is.null(nadir[[1]]) && !is.null(nadir[[2]])) { # Simulate the nadir
       m <- paste("simulating ", nadir[[1]], " nadir values...", sep = "")
       message(m)
       
-      # ppl
+      # SET VARIABLES
       ppl_nadir <- vector()
+      strata_nadir <- vector()
+      correl_nadir <- vector()
+      mssd_nadir <- vector()
+      
+      # BEGIN THE SIMULATION
       for (i in 1:nadir[[1]]) {
         pts <- sample(1:n.candi, n.pts)
+        sm <- covars[pts, ]
         pts <- candi[pts, ]
-        dm <- as.matrix(dist(pts[, 2:3], method = "euclidean"))
-        ppl <- .getPointsPerLag(lags, dm)
+        
+        # ppl
+        dm_ppl <- as.matrix(dist(pts[, 2:3], method = "euclidean"))
+        ppl <- .getPointsPerLag(lags, dm_ppl)
         if (ppl.criterion == "distribution") {
           if (is.null(pre.distri)) {
             pre.distri <- rep(n.pts, n.lags)
@@ -23,30 +32,19 @@
             ppl_nadir[i] <- n.pts / (min(ppl) + 1)
           }
         }
-      }
-      
-      # acdc
-      if (covar.type == "numeric") { # numeric covariates
-        strata_nadir <- vector()
-        correl_nadir <- vector()
-        for (i in 1:nadir[[1]]) {
-          pts <- sample(c(1:n.candi), n.pts)
-          sm <- covars[pts, ]
-          scm <- cor(sm, use = "complete.obs")
+        
+        # acdc
+        if (covars.type == "numeric") { # numeric covariates
+          scm <- cor(sm, use = "complete.obs",  method = "pearson")
           counts <- lapply(1:n.cov, function (i)
             hist(sm[, i], strata[[1]][[i]], plot = FALSE)$counts)
           counts <- sapply(1:n.cov, function (i)
             sum(abs(counts[[i]] - strata[[2]][[i]])))
           strata_nadir[i] <- sum(counts)
-          correl_nadir[i] <- sum(abs(pop.cor.mat - scm))
-        }
-      } else { # factor covariates
-        if (covar.type == "factor") {
-          strata_nadir <- vector()
-          correl_nadir <- vector()
-          for (i in 1:nadir[[1]]) {
-            pts <- sample(c(1:n.candi), n.pts)
-            sm <- covars[pts, ]
+          correl_nadir[i] <- sum(abs(pcm - scm))
+          
+        } else { # factor covariates
+          if (covars.type == "factor") {
             scm <- pedometrics::cramer(sm)
             samp_prop <- lapply(sm, function(x) table(x) / n.pts)
             samp_prop <- sapply(1:n.cov, function (i)
@@ -55,30 +53,34 @@
             correl_nadir[i] <- sum(abs(pcm - scm))
           }
         }
-      }
-      
-      # mssd
-      mssd_nadir <- vector()
-      for (i in 1:nadir[[1]]) {
-        pts <- sample(c(1:n.candi), n.pts)
-        pts <- candi[pts, ]
+        
+        # mssd
         dm_mssd <- fields::rdist(candi[, 2:3], pts[, 2:3])
         mssd_nadir[i] <- .calcMSSDCpp(dm_mssd)
       }
-      res <- list(ppl = ppl_nadir, strata = strata_nadir, 
-                  correl = correl_nadir, mssd_nadir = mssd_nadir)
+      
+      # SHOULD WE SAVE AND RETURN THE SIMULATED VALUES?
+      # ASR: We compute the mean simulated value and return it as an attribute
+      #      because we want to explore the simulated values in the future.
+      if (nadir[[2]]) {
+        res <- list(ppl = ppl_nadir, strata = strata_nadir, 
+                    correl = correl_nadir, mssd_nadir = mssd_nadir)
+      } else {
+        res <- list(ppl = "ppl_nadir", strata = "strata_nadir", 
+                    correl = "correl_nadir", mssd_nadir = "mssd_nadir")
+      }
       a <- attributes(res)
       a$ppl_nadir <- mean(ppl_nadir) / 100
       a$strata_nadir <- mean(strata_nadir) / 100
       a$correl_nadir <- mean(correl_nadir) / 100
       a$mssd_nadir <- mean(mssd_nadir) / 100
       attributes(res) <- a
+      
+      # ASR: Other options are not available yet.
     } else {
-      if (!is.null(nadir[[2]])) {
-        message("sorry but you cannot set the nadir point")
-      } else {
-        message("sorry but the nadir point cannot be calculated")
-      }
+      if (!is.null(nadir[[3]])) {
+        } else {
+        }
     }
     return (res)
   }
@@ -91,11 +93,11 @@ optimPAN <-
             lags = 7, lags.type = "exponential", lags.base = 2, cutoff = NULL,
             ppl.criterion = "distribution", pre.distri = NULL,
             # ACDC arguments
-            covars, covar.type = "numeric", strata.type = "equal.area", 
+            covars, covars.type = "numeric", strata.type = "equal.area", 
             use.coords = FALSE, weights.ACDC = list(strata = 0.5, correl = 0.5),
             # PAN arguments
             weights.PAN = list(PPL = 1/3, ACDC = 1/3, MSSD = 1/3),
-            nadir = list(sim = 1000, user = NULL, abs = NULL), 
+            nadir = list(sim = 1000, save.sim = TRUE, user = NULL, abs = NULL), 
             # Other
             plotit = TRUE, boundary, progress = TRUE, verbose = TRUE) {
     
@@ -108,7 +110,7 @@ optimPAN <-
     check <- .optimPPLcheck(lags, lags.type, lags.base, cutoff, ppl.criterion, 
                             pre.distri)
     if (!is.null(check)) stop (check, call. = FALSE)    
-    check <- .optimACDCcheck(candidates, covars, covar.type, weights.ACDC, 
+    check <- .optimACDCcheck(candidates, covars, covars.type, weights.ACDC, 
                              use.coords, strata.type)
     if (!is.null(check)) stop (check, call. = FALSE)
     check <- .optimPANcheck(weights.PAN, nadir)
@@ -141,167 +143,218 @@ optimPAN <-
     }
     dm_ppl <- as.matrix(dist(conf0[, 2:3], method = "euclidean"))
     ppl <- .getPointsPerLag(lags, dm_ppl)
+    energy0_ppl <- .objPointsPerLag(points.per.lag = ppl, n.lags = n_lags, 
+                                    n.pts = n_pts, criterion = ppl.criterion,
+                                    pre.distri = pre.distri)
     # mssd
     dm_mssd <- fields::rdist(candidates[, 2:3], conf0[, 2:3])
+    
     # acdc
     if (use.coords) {
-      if (!continuous) {
+      if (covars.type == "factor") {
         coords <- data.frame(candidates[, 2:3])
         breaks <- .contStrata(n_pts, coords, strata.type)[[1]]
-        coords <- cont2cat(coords, breaks)
+        coords <- pedometrics::cont2cat(coords, breaks)
         covars <- data.frame(covars, coords)
       } else {
+        if (covars.type == "numeric")
         covars <- data.frame(covars, candidates[, 2:3])
       }
     }
     n_cov <- ncol(covars)
     sm <- covars[points[, 1], ]
-    if (continuous) { # Continuous covariates
+    if (covars.type == "numeric") { # Numeric covariates
       pcm <- cor(covars, use = "complete.obs")
       strata <- .contStrata(n_pts, covars, strata.type)
-      
-      nadir <- .panNadir(n.pts = n_pts, n.candi = n_candi, candi = candi, 
-                         n.lags = n_lags, lags = lags, 
-                         ppl.criterion = ppl.criterion, pre.distri = pre.distri,
-                         nadir = nadir, n.cov = n_cov, covars = covars, 
-                         covar.type = covar.type, pcm = pcm, strata = strata)
-      
+      nadir <- .panNadir(n_pts, n_candi, candidates, n_lags, lags, 
+                         ppl.criterion, pre.distri, nadir, n_cov, covars, 
+                         covars.type, pcm, strata)
       scm <- cor(sm, use = "complete.obs")
-      energy0
-      
-    } else { # Categorical covariates
+      energy0_acdc <- .objCont(sm, n_cov, strata, pcm, scm, nadir, weights.ACDC)
+    } else { # Factor covariates
       pcm <- pedometrics::cramer(covars)
       pop_prop <- lapply(covars, function(x) table(x) / nrow(covars))
-      
-      nadir <- .panNadir(n.pts = n_pts, n.candi = n_candi, candi = candi, 
-                         n.lags = n_lags, lags = lags, 
-                         ppl.criterion = ppl.criterion, pre.distri = pre.distri,
-                         nadir = nadir, n.cov = n_cov, covars = covars, 
-                         covar.type = covar.type, pcm = pcm, 
-                         pop.prop = pop.prop)
-      
+      nadir <- .panNadir(n_pts, n_candi, candidates, n_lags, lags, 
+                         ppl.criterion, pre.distri, nadir, n_cov, covars, 
+                         covars.type, pcm, pop.prop)
       scm <- pedometrics::cramer(sm)
-      energy0
+      energy0_acdc <- .objCat(sm, pop_prop, nadir, weights.ACDC, pcm, scm, 
+                              n_pts, n_cov)
     }
+    energy0_ppl <- energy0_ppl / attr(nadir, "ppl")
+    energy0_mssd <- .calcMSSDCpp(dm_mssd) / attr(nadir, "mssd")
+    
+    # WEIGHTED SUM METHOD
+    # The sub-arguments of 'weights.PAN' must be named so that we have a
+    # guarantee that the correct weights are used.
+    energy0_ppl  <- energy0_ppl * weights.PAN$PPL
+    energy0_acdc <- energy0_acdc * weights.PAN$ACDC
+    energy0_mssd <- energy0_mssd * weights.PAN$MSSD
+    energy0      <- energy0_ppl + energy0_acdc + energy0_mssd
     
     # OTHER SETTINGS FOR THE SIMULATED ANNEALING ALGORITHM
     # ppl
-    old_dm_ppl <- new_dm_ppl <- best_dm_ppl <- dm_ppl
+    old_dm_ppl  <- new_dm_ppl <- best_dm_ppl <- dm_ppl
     # acdc
-    old_scm <- new_scm <- best_scm <- scm
-    old_sm <- new_sm <- best_sm <- sm
+    old_scm     <- new_scm <- best_scm <- scm
+    old_sm      <- new_sm <- best_sm <- sm
     # mssd
     old_dm_mssd <- new_dm_mssd <- best_dm_mssd <- dm_mssd
     # other
     count <- 0
-    old_energy <- energy0
+    old_energy  <- energy0
     best_energy <- Inf
-    energies <- accept_probs <- vector()
-    x_max0 <- x.max
-    y_max0 <- y.max
+    energies    <- accept_probs <- vector()
+    x_max0      <- x.max
+    y_max0      <- y.max
     if (progress) pb <- txtProgressBar(min = 1, max = iterations, style = 3)
     time0 <- proc.time()
     
-    # Begin the main loop
+    # BEGIN THE ITERATIONS
     for (k in 1:iterations) {
       
       # Jitter one of the points and update x.max and y.max
-      # Which point (wp)?
+      # Which point (wp) are we jittering?
       wp <- sample(c(1:n_pts), 1)
       new_conf <- spJitterFinite(old_conf, candidates, x.max, x.min, y.max,
                                  y.min, wp)
       x.max <- x_max0 - (k / iterations) * (x_max0 - x.min)
       y.max <- y_max0 - (k / iterations) * (y_max0 - y.min)
       
-      # UPDATE DATASETS
+      # UPDATE DATASETS AND COMPUTE NEW ENERGY STATE
       # ppl: distance matrix
       new_dm_ppl <- .updatePPLCpp(new_conf[, 2:3], old_dm_ppl, wp)
       ppl <- .getPointsPerLag(lags, new_dm_ppl)
-      new_energy_ppl <- .objPointsPerLag(ppl, n_lags, n_pts, criterion, 
+      new_energy_ppl <- .objPointsPerLag(ppl, n_lags, n_pts, ppl.criterion, 
                                          pre.distri)
+      new_energy_ppl <- new_energy_ppl / attr(nadir, "ppl")
+      
       # acdc: sample and correlation matrices
-      if (continuous) { # Continuous covariates
-        new_row <- covars[new_conf[wp, 1], ]
-        new_sm[wp, ] <- new_row
+      if (continuous) { # Numeric covariates
+        #new_row <- covars[new_conf[wp, 1], ]
+        #new_sm[wp, ] <- new_row
+        new_sm[wp, ] <- covars[new_conf[wp, 1], ]
         new_scm <- cor(new_sm, use = "complete.obs")
-        new_energy_acdc <- .objCont(new_sm, strata, pcm, new_scm, nadir, 
-                                    weights)
+        new_energy_acdc <- .objCont(new_sm, n_cov, strata, pcm, new_scm, nadir, 
+                                    weights.ACDC)
       } else { # Categorical covariates
-        new_row <- covars[new_conf[wp, 1], ]
-        new_sm[wp, ] <- new_row
+        #new_row <- covars[new_conf[wp, 1], ]
+        #new_sm[wp, ] <- new_row
+        new_sm[wp, ] <- covars[new_conf[wp, 1], ]
         new_scm <- pedometrics::cramer(new_sm)
-        new_energy_acdc <- .objCat(new_sm, pop_prop, nadir, weights, pcm,
+        new_energy_acdc <- .objCat(new_sm, pop_prop, nadir, weights.ACDC, pcm,
                                    new_scm, n_pts, n_cov)
       }
+      
       # mssd: distance matrix
       x2 <- matrix(new_conf[wp, ], nrow = 1)
       new_dm_mssd <- .updateMSSDCpp(candidates, x2, old_dm_mssd, wp)
-      new_energy_mssd <- .calcMSSDCpp(new_dm_mssd)
+      new_energy_mssd <- .calcMSSDCpp(new_dm_mssd) / attr(nadir, "mssd")      
+      
+      # WEIGHTED SUM METHOD
+      # The sub-arguments of 'weights.PAN' must be named so that we have a
+      # guarantee that the correct weights are used.
+      new_energy_ppl  <- new_energy_ppl * weights.PAN$PPL
+      new_energy_acdc <- new_energy_acdc * weights.PAN$ACDC
+      new_energy_mssd <- new_energy_mssd * weights.PAN$MSSD
+      new_energy      <- new_energy_ppl + new_energy_acdc + new_energy_mssd
       
       # Evaluate the new system configuration
       random_prob <- runif(1)
       actual_prob <- acceptance[[1]] * exp(-k / acceptance[[2]])
       accept_probs[k] <- actual_prob
       if (new_energy <= old_energy) {
-        old_conf <- new_conf
-        old_energy <- new_energy
-        old_sm <- new_sm
-        old_scm <- new_scm
-        count <- 0
+        old_conf    <- new_conf
+        old_energy  <- new_energy
+        count       <- 0
+        # ppl
+        old_dm_ppl  <- new_dm_ppl
+        # acdc
+        old_sm      <- new_sm
+        old_scm     <- new_scm
+        # mssd
+        old_dm_mssd <- new_dm_mssd
       } else {
         if (new_energy > old_energy & random_prob <= actual_prob) {
-          old_conf <- new_conf
-          old_energy <- new_energy
-          old_sm <- new_sm
-          old_scm <- new_scm
-          count <- count + 1
+          old_conf    <- new_conf
+          old_energy  <- new_energy
+          count       <- count + 1
+          # ppl
+          old_dm_ppl  <- new_dm_ppl
+          # acdc
+          old_sm      <- new_sm
+          old_scm     <- new_scm
+          # mssd
+          old_dm_mssd <- new_dm_mssd
           if (verbose) {
             cat("\n", count, "iteration(s) with no improvement... p = ", 
                 random_prob, "\n")
           }
         } else {
-          new_energy <- old_energy
-          new_conf <- old_conf
-          new_sm <- old_sm
-          new_scm <- old_scm
-          count <- count + 1
+          new_energy  <- old_energy
+          new_conf    <- old_conf
+          count       <- count + 1
+          # ppl
+          new_dm_ppl  <- old_dm_ppl
+          # acdc
+          new_sm      <- old_sm
+          new_scm     <- old_scm
+          # mssd
+          new_dm_mssd <- old_dm_mssd
           if (verbose) {
             cat("\n", count, "iteration(s) with no improvement... stops at",
                 stopping[[1]], "\n")
           }
         }
       }
+      
       # Best energy state
       energies[k] <- new_energy
       if (new_energy < best_energy / 1.0000001) {
-        best_k <- k
-        best_conf <- new_conf
-        best_energy <- new_energy
-        best_old_energy <- old_energy
-        old_conf <- old_conf
-        best_sm <- new_sm
-        best_old_sm <- old_sm
-        best_scm <- new_scm
-        best_old_scm <- old_scm
+        best_k           <- k
+        best_conf        <- new_conf
+        best_energy      <- new_energy
+        best_old_energy  <- old_energy
+        old_conf         <- old_conf
+        # ppl
+        best_dm_ppl      <- new_dm_ppl
+        best_old_dm_ppl  <- old_dm_ppl
+        # acdc
+        best_sm          <- new_sm
+        best_old_sm      <- old_sm
+        best_scm         <- new_scm
+        best_old_scm     <- old_scm
+        # mssd
+        best_dm_mssd     <- new_dm_mssd
+        best_old_dm_mssd <- old_dm_mssd
       }
+      
       # Plotting
       if (plotit && any(round(seq(1, iterations, 10)) == k)) {
         .spSANNplot(energy0, energies, k, acceptance, 
                     accept_probs, boundary, new_conf[, 2:3],
                     conf0[, 2:3], y_max0, y.max, x_max0, x.max)
       }
+      
       # Freezing parameters
       if (count == stopping[[1]]) {
         if (new_energy > best_energy * 1.000001) {
-          old_conf <- old_conf
-          new_conf <- best_conf
-          new_sm <- best_sm
-          new_scm <- best_scm
-          old_energy <- best_old_energy
-          new_energy <- best_energy
-          old_sm <- best_old_sm
-          old_scm <- best_old_scm
-          count <- 0
+          old_conf    <- old_conf
+          new_conf    <- best_conf
+          old_energy  <- best_old_energy
+          new_energy  <- best_energy
+          count       <- 0
+          # ppl
+          new_dm_ppl  <- best_dm_ppl
+          old_dm_ppl  <- best_old_dm_ppl
+          # acdc
+          new_sm      <- best_sm
+          new_scm     <- best_scm
+          old_sm      <- best_old_sm
+          old_scm     <- best_old_scm
+          # mssd
+          new_dm_mssd <- best_dm_mssd
+          old_dm_mssd <- best_old_dm_mssd
           cat("\n", "reached maximum count with suboptimal configuration\n")
           cat("\n", "restarting with previously best configuration\n")
           cat("\n", count, "iteration(s) with no improvement... stops at",
@@ -322,8 +375,9 @@ optimPAN <-
   function (weights.PAN, nadir) {
     
     # weights.PAN
-    if (!is.list(weights.PAN) || length(weights.PAN) != 3) {
-      res <- paste("'weights.PAN' must be a list with three sub-arguments")
+    if (!is.list(weights.PAN) || length(weights.PAN) != 3 || 
+          is.null(names(weights.PAN))) {
+      res <- paste("'weights.PAN' must be a list with 3 named sub-arguments")
       return (res)
     }
     if (sum(unlist(weights.PAN)) != 1) {
@@ -332,18 +386,28 @@ optimPAN <-
     }
     
     # nadir
-    nadir <- list(sim = 1000, user = NULL, abs = NULL)
-    if (!is.list(nadir) || missing(weights.PAN)) {
-      res <- paste("'nadir' must be a list with three sub-arguments")
+    if (!is.list(nadir) || length(nadir) != 4) {
+      res <- paste("'nadir' must be a list with four sub-arguments")
       return (res)
     }
-    n <- which(sapply(nadir, is.null) == TRUE)
-    if (length(nadir) == 2 && length(n) < 1) {
-      res <- paste("'nadir' must have only one non-null sub-argument")
-      return (res)
-    }
-    if (length(nadir) == 3 && length(n) < 2) {
-      res <- paste("'nadir' must have only one non-null sub-argument")
-      return (res)
+    n <- !sapply(nadir, is.null)
+    if (n[[1]] == TRUE) {
+      if (n[[2]] == FALSE) {
+        res <- paste("you must inform if the simulations should be saved")
+        return (res)
+      }
+      if (n[[3]] == TRUE || n[[4]] == TRUE) {
+        res <- paste("you must choose a single nadir option")
+        return (res)
+      }
+    } else {
+      if (n[[3]] == TRUE) {
+        res <- paste("sorry but you cannot set the nadir point")
+        return (res)
+      }
+      if (n[[4]] == TRUE) {
+       res <- paste("sorry but the nadir point cannot be calculated")
+       return (res)
+      }
     }
   }

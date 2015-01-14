@@ -9,8 +9,11 @@ require(Hmisc)
 source('R/spSANNtools.R')
 source('R/spJitter.R')
 source('R/optimACDC.R')
+source('R/optimPPL.R')
+source('R/optimPAN.R')
 Rcpp::sourceCpp('src/spJitterCpp.cpp')
 Rcpp::sourceCpp('src/updatePPLCpp.cpp')
+Rcpp::sourceCpp('src/calcMSSDCpp.cpp')
 # PREPARE DATA #################################################################
 data(meuse.grid)
 candidates <- meuse.grid[, 1:2]
@@ -40,10 +43,11 @@ pre.distri <- NULL
 cutoff <- sqrt((x.max * x.max) + (y.max * y.max))
 # ACDC
 covars <- meuse.grid[, 1]
-covar.type <- "numeric"
+covars.type <- "numeric"
 use.coords <- TRUE
 strata.type <- "equal.area"
 weights.ACDC <- list(strata = 0.5, correl = 0.5)
 # MOOP
 weights.PAN <- list(PPL = 1/3, ACDC = 1/3, MSSD = 1/3)
-nadir <- list(sim = 1000, user = NULL, abs = NULL)
+nadir <- list(sim = 100, save.sim = FALSE, user = NULL, abs = NULL)
+
