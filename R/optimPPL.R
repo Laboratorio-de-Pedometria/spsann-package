@@ -1,44 +1,44 @@
 #' Optimization of sample patterns for for variogram estimation
-#' 
-#' Optimize a sample pattern for variogram estimation. The criterion used is 
-#' the number of points or point-pairs per lag distance class (\code{optimPPL}). 
-#' \code{pointsPerLag} and \code{pairsPerLag} count the number of points or 
-#' point-pairs per lag distance class. \code{objPoints} and \code{objPairs} 
-#' compute the deviation of the observed distribution of counts from a 
-#' pre-specified distribution, or the minimum number of points or point pairs 
+#'
+#' Optimize a sample pattern for variogram estimation. The criterion used is
+#' the number of points or point-pairs per lag distance class (\code{optimPPL}).
+#' \code{pointsPerLag} and \code{pairsPerLag} count the number of points or
+#' point-pairs per lag distance class. \code{objPoints} and \code{objPairs}
+#' compute the deviation of the observed distribution of counts from a
+#' pre-specified distribution, or the minimum number of points or point pairs
 #' observed over all lag distance classes.
-#' 
-#' @param lags Integer. The number of lag distance classes. Alternatively, a 
-#' vector of numeric values with the lower and upper limits of each lag 
-#' distance class. The lowest value must be larger than zero, e.g. 0.0001. 
+#'
+#' @param lags Integer. The number of lag distance classes. Alternatively, a
+#' vector of numeric values with the lower and upper limits of each lag
+#' distance class. The lowest value must be larger than zero, e.g. 0.0001.
 #' Defaults to \code{lags = 7}.
-#' 
+#'
 #' @param lags.type Character. The type of lag distance classes. Available
-#' options are \code{"equidistant"} and \code{"exponential"}. Defaults to 
+#' options are \code{"equidistant"} and \code{"exponential"}. Defaults to
 #' \code{lags.type = "exponential"}. See \sQuote{Details} for more information.
-#' 
-#' @param lags.base Numeric. Base of the exponential expression used to 
-#' create the exponential lag distance classes. Defaults to 
+#'
+#' @param lags.base Numeric. Base of the exponential expression used to
+#' create the exponential lag distance classes. Defaults to
 #' \code{lags.base = 2}. See \sQuote{Details} for more information.
-#' 
-#' @param cutoff Numeric. The maximum distance up to which lag distance classes 
-#' are created. Used only when \code{lags} is an integer. See \sQuote{Details} 
+#'
+#' @param cutoff Numeric. The maximum distance up to which lag distance classes
+#' are created. Used only when \code{lags} is an integer. See \sQuote{Details}
 #' for more information.
-#' 
-#' @param criterion Character. The measure to be used to describe the energy 
-#' state of the current system configuration. Available options are 
-#' \code{"minimum"} and \code{"distribution"}. Defaults to 
+#'
+#' @param criterion Character. The measure to be used to describe the energy
+#' state of the current system configuration. Available options are
+#' \code{"minimum"} and \code{"distribution"}. Defaults to
 #' \code{objective = "minimum"}. See \sQuote{Details} for more information.
-#' 
-#' @param pre.distri Numeric vector. The pre-specified distribution of points 
-#' or point-pair with which the observed counts of points or point-pairs per 
-#' lag distance class is compared. Used only when 
-#' \code{criterion = "distribution"}. Defaults to a uniform distribution. See 
+#'
+#' @param pre.distri Numeric vector. The pre-specified distribution of points
+#' or point-pair with which the observed counts of points or point-pairs per
+#' lag distance class is compared. Used only when
+#' \code{criterion = "distribution"}. Defaults to a uniform distribution. See
 #' \sQuote{Details} for more information.
-#' 
+#'
 #' @template spJitter_doc
 #' @template spSANN_doc
-#' 
+#'
 #' @details
 #' \subsection{Distances}{
 #' Euclidean distances between points are calculated. This computation requires
@@ -46,75 +46,75 @@
 #' this requirement is attained.
 #' }
 #' \subsection{Distribution}{
-#' Using the default uniform distribution means that the number of 
-#' \strong{point-pairs} per lag is equal to 
+#' Using the default uniform distribution means that the number of
+#' \strong{point-pairs} per lag is equal to
 #' \eqn{n \times (n - 1) / (2 \times lag)}, where \eqn{n} is the total number
 #' of points and \eqn{lag} is the number of lags.
-#' 
-#' Using the default uniform distribution means that the number of 
-#' \strong{points} per lag is equal to the total number of points. This is the 
+#'
+#' Using the default uniform distribution means that the number of
+#' \strong{points} per lag is equal to the total number of points. This is the
 #' same as expecting that each point contributes to every lag.
-#' 
-#' Distributions other than the available options can be easily implemented 
+#'
+#' Distributions other than the available options can be easily implemented
 #' changing the arguments \code{lags}, \code{lags.base} and \code{pre.distri}.
 #' }
 #' \subsection{Type of lags}{
-#' Two types of lags can be created by default. The first are evenly spaced 
+#' Two types of lags can be created by default. The first are evenly spaced
 #' lags (\code{lags.type = "equidistant"}). They are created by simply dividing
 #' the distance interval from 0.0001 to \code{cutoff} by the required number of
-#' lags. The minimum value of 0.0001 guarantees that a point does not form a 
+#' lags. The minimum value of 0.0001 guarantees that a point does not form a
 #' pair with itself.
-#' 
+#'
 #' The second type of lags is defined by exponential spacings
-#' (\code{lags.type = "exponential"}). The spacings are defined by the base 
-#' \eqn{b} of the exponential expression \eqn{b^n}, where \eqn{n} is the 
-#' required number of lags. The base is defined using the argument 
+#' (\code{lags.type = "exponential"}). The spacings are defined by the base
+#' \eqn{b} of the exponential expression \eqn{b^n}, where \eqn{n} is the
+#' required number of lags. The base is defined using the argument
 #' \code{lags.base}.
 #' }
 #' \subsection{Criteria}{
 #' There are two optimizing criteria implemented. The first is called using
 #' \code{criterion = "distribution"} and is used to minimize the sum of
-#' differences between a pre-specified distribution and the observed 
+#' differences between a pre-specified distribution and the observed
 #' distribution of points or point-pairs per lag.
-#' 
-#' The second criterion is called using \code{criterion = "minimum"}. It 
-#' corresponds to maximizing the minimum number of points or point-pairs 
+#'
+#' The second criterion is called using \code{criterion = "minimum"}. It
+#' corresponds to maximizing the minimum number of points or point-pairs
 #' observed over all lags.
 #' }
 #' @return
-#' \code{optimPPL} returns a matrix: the optimized sample pattern with 
+#' \code{optimPPL} returns a matrix: the optimized sample pattern with
 #' the evolution of the energy state during the optimization as an attribute.
-#' 
-#' \code{pointsPerLag} and \code{pairsPerLag} return a data.frame with three 
-#' columns: a) the lower and b) upper limits of each lag, and c) the number of 
+#'
+#' \code{pointsPerLag} and \code{pairsPerLag} return a data.frame with three
+#' columns: a) the lower and b) upper limits of each lag, and c) the number of
 #' points or point-pairs per lag.
-#' 
+#'
 #' \code{objPoints} and \code{objPairs} return a numeric value depending on the
 #' choice of \code{criterion}. If \code{criterion = "distribution"}, the sum of
 #' the differences between the pre-specified and observed distribution of counts
-#' of points or point-pairs per lag. If \code{criterion = "minimum"}, the 
-#' inverse of the minimum count of points or point pairs over all lags 
+#' of points or point-pairs per lag. If \code{criterion = "minimum"}, the
+#' inverse of the minimum count of points or point pairs over all lags
 #' multiplied by a constant.
-#' 
+#'
 #' @references
-#' Bresler, E.; Green, R. E. \emph{Soil parameters and sampling scheme for 
-#' characterizing soil hydraulic properties of a watershed}. Honolulu: 
+#' Bresler, E.; Green, R. E. \emph{Soil parameters and sampling scheme for
+#' characterizing soil hydraulic properties of a watershed}. Honolulu:
 #' University of Hawaii at Manoa, p. 42, 1982.
-#' 
-#' Marler, R. T.; Arora, J. S. Function-transformation methods for 
-#' multi-objective optimization. \emph{Engineering Optimization}. v. 37, p. 
+#'
+#' Marler, R. T.; Arora, J. S. Function-transformation methods for
+#' multi-objective optimization. \emph{Engineering Optimization}. v. 37, p.
 #' 551-570, 2005.
-#' 
+#'
 #' Russo, D. Design of an optimal sampling network for estimating the variogram.
 #' \emph{Soil Science Society of America Journal}. v. 48, p. 708-716, 1984.
-#' 
+#'
 #' Truong, P. N.; Heuvelink, G. B. M.; Gosling, J. P. Web-based tool for expert
-#' elicitation of the variogram. \emph{Computers and Geosciences}. v. 51, p. 
+#' elicitation of the variogram. \emph{Computers and Geosciences}. v. 51, p.
 #' 390-399, 2013.
-#' 
+#'
 #' Warrick, A. W.; Myers, D. E. Optimization of sampling locations for variogram
 #' calculations. \emph{Water Resources Research}. v. 23, p. 496-500, 1987.
-#' 
+#'
 #' @author
 #' Alessandro Samuel-Rosa \email{alessandrosamuelrosa@@gmail.com}
 #' @aliases optimPPL pointsPerLag objPoints pairsPerLag objPairs
@@ -130,32 +130,32 @@
 #' objPoints(meuse, cutoff = 1000)
 # UNIT TEST ####################################################################
 # Use \code{lags = 1} with \code{pointsPerLag} and \code{pairsPerLag} to check
-# that the functions are working correctly. They should return the total number 
-# of points in \code{points} and the total possible number of point-pairs 
+# that the functions are working correctly. They should return the total number
+# of points in \code{points} and the total possible number of point-pairs
 # \eqn{n \times (n - 1) / 2}, respectively.
 # FUNCTION - MAIN ##############################################################
 optimPPL <-
-  function (points, candidates, lags = 7, lags.type = "exponential", 
-            lags.base = 2, cutoff = NULL, criterion = "distribution", 
+  function (points, candidates, lags = 7, lags.type = "exponential",
+            lags.base = 2, cutoff = NULL, criterion = "distribution",
             pre.distri = NULL, x.max, x.min, y.max, y.min, iterations = 10000,
             acceptance = list(initial = 0.99, cooling = iterations / 10),
             stopping = list(max.count = iterations / 10), plotit = TRUE,
             boundary, progress = TRUE, verbose = TRUE) {
-    
+
     # Check arguments
     check <- .spSANNcheck(points, candidates, x.max, x.min, y.max, y.min,
                           iterations, acceptance, stopping, plotit, boundary,
                           progress, verbose)
     if (!is.null(check)) stop (check, call. = FALSE)
-    check <- .optimPPLcheck(lags, lags.type, lags.base, cutoff, criterion, 
+    check <- .optimPPLcheck(lags, lags.type, lags.base, cutoff, criterion,
                             pre.distri)
     if (!is.null(check)) stop (check, call. = FALSE)
-    
+
     if (plotit) {
       par0 <- par()
       on.exit(suppressWarnings(par(par0)))
     }
-    
+
     # Prepare points
     n_candi <- nrow(candidates)
     if (is.integer(points) || is.numint(points)) {
@@ -165,23 +165,23 @@ optimPPL <-
     } else {
       n_pts <- nrow(points)
     }
-    
+
     # Prepare lags
     if (length(lags) >= 3) {
       n_lags <- length(lags) - 1
     } else {
       n_lags <- lags
-      lags <- .getLagBreaks(lags, lags.type, cutoff, lags.base) 
+      lags <- .getLagBreaks(lags, lags.type, cutoff, lags.base)
     }
     sys_config0 <- points
     old_sys_config <- sys_config0
-    
+
     # Initial energy state
     dist_mat <- as.matrix(dist(sys_config0[, 2:3], method = "euclidean"))
     point_per_lag <- .getPointsPerLag(lags, dist_mat)
-    energy_state0 <- .objPointsPerLag(point_per_lag, n_lags, n_pts, 
+    energy_state0 <- .objPointsPerLag(point_per_lag, n_lags, n_pts,
                                       criterion, pre.distri)
-    
+
     # other settings for the simulated annealing algorithm
     old_dist_mat <- dist_mat
     new_dist_mat <- dist_mat
@@ -195,24 +195,24 @@ optimPPL <-
     y_max0 <- y.max
     if (progress) pb <- txtProgressBar(min = 1, max = iterations, style = 3)
     time0 <- proc.time()
-    
+
     # begin the main loop
     for (k in 1:iterations) {
-      
+
       # jitter one of the points and update x.max and y.max
       which_point <- sample(c(1:n_pts), 1)
-      new_sys_config <- spJitterFinite(old_sys_config, candidates, x.max, 
+      new_sys_config <- spJitterFinite(old_sys_config, candidates, x.max,
                                        x.min, y.max, y.min, which_point)
       x.max <- x_max0 - (k / iterations) * (x_max0 - x.min)
       y.max <- y_max0 - (k / iterations) * (y_max0 - y.min)
-      
+
       # update the distance matrix and calculate the new energy state
       new_dist_mat <- .updatePPLCpp(new_sys_config[, 2:3], old_dist_mat,
                                     which_point)
       point_per_lag <- .getPointsPerLag(lags, new_dist_mat)
       new_energy_state <- .objPointsPerLag(point_per_lag, n_lags, n_pts,
                                            criterion, pre.distri)
-      
+
       # evaluate the new system configuration
       random_prob <- runif(1)
       actual_prob <- acceptance[[1]] * exp(-k / acceptance[[2]])
@@ -229,7 +229,7 @@ optimPPL <-
           old_dist_mat     <- new_dist_mat
           count <- count + 1
           if (verbose) {
-            cat("\n", count, "iteration(s) with no improvement... p = ", 
+            cat("\n", count, "iteration(s) with no improvement... p = ",
                 random_prob, "\n")
           }
         } else {
@@ -243,7 +243,7 @@ optimPPL <-
           }
         }
       }
-      
+
       # Best energy state
       energy_states[k] <- new_energy_state
       if (new_energy_state < best_energy_state / 1.0000001) {
@@ -255,24 +255,24 @@ optimPPL <-
         best_dist_mat         <- new_dist_mat
         best_old_dist_mat     <- old_dist_mat
       }
-      
+
       # Plotting
       if (plotit && any(round(seq(1, iterations, 10)) == k)) {
-        .spSANNplot(energy_state0, energy_states, k, acceptance, 
+        .spSANNplot(energy_state0, energy_states, k, acceptance,
                     accept_probs, boundary, new_sys_config[, 2:3],
                     sys_config0[, 2:3], y_max0, y.max, x_max0, x.max)
-      } 
-      
+      }
+
       # Freezing parameters
       if (count == stopping[[1]]) {
         if (new_energy_state > best_energy_state * 1.000001) {
           old_sys_config   <- old_sys_config
           new_sys_config   <- best_sys_config
-          new_dist_mat     <- best_dist_mat
           old_energy_state <- best_old_energy_state
           new_energy_state <- best_energy_state
-          old_dist_mat     <- best_old_dist_mat
           count <- 0
+          new_dist_mat <- best_dist_mat
+          old_dist_mat <- best_old_dist_mat
           cat("\n", "reached maximum count with suboptimal configuration\n")
           cat("\n", "restarting with previously best configuration\n")
           cat("\n", count, "iteration(s) with no improvement... stops at",
@@ -295,7 +295,7 @@ objPoints <-
   function (points, candidates, lags = 7, lags.type = "exponential",
             lags.base = 2, cutoff = NULL, criterion = "distribution",
             pre.distri = NULL) {
-    
+
     # Prepare points
     if (is.integer(points)) {
       n_pts <- points
@@ -304,15 +304,15 @@ objPoints <-
     } else {
       n_pts <- nrow(points)
     }
-    
+
     # Prepare lags
     if (length(lags) >= 3) {
       n_lags <- length(lags) - 1
     } else {
       n_lags <- lags
-      lags <- .getLagBreaks(lags, lags.type, cutoff, lags.base) 
+      lags <- .getLagBreaks(lags, lags.type, cutoff, lags.base)
     }
-    
+
     dm <- as.matrix(dist(points[, 2:3], method = "euclidean"))
     ppl <- .getPointsPerLag(lags, dm)
     res <- .objPointsPerLag(ppl, n_lags, n_pts, criterion, pre.distri)
@@ -324,7 +324,7 @@ objPoints <-
 pointsPerLag <-
   function (points, candidates, lags = 7, lags.type = "exponential",
             lags.base = 2, cutoff = NULL) {
-    
+
     # Prepare points
     if (is.integer(points) || is.numint(points)) {
       n_pts <- points
@@ -333,22 +333,22 @@ pointsPerLag <-
     } else {
       n_pts <- nrow(points)
     }
-    
+
     # Prepare lags
     if (length(lags) == 1) {
       lags <- .getLagBreaks(lags, lags.type, cutoff, lags.base)
     }
-    
+
     dm <- as.matrix(dist(points[, 2:3], method = "euclidean"))
     res <- .getPointsPerLag(lags, dm)
-    res <- data.frame(lag.lower = lags[-length(lags)], points = res, 
+    res <- data.frame(lag.lower = lags[-length(lags)], points = res,
                       lag.upper = lags[-1])
     return (res)
   }
 # INTERNAL FUNCTION - CHECK ARGUMENTS ##########################################
 .optimPPLcheck <-
   function (lags, lags.type, lags.base, cutoff, criterion, pre.distri) {
-    
+
     # lags and cutoff
     if (length(lags) == 1 && is.null(cutoff)) {
       res <- paste("'cutoff' is mandatory when the lag intervals are not set")
@@ -358,7 +358,7 @@ pointsPerLag <-
       res <- paste("'cutoff' cannot be used when the lag intervals are set")
       return (res)
     }
-    
+
     # lags.type
     lt <- c("equidistant", "exponential")
     lt <- is.na(any(match(lt, lags.type)))
@@ -366,13 +366,13 @@ pointsPerLag <-
       res <- paste("'lags.type = ", lags.type, "' is not supported", sep = "")
       return (res)
     }
-    
+
     # lags.base
     if (!is.numeric(lags.base) || length(lags.base) > 1) {
       res <- paste("'lags.base' must be a numeric value")
       return (res)
     }
-    
+
     # criterion
     cr <- c("distribution", "minimum")
     cr <- is.na(any(match(cr, criterion)))
@@ -380,7 +380,7 @@ pointsPerLag <-
       res <- paste("'criterion = ", criterion, "' is not supported", sep = "")
       return (res)
     }
-    
+
     # pre.distri
     if (!is.null(pre.distri)) {
       if (!is.numeric(pre.distri)) {
@@ -445,7 +445,7 @@ pointsPerLag <-
     return (lags)
   }
 # # POINT PAIRS PER LAG DISTANCE CLASS
-# .pairsPerLag <- 
+# .pairsPerLag <-
 #   function (points, lags, lags.type = "equidistant", lags.base = 2,
 #             cutoff = NULL) {
 #     if (missing(points)) {
@@ -455,7 +455,7 @@ pointsPerLag <-
 #       stop ("'lags' should be a numeric value or vector")
 #     }
 #     if (length(lags) == 1 && is.null(cutoff)) {
-#       stop ("'cutoff' is a mandatory when the lag intervals are not specified") 
+#       stop ("'cutoff' is a mandatory when the lag intervals are not specified")
 #     }
 #     if (length(lags) > 1 && !is.null(cutoff)) {
 #       stop ("'cutoff' cannot be used when the lag intervals are specified")
@@ -478,12 +478,12 @@ pointsPerLag <-
 #       n <- which(d > lags[i] & d <= lags[i + 1])
 #       pairs[i] <- length(n)
 #     }
-#     res <- data.frame(lag.lower = lags[-length(lags)], 
+#     res <- data.frame(lag.lower = lags[-length(lags)],
 #                       pairs = pairs[-length(lags)], lag.upper = lags[-1])
 #     return (res)
 #   }
 # # OBJECIVE FUNCTION - POINT PAIRS PER LAG DISTANCE CLASS
-# .objPairs <- 
+# .objPairs <-
 #   function (points, lags, lags.type = "equidistant", lags.base = 2,
 #             cutoff = NULL, criterion = "minimum", pre.distri) {
 #     if (missing(points)) {
@@ -493,7 +493,7 @@ pointsPerLag <-
 #       stop ("'lags' should be a numeric value or vector")
 #     }
 #     if (length(lags) == 1 && is.null(cutoff)) {
-#       stop ("'cutoff' is a mandatory when the lag intervals are not specified") 
+#       stop ("'cutoff' is a mandatory when the lag intervals are not specified")
 #     }
 #     if (length(lags) > 1 && !is.null(cutoff)) {
 #       stop ("'cutoff' cannot be used when the lag intervals are specified")
@@ -521,10 +521,10 @@ pointsPerLag <-
 #       return (res)
 #     }
 #     if (criterion == "minimum") {
-#       pairs <- pairsPerLag(points, lags = lags, cutoff = cutoff, 
+#       pairs <- pairsPerLag(points, lags = lags, cutoff = cutoff,
 #                            lags.type = lags.type, lags.base = lags.base)
 #       res <- 10000 * (min(pairs$pairs) + 1)
 #       return (res)
-#     }    
+#     }
 #   }
 # # End!
