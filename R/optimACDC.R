@@ -1,64 +1,64 @@
 #' Optimization of sample patterns for trend estimation
-#' 
-#' Optimize a sample pattern for trend estimaton. The criterion used is 
-#' matching the association/correlation and marginal distribution of the 
+#'
+#' Optimize a sample pattern for trend estimaton. The criterion used is
+#' matching the association/correlation and marginal distribution of the
 #' covariates (\code{optimACDC}).
-#' 
+#'
 #' @template spJitter_doc
 #' @template spSANN_doc
-#' 
+#'
 #' @param covars Data frame or matrix with the covariates in the columns.
-#' 
-#' @param continuous Logical. Are the covariates \sQuote{continuous} or 
+#'
+#' @param continuous Logical. Are the covariates \sQuote{continuous} or
 #' \sQuote{categorical}. Defaults to \code{continuous = TRUE}.
-#' 
+#'
 #' @param weights List with two sub-arguments. The weights assigned to the
-#' sampling strata/classes and the correlation/association measure. They must 
+#' sampling strata/classes and the correlation/association measure. They must
 #' sum to unity. Defaults to \code{weights = list(strata = 0.5, correl = 0.5)}.
-#' 
+#'
 #' @param use.coords Logical. Should the coordinates be used as covariates?
 #' Defaults to \code{use.coords = FALSE}.
-#' 
-#' @param strata.type Character. The type of strata to be used with 
-#' continuous covariates. Available options are \code{"equal.area"} and 
+#'
+#' @param strata.type Character. The type of strata to be used with
+#' continuous covariates. Available options are \code{"equal.area"} and
 #' \code{"equal.range"}. Defaults to \code{strata.type = "equal.area"}. See
 #' \sQuote{Details} for more information.
-#' 
-#' @param nadir List with three subarguments: \code{sim} -- the number of 
-#' random realizations to estimate the nadir point; \code{user} -- a 
-#' user-defined value; \code{abs} -- logical for calculating the nadir point 
+#'
+#' @param nadir List with three subarguments: \code{sim} -- the number of
+#' random realizations to estimate the nadir point; \code{user} -- a
+#' user-defined value; \code{abs} -- logical for calculating the nadir point
 #' internally. Only simulations are implemented in the current version.
-#' Defaults to \code{nadir = list(sim = 1000, user = NULL, abs = NULL}. See 
+#' Defaults to \code{nadir = list(sim = 1000, user = NULL, abs = NULL}. See
 #' \sQuote{Details} for more information.
-#' 
+#'
 #' @details
 #' This method is also known as the conditioned Latin Hypercube of Minasny and
 #' McBratney (2006). Visit the package manual to see the corrections that we
 #' have made in that method.
-#' 
+#'
 #' @return
-#' \code{optimACDC} returns a matrix: the optimized sample pattern with 
+#' \code{optimACDC} returns a matrix: the optimized sample pattern with
 #' the evolution of the energy state during the optimization as an attribute.
-#' 
+#'
 #' @references
 #' Minasny, B.; McBratney, A. B. A conditioned Latin hypercube method for
 #' sampling in the presence of ancillary information. \emph{Computers &
 #' Geosciences}, v. 32, p. 1378-1388, 2006.
-#' 
+#'
 #' Minasny, B.; McBratney, A. B. Conditioned Latin Hypercube Sampling for
 #' calibrating soil sensor data to soil properties. Chapter 9. Viscarra Rossel,
 #' R. A.; McBratney, A. B.; Minasny, B. (Eds.) \emph{Proximal Soil Sensing}.
 #' Amsterdam: Springer, p. 111-119, 2010.
-#' 
+#'
 #' Mulder, V. L.; de Bruin, S.; Schaepman, M. E. Representing major soil
 #' variability at regional scale by constrained Latin hypercube sampling of
 #' remote sensing data. \emph{International Journal of Applied Earth Observation
 #' and Geoinformation}, v. 21, p. 301-310, 2013.
-#' 
+#'
 #' Roudier, P.; Beaudette, D.; Hewitt, A. A conditioned Latin hypercube sampling
 #' algorithm incorporating operational constraints. \emph{5th Global Workshop on
 #' Digital Soil Mapping}. Sydney: p. 227-231, 2012.
-#' 
+#'
 #' @author Alessandro Samuel-Rosa \email{alessandrosamuelrosa@@gmail.com}
 #' @seealso \code{\link[clhs]{clhs}}
 #' @keywords spatial optimize
@@ -84,8 +84,8 @@
 #' x.max <- diff(bbox(boundary)[1, ])
 #' y.min <- x.min <- 40
 #' y.max <- diff(bbox(boundary)[2, ])
-#' res <- optimACDC(points, candidates, covars, x.max = x.max, 
-#'                  x.min = x.min, y.max = y.max, y.min = y.min, 
+#' res <- optimACDC(points, candidates, covars, x.max = x.max,
+#'                  x.min = x.min, y.max = y.max, y.min = y.min,
 #'                  boundary = boundary, nadir = list(10), iterations = 100)
 # MAIN FUNCTION ################################################################
 optimACDC <-
@@ -97,38 +97,39 @@ optimACDC <-
             acceptance = list(initial = 0.99, cooling = iterations / 10),
             stopping = list(max.count = iterations / 10), plotit = TRUE,
             boundary, progress = TRUE, verbose = TRUE) {
-    
+
     # Check arguments
     if (!is.data.frame(covars)) covars <- as.data.frame(covars)
     check <- .spSANNcheck(points, candidates, x.max, x.min, y.max, y.min,
                           iterations, acceptance, stopping, plotit, boundary,
                           progress, verbose)
     if (!is.null(check)) stop (check, call. = FALSE)
-    check <- .optimACDCcheck(candidates, covars, continuous, weights, 
+    check <- .optimACDCcheck(candidates, covars, continuous, weights,
                              use.coords, strata.type)
     if (!is.null(check)) stop (check, call. = FALSE)
-    
+
     if (plotit) {
       par0 <- par()
       on.exit(suppressWarnings(par(par0)))
     }
-    
+
     # ASR: this will be used to avoid calculating one of the measures in case
     #      its weight is equal to zero
     #use_strata <- ifelse(weights[[1]] == 0, "no", "yes")
     #use_correl <- ifelse(weights[[2]] == 0, "no", "yes")
-    
+
     # Prepare sample points
+    n_candi <- nrow(candidates)
     if (length(points) == 1 && pedometrics::is.numint(points)) {
       n_pts <- points
-      points <- sample(1:nrow(candidates), n_pts)
+      points <- sample(1:n_candi, n_pts)
       points <- candidates[points, ]
     } else {
       n_pts <- nrow(points)
     }
     conf0 <- points
     old_conf <- conf0
-    
+
     # Prepare covariates (covars) and create the starting sample matrix (sm)
     if (use.coords) {
       if (!continuous) {
@@ -142,17 +143,17 @@ optimACDC <-
     }
     n_cov <- ncol(covars)
     sm <- covars[points[, 1], ]
-    
+
     # Base data and initial energy state (energy)
     if (continuous) { # Continuous covariates
       # ASR: we should compute the true population correlation matrix (pcm)
       #      and then compare it with the sample correlation matrix (scm)
       pcm <- cor(covars, use = "complete.obs")
       strata <- .contStrata(n_pts, covars, strata.type)
-      nadir <- .contNadir(n_pts, pcm, nadir, candidates, covars, strata)      
+      nadir <- .contNadir(n_pts, pcm, nadir, candidates, covars, strata)
       scm <- cor(sm, use = "complete.obs")
-      energy0 <- .objCont(sm, strata, pcm, scm, nadir, weights) 
-      
+      energy0 <- .objCont(sm, n_cov, strata, pcm, scm, nadir, weights)
+
     } else { # Categorical covariates
       pcm <- pedometrics::cramer(covars)
       pop_prop <- lapply(covars, function(x) table(x) / nrow(covars))
@@ -160,7 +161,7 @@ optimACDC <-
       scm <- pedometrics::cramer(sm)
       energy0 <- .objCat(sm, pop_prop, nadir, weights, pcm, scm, n_pts, n_cov)
     }
-    
+
     # Other settings for the simulated annealing algorithm
     old_scm <- new_scm <- best_scm <- scm
     old_sm <- new_sm <- best_sm <- sm
@@ -173,10 +174,10 @@ optimACDC <-
     y_max0 <- y.max
     if (progress) pb <- txtProgressBar(min = 1, max = iterations, style = 3)
     time0 <- proc.time()
-    
+
     # Begin the main loop
     for (k in 1:iterations) {
-      
+
       # Jitter one of the points and update x.max and y.max
       # Which point (wp)?
       wp <- sample(c(1:n_pts), 1)
@@ -184,14 +185,15 @@ optimACDC <-
                                  y.min, wp)
       x.max <- x_max0 - (k / iterations) * (x_max0 - x.min)
       y.max <- y_max0 - (k / iterations) * (y_max0 - y.min)
-      
+
       # Update sample and correlation matrices, and energy state
       if (continuous) { # Continuous covariates
         new_row <- covars[new_conf[wp, 1], ]
         new_sm[wp, ] <- new_row
         new_scm <- cor(new_sm, use = "complete.obs")
-        new_energy <- .objCont(new_sm, strata, pcm, new_scm, nadir, weights)
-        
+        new_energy <- .objCont(new_sm, n_cov, strata, pcm, new_scm, nadir,
+                               weights)
+
       } else { # Categorical covariates
         new_row <- covars[new_conf[wp, 1], ]
         new_sm[wp, ] <- new_row
@@ -199,7 +201,7 @@ optimACDC <-
         new_energy <- .objCat(new_sm, pop_prop, nadir, weights, pcm,
                               new_scm, n_pts, n_cov)
       }
-      
+
       # Evaluate the new system configuration
       random_prob <- runif(1)
       actual_prob <- acceptance[[1]] * exp(-k / acceptance[[2]])
@@ -218,7 +220,7 @@ optimACDC <-
           old_scm <- new_scm
           count <- count + 1
           if (verbose) {
-            cat("\n", count, "iteration(s) with no improvement... p = ", 
+            cat("\n", count, "iteration(s) with no improvement... p = ",
                 random_prob, "\n")
           }
         } else {
@@ -248,7 +250,7 @@ optimACDC <-
       }
       # Plotting
       if (plotit && any(round(seq(1, iterations, 10)) == k)) {
-        .spSANNplot(energy0, energies, k, acceptance, 
+        .spSANNplot(energy0, energies, k, acceptance,
                     accept_probs, boundary, new_conf[, 2:3],
                     conf0[, 2:3], y_max0, y.max, x_max0, x.max)
       }
@@ -281,18 +283,18 @@ optimACDC <-
 # INTERNAL FUNCTION - CHECK ARGUMENTS ##########################################
 .optimACDCcheck <-
   function (candidates, covars, covar.type, weights, use.coords, strata.type) {
-    
+
     # covars
     if (ncol(covars) < 2 && use.coords == FALSE) {
       res <- paste("'covars' must have two or more columns")
       return (res)
     }
     if (nrow(candidates) != nrow(covars)) {
-      res <- 
+      res <-
         paste("'candidates' and 'covars' must have the same number of rows")
       return (res)
     }
-    
+
     # weights
     if (!is.list(weights) || length(weights) != 2) {
       res <- paste("'weights' must be a list with two sub-arguments")
@@ -302,12 +304,12 @@ optimACDC <-
       res <- paste("the 'weights' must sum to 1")
       return (res)
     }
-    
+
     # strata.type
     st <- c("equal.area", "equal.range")
     st <- is.na(any(match(st, strata.type)))
     if (st) {
-      res <- paste("'strata.type = ", strata.type, "' is not supported", 
+      res <- paste("'strata.type = ", strata.type, "' is not supported",
                    sep = "")
       return (res)
     }
@@ -319,7 +321,7 @@ optimACDC <-
 # TODO: build a function is pedometrics
 .contStrata <-
   function (n.pts, covars, strata.type) {
-    
+
     # equal area strata
     if (strata.type == "equal.area") {
       n_cov <- ncol(covars)
@@ -327,13 +329,13 @@ optimACDC <-
       breaks <- lapply(covars, quantile, probs, na.rm = TRUE, type = 3)
       #count <- lapply(breaks, table)
       #count <- lapply(count, as.integer)
-      #count <- lapply(count, function(x) {x[2] <- x[2] + x[1] - 1; x[-1L]})      
+      #count <- lapply(count, function(x) {x[2] <- x[2] + x[1] - 1; x[-1L]})
       breaks <- lapply(breaks, unique)
       count <- lapply(1:n_cov, function (i)
         hist(covars[, i], breaks[[i]], plot = FALSE)$counts)
       count <- lapply(1:n_cov, function(i) count[[i]] / sum(count[[i]]) * n.pts)
       strata <- list(breaks, count)
-      
+
     } else {
       # equal range strata
       if (strata.type == "equal.range") {
@@ -347,7 +349,7 @@ optimACDC <-
         breaks <- lapply(breaks, unique)
         count <- lapply(1:n_cov, function (i)
           hist(covars[, i], breaks[[i]], plot = FALSE)$counts)
-        count <- lapply(1:n_cov, function(i) 
+        count <- lapply(1:n_cov, function(i)
           count[[i]] / sum(count[[i]]) * n.pts)
         # This was an option to merge null strata
         #breaks <- lapply(breaks, unique)
@@ -388,7 +390,7 @@ optimACDC <-
 # INTERNAL FUNCTION - NADIR FOR CONTINUOUS COVARIATES ##########################
 .contNadir <-
   function (n.pts, pcm, nadir, candi, covars, strata) {
-    
+
     if (!is.null(nadir[[1]])) { # Simulate the nadir point
       message(paste("simulating ", nadir[[1]], " nadir values...", sep = ""))
       strata_nadir <- vector()
@@ -438,10 +440,10 @@ optimACDC <-
   }
 # INTERNAL FUNCTION - CRITERION FOR CONTINUOUS COVARIATES ######################
 .objCont <-
-  function (sm, strata, pcm, scm, nadir, weights) {
-    counts <- lapply(1:ncol(sm), function (i)
+  function (sm, n.cov, strata, pcm, scm, nadir, weights) {
+    counts <- lapply(1:n.cov, function (i)
       hist(sm[, i], strata[[1]][[i]], plot = FALSE)$counts)
-    counts <- sapply(1:ncol(sm), function (i)
+    counts <- sapply(1:n.cov, function (i)
       sum(abs(counts[[i]] - strata[[2]][[i]])))
     obj_cont <- sum(counts) / attr(nadir, "strata")
     obj_cont <- obj_cont * weights[[1]]
@@ -453,7 +455,7 @@ optimACDC <-
 # INTERNAL FUNCTION - NADIR FOR CATEGORICAL COVARIATES #########################
 .catNadir <-
   function (nadir, candi, n.pts, covars, pop.prop, pcm) {
-    if (!is.null(nadir[[1]])) {    
+    if (!is.null(nadir[[1]])) {
       message("simulating nadir values...")
       strata_nadir <- vector()
       correl_nadir <- vector()
