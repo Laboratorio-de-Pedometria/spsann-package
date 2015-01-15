@@ -13,25 +13,23 @@ using namespace Rcpp;
 NumericMatrix updateMSSDCpp(NumericMatrix x1, NumericMatrix x2, 
                             NumericMatrix dm, int idx) {
   int ncol = x1.ncol(), nrow = x1.nrow(), i, j;
-  
-  /* Fill the vector with zeros and four decimal places to set the format of */
-  /* the output */
   NumericVector d(nrow, 0.0000);
   
-  /* begin the main loop over the rows of the matrix of coordinates */
-  for (i = 0; i < nrow; i++) {
-    
-    /* begin the secondary loop over the columns of the matrix of coordinates */
-    for (j = 0; j < ncol; j++) {
+  for (i = 0; i < nrow; i++) { /* loop over the rows */    
+    for (j = 0; j < ncol; j++) { /* loop over the columns */
       d[i] += pow(x1[nrow * j + i] - x2[j], 2);
     }
-    
-    /* matrix indexes beging at 0 in C++, while in R it starts at 1 */
-    idx -= 1;
-    
     /* take the squared root and replace the values in the distance matrix */
-    dm(i, idx) = pow(d[i], 0.5);
+    dm(i, idx - 1) = pow(d[i], 0.5);
   }
   return (dm);
 }
-/* End! */
+// # Testing
+// require(SpatialTools)
+// x1 <- matrix(rep(1, 6), ncol = 2); x1
+// x1[2, ] <- c(2, 2); x1
+// b <- x1[c(1, 3), ]; b
+// dm <- SpatialTools::dist2(x1, b); dm
+// idx <- as.integer(2); idx
+// x2 <- matrix(x1[idx, ], nrow = 1); x2
+// .updateMSSDCpp(x1, x2, dm, idx)

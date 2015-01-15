@@ -54,87 +54,92 @@ optimMSSD <-
             acceptance = list(initial = 0.99, cooling = iterations / 10),
             stopping = list(max.count = iterations / 10), plotit = TRUE,
             boundary, progress = TRUE, verbose = TRUE) {
-
-    check <- .spSANNcheck(points, candidates, x.max, x.min, y.max, y.min,
-                          iterations, acceptance, stopping, plotit, boundary,
-                          progress, verbose)
+    
+    check <- .spSANNcheck(points = points, candidates = candidates, 
+                          x.max = x.max, x.min = x.min, y.max = y.max, 
+                          y.min = y.min, iterations = iterations, 
+                          acceptance = acceptance, stopping = stopping, 
+                          plotit = plotit, boundary = boundary, 
+                          progress = progress, verbose = verbose)
     if (!is.null(check)) stop (check, call. = FALSE)
-
+    
     if (plotit) {
       par0 <- par()
       on.exit(suppressWarnings(par(par0)))
     }
-    if (is.integer(points)) {
+    n_candi <- nrow(candidates)
+    if (is.integer(points) || pedometrics::is.numint(points)) {
       n_pts <- points
-      points <- sample(c(1:dim(candidates)[1]), n_pts)
+      points <- sample(1:n_candi, n_pts)
       points <- candidates[points, ]
     } else {
       n_pts <- nrow(points)
     }
-    sys_config0 <- points
-    old_sys_config <- sys_config0
+    config0 <- points
+    old_config <- config0
 
     # Calculate the initial energy state. The distance matrix is calculated
     # using the fields::rdist(). The function .calcMSSDCpp() does the squaring
     # internaly.
-    # ASR: write own distance function
-    dist_mat <- fields::rdist(candidates[, 2:3], sys_config0[, 2:3])
-    energy_state0 <- .calcMSSDCpp(dist_mat)
-
+    # ASR: write own distance function in C++
+    dm <- fields::rdist(candidates[, 2:3], config0[, 2:3])
+    energy0 <- .calcMSSDCpp(dm)
+    
     # other settings for the simulated annealing algorithm
-    old_dist_mat  <- dist_mat
-    new_dist_mat  <- dist_mat
-    best_dist_mat <- dist_mat
+    old_dm        <- dm
+    new_dm        <- dm
+    best_dm       <- dm
     count         <- 0
-    old_energy_state <- energy_state0
-    best_energy_state <- Inf
+    old_energy    <- energy0
+    best_energy   <- Inf
     energy_states <- vector()
     accept_probs  <- vector()
     x_max0        <- x.max
     y_max0        <- y.max
     if (progress) pb <- txtProgressBar(min = 1, max = iterations, style = 3)
     time0 <- proc.time()
-
+    
     # Begin the main loop
     for (k in 1:iterations) {
-
+      
       # Jitter one of the points and update x.max and y.max
       # ASR: spJitterFinite() can be improved implementing it in C++
-      which_point <- sample(c(1:n_pts), 1)
-      new_sys_config <- spJitterFinite(old_sys_config, candidates, x.max,
-                                       x.min, y.max, y.min, which_point)
+      wp <- sample(c(1:n_pts), 1)
+      new_config <- spJitterFinite(old_config, candidates, x.max,
+                                       x.min, y.max, y.min, wp)
       x.max <- x_max0 - (k / iterations) * (x_max0 - x.min)
       y.max <- y_max0 - (k / iterations) * (y_max0 - y.min)
-
+      
       # Update the distance matrix and calculate the new energy state
-      x2 <- matrix(new_sys_config[which_point, ], nrow = 1)
-      new_dist_mat <- .updateMSSDCpp(candidates, x2, old_dist_mat, which_point)
-      new_energy_state <- .calcMSSDCpp(new_dist_mat)
-
+      x2 <- matrix(new_config[wp, 2:3], nrow = 1)
+      new_dm <- .updateMSSDCpp(x1 = candidates[, 2:3], x2 = x2, dm = old_dm, 
+                               idx = wp)
+      new_energy <- .calcMSSDCpp(new_dm)
+      
       # Evaluate the new system configuration
       random_prob     <- runif(1)
       actual_prob     <- acceptance[[1]] * exp(-k / acceptance[[2]])
       accept_probs[k] <- actual_prob
-      if (new_energy_state <= old_energy_state) {
-        old_sys_config   <- new_sys_config
-        old_energy_state <- new_energy_state
-        count            <- 0
-        old_dist_mat     <- new_dist_mat
+      if (new_energy <= old_energy) {
+        old_config <- new_config
+        old_energy <- new_energy
+        count      <- 0
+        old_dm     <- new_dm
       } else {
-        if (new_energy_state > old_energy_state & random_prob <= actual_prob) {
-          old_sys_config   <- new_sys_config
-          old_energy_state <- new_energy_state
-          count            <- count + 1
-          old_dist_mat     <- new_dist_mat
+        if (new_energy > old_energy & random_prob <= actual_prob) {
+          old_config <- new_config
+          old_energy <- new_energy
+          count      <- count + 1
+          old_dm     <- new_dm
           if (verbose) {
             cat("\n", count, "iteration(s) with no improvement... p = ",
                 random_prob, "\n")
           }
           } else {
-            new_energy_state <- old_energy_state
-            new_sys_config   <- old_sys_config
-            count            <- count + 1
-            new_dist_mat     <- old_dist_mat
+            new_energy <- old_energy
+            new_config <- old_config
+            count      <- count + 1
+            new_dm     <- old_dm
             if (verbose) {
               cat("\n", count, "iteration(s) with no improvement... stops at",
                   stopping[[1]], "\n")
@@ -143,36 +148,36 @@ optimMSSD <-
       }
 
       # Best energy state
-      energy_states[k] <- new_energy_state
-      if (new_energy_state < best_energy_state / 1.0000001) {
-        best_k                <- k
-        best_sys_config       <- new_sys_config
-        best_energy_state     <- new_energy_state
-        best_old_energy_state <- old_energy_state
-        old_sys_config        <- old_sys_config
-        best_dist_mat         <- new_dist_mat
-        best_old_dist_mat     <- old_dist_mat
+      energy_states[k] <- new_energy
+      if (new_energy < best_energy / 1.0000001) {
+        best_k          <- k
+        best_config     <- new_config
+        best_energy     <- new_energy
+        best_old_energy <- old_energy
+        old_config      <- old_config
+        best_dm         <- new_dm
+        best_old_dm     <- old_dm
       }
 
       # Plotting
       if (any(round(seq(1, iterations, 10)) == k)) {
         if (plotit){
-          .spSANNplot(energy_state0, energy_states, k, acceptance,
-                      accept_probs, boundary, new_sys_config[, 2:3],
-                      sys_config0[, 2:3], y_max0, y.max, x_max0, x.max)
+          .spSANNplot(energy0, energy_states, k, acceptance,
+                      accept_probs, boundary, new_config[, 2:3],
+                      config0[, 2:3], y_max0, y.max, x_max0, x.max)
         }
       }
 
       # Freezing parameters
       if (count == stopping[[1]]) {
-        if (new_energy_state > best_energy_state * 1.000001) {
-          old_sys_config   <- old_sys_config
-          new_sys_config   <- best_sys_config
-          old_energy_state <- best_old_energy_state
-          new_energy_state <- best_energy_state
-          count            <- 0
-          new_dist_mat     <- best_dist_mat
-          old_dist_mat     <- best_old_dist_mat
+        if (new_energy > best_energy * 1.000001) {
+          old_config <- old_config
+          new_config <- best_config
+          old_energy <- best_old_energy
+          new_energy <- best_energy
+          count      <- 0
+          new_dm     <- best_dm
+          old_dm     <- best_old_dm
           cat("\n", "reached maximum count with suboptimal configuration\n")
           cat("\n", "restarting with previously best configuration\n")
           cat("\n", count, "iteration(s) with no improvement... stops at",
@@ -185,7 +190,7 @@ optimMSSD <-
     }
     if (progress) close(pb)
     if (plotit) par(par0)
-    res <- .spSANNout(new_sys_config, energy_state0, energy_states, time0)
+    res <- .spSANNout(new_config, energy0, energy_states, time0)
     return (res)
   }
 # FUNCTION - CALCULATE THE CRITERION VALUE #####################################
@@ -193,8 +198,8 @@ optimMSSD <-
 #' @export
 objMSSD <-
   function (candidates, points) {
-    dist_mat <- fields::rdist(candidates[, 2:3], points[, 2:3])
-    res <- .calcMSSDCpp(dist_mat)
+    dm <- fields::rdist(candidates[, 2:3], points[, 2:3])
+    res <- .calcMSSDCpp(dm)
     return (res)
   }
 # INTERNAL FUNCTION - NEAREST POINT ############################################
@@ -208,8 +213,8 @@ objMSSD <-
       stop (paste("'which.pts' should be a vector of length smaller than ",
                   dim(dist.mat)[2], sep = ""))
     }
-    sub_dist_mat <- dist.mat[, which.pts]
-    min_dist_id <- apply(sub_dist_mat, MARGIN = 1, FUN = which.min)
+    sub_dm <- dist.mat[, which.pts]
+    min_dist_id <- apply(sub_dm, MARGIN = 1, FUN = which.min)
     return (min_dist_id)
   }
 # End!
