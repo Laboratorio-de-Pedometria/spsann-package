@@ -64,13 +64,8 @@ optimPAN <-
 
     # PREPARE SAMPLE POINTS
     n_candi <- nrow(candi)
-    if (length(points) == 1 && pedometrics::is.numint(points)) {
-      n_pts <- points
-      points <- sample(1:n_candi, n_pts)
-      points <- candi[points, ]
-    } else {
-      n_pts <- nrow(points)
-    }
+    points <- .spsannPoints(points = points, candi = candi, n.candi = n_candi)
+    n_pts <- nrow(points)
     conf0 <- points
     old_conf <- conf0
 
