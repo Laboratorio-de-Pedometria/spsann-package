@@ -10,7 +10,34 @@
 #'
 #' @template spJitter_doc
 #' @template spSANN_doc
-#' @template optimPPL_doc
+#' 
+#' @param lags Integer. The number of lag distance classes. Alternatively, a
+#' vector of numeric values with the lower and upper limits of each lag
+#' distance class. The lowest value must be larger than zero, e.g. 0.0001.
+#' Defaults to \code{lags = 7}.
+#' 
+#' @param lags.type Character. The type of lag distance classes. Available
+#' options are \code{"equidistant"} and \code{"exponential"}. Defaults to
+#' \code{lags.type = "exponential"}. See \sQuote{Details} for more information.
+#'
+#' @param lags.base Numeric. Base of the exponential expression used to
+#' create the exponential lag distance classes. Defaults to
+#' \code{lags.base = 2}. See \sQuote{Details} for more information.
+#'
+#' @param cutoff Numeric value. The maximum distance up to which lag distance
+#' classes are created. Used only when \code{lags} is an integer. 
+#' See \sQuote{Details} for more information.
+#'
+#' @param criterion Character value. The measure to be used to describe the
+#' energy state of the current system configuration. Available options are
+#' \code{"minimum"} and \code{"distribution"}. Defaults to
+#' \code{objective = "minimum"}. See \sQuote{Details} for more information.
+#'
+#' @param pre.distri Numeric vector. The pre-specified distribution of points
+#' or point-pair with which the observed counts of points or point-pairs per
+#' lag distance class is compared. Used only when
+#' \code{criterion = "distribution"}. Defaults to a uniform distribution. See
+#' \sQuote{Details} for more information.
 #'
 #' @details
 #' \subsection{Distances}{
@@ -116,6 +143,7 @@ optimPPL <-
             boundary, progress = TRUE, verbose = TRUE) {
 
     # Check arguments
+    # http://www.r-bloggers.com/a-warning-about-warning/
     check <- .spSANNcheck(points, candi, x.max, x.min, y.max, y.min,
                           iterations, acceptance, stopping, plotit, boundary,
                           progress, verbose)
@@ -131,14 +159,9 @@ optimPPL <-
 
     # Prepare points
     n_candi <- nrow(candi)
-    if (is.integer(points) || is.numint(points)) {
-      n_pts <- points
-      points <- sample(c(1:n_candi), n_pts)
-      points <- candi[points, ]
-    } else {
-      n_pts <- nrow(points)
-    }
-
+    points <- .spsannPoints(points = points, candi = candi, n.candi = n_candi)
+    n_pts <- nrow(points)
+    
     # Prepare lags
     if (length(lags) >= 3) {
       n_lags <- length(lags) - 1
@@ -146,11 +169,11 @@ optimPPL <-
       n_lags <- lags
       lags <- .getLagBreaks(lags, lags.type, cutoff, lags.base)
     }
-    sys_config0 <- points
-    old_sys_config <- sys_config0
+    sys_conf0 <- points
+    old_sys_conf <- sys_conf0
 
     # Initial energy state
-    dist_mat <- as.matrix(dist(sys_config0[, 2:3], method = "euclidean"))
+    dist_mat <- as.matrix(dist(sys_conf0[, 2:3], method = "euclidean"))
     point_per_lag <- .getPointsPerLag(lags, dist_mat)
     energy_state0 <- .objPointsPerLag(point_per_lag, n_lags, n_pts,
                                       criterion, pre.distri)
@@ -174,13 +197,13 @@ optimPPL <-
 
       # jitter one of the points and update x.max and y.max
       which_point <- sample(c(1:n_pts), 1)
-      new_sys_config <- spJitterFinite(old_sys_config, candi, x.max,
+      new_sys_conf <- spJitterFinite(old_sys_conf, candi, x.max,
                                        x.min, y.max, y.min, which_point)
       x.max <- x_max0 - (k / iterations) * (x_max0 - x.min)
       y.max <- y_max0 - (k / iterations) * (y_max0 - y.min)
 
       # update the distance matrix and calculate the new energy state
-      new_dist_mat <- .updatePPLCpp(new_sys_config[, 2:3], old_dist_mat,
+      new_dist_mat <- .updatePPLCpp(new_sys_conf[, 2:3], old_dist_mat,
                                     which_point)
       point_per_lag <- .getPointsPerLag(lags, new_dist_mat)
       new_energy_state <- .objPointsPerLag(point_per_lag, n_lags, n_pts,
@@ -191,13 +214,13 @@ optimPPL <-
       actual_prob <- acceptance[[1]] * exp(-k / acceptance[[2]])
       accept_probs[k] <- actual_prob
       if (new_energy_state <= old_energy_state) {
-        old_sys_config   <- new_sys_config
+        old_sys_conf   <- new_sys_conf
         old_energy_state <- new_energy_state
         old_dist_mat     <- new_dist_mat
         count <- 0
       } else {
         if (new_energy_state > old_energy_state & random_prob <= actual_prob) {
-          old_sys_config   <- new_sys_config
+          old_sys_conf   <- new_sys_conf
           old_energy_state <- new_energy_state
           old_dist_mat     <- new_dist_mat
           count <- count + 1
@@ -207,7 +230,7 @@ optimPPL <-
           }
         } else {
           new_energy_state <- old_energy_state
-          new_sys_config   <- old_sys_config
+          new_sys_conf   <- old_sys_conf
           new_dist_mat     <- old_dist_mat
           count <- count + 1
           if (verbose) {
@@ -221,10 +244,10 @@ optimPPL <-
       energy_states[k] <- new_energy_state
       if (new_energy_state < best_energy_state / 1.0000001) {
         best_k <- k
-        best_sys_config       <- new_sys_config
+        best_sys_conf       <- new_sys_conf
         best_energy_state     <- new_energy_state
         best_old_energy_state <- old_energy_state
-        old_sys_config        <- old_sys_config
+        old_sys_conf        <- old_sys_conf
         best_dist_mat         <- new_dist_mat
         best_old_dist_mat     <- old_dist_mat
       }
@@ -232,15 +255,15 @@ optimPPL <-
       # Plotting
       if (plotit && any(round(seq(1, iterations, 10)) == k)) {
         .spSANNplot(energy_state0, energy_states, k, acceptance,
-                    accept_probs, boundary, new_sys_config[, 2:3],
-                    sys_config0[, 2:3], y_max0, y.max, x_max0, x.max)
+                    accept_probs, boundary, new_sys_conf[, 2:3],
+                    sys_conf0[, 2:3], y_max0, y.max, x_max0, x.max)
       }
 
       # Freezing parameters
       if (count == stopping[[1]]) {
         if (new_energy_state > best_energy_state * 1.000001) {
-          old_sys_config   <- old_sys_config
-          new_sys_config   <- best_sys_config
+          old_sys_conf   <- old_sys_conf
+          new_sys_conf   <- best_sys_conf
           old_energy_state <- best_old_energy_state
           new_energy_state <- best_energy_state
           count <- 0
@@ -257,8 +280,7 @@ optimPPL <-
       if (progress) setTxtProgressBar(pb, k)
     }
     if (progress) close(pb)
-    if (plotit) par(par0)
-    res <- .spSANNout(new_sys_config, energy_state0, energy_states, time0)
+    res <- .spSANNout(new_sys_conf, energy_state0, energy_states, time0)
     return (res)
   }
 # FUNCTION - CALCULATE THE CRITERION VALUE #####################################
@@ -270,10 +292,17 @@ objPoints <-
             pre.distri = NULL) {
 
     # Prepare points
-    if (is.integer(points)) {
-      n_pts <- points
-      points <- sample(c(1:dim(candi)[1]), n_pts)
-      points <- candi[points, ]
+    if (is.integer(points) || is.numint(points)) {
+      n_candi <- nrow(candi)
+      if (length(points) > 1) {
+        n_pts <- length(points)
+        points <- candi[points, ]
+      }
+      if (length(points) == 1) {
+        n_pts <- points
+        points <- sample(1:n_candi, n_pts)
+        points <- candi[points, ] 
+      }
     } else {
       n_pts <- nrow(points)
     }
@@ -283,12 +312,15 @@ objPoints <-
       n_lags <- length(lags) - 1
     } else {
       n_lags <- lags
-      lags <- .getLagBreaks(lags, lags.type, cutoff, lags.base)
+      lags <- .getLagBreaks(lags = lags, lags.type = lags.type, 
+                            cutoff = cutoff, lags.base = lags.base)
     }
 
     dm <- as.matrix(dist(points[, 2:3], method = "euclidean"))
-    ppl <- .getPointsPerLag(lags, dm)
-    res <- .objPointsPerLag(ppl, n_lags, n_pts, criterion, pre.distri)
+    ppl <- .getPointsPerLag(lags = lags, dist.mat = dm)
+    res <- .objPointsPerLag(points.per.lag = ppl, n.lags = n_lags, 
+                            n.pts = n_pts, criterion = criterion, 
+                            pre.distri = pre.distri)
     return (res)
   }
 # FUNCTION - POINTS PER LAG DISTANCE CLASS #####################################
@@ -301,7 +333,8 @@ pointsPerLag <-
     # Prepare points
     if (is.integer(points) || is.numint(points)) {
       n_pts <- points
-      points <- sample(1:dim(candi)[1], n_pts)
+      n_candi <- nrow(candi)
+      points <- sample(1:n_candi, n_pts)
       points <- candi[points, ]
     } else {
       n_pts <- nrow(points)
