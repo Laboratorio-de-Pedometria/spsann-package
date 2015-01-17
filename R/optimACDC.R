@@ -9,8 +9,9 @@
 #'
 #' @param covars Data frame or matrix with the covariates in the columns.
 #'
-#' @param continuous Logical. Are the covariates \sQuote{continuous} or
-#' \sQuote{categorical}. Defaults to \code{continuous = TRUE}.
+#' @param covars.type Character value defining the type of covariates that are
+#' being used. Available options are \code{"numeric"} and \code{"factor"}.
+#' Defaults to \code{covars.type = "numeric"}.
 #'
 #' @param weights List with two sub-arguments. The weights assigned to the
 #' sampling strata/classes and the correlation/association measure. They must
@@ -20,7 +21,7 @@
 #' Defaults to \code{use.coords = FALSE}.
 #'
 #' @param strata.type Character. The type of strata to be used with
-#' continuous covariates. Available options are \code{"equal.area"} and
+#' numeric covariates. Available options are \code{"equal.area"} and
 #' \code{"equal.range"}. Defaults to \code{strata.type = "equal.area"}. See
 #' \sQuote{Details} for more information.
 #'
@@ -89,10 +90,10 @@
 #'                  boundary = boundary, nadir = list(10), iterations = 100)
 # MAIN FUNCTION ################################################################
 optimACDC <-
-  function (points, candidates, covars, continuous = TRUE,
+  function (points, candidates, covars, covars.type = "numeric",
             weights = list(strata = 0.5, correl = 0.5), use.coords = FALSE,
             strata.type = "equal.area",
-            nadir = list(sim = 1000, user = NULL, abs = NULL),
+            nadir = list(sim = 1000, save.sim = TRUE, user = NULL, abs = NULL),
             x.max, x.min, y.max, y.min, iterations,
             acceptance = list(initial = 0.99, cooling = iterations / 10),
             stopping = list(max.count = iterations / 10), plotit = TRUE,
@@ -104,7 +105,7 @@ optimACDC <-
                           iterations, acceptance, stopping, plotit, boundary,
                           progress, verbose)
     if (!is.null(check)) stop (check, call. = FALSE)
-    check <- .optimACDCcheck(candidates, covars, continuous, weights,
+    check <- .optimACDCcheck(candidates, covars, covars.type, weights,
                              use.coords, strata.type)
     if (!is.null(check)) stop (check, call. = FALSE)
 
@@ -132,9 +133,9 @@ optimACDC <-
 
     # Prepare covariates (covars) and create the starting sample matrix (sm)
     if (use.coords) {
-      if (!continuous) {
+      if (covars.type == "factor") {
         coords <- data.frame(candidates[, 2:3])
-        breaks <- .contStrata(n_pts, coords, strata.type)[[1]]
+        breaks <- .numStrata(n_pts, coords, strata.type)[[1]]
         coords <- cont2cat(coords, breaks)
         covars <- data.frame(covars, coords)
       } else {
@@ -145,33 +146,47 @@ optimACDC <-
     sm <- covars[points[, 1], ]
 
     # Base data and initial energy state (energy)
-    if (continuous) { # Continuous covariates
+    if (covars.type == "numeric") { # Numeric covariates
       # ASR: we should compute the true population correlation matrix (pcm)
       #      and then compare it with the sample correlation matrix (scm)
       pcm <- cor(covars, use = "complete.obs")
-      strata <- .contStrata(n_pts, covars, strata.type)
-      nadir <- .contNadir(n_pts, pcm, nadir, candidates, covars, strata)
+      strata <- .numStrata(n.pts = n_pts, covars = covars, 
+                           strata.type = strata.type)
+      nadir <- .numNadir(n.pts = n_pts, n.cov = n_cov, n.candi = n_candi, 
+                         pcm = pcm, nadir = nadir, candi = candidates, 
+                         covars = covars, strata = strata)
       scm <- cor(sm, use = "complete.obs")
-      energy0 <- .objCont(sm, n_cov, strata, pcm, scm, nadir, weights)
+      energy0 <- .objNum(sm = sm, n.cov = n_cov, strata = strata, pcm = pcm, 
+                         scm = scm, nadir = nadir, weights = weights)
 
-    } else { # Categorical covariates
-      pcm <- pedometrics::cramer(covars)
-      pop_prop <- lapply(covars, function(x) table(x) / nrow(covars))
-      nadir <- .catNadir(nadir, candidates, n_pts, covars, pop_prop, pcm)
-      scm <- pedometrics::cramer(sm)
-      energy0 <- .objCat(sm, pop_prop, nadir, weights, pcm, scm, n_pts, n_cov)
+    } else { # Factor covariates
+      if (covars.type == "factor") {
+        pcm <- pedometrics::cramer(covars)
+        pop_prop <- lapply(covars, function(x) table(x) / nrow(covars))
+        nadir <- .facNadir(nadir = nadir, candi = candidates, n.candi = n_candi,
+                           n.pts = n_pts, n.cov = n_cov, covars = covars, 
+                           pop.prop = pop_prop, pcm = pcm)
+        scm <- pedometrics::cramer(sm)
+        energy0 <- .objFac(sm = sm, pop.prop = pop_prop, nadir = nadir, 
+                           weights = weights, pcm = pcm, scm = scm,
+                           n.pts = n_pts, n.cov = n_cov)
+      }
     }
 
     # Other settings for the simulated annealing algorithm
-    old_scm <- new_scm <- best_scm <- scm
-    old_sm <- new_sm <- best_sm <- sm
-    count <- 0
-    old_energy <- energy0
-    best_energy <- Inf
-    energies <- vector()
+    old_scm      <- scm
+    new_scm      <- scm
+    best_scm     <- scm
+    old_sm       <- sm
+    new_sm       <- sm
+    best_sm      <- sm
+    count        <- 0
+    old_energy   <- energy0
+    best_energy  <- Inf
+    energies     <- vector()
     accept_probs <- vector()
-    x_max0 <- x.max
-    y_max0 <- y.max
+    x_max0       <- x.max
+    y_max0       <- y.max
     if (progress) pb <- txtProgressBar(min = 1, max = iterations, style = 3)
     time0 <- proc.time()
 
@@ -187,48 +202,52 @@ optimACDC <-
       y.max <- y_max0 - (k / iterations) * (y_max0 - y.min)
 
       # Update sample and correlation matrices, and energy state
-      if (continuous) { # Continuous covariates
+      if (covars.type == "numeric") { # Numeric covariates
         new_row <- covars[new_conf[wp, 1], ]
         new_sm[wp, ] <- new_row
         new_scm <- cor(new_sm, use = "complete.obs")
-        new_energy <- .objCont(new_sm, n_cov, strata, pcm, new_scm, nadir,
-                               weights)
+        new_energy <- .objNum(sm = new_sm, n.cov = n_cov, strata = strata, 
+                              pcm = pcm, scm = new_scm, nadir = nadir,
+                              weights = weights)
 
-      } else { # Categorical covariates
-        new_row <- covars[new_conf[wp, 1], ]
-        new_sm[wp, ] <- new_row
-        new_scm <- pedometrics::cramer(new_sm)
-        new_energy <- .objCat(new_sm, pop_prop, nadir, weights, pcm,
-                              new_scm, n_pts, n_cov)
+      } else { # Factor covariates
+        if (covars.type == "factor") {
+          new_row <- covars[new_conf[wp, 1], ]
+          new_sm[wp, ] <- new_row
+          new_scm <- pedometrics::cramer(new_sm)
+          new_energy <- .objFac(sm = new_sm, pop.prop = pop_prop, 
+                                nadir = nadir, weights = weights, pcm = pcm, 
+                                scm = new_scm, n.pts = n_pts, n.cov = n_cov)
+        }
       }
-
+      
       # Evaluate the new system configuration
       random_prob <- runif(1)
       actual_prob <- acceptance[[1]] * exp(-k / acceptance[[2]])
       accept_probs[k] <- actual_prob
       if (new_energy <= old_energy) {
-        old_conf <- new_conf
+        old_conf   <- new_conf
         old_energy <- new_energy
-        old_sm <- new_sm
-        old_scm <- new_scm
-        count <- 0
+        count      <- 0
+        old_sm     <- new_sm
+        old_scm    <- new_scm
       } else {
         if (new_energy > old_energy & random_prob <= actual_prob) {
-          old_conf <- new_conf
+          old_conf   <- new_conf
           old_energy <- new_energy
-          old_sm <- new_sm
-          old_scm <- new_scm
-          count <- count + 1
+          count      <- count + 1
+          old_sm     <- new_sm
+          old_scm    <- new_scm
           if (verbose) {
             cat("\n", count, "iteration(s) with no improvement... p = ",
                 random_prob, "\n")
           }
         } else {
           new_energy <- old_energy
-          new_conf <- old_conf
-          new_sm <- old_sm
-          new_scm <- old_scm
-          count <- count + 1
+          new_conf   <- old_conf
+          count      <- count + 1
+          new_sm     <- old_sm
+          new_scm    <- old_scm
           if (verbose) {
             cat("\n", count, "iteration(s) with no improvement... stops at",
                 stopping[[1]], "\n")
@@ -238,15 +257,15 @@ optimACDC <-
       # Best energy state
       energies[k] <- new_energy
       if (new_energy < best_energy / 1.0000001) {
-        best_k <- k
-        best_conf <- new_conf
-        best_energy <- new_energy
+        best_k          <- k
+        best_conf       <- new_conf
+        best_energy     <- new_energy
         best_old_energy <- old_energy
-        old_conf <- old_conf
-        best_sm <- new_sm
-        best_old_sm <- old_sm
-        best_scm <- new_scm
-        best_old_scm <- old_scm
+        old_conf        <- old_conf
+        best_sm         <- new_sm
+        best_old_sm     <- old_sm
+        best_scm        <- new_scm
+        best_old_scm    <- old_scm
       }
       # Plotting
       if (plotit && any(round(seq(1, iterations, 10)) == k)) {
@@ -257,15 +276,15 @@ optimACDC <-
       # Freezing parameters
       if (count == stopping[[1]]) {
         if (new_energy > best_energy * 1.000001) {
-          old_conf <- old_conf
-          new_conf <- best_conf
-          new_sm <- best_sm
-          new_scm <- best_scm
+          old_conf   <- old_conf
+          new_conf   <- best_conf
           old_energy <- best_old_energy
           new_energy <- best_energy
-          old_sm <- best_old_sm
-          old_scm <- best_old_scm
-          count <- 0
+          count      <- 0
+          new_sm     <- best_sm
+          new_scm    <- best_scm
+          old_sm     <- best_old_sm
+          old_scm    <- best_old_scm
           cat("\n", "reached maximum count with suboptimal configuration\n")
           cat("\n", "restarting with previously best configuration\n")
           cat("\n", count, "iteration(s) with no improvement... stops at",
@@ -283,7 +302,7 @@ optimACDC <-
 # INTERNAL FUNCTION - CHECK ARGUMENTS ##########################################
 .optimACDCcheck <-
   function (candidates, covars, covar.type, weights, use.coords, strata.type) {
-
+    
     # covars
     if (ncol(covars) < 2 && use.coords == FALSE) {
       res <- paste("'covars' must have two or more columns")
@@ -294,7 +313,19 @@ optimACDC <-
         paste("'candidates' and 'covars' must have the same number of rows")
       return (res)
     }
-
+    
+    # covars.type
+    if (missing(covars.type)) {
+      res <- paste("'covars.type' is missing")
+      return (res)
+    } else {
+      if (covars.type != "numeric" || covars.type != "factor") {
+        res <- paste("'covars.type = ", covars.type, "' is not supported", 
+                     sep = "")
+        return (res)
+      }
+    }
+    
     # weights
     if (!is.list(weights) || length(weights) != 2) {
       res <- paste("'weights' must be a list with two sub-arguments")
@@ -304,7 +335,7 @@ optimACDC <-
       res <- paste("the 'weights' must sum to 1")
       return (res)
     }
-
+    
     # strata.type
     st <- c("equal.area", "equal.range")
     st <- is.na(any(match(st, strata.type)))
@@ -314,12 +345,12 @@ optimACDC <-
       return (res)
     }
   }
-# INTERNAL FUNCTION - BREAKS FOR CONTINUOUS COVARIATES #########################
+# INTERNAL FUNCTION - BREAKS FOR NUMERIC COVARIATES ############################
 # Now we define the breaks and the distribution, and return it as a list
 # Quantiles now honour the fact that the data are discontinuous
 # NOTE: there is a problem when the number of unique values is small (3)
 # TODO: build a function is pedometrics
-.contStrata <-
+.numStrata <-
   function (n.pts, covars, strata.type) {
 
     # equal area strata
@@ -371,7 +402,7 @@ optimACDC <-
     }
     return (strata)
   }
-# INTERNAL FUNCTION - DISTRIBUTION FOR CONTINUOUS COVARIATES ###################
+# INTERNAL FUNCTION - DISTRIBUTION FOR NUMERIC COVARIATES ######################
 # .contDistri <-
 #   function (pre.distri, n.pts) {
 #     if (length(pre.distri) > 1) {
@@ -387,35 +418,52 @@ optimACDC <-
 #     }
 #     return (pre.distri)
 #   }
-# INTERNAL FUNCTION - NADIR FOR CONTINUOUS COVARIATES ##########################
-.contNadir <-
-  function (n.pts, pcm, nadir, candi, covars, strata) {
+# INTERNAL FUNCTION - NADIR FOR NUMERIC COVARIATES #############################
+.numNadir <-
+  function (n.pts, n.cov, n.candi, pcm, nadir, candi, covars, strata) {
 
-    if (!is.null(nadir[[1]])) { # Simulate the nadir point
-      message(paste("simulating ", nadir[[1]], " nadir values...", sep = ""))
+    if (!is.null(nadir[[1]]) && !is.null(nadir[[2]])) { # Simulate the nadir
+      m <- paste("simulating ", nadir[[1]], " nadir values...", sep = "")
+      message(m)
+      
+      # SET VARIABLES
       strata_nadir <- vector()
       correl_nadir <- vector()
+      
+      # BEGIN THE SIMULATION
       for (i in 1:nadir[[1]]) {
-        pts <- sample(c(1:nrow(candi)), n.pts)
+        pts <- sample(1:n.candi, n.pts)
         sm <- covars[pts, ]
         scm <- cor(sm, use = "complete.obs")
-        counts <- lapply(1:ncol(covars), function (i)
+        counts <- lapply(1:n.cov, function (i)
           hist(sm[, i], strata[[1]][[i]], plot = FALSE)$counts)
-        counts <- sapply(1:ncol(covars), function (i)
+        counts <- sapply(1:n.cov, function (i)
           sum(abs(counts[[i]] - strata[[2]][[i]])))
         strata_nadir[i] <- sum(counts)
         correl_nadir[i] <- sum(abs(pcm - scm))
       }
-      res <- list(strata = strata_nadir, correl = correl_nadir)
+      
+      # SHOULD WE SAVE AND RETURN THE SIMULATED VALUES?
+      # ASR: We compute the mean simulated value and return it as an attribute
+      #      because we want to explore the simulated values in the future.
+      if (nadir[[2]]) {
+        res <- list(strata = strata_nadir, correl = correl_nadir)
+      } else {
+        res <- list(strata = "strata_nadir", correl = "correl_nadir")
+      }
       a <- attributes(res)
       a$strata_nadir <- mean(strata_nadir) / 100
       a$correl_nadir <- mean(correl_nadir) / 100
       attributes(res) <- a
+      
+      # ASR: Other options are not available yet.
     } else {
-      if (!is.null(nadir[[2]])) {
+      if (!is.null(nadir[[3]])) {
         message("sorry but you cannot set the nadir point")
       } else {
-        message("sorry but the nadir point cannot be calculated")
+        if (!is.null(nadir[[4]])) {
+          message("sorry but the nadir point cannot be calculated")
+        }
         # Maximum absolute value: upper bound is equal to 100
         # For a single covariate, the lower bound is equal to 0
         # For the correlation matrix, the lower bound is always equal to 0
@@ -438,8 +486,8 @@ optimACDC <-
     }
     return (res)
   }
-# INTERNAL FUNCTION - CRITERION FOR CONTINUOUS COVARIATES ######################
-.objCont <-
+# INTERNAL FUNCTION - CRITERION FOR NUMERIC COVARIATES #########################
+.objNum <-
   function (sm, n.cov, strata, pcm, scm, nadir, weights) {
     counts <- lapply(1:n.cov, function (i)
       hist(sm[, i], strata[[1]][[i]], plot = FALSE)$counts)
@@ -452,40 +500,59 @@ optimACDC <-
     res <- obj_cont + obj_cor
     return (res)
   }
-# INTERNAL FUNCTION - NADIR FOR CATEGORICAL COVARIATES #########################
-.catNadir <-
-  function (nadir, candi, n.pts, covars, pop.prop, pcm) {
-    if (!is.null(nadir[[1]])) {
-      message("simulating nadir values...")
+# INTERNAL FUNCTION - NADIR FOR FACTOR COVARIATES ##############################
+.facNadir <-
+  function (nadir, candi, n.candi, n.pts, n.cov, covars, pop.prop, pcm) {
+    
+    if (!is.null(nadir[[1]]) && !is.null(nadir[[2]])) { # Simulate the nadir
+      m <- paste("simulating ", nadir[[1]], " nadir values...", sep = "")
+      message(m)
+      
+      # SET VARIABLES
       strata_nadir <- vector()
       correl_nadir <- vector()
+      
+      # BEGIN THE SIMULATION
       for (i in 1:nadir[[1]]) {
-        pts <- sample(c(1:nrow(candi)), n.pts)
+        pts <- sample(1:n.candi, n.pts)
         sm <- covars[pts, ]
         scm <- pedometrics::cramer(sm)
         samp_prop <- lapply(sm, function(x) table(x) / n.pts)
-        samp_prop <- sapply(1:ncol(covars), function (i)
+        samp_prop <- sapply(1:n.cov, function (i)
           sum(abs(samp_prop[[i]] - pop.prop[[i]])))
         strata_nadir[i] <- sum(samp_prop)
         correl_nadir[i] <- sum(abs(pcm - scm))
       }
-      res <- list(strata = strata_nadir, correl = correl_nadir)
+      
+      # SHOULD WE SAVE AND RETURN THE SIMULATED VALUES?
+      # ASR: We compute the mean simulated value and return it as an attribute
+      #      because we want to explore the simulated values in the future.
+      if (nadir[[2]]) {
+        res <- list(strata = strata_nadir, correl = correl_nadir)
+      } else {
+        res <- list(strata = "strata_nadir", correl = "correl_nadir")
+      }
       a <- attributes(res)
       a$strata_nadir <- mean(strata_nadir) / 100
       a$correl_nadir <- mean(correl_nadir) / 100
       attributes(res) <- a
-    } else {
-      if (!is.null(nadir[[2]])) {
-        message("sorry but you cannot set the nadir point")
-        } else {
-          message("sorry but the nadir point cannot be calculated")
-        }
-    }
+      
+      # ASR: Other options are not available yet.
+      } else {
+        if (!is.null(nadir[[3]])) {
+          message("sorry but you cannot set the nadir point")
+          } else {
+            if (!is.null(nadir[[4]])) {
+              message("sorry but the nadir point cannot be calculated")
+            }
+          }
+      }
     return (res)
   }
-# INTERNAL FUNCTION - CRITERION FOR CATEGORICAL COVARIATES #####################
-.objCat <-
+# INTERNAL FUNCTION - CRITERION FOR FACTOR COVARIATES ##########################
+.objFac <-
   function (sm, pop.prop, nadir, weights, pcm, scm, n.pts, n.cov) {
+    
     samp_prop <- lapply(sm, function(x) table(x) / n.pts)
     samp_prop <- sapply(1:n.cov, function (i)
       sum(abs(samp_prop[[i]] - pop.prop[[i]])))
