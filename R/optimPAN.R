@@ -9,11 +9,17 @@
 #'
 #' @template spJitter_doc
 #' @template spSANN_doc
-#'
+#' @param PPL List with the arguments used to optimize the sample pattern to the
+#' number of points or point-pairs per lag. See \code{optimPPL} for more info.
+#' @param ACDC List with the arguments used to optimize the sample pattern
+#' regardig the association/correlation and marginal distribution of the 
+#' covariates. See \code{optimACDC} for more info.
+#' @param PAN List with two named sub-arguments: \code{weights} and 
+#' \code{nadir}. The sub-arguments must be named. The weights must sum to unity.
 #'
 # MAIN FUNCTION ################################################################
 optimPAN <-
-  function (points, candidates, x.max, x.min, y.max, y.min, iterations = 10000,
+  function (points, candi, x.max, x.min, y.max, y.min, iterations = 10000,
             acceptance = list(initial = 0.99, cooling = iterations / 10),
             stopping = list(max.count = iterations / 10),
             PPL = list(lags = 7, lags.type = "exponential", lags.base = 2,
@@ -29,7 +35,7 @@ optimPAN <-
 
     # Check arguments
     if (!is.data.frame(ACDC$covars)) ACDC$covars <- as.data.frame(ACDC$covars)
-    check <- .spSANNcheck(points = points, candidates = candidates,
+    check <- .spSANNcheck(points = points, candi = candi,
                           x.max = x.max, x.min = x.min, y.max = y.max,
                           y.min = y.min, iterations = iterations,
                           acceptance = acceptance, stopping = stopping,
@@ -41,7 +47,7 @@ optimPAN <-
                             criterion = PPL$criterion,
                             pre.distri = PPL$pre.distri)
     if (!is.null(check)) stop (check, call. = FALSE)
-    check <- .optimACDCcheck(candidates = candidates, covars = ACDC$covars,
+    check <- .optimACDCcheck(candi = candi, covars = ACDC$covars,
                              covar.type = ACDC$covars.type,
                              weights = ACDC$weights,
                              use.coords = ACDC$use.coords,
@@ -57,11 +63,11 @@ optimPAN <-
     }
 
     # PREPARE SAMPLE POINTS
-    n_candi <- nrow(candidates)
+    n_candi <- nrow(candi)
     if (length(points) == 1 && pedometrics::is.numint(points)) {
       n_pts <- points
       points <- sample(1:n_candi, n_pts)
-      points <- candidates[points, ]
+      points <- candi[points, ]
     } else {
       n_pts <- nrow(points)
     }
@@ -88,7 +94,7 @@ optimPAN <-
     energy0_ppl <- .objPointsPerLag(ppl, n_lags, n_pts, criterion, pre.distri)
 
     # mssd
-    dm_mssd <- fields::rdist(candidates[, 2:3], conf0[, 2:3])
+    dm_mssd <- fields::rdist(candi[, 2:3], conf0[, 2:3])
 
     # acdc
     use.coords  <- ACDC$use.coords
@@ -96,13 +102,13 @@ optimPAN <-
     strata.type <- ACDC$strata.type
     if (use.coords) {
       if (covars.type == "factor") {
-        coords <- data.frame(candidates[, 2:3])
+        coords <- data.frame(candi[, 2:3])
         breaks <- .numStrata(n_pts, coords, strata.type)[[1]]
         coords <- pedometrics::cont2cat(coords, breaks)
         ACDC$covars <- data.frame(ACDC$covars, coords)
       } else {
         if (covars.type == "numeric")
-          ACDC$covars <- data.frame(ACDC$covars, candidates[, 2:3])
+          ACDC$covars <- data.frame(ACDC$covars, candi[, 2:3])
       }
     }
     n_cov <- ncol(ACDC$covars)
@@ -111,7 +117,7 @@ optimPAN <-
       pcm <- cor(ACDC$covars, use = "complete.obs")
       strata <- .numStrata(n.pts = n_pts, covars = ACDC$covars,
                             strata.type = strata.type)
-      nadir <- .panNadir(n.pts = n_pts, n.candi = n_candi, candi = candidates,
+      nadir <- .panNadir(n.pts = n_pts, n.candi = n_candi, candi = candi,
                          n.lags = n_lags, lags = lags, criterion = criterion,
                          pre.distri = pre.distri, nadir = nadir, n.cov = n_cov,
                          covars = ACDC$covars, covars.type = covars.type,
@@ -123,7 +129,7 @@ optimPAN <-
     } else { # Factor covariates
       pcm <- pedometrics::cramer(ACDC$covars)
       pop_prop <- lapply(ACDC$covars, function(x) table(x) / n_candi)
-      nadir <- .panNadir(n.pts = n_pts, n.candi = n_candi, candi = candidates,
+      nadir <- .panNadir(n.pts = n_pts, n.candi = n_candi, candi = candi,
                          n.lags = n_lags, lags = lags, criterion = criterion,
                          pre.distri = pre.distri, nadir = nadir, n.cov = n_cov,
                          covars = ACDC$covars, covars.type, pcm, pop.prop)
@@ -175,7 +181,7 @@ optimPAN <-
       # Jitter one of the points and update x.max and y.max
       # Which point (wp) are we jittering?
       wp <- sample(c(1:n_pts), 1)
-      new_conf <- spJitterFinite(old_conf, candidates, x.max, x.min, y.max,
+      new_conf <- spJitterFinite(old_conf, candi, x.max, x.min, y.max,
                                  y.min, wp)
       x.max <- x_max0 - (k / iterations) * (x_max0 - x.min)
       y.max <- y_max0 - (k / iterations) * (y_max0 - y.min)
@@ -212,7 +218,7 @@ optimPAN <-
 
       # mssd: distance matrix
       x2 <- matrix(new_conf[wp, 2:3], nrow = 1)
-      new_dm_mssd <- .updateMSSDCpp(x1 = candidates[, 2:3], x2 = x2,
+      new_dm_mssd <- .updateMSSDCpp(x1 = candi[, 2:3], x2 = x2,
                                     dm = old_dm_mssd, idx = wp)
       new_energy_mssd <- .calcMSSDCpp(new_dm_mssd) / attr(nadir, "mssd")
 

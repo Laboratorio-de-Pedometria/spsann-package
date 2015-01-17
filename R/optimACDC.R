@@ -9,13 +9,14 @@
 #'
 #' @param covars Data frame or matrix with the covariates in the columns.
 #'
-#' @param covars.type Character value defining the type of covariates that are
+#' @param covars.type Character defining the type of covariates that is
 #' being used. Available options are \code{"numeric"} and \code{"factor"}.
 #' Defaults to \code{covars.type = "numeric"}.
 #'
-#' @param weights List with two sub-arguments. The weights assigned to the
-#' sampling strata/classes and the correlation/association measure. They must
-#' sum to unity. Defaults to \code{weights = list(strata = 0.5, correl = 0.5)}.
+#' @param weights List with two named sub-arguments. The weights assigned to 
+#' the sampling strata/classes and the correlation/association measure. They
+#' must be named and sum to unity. Defaults to 
+#' \code{weights = list(strata = 0.5, correl = 0.5)}.
 #'
 #' @param use.coords Logical. Should the coordinates be used as covariates?
 #' Defaults to \code{use.coords = FALSE}.
@@ -25,13 +26,14 @@
 #' \code{"equal.range"}. Defaults to \code{strata.type = "equal.area"}. See
 #' \sQuote{Details} for more information.
 #'
-#' @param nadir List with three subarguments: \code{sim} -- the number of
-#' random realizations to estimate the nadir point; \code{user} -- a
-#' user-defined value; \code{abs} -- logical for calculating the nadir point
-#' internally. Only simulations are implemented in the current version.
-#' Defaults to \code{nadir = list(sim = 1000, user = NULL, abs = NULL}. See
-#' \sQuote{Details} for more information.
-#'
+#' @param nadir List with four named subarguments: \code{sim} -- the number of
+#' random realizations to estimate the nadir point; \code{save.sim} -- logical 
+#' for saving the simulated values and returning them as an attribute of the 
+#' optimized sample configuration; \code{user} -- a user-defined value;
+#' \code{abs} -- logical for calculating the nadir point internally. Only
+#' simulations are implemented in the current version. Defaults to 
+#' \code{nadir = list(sim = 1000, save.sim = TRUE, user = NULL, abs = NULL)}.
+#' 
 #' @details
 #' This method is also known as the conditioned Latin Hypercube of Minasny and
 #' McBratney (2006). Visit the package manual to see the corrections that we
@@ -70,27 +72,36 @@
 #' @importFrom SpatialTools dist2
 #' @export
 #' @examples
+#' require(ASRtools)
+#' require(pedometrics)
 #' require(sp)
 #' require(rgeos)
+#' require(Hmisc)
 #' data(meuse.grid)
-#' candidates <- meuse.grid[, 1:2]
-#' coordinates(candidates) <- ~ x + y
-#' gridded(candidates) <- TRUE
-#' boundary <- as(candidates, "SpatialPolygons")
+#' candi <- meuse.grid[, 1:2]
+#' coordinates(candi) <- ~ x + y
+#' gridded(candi) <- TRUE
+#' boundary <- as(candi, "SpatialPolygons")
 #' boundary <- gUnionCascaded(boundary)
-#' candidates <- coordinates(candidates)
-#' candidates <- matrix(cbind(c(1:dim(candidates)[1]), candidates), ncol = 3)
-#' covars <- meuse.grid[, c(1, 2, 3, 4, 5)]
-#' points <- 100
+#' candi <- coordinates(candi)
+#' candi <- matrix(cbind(1:dim(candi)[1], candi), ncol = 3)
+#' str(meuse.grid)
+#' covars <- meuse.grid[, 5]
 #' x.max <- diff(bbox(boundary)[1, ])
 #' y.min <- x.min <- 40
 #' y.max <- diff(bbox(boundary)[2, ])
-#' res <- optimACDC(points, candidates, covars, x.max = x.max,
-#'                  x.min = x.min, y.max = y.max, y.min = y.min,
-#'                  boundary = boundary, nadir = list(10), iterations = 100)
+#' nadir <- list(sim = 10, save.sim = TRUE, user = NULL, abs = NULL)
+#' weights <- list(strata = 0.5, correl = 0.5)
+#' set.seed(2001)
+#' res <- optimACDC(points = 100, candi = candi, covars = covars, 
+#'                  use.coords = TRUE, covars.type = "numeric", 
+#'                  weights = weights,
+#'                  x.max = x.max, x.min = x.min, y.max = y.max, y.min = y.min,
+#'                  boundary = boundary, nadir = nadir, iterations = 100)
+#' str(res)
 # MAIN FUNCTION ################################################################
 optimACDC <-
-  function (points, candidates, covars, covars.type = "numeric",
+  function (points, candi, covars, covars.type = "numeric",
             weights = list(strata = 0.5, correl = 0.5), use.coords = FALSE,
             strata.type = "equal.area",
             nadir = list(sim = 1000, save.sim = TRUE, user = NULL, abs = NULL),
@@ -101,12 +112,13 @@ optimACDC <-
 
     # Check arguments
     if (!is.data.frame(covars)) covars <- as.data.frame(covars)
-    check <- .spSANNcheck(points, candidates, x.max, x.min, y.max, y.min,
+    check <- .spSANNcheck(points, candi, x.max, x.min, y.max, y.min,
                           iterations, acceptance, stopping, plotit, boundary,
                           progress, verbose)
     if (!is.null(check)) stop (check, call. = FALSE)
-    check <- .optimACDCcheck(candidates, covars, covars.type, weights,
-                             use.coords, strata.type)
+    check <- .optimACDCcheck(candi = candi, covars = covars, 
+                             covars.type = covars.type, weights = weights, 
+                             use.coords = use.coords, strata.type = strata.type)
     if (!is.null(check)) stop (check, call. = FALSE)
 
     if (plotit) {
@@ -120,11 +132,11 @@ optimACDC <-
     #use_correl <- ifelse(weights[[2]] == 0, "no", "yes")
 
     # Prepare sample points
-    n_candi <- nrow(candidates)
+    n_candi <- nrow(candi)
     if (length(points) == 1 && pedometrics::is.numint(points)) {
       n_pts <- points
       points <- sample(1:n_candi, n_pts)
-      points <- candidates[points, ]
+      points <- candi[points, ]
     } else {
       n_pts <- nrow(points)
     }
@@ -134,12 +146,12 @@ optimACDC <-
     # Prepare covariates (covars) and create the starting sample matrix (sm)
     if (use.coords) {
       if (covars.type == "factor") {
-        coords <- data.frame(candidates[, 2:3])
+        coords <- data.frame(candi[, 2:3])
         breaks <- .numStrata(n_pts, coords, strata.type)[[1]]
         coords <- cont2cat(coords, breaks)
         covars <- data.frame(covars, coords)
       } else {
-        covars <- data.frame(covars, candidates[, 2:3])
+        covars <- data.frame(covars, candi[, 2:3])
       }
     }
     n_cov <- ncol(covars)
@@ -153,7 +165,7 @@ optimACDC <-
       strata <- .numStrata(n.pts = n_pts, covars = covars, 
                            strata.type = strata.type)
       nadir <- .numNadir(n.pts = n_pts, n.cov = n_cov, n.candi = n_candi, 
-                         pcm = pcm, nadir = nadir, candi = candidates, 
+                         pcm = pcm, nadir = nadir, candi = candi, 
                          covars = covars, strata = strata)
       scm <- cor(sm, use = "complete.obs")
       energy0 <- .objNum(sm = sm, n.cov = n_cov, strata = strata, pcm = pcm, 
@@ -163,7 +175,7 @@ optimACDC <-
       if (covars.type == "factor") {
         pcm <- pedometrics::cramer(covars)
         pop_prop <- lapply(covars, function(x) table(x) / nrow(covars))
-        nadir <- .facNadir(nadir = nadir, candi = candidates, n.candi = n_candi,
+        nadir <- .facNadir(nadir = nadir, candi = candi, n.candi = n_candi,
                            n.pts = n_pts, n.cov = n_cov, covars = covars, 
                            pop.prop = pop_prop, pcm = pcm)
         scm <- pedometrics::cramer(sm)
@@ -196,7 +208,7 @@ optimACDC <-
       # Jitter one of the points and update x.max and y.max
       # Which point (wp)?
       wp <- sample(c(1:n_pts), 1)
-      new_conf <- spJitterFinite(old_conf, candidates, x.max, x.min, y.max,
+      new_conf <- spJitterFinite(old_conf, candi, x.max, x.min, y.max,
                                  y.min, wp)
       x.max <- x_max0 - (k / iterations) * (x_max0 - x.min)
       y.max <- y_max0 - (k / iterations) * (y_max0 - y.min)
@@ -301,16 +313,16 @@ optimACDC <-
   }
 # INTERNAL FUNCTION - CHECK ARGUMENTS ##########################################
 .optimACDCcheck <-
-  function (candidates, covars, covar.type, weights, use.coords, strata.type) {
+  function (candi, covars, covars.type, weights, use.coords, strata.type) {
     
     # covars
     if (ncol(covars) < 2 && use.coords == FALSE) {
       res <- paste("'covars' must have two or more columns")
       return (res)
     }
-    if (nrow(candidates) != nrow(covars)) {
+    if (nrow(candi) != nrow(covars)) {
       res <-
-        paste("'candidates' and 'covars' must have the same number of rows")
+        paste("'candi' and 'covars' must have the same number of rows")
       return (res)
     }
     
@@ -319,7 +331,8 @@ optimACDC <-
       res <- paste("'covars.type' is missing")
       return (res)
     } else {
-      if (covars.type != "numeric" || covars.type != "factor") {
+      ct <- match(covars.type, c("numeric", "factor"))
+      if (!ct) {
         res <- paste("'covars.type = ", covars.type, "' is not supported", 
                      sep = "")
         return (res)
@@ -327,8 +340,13 @@ optimACDC <-
     }
     
     # weights
-    if (!is.list(weights) || length(weights) != 2) {
-      res <- paste("'weights' must be a list with two sub-arguments")
+    aa <- !is.list(weights)
+    bb <- length(weights) != 2
+    cc <- is.null(names(weights))
+    dd <- !all(c(names(weights) == c("strata", "correl")) == TRUE)
+    if (aa || bb || cc || dd) {
+      res <- paste("'weights' must be a list with two named sub-arguments:",
+                   "'strata' and 'correl'", sep = "")
       return (res)
     }
     if (sum(unlist(weights)) != 1) {

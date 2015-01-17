@@ -50,12 +50,12 @@
 #' objMSSD(meuse.grid, points)
 # FUNCTION - MAIN ##############################################################
 optimMSSD <-
-  function (points, candidates, x.max, x.min, y.max, y.min, iterations = 10000,
+  function (points, candi, x.max, x.min, y.max, y.min, iterations = 10000,
             acceptance = list(initial = 0.99, cooling = iterations / 10),
             stopping = list(max.count = iterations / 10), plotit = TRUE,
             boundary, progress = TRUE, verbose = TRUE) {
     
-    check <- .spSANNcheck(points = points, candidates = candidates, 
+    check <- .spSANNcheck(points = points, candi = candi, 
                           x.max = x.max, x.min = x.min, y.max = y.max, 
                           y.min = y.min, iterations = iterations, 
                           acceptance = acceptance, stopping = stopping, 
@@ -67,11 +67,11 @@ optimMSSD <-
       par0 <- par()
       on.exit(suppressWarnings(par(par0)))
     }
-    n_candi <- nrow(candidates)
+    n_candi <- nrow(candi)
     if (is.integer(points) || pedometrics::is.numint(points)) {
       n_pts <- points
       points <- sample(1:n_candi, n_pts)
-      points <- candidates[points, ]
+      points <- candi[points, ]
     } else {
       n_pts <- nrow(points)
     }
@@ -82,7 +82,7 @@ optimMSSD <-
     # using the fields::rdist(). The function .calcMSSDCpp() does the squaring
     # internaly.
     # ASR: write own distance function in C++
-    dm <- fields::rdist(candidates[, 2:3], config0[, 2:3])
+    dm <- fields::rdist(candi[, 2:3], config0[, 2:3])
     energy0 <- .calcMSSDCpp(dm)
     
     # other settings for the simulated annealing algorithm
@@ -105,14 +105,14 @@ optimMSSD <-
       # Jitter one of the points and update x.max and y.max
       # ASR: spJitterFinite() can be improved implementing it in C++
       wp <- sample(c(1:n_pts), 1)
-      new_config <- spJitterFinite(old_config, candidates, x.max,
+      new_config <- spJitterFinite(old_config, candi, x.max,
                                        x.min, y.max, y.min, wp)
       x.max <- x_max0 - (k / iterations) * (x_max0 - x.min)
       y.max <- y_max0 - (k / iterations) * (y_max0 - y.min)
       
       # Update the distance matrix and calculate the new energy state
       x2 <- matrix(new_config[wp, 2:3], nrow = 1)
-      new_dm <- .updateMSSDCpp(x1 = candidates[, 2:3], x2 = x2, dm = old_dm, 
+      new_dm <- .updateMSSDCpp(x1 = candi[, 2:3], x2 = x2, dm = old_dm, 
                                idx = wp)
       new_energy <- .calcMSSDCpp(new_dm)
       
@@ -197,8 +197,8 @@ optimMSSD <-
 #' @rdname optimMSSD
 #' @export
 objMSSD <-
-  function (candidates, points) {
-    dm <- fields::rdist(candidates[, 2:3], points[, 2:3])
+  function (candi, points) {
+    dm <- fields::rdist(candi[, 2:3], points[, 2:3])
     res <- .calcMSSDCpp(dm)
     return (res)
   }

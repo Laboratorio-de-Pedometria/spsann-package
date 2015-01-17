@@ -1,12 +1,12 @@
 #' @importFrom sp bbox
 # INTERNAL FUNCTION - CHECK ARGUMENTS ##########################################
 .spSANNcheck <-
-  function (points, candidates, x.max, x.min, y.max, y.min, iterations,
+  function (points, candi, x.max, x.min, y.max, y.min, iterations,
             acceptance, stopping, plotit, boundary, progress, verbose) {
     
     # missing arguments
-    arg <- c("points", "candidates", "x.max", "x.min", "y.max", "y.min")
-    mis <- c(missing(points), missing(candidates), missing(x.max), 
+    arg <- c("points", "candi", "x.max", "x.min", "y.max", "y.min")
+    mis <- c(missing(points), missing(candi), missing(x.max), 
              missing(x.min), missing(y.max), missing(y.min))
     if (any(mis)) {
       i <- which(mis == TRUE)
@@ -14,9 +14,9 @@
       return (res)
     }
     
-    # candidates
-    if (ncol(candidates) != 3) {
-      res <- paste("'candidates' must have three columns")
+    # candi
+    if (ncol(candi) != 3) {
+      res <- paste("'candi' must have three columns")
       return (res)
     }
     
@@ -130,7 +130,7 @@
 #   }
 # spatial simulated annealing
 # spSANN <-
-#   function (points, candidates, x.max, x.min, y.max, y.min, fun, ...,
+#   function (points, candi, x.max, x.min, y.max, y.min, fun, ...,
 #             iterations = 10000, plotit = TRUE, boundary,
 #             acceptance = list(initial = 0.99, cooling = iterations / 10),
 #             stopping = list(max.count = 200), progress = TRUE, 
@@ -157,7 +157,7 @@
 #     time0             <- proc.time()
 #     for (k in 1:iterations) {
 #       id <- sample(c(1:n_pts), 1)
-#       new_sys_config <- spJitterFinite(old_sys_config, candidates = candidates,
+#       new_sys_config <- spJitterFinite(old_sys_config, candi = candi,
 #                                        x.max = x.max, x.min = x.min, 
 #                                        y.max = y.max, y.min = y.min,
 #                                        which.pts = id)

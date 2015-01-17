@@ -6,11 +6,33 @@ require(pedometrics)
 require(sp)
 require(rgeos)
 require(Hmisc)
-source('~/PROJECTS/r-packages/spsann/R/optimACDC.R')
-source('~/PROJECTS/r-packages/spsann/R/spSANNtools.R')
-source('~/PROJECTS/r-packages/pedometrics/cooking/utils.R')
-source('~/PROJECTS/r-packages/spsann/R/spJitter.R')
+source('R/optimACDC.R')
+source('R/spSANNtools.R')
+source('R/spJitter.R')
 Rcpp::sourceCpp('src/spJitterCpp.cpp')
+# 0) DEFAULT EXAMPLE ###########################################################
+data(meuse.grid)
+candidates <- meuse.grid[, 1:2]
+coordinates(candidates) <- ~ x + y
+gridded(candidates) <- TRUE
+boundary <- as(candidates, "SpatialPolygons")
+boundary <- gUnionCascaded(boundary)
+candidates <- coordinates(candidates)
+candidates <- matrix(cbind(1:dim(candidates)[1], candidates), ncol = 3)
+str(meuse.grid)
+covars <- meuse.grid[, 5]
+x.max <- diff(bbox(boundary)[1, ])
+y.min <- x.min <- 40
+y.max <- diff(bbox(boundary)[2, ])
+nadir <- list(sim = 10, save.sim = TRUE, user = NULL, abs = NULL)
+weights <- list(strata = 0.5, correl = 0.5)
+set.seed(2001)
+res <- optimACDC(points = 100, candidates = candidates, covars = covars, 
+                 use.coords = TRUE, covars.type = "numeric", weights = weights,
+                 x.max = x.max, x.min = x.min, y.max = y.max, y.min = y.min,
+                 boundary = boundary, nadir = nadir, iterations = 100)
+str(res)
+#
 # PREPARE DATA #################################################################
 data(meuse.grid)
 candidates <- meuse.grid[, 1:2]
@@ -21,6 +43,7 @@ boundary <- gUnionCascaded(boundary)
 candidates <- coordinates(candidates)
 candidates <- matrix(cbind(c(1:dim(candidates)[1]), candidates), ncol = 3)
 #
+
 # 1) CONTINUOUS COVARIATES USIGN THE COORDINATES ###############################
 covars <- meuse.grid[, 5]
 points <- 100

@@ -108,7 +108,7 @@
 # \eqn{n \times (n - 1) / 2}, respectively.
 # FUNCTION - MAIN ##############################################################
 optimPPL <-
-  function (points, candidates, lags = 7, lags.type = "exponential",
+  function (points, candi, lags = 7, lags.type = "exponential",
             lags.base = 2, cutoff = NULL, criterion = "distribution",
             pre.distri = NULL, x.max, x.min, y.max, y.min, iterations = 10000,
             acceptance = list(initial = 0.99, cooling = iterations / 10),
@@ -116,7 +116,7 @@ optimPPL <-
             boundary, progress = TRUE, verbose = TRUE) {
 
     # Check arguments
-    check <- .spSANNcheck(points, candidates, x.max, x.min, y.max, y.min,
+    check <- .spSANNcheck(points, candi, x.max, x.min, y.max, y.min,
                           iterations, acceptance, stopping, plotit, boundary,
                           progress, verbose)
     if (!is.null(check)) stop (check, call. = FALSE)
@@ -130,11 +130,11 @@ optimPPL <-
     }
 
     # Prepare points
-    n_candi <- nrow(candidates)
+    n_candi <- nrow(candi)
     if (is.integer(points) || is.numint(points)) {
       n_pts <- points
       points <- sample(c(1:n_candi), n_pts)
-      points <- candidates[points, ]
+      points <- candi[points, ]
     } else {
       n_pts <- nrow(points)
     }
@@ -174,7 +174,7 @@ optimPPL <-
 
       # jitter one of the points and update x.max and y.max
       which_point <- sample(c(1:n_pts), 1)
-      new_sys_config <- spJitterFinite(old_sys_config, candidates, x.max,
+      new_sys_config <- spJitterFinite(old_sys_config, candi, x.max,
                                        x.min, y.max, y.min, which_point)
       x.max <- x_max0 - (k / iterations) * (x_max0 - x.min)
       y.max <- y_max0 - (k / iterations) * (y_max0 - y.min)
@@ -265,15 +265,15 @@ optimPPL <-
 #' @rdname optimPPL
 #' @export
 objPoints <-
-  function (points, candidates, lags = 7, lags.type = "exponential",
+  function (points, candi, lags = 7, lags.type = "exponential",
             lags.base = 2, cutoff = NULL, criterion = "distribution",
             pre.distri = NULL) {
 
     # Prepare points
     if (is.integer(points)) {
       n_pts <- points
-      points <- sample(c(1:dim(candidates)[1]), n_pts)
-      points <- candidates[points, ]
+      points <- sample(c(1:dim(candi)[1]), n_pts)
+      points <- candi[points, ]
     } else {
       n_pts <- nrow(points)
     }
@@ -295,14 +295,14 @@ objPoints <-
 #' @rdname optimPPL
 #' @export
 pointsPerLag <-
-  function (points, candidates, lags = 7, lags.type = "exponential",
+  function (points, candi, lags = 7, lags.type = "exponential",
             lags.base = 2, cutoff = NULL) {
 
     # Prepare points
     if (is.integer(points) || is.numint(points)) {
       n_pts <- points
-      points <- sample(c(1:dim(candidates)[1]), n_pts)
-      points <- candidates[points, ]
+      points <- sample(1:dim(candi)[1], n_pts)
+      points <- candi[points, ]
     } else {
       n_pts <- nrow(points)
     }

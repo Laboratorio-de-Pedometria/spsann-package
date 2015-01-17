@@ -40,24 +40,24 @@
 #' meuse.grid <- matrix(cbind(1:dim(meuse.grid)[1], meuse.grid), ncol = 3)
 #' pts1 <- sample(c(1:dim(meuse.grid)[1]), 155)
 #' pts2 <- meuse.grid[pts1, ]
-#' pts3 <- spJitterFinite(points = pts2, candidates = meuse.grid, x.min = 40,
+#' pts3 <- spJitterFinite(points = pts2, candi = meuse.grid, x.min = 40,
 #'                       x.max = 100, y.min = 40, y.max = 100, which.point = 10)
 #' plot(meuse.grid[, 2:3], asp = 1, pch = 15, col = "gray")
 #' points(pts2[, 2:3], col = "red", cex = 0.5)
 #' points(pts3[, 2:3], pch = 19, col = "blue", cex = 0.5)
 # FUNCTION #####################################################################
 spJitterFinite <-
-  function (points, candidates, x.max, x.min, y.max, y.min, which.point) {
-    pt1 <- .spJitterCpp(points[, 2:3], candidates[, 2:3], x.max, x.min, y.max, 
+  function (points, candi, x.max, x.min, y.max, y.min, which.point) {
+    pt1 <- .spJitterCpp(points[, 2:3], candi[, 2:3], x.max, x.min, y.max, 
                         y.min, which.point)
     
     # ASR: Pass all the following to C++
     pt1 <- pt1[pt1 != 0]
-    pt2 <- candidates[sample(pt1, 1), ]
+    pt2 <- candi[sample(pt1, 1), ]
     dup <- duplicated(rbind(pt2, points))
     if (any(dup)) {
       while (any(dup)) {
-        pt2 <- candidates[sample(pt1, 1), ]
+        pt2 <- candi[sample(pt1, 1), ]
         dup <- duplicated(rbind(pt2, points))
       }
     }
@@ -104,19 +104,19 @@ spJitterFinite <-
 # exercise (\code{spSANN}) is decreased. Used only when \code{size} is larger
 # than 1. See \code{spSANN} for more information.}
 # spJitterFinite <-
-#   function (points, candidates, x.max, x.min, y.max, y.min, which.pts) {
+#   function (points, candi, x.max, x.min, y.max, y.min, which.pts) {
 #     d_x <- x.max + x.min
 #     d_y <- y.max + y.min
 #     pt0 <- points[which.pts, ]
 #     d_x <- unlist(c(pt0[1] - d_x, pt0[1] + d_x))
 #     d_y <- unlist(c(pt0[2] - d_y, pt0[2] + d_y))
-#     pt1 <- which(candidates[, 1] >= d_x[1] & candidates[, 1] <= d_x[2] &
-#                    candidates[, 2] >= d_y[1] & candidates[, 2] <= d_y[2])
-#     pt2 <- candidates[sample(pt1, 1), ]
+#     pt1 <- which(candi[, 1] >= d_x[1] & candi[, 1] <= d_x[2] &
+#                    candi[, 2] >= d_y[1] & candi[, 2] <= d_y[2])
+#     pt2 <- candi[sample(pt1, 1), ]
 #     dup <- duplicated(rbind(pt2, points))
 #     if (any(dup)) {
 #       while (any(dup)) {
-#         pt2 <- candidates[sample(pt1, 1), ]
+#         pt2 <- candi[sample(pt1, 1), ]
 #         dup <- duplicated(rbind(pt2, points))
 #       }
 #     }
@@ -126,7 +126,7 @@ spJitterFinite <-
 #   }
 # OLD spJitter FUNCTION ########################################################
 # spJitter <- 
-#   function (obj, candidates = NULL, where = NULL, which = NULL, finite = NULL,
+#   function (obj, candi = NULL, where = NULL, which = NULL, finite = NULL,
 #             x.coord = list(min = NULL, max = NULL), 
 #             y.coord = list(min = NULL, max = NULL), 
 #             zero = 1, iterations = 10000, verbose = TRUE) {
@@ -154,34 +154,34 @@ spJitterFinite <-
 #       if (inherits(obj, "SpatialPoints")) {
 #         stop ("'obj' should be a vector of indexes")
 #       }
-#       if (is.null(candidates)) {
-#         stop ("'candidates' is a mandatory argument")
+#       if (is.null(candi)) {
+#         stop ("'candi' is a mandatory argument")
 #       }
-#       if (!inherits(candidates, what = "data.frame")) {
-#         stop ("'candidates' should be a data.frame")
+#       if (!inherits(candi, what = "data.frame")) {
+#         stop ("'candi' should be a data.frame")
 #       } else {
-#         if (dim(candidates)[2] != 2 || 
-#               any(colnames(candidates) != c("x", "y"))) {
-#           stop ("'candidates' should have 2 columns named 'x' and 'y'")
+#         if (dim(candi)[2] != 2 || 
+#               any(colnames(candi) != c("x", "y"))) {
+#           stop ("'candi' should have 2 columns named 'x' and 'y'")
 #         }
 #       }
 #       if (unique(which == "all")) {
 #         stop ("this option is not functional yet")
-#         #res <- candidates[sample(c(1:length(candidates)), length(obj)), ]
+#         #res <- candi[sample(c(1:length(candi)), length(obj)), ]
 #         } else {
 #           if (length(which) > 1) {
 #             stop ("this option is not functional yet")
 #             #pt0 <- coordinates(obj[which, ])
 #             #res <- list()
 #             #for (i in 1:length(which)) {
-#             #  cand <- coordinates(candidates)
+#             #  cand <- coordinates(candi)
 #             #  d_x <- x.coord$max + x.coord$min
 #             #  d_y <- y.coord$max + y.coord$min
 #             #  d_x <- c(pt0[i, "x"] - d_x, pt0[i, "x"] + d_x)
 #             #  d_y <- c(pt0[i, "y"] - d_y, pt0[i, "y"] + d_y)
 #             #  cand <- which(cand[, "x"] >= d_x[1] & cand[, "x"] <= d_x[2] &
 #             #                  cand[, "y"] >= d_y[1] & cand[, "y"] <= d_y[2])
-#             #  res[i] <- candidates[sample(cand, 1), ]
+#             #  res[i] <- candi[sample(cand, 1), ]
 #             #}
 #             #res <- data.frame(t(sapply(res, coordinates)))
 #             #colnames(res) <- c("x", "y")
@@ -189,7 +189,7 @@ spJitterFinite <-
 #             #proj4string(res) <- proj4string(obj)
 #             #res <- rbind(obj[-which, ], res)
 #           } else {
-#             res <- .spJitterFiniteOne(obj = obj, candidates = candidates,
+#             res <- .spJitterFiniteOne(obj = obj, candi = candi,
 #                                       x.max = x.coord$max, x.min = x.coord$min,
 #                                       y.max = y.coord$max, y.min = y.coord$min,
 #                                       which = which)
