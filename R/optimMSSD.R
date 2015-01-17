@@ -67,22 +67,19 @@ optimMSSD <-
       par0 <- par()
       on.exit(suppressWarnings(par(par0)))
     }
+    
+    # Prepare sample points
     n_candi <- nrow(candi)
-    if (is.integer(points) || pedometrics::is.numint(points)) {
-      n_pts <- points
-      points <- sample(1:n_candi, n_pts)
-      points <- candi[points, ]
-    } else {
-      n_pts <- nrow(points)
-    }
-    config0 <- points
-    old_config <- config0
+    points <- .spsannPoints(points = points, candi = candi, n.candi = n_candi)
+    n_pts <- nrow(points)
+    conf0 <- points
+    old_conf <- conf0
 
     # Calculate the initial energy state. The distance matrix is calculated
     # using the fields::rdist(). The function .calcMSSDCpp() does the squaring
     # internaly.
     # ASR: write own distance function in C++
-    dm <- fields::rdist(candi[, 2:3], config0[, 2:3])
+    dm <- fields::rdist(candi[, 2:3], conf0[, 2:3])
     energy0 <- .calcMSSDCpp(dm)
     
     # other settings for the simulated annealing algorithm
@@ -105,13 +102,13 @@ optimMSSD <-
       # Jitter one of the points and update x.max and y.max
       # ASR: spJitterFinite() can be improved implementing it in C++
       wp <- sample(c(1:n_pts), 1)
-      new_config <- spJitterFinite(old_config, candi, x.max,
+      new_conf <- spJitterFinite(old_conf, candi, x.max,
                                        x.min, y.max, y.min, wp)
       x.max <- x_max0 - (k / iterations) * (x_max0 - x.min)
       y.max <- y_max0 - (k / iterations) * (y_max0 - y.min)
       
       # Update the distance matrix and calculate the new energy state
-      x2 <- matrix(new_config[wp, 2:3], nrow = 1)
+      x2 <- matrix(new_conf[wp, 2:3], nrow = 1)
       new_dm <- .updateMSSDCpp(x1 = candi[, 2:3], x2 = x2, dm = old_dm, 
                                idx = wp)
       new_energy <- .calcMSSDCpp(new_dm)
@@ -121,13 +118,13 @@ optimMSSD <-
       actual_prob     <- acceptance[[1]] * exp(-k / acceptance[[2]])
       accept_probs[k] <- actual_prob
       if (new_energy <= old_energy) {
-        old_config <- new_config
+        old_conf <- new_conf
         old_energy <- new_energy
         count      <- 0
         old_dm     <- new_dm
       } else {
         if (new_energy > old_energy & random_prob <= actual_prob) {
-          old_config <- new_config
+          old_conf <- new_conf
           old_energy <- new_energy
           count      <- count + 1
           old_dm     <- new_dm
@@ -137,7 +134,7 @@ optimMSSD <-
           }
           } else {
             new_energy <- old_energy
-            new_config <- old_config
+            new_conf <- old_conf
             count      <- count + 1
             new_dm     <- old_dm
             if (verbose) {
@@ -151,10 +148,10 @@ optimMSSD <-
       energy_states[k] <- new_energy
       if (new_energy < best_energy / 1.0000001) {
         best_k          <- k
-        best_config     <- new_config
+        best_conf     <- new_conf
         best_energy     <- new_energy
         best_old_energy <- old_energy
-        old_config      <- old_config
+        old_conf      <- old_conf
         best_dm         <- new_dm
         best_old_dm     <- old_dm
       }
@@ -163,16 +160,16 @@ optimMSSD <-
       if (any(round(seq(1, iterations, 10)) == k)) {
         if (plotit){
           .spSANNplot(energy0, energy_states, k, acceptance,
-                      accept_probs, boundary, new_config[, 2:3],
-                      config0[, 2:3], y_max0, y.max, x_max0, x.max)
+                      accept_probs, boundary, new_conf[, 2:3],
+                      conf0[, 2:3], y_max0, y.max, x_max0, x.max)
         }
       }
 
       # Freezing parameters
       if (count == stopping[[1]]) {
         if (new_energy > best_energy * 1.000001) {
-          old_config <- old_config
-          new_config <- best_config
+          old_conf <- old_conf
+          new_conf <- best_conf
           old_energy <- best_old_energy
           new_energy <- best_energy
           count      <- 0
@@ -190,7 +187,7 @@ optimMSSD <-
     }
     if (progress) close(pb)
     if (plotit) par(par0)
-    res <- .spSANNout(new_config, energy0, energy_states, time0)
+    res <- .spSANNout(new_conf, energy0, energy_states, time0)
     return (res)
   }
 # FUNCTION - CALCULATE THE CRITERION VALUE #####################################
