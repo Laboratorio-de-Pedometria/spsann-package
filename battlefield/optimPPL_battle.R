@@ -5,20 +5,43 @@ require(ASRtools)
 require(pedometrics)
 require(sp)
 require(rgeos)
-require(Hmisc)
-source('~/PROJECTS/r-packages/spsann/R/spSANNtools.R')
-source('~/PROJECTS/r-packages/spsann/R/spJitter.R')
+source('R/spSANNtools.R')
+source('R/spJitter.R')
+source('R/optimPPL.R')
 Rcpp::sourceCpp('src/spJitterCpp.cpp')
 Rcpp::sourceCpp('src/updatePPLCpp.cpp')
+# 0) DEFAULT EXAMPLE ###########################################################
+data(meuse.grid)
+candi <- meuse.grid[, 1:2]
+coordinates(candi) <- ~ x + y
+gridded(candi) <- TRUE
+boundary <- as(candi, "SpatialPolygons")
+boundary <- gUnionCascaded(boundary)
+candi <- coordinates(candi)
+candi <- matrix(cbind(1:nrow(candi), candi), ncol = 3)
+x.max <- diff(bbox(boundary)[1, ])
+y.max <- diff(bbox(boundary)[2, ])
+cutoff <- sqrt((x.max * x.max) + (y.max * y.max))
+set.seed(2001)
+res <- optimPPL(points = 100, candi = candi, lags = 7, lags.base = 2,
+                criterion = "distribution", lags.type = "exponential",
+                cutoff = cutoff, x.max = x.max, x.min = 40, y.max = y.max, 
+                y.min = 40, boundary = boundary, iterations = 100)
+str(res)
+pointsPerLag(points = res, lags = 7, lags.type = "exponential", lags.base = 2, 
+             cutoff = cutoff)
+objPoints(points = res, lags = 7, lags.type = "exponential", lags.base = 2,
+          cutoff = cutoff, criterion = "distribution")
+attr(res, "energy.state")
 # PREPARE DATA #################################################################
 data(meuse.grid)
-candidates <- meuse.grid[, 1:2]
-coordinates(candidates) <- ~ x + y
-gridded(candidates) <- TRUE
-boundary <- as(candidates, "SpatialPolygons")
+candi <- meuse.grid[, 1:2]
+coordinates(candi) <- ~ x + y
+gridded(candi) <- TRUE
+boundary <- as(candi, "SpatialPolygons")
 boundary <- gUnionCascaded(boundary)
-candidates <- coordinates(candidates)
-candidates <- matrix(cbind(c(1:dim(candidates)[1]), candidates), ncol = 3)
+candi <- coordinates(candi)
+candi <- matrix(cbind(1:nrow(candi), candi), ncol = 3)
 #
 # 1) DISTRIBUTION = EXPONENTIAL; CRITERION = DISTRIBUTION; POINTS = 100 ########
 lags.type <- "exponential"
@@ -40,6 +63,6 @@ progress <- TRUE
 verbose <- TRUE
 X11()
 set.seed(2001)
-tmp <- optimPPL(points = points, candidates = candidates, lags = lags, lags.type = lags.type, lags.base = lags.base, cutoff = cutoff, criterion = criterion, pre.distri = pre.distri, x.max = x.max, x.min = x.min, y.max = y.max, y.min = y.min, boundary = boundary, iterations = iterations, acceptance = acceptance, stopping = stopping)
+tmp <- optimPPL(points = points, candi = candi, lags = lags, lags.type = lags.type, lags.base = lags.base, cutoff = cutoff, criterion = criterion, pre.distri = pre.distri, x.max = x.max, x.min = x.min, y.max = y.max, y.min = y.min, boundary = boundary, iterations = iterations, acceptance = acceptance, stopping = stopping)
 pointsPerLag(points = tmp, lags = lags, lags.type = lags.type, cutoff = cutoff)
 objPoints(points = tmp, lags = lags, lags.type = lags.type, lags.base = lags.base, cutoff = cutoff, criterion = criterion, pre.distri = pre.distri)
