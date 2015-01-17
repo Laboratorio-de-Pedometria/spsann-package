@@ -3,17 +3,16 @@
 #' @param iterations Integer. The maximum number of iterations that should be
 #' used for the optimization.
 #' 
-#' @param acceptance List with two sub-arguments: \code{initial} and 
-#' \code{cooling}. \code{initial} is a numeric value between 0 and 1 defining
-#' the initial acceptance probability. Defaults to \code{initial = 0.99}.
-#' \code{cooling} is a numeric value defining the exponential factor by with 
-#' the acceptance probability decreases at each iteration. Defaults to 
-#' \code{cooling = iterations / 10}.
+#' @param acceptance List with two named sub-arguments: \code{initial} -- 
+#' numeric value between 0 and 1 defining the initial acceptance probability, 
+#' and \code{cooling} -- a numeric value defining the exponential factor by
+#' witch the acceptance probability decreases at each iteration. Defaults to 
+#' \code{acceptance = list(initial = 0.99, cooling = iterations / 10)}.
 #' 
-#' @param stopping List with one sub-argument: \code{max.count}. 
-#' \code{max.count} is an integer value defining the maximum allowable number 
-#' of iterations without improvement of the objective function value. Defaults 
-#' to \code{max.count = iterations / 10}.
+#' @param stopping List with one named sub-argument: \code{max.count} -- 
+#' integer value defining the maximum allowable number of iterations without 
+#' improvement of the objective function value. Defaults to 
+#' \code{stopping = list(max.count = iterations / 10)}.
 #' 
 #' @param plotit Logical for ploting the optimization results. This includes 
 #' a) the progress of the objective function values and acceptance 
