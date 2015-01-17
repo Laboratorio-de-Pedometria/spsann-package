@@ -1,61 +1,61 @@
 #' Optimization of sample patterns for variogram and trend estimation,
 #' and spatial interpolation
-#' 
+#'
 #' Optimize a sample pattern for variogram and trend estimation, and spatial
 #' interpolation. The criteria used are the number of points or point-pairs per
 #' lag distance class (PPL), matching the association/correlation and marginal
-#' distribution of the covariates (ACDC), and the mean squared shortest 
+#' distribution of the covariates (ACDC), and the mean squared shortest
 #' distance (MSSD).
-#' 
+#'
 #' @template spJitter_doc
 #' @template spSANN_doc
-#' 
-#' 
+#'
+#'
 # MAIN FUNCTION ################################################################
 optimPAN <-
   function (points, candidates, x.max, x.min, y.max, y.min, iterations = 10000,
             acceptance = list(initial = 0.99, cooling = iterations / 10),
             stopping = list(max.count = iterations / 10),
             PPL = list(lags = 7, lags.type = "exponential", lags.base = 2,
-                        cutoff = NULL, criterion = "distribution", 
+                        cutoff = NULL, criterion = "distribution",
                         pre.distri = NULL),
-            ACDC = list(covars, covars.type = "numeric", 
-                        strata.type = "equal.area", use.coords = FALSE, 
+            ACDC = list(covars, covars.type = "numeric",
+                        strata.type = "equal.area", use.coords = FALSE,
                         weights = list(strata = 0.5, correl = 0.5)),
             PAN = list(weights = list(PPL = 1/3, ACDC = 1/3, MSSD = 1/3),
                        nadir = list(sim = 1000, save.sim = TRUE, user = NULL,
                                     abs = NULL)),
             plotit = TRUE, boundary, progress = TRUE, verbose = TRUE) {
-    
+
     # Check arguments
     if (!is.data.frame(ACDC$covars)) ACDC$covars <- as.data.frame(ACDC$covars)
     check <- .spSANNcheck(points = points, candidates = candidates,
-                          x.max = x.max, x.min = x.min, y.max = y.max, 
-                          y.min = y.min, iterations = iterations, 
+                          x.max = x.max, x.min = x.min, y.max = y.max,
+                          y.min = y.min, iterations = iterations,
                           acceptance = acceptance, stopping = stopping,
-                          plotit = plotit, boundary = boundary, 
+                          plotit = plotit, boundary = boundary,
                           progress = progress, verbose = verbose)
     if (!is.null(check)) stop (check, call. = FALSE)
-    check <- .optimPPLcheck(lags = PPL$lags, lags.type = PPL$lags.type, 
+    check <- .optimPPLcheck(lags = PPL$lags, lags.type = PPL$lags.type,
                             lags.base = PPL$lags.base, cutoff = PPL$cutoff,
-                            criterion = PPL$criterion, 
+                            criterion = PPL$criterion,
                             pre.distri = PPL$pre.distri)
     if (!is.null(check)) stop (check, call. = FALSE)
     check <- .optimACDCcheck(candidates = candidates, covars = ACDC$covars,
-                             covar.type = ACDC$covars.type, 
-                             weights = ACDC$weights, 
-                             use.coords = ACDC$use.coords, 
+                             covar.type = ACDC$covars.type,
+                             weights = ACDC$weights,
+                             use.coords = ACDC$use.coords,
                              strata.type = ACDC$strata.type)
     if (!is.null(check)) stop (check, call. = FALSE)
     check <- .optimPANcheck(weights = PAN$weights, nadir = PAN$nadir)
     if (!is.null(check)) stop (check, call. = FALSE)
-    
+
     # PLOTTING
     if (plotit) {
       par0 <- par()
       on.exit(suppressWarnings(par(par0)))
     }
-    
+
     # PREPARE SAMPLE POINTS
     n_candi <- nrow(candidates)
     if (length(points) == 1 && pedometrics::is.numint(points)) {
@@ -67,7 +67,7 @@ optimPAN <-
     }
     conf0 <- points
     old_conf <- conf0
-    
+
     # BASE VARIABLES AND DATASETS, NADIR POINT AND INITIAL ENERGY STATE
     nadir      <- PAN$nadir
     # ppl
@@ -81,15 +81,15 @@ optimPAN <-
       n_lags <- length(lags) - 1
     } else {
       n_lags <- lags
-      lags <- .getLagBreaks(lags, lags.type, cutoff, lags.base) 
+      lags <- .getLagBreaks(lags, lags.type, cutoff, lags.base)
     }
     dm_ppl <- as.matrix(dist(conf0[, 2:3], method = "euclidean"))
     ppl <- .getPointsPerLag(lags, dm_ppl)
     energy0_ppl <- .objPointsPerLag(ppl, n_lags, n_pts, criterion, pre.distri)
-    
+
     # mssd
     dm_mssd <- fields::rdist(candidates[, 2:3], conf0[, 2:3])
-    
+
     # acdc
     use.coords  <- ACDC$use.coords
     covars.type <- ACDC$covars.type
@@ -97,7 +97,7 @@ optimPAN <-
     if (use.coords) {
       if (covars.type == "factor") {
         coords <- data.frame(candidates[, 2:3])
-        breaks <- .contStrata(n_pts, coords, strata.type)[[1]]
+        breaks <- .numStrata(n_pts, coords, strata.type)[[1]]
         coords <- pedometrics::cont2cat(coords, breaks)
         ACDC$covars <- data.frame(ACDC$covars, coords)
       } else {
@@ -109,16 +109,16 @@ optimPAN <-
     sm <- ACDC$covars[points[, 1], ]
     if (covars.type == "numeric") { # Numeric covariates
       pcm <- cor(ACDC$covars, use = "complete.obs")
-      strata <- .contStrata(n.pts = n_pts, covars = ACDC$covars, 
+      strata <- .numStrata(n.pts = n_pts, covars = ACDC$covars,
                             strata.type = strata.type)
-      nadir <- .panNadir(n.pts = n_pts, n.candi = n_candi, candi = candidates, 
+      nadir <- .panNadir(n.pts = n_pts, n.candi = n_candi, candi = candidates,
                          n.lags = n_lags, lags = lags, criterion = criterion,
                          pre.distri = pre.distri, nadir = nadir, n.cov = n_cov,
-                         covars = ACDC$covars, covars.type = covars.type, 
+                         covars = ACDC$covars, covars.type = covars.type,
                          pcm = pcm, strata = strata)
       scm <- cor(sm, use = "complete.obs")
-      energy0_acdc <- .objCont(sm = sm, n.cov = n_cov, strata = strata, 
-                               pcm = pcm, scm = scm, nadir = nadir, 
+      energy0_acdc <- .objNum(sm = sm, n.cov = n_cov, strata = strata,
+                               pcm = pcm, scm = scm, nadir = nadir,
                                weights = ACDC$weights)
     } else { # Factor covariates
       pcm <- pedometrics::cramer(ACDC$covars)
@@ -128,12 +128,13 @@ optimPAN <-
                          pre.distri = pre.distri, nadir = nadir, n.cov = n_cov,
                          covars = ACDC$covars, covars.type, pcm, pop.prop)
       scm <- pedometrics::cramer(sm)
-      energy0_acdc <- .objCat(sm, pop_prop, nadir, ACDC$weights, pcm, scm, 
-                              n_pts, n_cov)
+      energy0_acdc <- .objFac(sm = sm, pop.prop = pop_prop, nadir = nadir,
+                              weights = ACDC$weights, pcm = pcm, scm = scm,
+                              n.pts = n_pts, n.cov = n_cov)
     }
     energy0_ppl <- energy0_ppl / attr(nadir, "ppl")
     energy0_mssd <- .calcMSSDCpp(x = dm_mssd) / attr(nadir, "mssd")
-    
+
     # WEIGHTED SUM METHOD
     # The sub-arguments of 'PAN$weights' must be named so that we have a
     # guarantee that the correct weights are used.
@@ -141,7 +142,7 @@ optimPAN <-
     energy0_acdc <- energy0_acdc * PAN$weights$ACDC
     energy0_mssd <- energy0_mssd * PAN$weights$MSSD
     energy0      <- energy0_ppl + energy0_acdc + energy0_mssd
-    
+
     # OTHER SETTINGS FOR THE SIMULATED ANNEALING ALGORITHM
     # ppl
     old_dm_ppl   <- dm_ppl
@@ -167,10 +168,10 @@ optimPAN <-
     y_max0       <- y.max
     if (progress) pb <- txtProgressBar(min = 1, max = iterations, style = 3)
     time0 <- proc.time()
-    
+
     # BEGIN THE ITERATIONS
     for (k in 1:iterations) {
-      
+
       # Jitter one of the points and update x.max and y.max
       # Which point (wp) are we jittering?
       wp <- sample(c(1:n_pts), 1)
@@ -178,43 +179,43 @@ optimPAN <-
                                  y.min, wp)
       x.max <- x_max0 - (k / iterations) * (x_max0 - x.min)
       y.max <- y_max0 - (k / iterations) * (y_max0 - y.min)
-      
+
       # UPDATE DATASETS AND COMPUTE NEW ENERGY STATE
       # ppl: distance matrix
       new_dm_ppl <- .updatePPLCpp(new_conf[, 2:3], old_dm_ppl, wp)
       ppl <- .getPointsPerLag(lags, new_dm_ppl)
-      new_energy_ppl <- .objPointsPerLag(ppl, n_lags, n_pts, criterion, 
+      new_energy_ppl <- .objPointsPerLag(ppl, n_lags, n_pts, criterion,
                                          pre.distri)
       new_energy_ppl <- new_energy_ppl / attr(nadir, "ppl")
-      
+
       # acdc: sample and correlation matrices
       if (covars.type == "numeric") { # Numeric covariates
         #new_row <- covars[new_conf[wp, 1], ]
         #new_sm[wp, ] <- new_row
         new_sm[wp, ] <- ACDC$covars[new_conf[wp, 1], ]
         new_scm <- cor(new_sm, use = "complete.obs")
-        new_energy_acdc <- .objCont(sm = new_sm, n.cov = n_cov, 
-                                    strata = strata, pcm = pcm, scm = new_scm,
-                                    nadir = nadir, weights = ACDC$weights)
-      } else { # Categorical covariates
+        new_energy_acdc <- .objNum(sm = new_sm, n.cov = n_cov, strata = strata,
+                                   pcm = pcm, scm = new_scm, nadir = nadir,
+                                   weights = ACDC$weights)
+      } else { # Factor covariates
         if (covars.type == "factor") {
           #new_row <- covars[new_conf[wp, 1], ]
           #new_sm[wp, ] <- new_row
           new_sm[wp, ] <- ACDC$covars[new_conf[wp, 1], ]
           new_scm <- pedometrics::cramer(new_sm)
-          new_energy_acdc <- .objCat(sm = new_sm, pop.prop = pop_prop, 
-                                     nadir = nadir, weights = ACDC$weights, 
-                                     pcm = pcm, scm = new_scm, n.pts = n_pts, 
+          new_energy_acdc <- .objFac(sm = new_sm, pop.prop = pop_prop,
+                                     nadir = nadir, weights = ACDC$weights,
+                                     pcm = pcm, scm = new_scm, n.pts = n_pts,
                                      n.cov = n_cov)
         }
       }
-      
+
       # mssd: distance matrix
       x2 <- matrix(new_conf[wp, 2:3], nrow = 1)
-      new_dm_mssd <- .updateMSSDCpp(x1 = candidates[, 2:3], x2 = x2, 
+      new_dm_mssd <- .updateMSSDCpp(x1 = candidates[, 2:3], x2 = x2,
                                     dm = old_dm_mssd, idx = wp)
-      new_energy_mssd <- .calcMSSDCpp(new_dm_mssd) / attr(nadir, "mssd")      
-      
+      new_energy_mssd <- .calcMSSDCpp(new_dm_mssd) / attr(nadir, "mssd")
+
       # WEIGHTED SUM METHOD
       # The sub-arguments of 'PAN$weights' must be named so that we have a
       # guarantee that the correct weights are used.
@@ -222,7 +223,7 @@ optimPAN <-
       new_energy_acdc <- new_energy_acdc * PAN$weights$ACDC
       new_energy_mssd <- new_energy_mssd * PAN$weights$MSSD
       new_energy      <- new_energy_ppl + new_energy_acdc + new_energy_mssd
-      
+
       # Evaluate the new system configuration
       random_prob <- runif(1)
       actual_prob <- acceptance[[1]] * exp(-k / acceptance[[2]])
@@ -251,7 +252,7 @@ optimPAN <-
           # mssd
           old_dm_mssd <- new_dm_mssd
           if (verbose) {
-            cat("\n", count, "iteration(s) with no improvement... p = ", 
+            cat("\n", count, "iteration(s) with no improvement... p = ",
                 random_prob, "\n")
           }
         } else {
@@ -271,7 +272,7 @@ optimPAN <-
           }
         }
       }
-      
+
       # Best energy state
       energies[k] <- new_energy
       if (new_energy < best_energy / 1.0000001) {
@@ -292,14 +293,14 @@ optimPAN <-
         best_dm_mssd     <- new_dm_mssd
         best_old_dm_mssd <- old_dm_mssd
       }
-      
+
       # Plotting
       if (plotit && any(round(seq(1, iterations, 10)) == k)) {
-        .spSANNplot(energy0, energies, k, acceptance, 
+        .spSANNplot(energy0, energies, k, acceptance,
                     accept_probs, boundary, new_conf[, 2:3],
                     conf0[, 2:3], y_max0, y.max, x_max0, x.max)
       }
-      
+
       # Freezing parameters
       if (count == stopping[[1]]) {
         if (new_energy > best_energy * 1.000001) {
@@ -336,9 +337,9 @@ optimPAN <-
 # INTERNAL FUNCTION - CHECK ARGUMENTS ##########################################
 .optimPANcheck <-
   function (weights, nadir) {
-    
+
     # PAN$weights
-    if (!is.list(weights) || length(weights) != 3 || 
+    if (!is.list(weights) || length(weights) != 3 ||
           is.null(names(weights))) {
       res <- paste("'PAN$weights' must be a list with 3 named sub-arguments")
       return (res)
@@ -347,7 +348,7 @@ optimPAN <-
       res <- paste("the 'PAN$weights' must sum to 1")
       return (res)
     }
-    
+
     # nadir
     if (!is.list(nadir) || length(nadir) != 4) {
       res <- paste("'nadir' must be a list with four sub-arguments")
@@ -378,23 +379,23 @@ optimPAN <-
 .panNadir <-
   function (n.pts, n.candi, candi, n.lags, lags, criterion, pre.distri,
             nadir, n.cov, covars, covars.type, pop.prop, pcm, strata) {
-    
+
     if (!is.null(nadir[[1]]) && !is.null(nadir[[2]])) { # Simulate the nadir
       m <- paste("simulating ", nadir[[1]], " nadir values...", sep = "")
       message(m)
-      
+
       # SET VARIABLES
-      ppl_nadir <- vector()
+      ppl_nadir    <- vector()
       strata_nadir <- vector()
       correl_nadir <- vector()
-      mssd_nadir <- vector()
-      
+      mssd_nadir   <- vector()
+
       # BEGIN THE SIMULATION
       for (i in 1:nadir[[1]]) {
         pts <- sample(1:n.candi, n.pts)
         sm <- covars[pts, ]
         pts <- candi[pts, ]
-        
+
         # ppl
         dm_ppl <- as.matrix(dist(pts[, 2:3], method = "euclidean"))
         ppl <- .getPointsPerLag(lags, dm_ppl)
@@ -408,7 +409,7 @@ optimPAN <-
             ppl_nadir[i] <- n.pts / (min(ppl) + 1)
           }
         }
-        
+
         # acdc
         if (covars.type == "numeric") { # numeric covariates
           scm <- cor(sm, use = "complete.obs",  method = "pearson")
@@ -418,7 +419,7 @@ optimPAN <-
             sum(abs(counts[[i]] - strata[[2]][[i]])))
           strata_nadir[i] <- sum(counts)
           correl_nadir[i] <- sum(abs(pcm - scm))
-          
+
         } else { # factor covariates
           if (covars.type == "factor") {
             scm <- pedometrics::cramer(sm)
@@ -429,20 +430,20 @@ optimPAN <-
             correl_nadir[i] <- sum(abs(pcm - scm))
           }
         }
-        
+
         # mssd
         dm_mssd <- fields::rdist(candi[, 2:3], pts[, 2:3])
         mssd_nadir[i] <- .calcMSSDCpp(dm_mssd)
       }
-      
+
       # SHOULD WE SAVE AND RETURN THE SIMULATED VALUES?
       # ASR: We compute the mean simulated value and return it as an attribute
       #      because we want to explore the simulated values in the future.
       if (nadir[[2]]) {
-        res <- list(ppl = ppl_nadir, strata = strata_nadir, 
+        res <- list(ppl = ppl_nadir, strata = strata_nadir,
                     correl = correl_nadir, mssd_nadir = mssd_nadir)
       } else {
-        res <- list(ppl = "ppl_nadir", strata = "strata_nadir", 
+        res <- list(ppl = "ppl_nadir", strata = "strata_nadir",
                     correl = "correl_nadir", mssd_nadir = "mssd_nadir")
       }
       a <- attributes(res)
@@ -451,11 +452,15 @@ optimPAN <-
       a$correl_nadir <- mean(correl_nadir) / 100
       a$mssd_nadir <- mean(mssd_nadir) / 100
       attributes(res) <- a
-      
+
       # ASR: Other options are not available yet.
     } else {
       if (!is.null(nadir[[3]])) {
+        message("sorry but you cannot set the nadir point")
       } else {
+        if (!is.null(nadir[[4]])) {
+          message("sorry but the nadir point cannot be calculated")
+        }
       }
     }
     return (res)
