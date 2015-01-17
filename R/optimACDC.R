@@ -9,7 +9,7 @@
 #'
 #' @param covars Data frame or matrix with the covariates in the columns.
 #'
-#' @param covars.type Character defining the type of covariates that is
+#' @param covars.type Character value. The type of covariates that is
 #' being used. Available options are \code{"numeric"} and \code{"factor"}.
 #' Defaults to \code{covars.type = "numeric"}.
 #'
@@ -21,15 +21,15 @@
 #' @param use.coords Logical. Should the coordinates be used as covariates?
 #' Defaults to \code{use.coords = FALSE}.
 #'
-#' @param strata.type Character. The type of strata to be used with
+#' @param strata.type Character value. The type of strata to be used with
 #' numeric covariates. Available options are \code{"equal.area"} and
 #' \code{"equal.range"}. Defaults to \code{strata.type = "equal.area"}. See
 #' \sQuote{Details} for more information.
 #'
-#' @param nadir List with four named subarguments: \code{sim} -- the number of
+#' @param nadir List with four named sub-arguments: \code{sim} -- the number of
 #' random realizations to estimate the nadir point; \code{save.sim} -- logical 
 #' for saving the simulated values and returning them as an attribute of the 
-#' optimized sample configuration; \code{user} -- a user-defined value;
+#' optimized sample pattern; \code{user} -- a user-defined value;
 #' \code{abs} -- logical for calculating the nadir point internally. Only
 #' simulations are implemented in the current version. Defaults to 
 #' \code{nadir = list(sim = 1000, save.sim = TRUE, user = NULL, abs = NULL)}.

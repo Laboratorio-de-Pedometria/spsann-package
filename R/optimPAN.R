@@ -9,14 +9,46 @@
 #'
 #' @template spJitter_doc
 #' @template spSANN_doc
-#' @param PPL List with the arguments used to optimize the sample pattern to the
-#' number of points or point-pairs per lag. See \code{optimPPL} for more info.
-#' @param ACDC List with the arguments used to optimize the sample pattern
-#' regardig the association/correlation and marginal distribution of the 
-#' covariates. See \code{optimACDC} for more info.
+#' 
+#' @param PPL List with six named sub-arguments. The parameters used to optimize 
+#' the sample pattern to the number of points or point-pairs per lag. See
+#' \code{optimPPL} for more info.
+#' 
+#' @param ACDC List with five named sub-arguments. The paramters used to 
+#' optimize the sample pattern regardig the association/correlation and 
+#' marginal distribution of the covariates. See \code{optimACDC} for more info.
+#' 
 #' @param PAN List with two named sub-arguments: \code{weights} and 
-#' \code{nadir}. The sub-arguments must be named. The weights must sum to unity.
-#'
+#' \code{nadir}. \code{weights} is a list with two named sub-arguments. It 
+#' contains the weights assigned to each objective function (PPL, ACDC, and 
+#' MSSD). They must be named and sum to unity. Defaults to 
+#' \code{weights = list(PPL = 1/3, ACDC = 1/3, MSSD = 1/3)}. \code{nadir} is a
+#' with four named sub-arguments: \code{sim} -- the number of
+#' random realizations to estimate the nadir point; \code{save.sim} -- logical 
+#' for saving the simulated values and returning them as an attribute of the 
+#' optimized sample pattern; \code{user} -- a user-defined value;
+#' \code{abs} -- logical for calculating the nadir point internally. Only
+#' simulations are implemented in the current version. Defaults to 
+#' \code{nadir = list(sim = 1000, save.sim = TRUE, user = NULL, abs = NULL)}.
+#' 
+#' @details
+#' 
+#' @return
+#' \code{optimPAN} returns a matrix: the optimized sample pattern with
+#' the evolution of the energy state during the optimization as an attribute.
+#' 
+#' @references
+#' 
+#' @author Alessandro Samuel-Rosa \email{alessandrosamuelrosa@@gmail.com}
+#' @keywords spatial optimize
+#' @concept simulated annealing
+#' @importFrom fields rdist
+#' @importFrom pedometrics cramer
+#' @importFrom pedometrics is.numint
+#' @importFrom pedometrics cont2cat
+#' @importFrom SpatialTools dist2
+#' @export
+#' @examples
 # MAIN FUNCTION ################################################################
 optimPAN <-
   function (points, candi, x.max, x.min, y.max, y.min, iterations = 10000,

@@ -11,6 +11,8 @@ source('R/optimPPL.R')
 Rcpp::sourceCpp('src/spJitterCpp.cpp')
 Rcpp::sourceCpp('src/updatePPLCpp.cpp')
 # 0) DEFAULT EXAMPLE ###########################################################
+# Check this! The optimization is returning an energy value different from that
+# returned by the function designed to calculate the energy
 data(meuse.grid)
 candi <- meuse.grid[, 1:2]
 coordinates(candi) <- ~ x + y

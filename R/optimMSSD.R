@@ -186,7 +186,6 @@ optimMSSD <-
       if (progress) setTxtProgressBar(pb, k)
     }
     if (progress) close(pb)
-    if (plotit) par(par0)
     res <- .spSANNout(new_conf, energy0, energy_states, time0)
     return (res)
   }

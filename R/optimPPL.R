@@ -167,25 +167,28 @@ optimPPL <-
       n_lags <- length(lags) - 1
     } else {
       n_lags <- lags
-      lags <- .getLagBreaks(lags, lags.type, cutoff, lags.base)
+      lags <- .getLagBreaks(lags = lags, lags.type = lags.type, 
+                            cutoff = cutoff, lags.base = lags.base)
     }
-    sys_conf0 <- points
-    old_sys_conf <- sys_conf0
+    conf0 <- points
+    old_conf <- conf0
 
     # Initial energy state
-    dist_mat <- as.matrix(dist(sys_conf0[, 2:3], method = "euclidean"))
-    point_per_lag <- .getPointsPerLag(lags, dist_mat)
-    energy_state0 <- .objPointsPerLag(point_per_lag, n_lags, n_pts,
-                                      criterion, pre.distri)
+    dm <- as.matrix(dist(conf0[, 2:3], method = "euclidean"))
+    point_per_lag <- .getPointsPerLag(lags = lags, dist.mat = dm)
+    energy0 <- .objPointsPerLag(points.per.lag = point_per_lag,
+                                      n.lags = n_lags, n.pts = n_pts,
+                                      criterion = criterion,
+                                      pre.distri = pre.distri)
 
     # other settings for the simulated annealing algorithm
-    old_dist_mat <- dist_mat
-    new_dist_mat <- dist_mat
-    best_dist_mat <- dist_mat
+    old_dm <- dm
+    new_dm <- dm
+    best_dm <- dm
     count <- 0
-    old_energy_state <- energy_state0
-    best_energy_state <- Inf
-    energy_states <- vector()
+    old_energy <- energy0
+    best_energy <- Inf
+    energies <- vector()
     accept_probs <- vector()
     x_max0 <- x.max
     y_max0 <- y.max
@@ -196,43 +199,47 @@ optimPPL <-
     for (k in 1:iterations) {
 
       # jitter one of the points and update x.max and y.max
-      which_point <- sample(c(1:n_pts), 1)
-      new_sys_conf <- spJitterFinite(old_sys_conf, candi, x.max,
-                                       x.min, y.max, y.min, which_point)
+      wp <- sample(1:n_pts, 1)
+      new_conf <- spJitterFinite(points = old_conf, candi = candi,
+                                     x.max = x.max, x.min = x.min, 
+                                     y.max = y.max, y.min = y.min, 
+                                     which.point = wp)
       x.max <- x_max0 - (k / iterations) * (x_max0 - x.min)
       y.max <- y_max0 - (k / iterations) * (y_max0 - y.min)
 
       # update the distance matrix and calculate the new energy state
-      new_dist_mat <- .updatePPLCpp(new_sys_conf[, 2:3], old_dist_mat,
-                                    which_point)
-      point_per_lag <- .getPointsPerLag(lags, new_dist_mat)
-      new_energy_state <- .objPointsPerLag(point_per_lag, n_lags, n_pts,
-                                           criterion, pre.distri)
+      new_dm <- .updatePPLCpp(x = new_conf[, 2:3], dm = old_dm,
+                                    idx = wp)
+      point_per_lag <- .getPointsPerLag(lags = lags, dist.mat = new_dm)
+      new_energy <- .objPointsPerLag(points.per.lag = point_per_lag, 
+                                           n.lags = n_lags, n.pts = n_pts,
+                                           criterion = criterion, 
+                                           pre.distri = pre.distri)
 
       # evaluate the new system configuration
       random_prob <- runif(1)
       actual_prob <- acceptance[[1]] * exp(-k / acceptance[[2]])
       accept_probs[k] <- actual_prob
-      if (new_energy_state <= old_energy_state) {
-        old_sys_conf   <- new_sys_conf
-        old_energy_state <- new_energy_state
-        old_dist_mat     <- new_dist_mat
-        count <- 0
+      if (new_energy <= old_energy) {
+        old_conf   <- new_conf
+        old_energy <- new_energy
+        count      <- 0
+        old_dm <- new_dm
       } else {
-        if (new_energy_state > old_energy_state & random_prob <= actual_prob) {
-          old_sys_conf   <- new_sys_conf
-          old_energy_state <- new_energy_state
-          old_dist_mat     <- new_dist_mat
-          count <- count + 1
+        if (new_energy > old_energy & random_prob <= actual_prob) {
+          old_conf   <- new_conf
+          old_energy <- new_energy
+          count      <- count + 1
+          old_dm     <- new_dm
           if (verbose) {
             cat("\n", count, "iteration(s) with no improvement... p = ",
                 random_prob, "\n")
           }
         } else {
-          new_energy_state <- old_energy_state
-          new_sys_conf   <- old_sys_conf
-          new_dist_mat     <- old_dist_mat
-          count <- count + 1
+          new_energy <- old_energy
+          new_conf   <- old_conf
+          count      <- count + 1
+          new_dm     <- old_dm
           if (verbose) {
             cat("\n", count, "iteration(s) with no improvement... stops at",
                 stopping[[1]], "\n")
@@ -241,34 +248,34 @@ optimPPL <-
       }
 
       # Best energy state
-      energy_states[k] <- new_energy_state
-      if (new_energy_state < best_energy_state / 1.0000001) {
-        best_k <- k
-        best_sys_conf       <- new_sys_conf
-        best_energy_state     <- new_energy_state
-        best_old_energy_state <- old_energy_state
-        old_sys_conf        <- old_sys_conf
-        best_dist_mat         <- new_dist_mat
-        best_old_dist_mat     <- old_dist_mat
+      energies[k] <- new_energy
+      if (new_energy < best_energy / 1.0000001) {
+        best_k          <- k
+        best_conf       <- new_conf
+        best_energy     <- new_energy
+        best_old_energy <- old_energy
+        old_conf        <- old_conf
+        best_dm         <- new_dm
+        best_old_dm     <- old_dm
       }
 
       # Plotting
       if (plotit && any(round(seq(1, iterations, 10)) == k)) {
-        .spSANNplot(energy_state0, energy_states, k, acceptance,
-                    accept_probs, boundary, new_sys_conf[, 2:3],
-                    sys_conf0[, 2:3], y_max0, y.max, x_max0, x.max)
+        .spSANNplot(energy0, energies, k, acceptance,
+                    accept_probs, boundary, new_conf[, 2:3],
+                    conf0[, 2:3], y_max0, y.max, x_max0, x.max)
       }
 
       # Freezing parameters
       if (count == stopping[[1]]) {
-        if (new_energy_state > best_energy_state * 1.000001) {
-          old_sys_conf   <- old_sys_conf
-          new_sys_conf   <- best_sys_conf
-          old_energy_state <- best_old_energy_state
-          new_energy_state <- best_energy_state
-          count <- 0
-          new_dist_mat <- best_dist_mat
-          old_dist_mat <- best_old_dist_mat
+        if (new_energy > best_energy * 1.000001) {
+          old_conf   <- old_conf
+          new_conf   <- best_conf
+          old_energy <- best_old_energy
+          new_energy <- best_energy
+          count      <- 0
+          new_dm     <- best_dm
+          old_dm     <- best_old_dm
           cat("\n", "reached maximum count with suboptimal configuration\n")
           cat("\n", "restarting with previously best configuration\n")
           cat("\n", count, "iteration(s) with no improvement... stops at",
@@ -280,7 +287,7 @@ optimPPL <-
       if (progress) setTxtProgressBar(pb, k)
     }
     if (progress) close(pb)
-    res <- .spSANNout(new_sys_conf, energy_state0, energy_states, time0)
+    res <- .spSANNout(new_conf, energy0, energies, time0)
     return (res)
   }
 # FUNCTION - CALCULATE THE CRITERION VALUE #####################################
