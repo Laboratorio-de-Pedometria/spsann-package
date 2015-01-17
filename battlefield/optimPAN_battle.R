@@ -14,6 +14,7 @@ source('R/optimPAN.R')
 Rcpp::sourceCpp('src/spJitterCpp.cpp')
 Rcpp::sourceCpp('src/updatePPLCpp.cpp')
 Rcpp::sourceCpp('src/calcMSSDCpp.cpp')
+Rcpp::sourceCpp('src/updateMSSDCpp.cpp')
 # PREPARE DATA #################################################################
 data(meuse.grid)
 candidates <- meuse.grid[, 1:2]
@@ -46,6 +47,9 @@ ACDC <- list(covars      = meuse.grid[, 1],
              strata.type = "equal.area",
              weights     = list(strata = 0.5, correl = 0.5))
 PAN <- list(weights = list(PPL = 1/3, ACDC = 1/3, MSSD = 1/3),
-            nadir   = list(sim = 100, save.sim = FALSE, user = NULL, 
+            nadir   = list(sim = 10, save.sim = FALSE, user = NULL, 
                            abs = NULL))
-
+# 1) FIRST TEST ################################################################
+x11()
+set.seed(2001)
+tmp <- optimPAN(points = points, candidates = candidates, x.max = x.max, x.min = x.min, y.max = y.max, y.min = y.min, iterations = iterations, acceptance = acceptance, stopping = stopping, PPL = PPL, ACDC = ACDC, PAN = PAN, plotit = plotit, boundary = boundary, progress = progress, verbose = verbose)
