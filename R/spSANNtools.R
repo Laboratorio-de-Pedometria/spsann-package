@@ -1,4 +1,26 @@
 #' @importFrom sp bbox
+# INTERNAL FUNCTION - PREPARE POINTS ###########################################
+.spsannPoints <-
+  function (points, candi, n.candi) {
+    
+    if (is.integer(points) || is.numint(points)) {
+      
+      # Integer vector
+      if (length(points) > 1) {
+        points <- candi[points, ]
+      }
+      
+      # Integer value
+      if (length(points) == 1) {
+        points <- sample(1:n.candi, points)
+        points <- candi[points, ] 
+      }
+    } else {
+      # Data frame of matrix
+      points <- points
+    }
+    return (points)
+  }
 # INTERNAL FUNCTION - CHECK ARGUMENTS ##########################################
 .spSANNcheck <-
   function (points, candi, x.max, x.min, y.max, y.min, iterations,
@@ -27,14 +49,24 @@
     }
     
     # acceptance
-    if (!is.list(acceptance) || length(acceptance) != 2) {
-      res <- paste("'acceptance' must be a list with two sub-arguments")
+    aa <- !is.list(acceptance)
+    bb <- length(acceptance) != 2
+    cc <- is.null(names(acceptance))
+    dd <- !all(c(names(acceptance) == c("initial", "cooling")) == TRUE)
+    if (aa || bb || cc || dd) {
+      res <- paste("'acceptance' must be a list with two named sub-arguments: ",
+                   "'initial' and 'cooling'", sep = "")
       return (res)
     }
     
     # stopping
-    if (!is.list(stopping) || length(stopping) != 1) {
-      res <- paste("'stopping' must be a list with one sub-argument")
+    aa <- !is.list(stopping)
+    bb <- length(stopping) != 1
+    cc <- is.null(names(stopping))
+    dd <- !all(c(names(stopping) == "max.count") == TRUE)
+    if (aa || bb || cc || dd) {
+      res <- paste("'stopping' must be a list with one named sub-argument: ",
+                   "'max.count'", sep = "")
       return (res)
     }
     
