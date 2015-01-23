@@ -110,6 +110,7 @@ optimMSSD <-
       # Update the distance matrix and calculate the new energy state
       x2 <- matrix(new_conf[wp, 2:3], nrow = 1)
       
+<<<<<<< HEAD
       # Update the matrix of distances in C++
       new_dm <- .updateMSSDCpp(x1 = candi[, 2:3], x2 = x2, dm = old_dm, 
                               idx = wp)
@@ -120,16 +121,37 @@ optimMSSD <-
       #new_dm[, wp] <- x2
       
       # Update the energy state
+=======
+      # Cpp function: there is a problem with this function
+      # new_dm <- .updateMSSDCpp(x1 = candi[, 2:3], x2 = x2, dm = old_dm, 
+      #                          idx = wp)
+      
+      # Update the matrix of distances in R
+      x2 <- SpatialTools::dist2(coords = candi[, 2:3], coords2 = x2)
+      new_dm <- old_dm
+      new_dm[, wp] <- x2
+      
+>>>>>>> ea06f437efa26e8c0ab25ffa18885e7e431822a2
       # new_energy <- mean(apply(new_dm, 1, min) ^ 2)
       new_energy <- .calcMSSDCpp(new_dm)
       
       # ASR: This is to test the 'update' function
+<<<<<<< HEAD
       #a <- objMSSD(candi = candi, points = new_conf)
       #if (round(new_energy, 2) != round(a, 2)) {
       # print(new_energy)
       # print(a)
       # break
       #}
+=======
+      a <- objMSSD(candi = candi, points = new_conf)
+      if (round(new_energy, 2) != round(a, 2)) {
+       print(new_energy)
+       print(a)
+       break
+      }
+      
+>>>>>>> ea06f437efa26e8c0ab25ffa18885e7e431822a2
       
       # Evaluate the new system configuration
       random_prob     <- runif(1)
