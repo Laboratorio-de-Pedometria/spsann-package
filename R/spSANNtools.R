@@ -84,15 +84,14 @@
   }
 # INTERNAL FUNCTION - PLOTTING #################################################
 .spSANNplot <-
-  function (energy_state0, energy_states, k, acceptance, accept_probs, 
-            boundary, new_sys_config, sys_config0, y_max0, y.max, x_max0, 
-            x.max, ...) {
+  function (energy0, energies, k, acceptance, accept_probs, boundary, new_conf,
+            conf0, y_max0, y.max, x_max0, x.max, ...) {
     par(mfrow = c(1, 2))
     
     # plot energy states
-    a <- c(energy_state0, energy_states[1:k])
+    a <- c(energy0, energies[1:k])
     plot(a ~ c(0:k), type = "l", xlab = "iteration", ylab = "energy state", ...)
-    abline(h = energy_state0, col = "red")
+    abline(h = energy0, col = "red")
     
     # plot acceptance probability
     a <- c(acceptance[[1]], accept_probs[1:k])
@@ -105,9 +104,9 @@
     # plot sample points
     bb <- bbox(boundary)
     plot(boundary)
-    points(sys_config0[, 1], sys_config0[, 2], pch = 1, cex = 0.5, 
+    points(conf0[, 1], conf0[, 2], pch = 1, cex = 0.5, 
            col = "lightgray")
-    points(new_sys_config[, 1], new_sys_config[, 2], pch = 20, cex = 0.5)
+    points(new_conf[, 1], new_conf[, 2], pch = 20, cex = 0.5)
     
     # plot maximum shift in the x and y coordinates
     x <- c(bb[1, 1], bb[1, 2])
@@ -137,18 +136,23 @@
   }
 # INTERNAL FUNCTION - PREPARE RESULTS ##########################################
 .spSANNout <-
-  function (new_sys_config, energy_state0, energy_states, time0) {
-    res <- new_sys_config
-    criterion <- c(energy_state0, energy_states)
+  function (new_conf, energy0, energies, time0, nadir) {
+    res <- new_conf
+    criterion <- c(energy0, energies)
     
     # Prepare attributes: energy states and running time
     a <- attributes(res)
     a$energy.state <- criterion
+    a$iterations <- length(energies)
     running_time <- (proc.time() - time0) / 60
     a$running.time <- running_time
+    if (!missing(nadir)) {
+      a$nadir <- nadir
+    }
     attributes(res) <- a
     
-    # Print running time
+    # Print the number of iterations and running time
+    cat("iterations = ", a$iterations, "\n", sep = "")
     cat("running time = ", round(running_time[3], 2), " minutes", sep = "")
     return (res)
   }
@@ -171,13 +175,13 @@
 #       par0 <- par()
 #     }
 #     n_pts             <- dim(points)[1]
-#     sys_config0       <- points
-#     old_sys_config    <- sys_config0
-#     energy_state0     <- .energyState(fun = fun, points = old_sys_config, ...)
-#     old_energy_state  <- energy_state0
+#     conf0       <- points
+#     old_sys_config    <- conf0
+#     energy0     <- .energyState(fun = fun, points = old_sys_config, ...)
+#     old_energy_state  <- energy0
 #     count             <- 0
 #     best_energy_state <- Inf
-#     energy_states     <- vector()
+#     energies     <- vector()
 #     accept_probs      <- vector()
 #     x_max             <- vector()
 #     y_max             <- vector()
@@ -189,7 +193,7 @@
 #     time0             <- proc.time()
 #     for (k in 1:iterations) {
 #       id <- sample(c(1:n_pts), 1)
-#       new_sys_config <- spJitterFinite(old_sys_config, candi = candi,
+#       new_conf <- spJitterFinite(old_sys_config, candi = candi,
 #                                        x.max = x.max, x.min = x.min, 
 #                                        y.max = y.max, y.min = y.min,
 #                                        which.pts = id)
@@ -197,17 +201,17 @@
 #       x_max[k] <- x.max
 #       y.max <- y_max0 - (k / iterations) * (y_max0 - y.min)
 #       y_max[k] <- y.max
-#       new_energy_state <- .energyState(fun=fun, points = new_sys_config, ...)
+#       new_energy_state <- .energyState(fun=fun, points = new_conf, ...)
 #       random_prob <- runif(1)
 #       actual_prob <- acceptance[[1]] * exp(-k / acceptance[[2]])
 #       accept_probs[k] <- actual_prob
 #       if (new_energy_state <= old_energy_state) {
-#         old_sys_config <- new_sys_config
+#         old_sys_config <- new_conf
 #         old_energy_state <- new_energy_state
 #         count <- 0
 #       } else {
 #         if (new_energy_state > old_energy_state & random_prob<=actual_prob) {
-#           old_sys_config <- new_sys_config
+#           old_sys_config <- new_conf
 #           old_energy_state <- new_energy_state
 #           count <- count + 1
 #           if (verbose) {
@@ -221,7 +225,7 @@
 #           }
 #         } else {
 #           new_energy_state <- old_energy_state
-#           new_sys_config <- old_sys_config
+#           new_conf <- old_sys_config
 #           count <- count + 1
 #           if (verbose) {
 #             if (count == 1) {
@@ -234,25 +238,25 @@
 #           }
 #         }
 #       }
-#       energy_states[k] <- new_energy_state
+#       energies[k] <- new_energy_state
 #       if (new_energy_state < best_energy_state / 1.0000001) {
 #         best_k <- k
-#         best_sys_config <- new_sys_config
+#         best_sys_config <- new_conf
 #         best_energy_state <- new_energy_state
 #         best_old_energy_state <- old_energy_state
 #         old_sys_config <- old_sys_config
 #       }
 #       if (any(round(seq(1, iterations, 10)) == k)) {
 #         if (plotit){
-#           .spSANNplot(energy_state0, energy_states,k,acceptance,accept_probs, 
-#                       boundary, new_sys_config, sys_config0, y_max0, y_max, 
+#           .spSANNplot(energy0, energies,k,acceptance,accept_probs, 
+#                       boundary, new_conf, conf0, y_max0, y_max, 
 #                       x_max0, x_max)
 #         } 
 #       }
 #       if (count == stopping[[1]]) {
 #         if (new_energy_state > best_energy_state * 1.000001) {
 #           old_sys_config <- old_sys_config
-#           new_sys_config <- best_sys_config
+#           new_conf <- best_sys_config
 #           old_energy_state <- best_old_energy_state
 #           new_energy_state <- best_energy_state
 #           count <- 0
@@ -279,8 +283,8 @@
 #     if (plotit){
 #       par(par0)
 #     }
-#     res <- new_sys_config
-#     criterion <- c(energy_state0, energy_states)
+#     res <- new_conf
+#     criterion <- c(energy0, energies)
 #     a <- attributes(res)
 #     a$energy.state <- criterion
 #     running_time <- (proc.time() - time0) / 60
