@@ -4,6 +4,7 @@ gc()
 require(ASRtools)
 require(pedometrics)
 require(sp)
+require(SpatialTools)
 require(rgeos)
 source('R/spSANNtools.R')
 source('R/spJitter.R')
@@ -24,11 +25,13 @@ candi <- matrix(cbind(1:nrow(candi), candi), ncol = 3)
 x.max <- diff(bbox(boundary)[1, ])
 y.max <- diff(bbox(boundary)[2, ])
 cutoff <- sqrt((x.max * x.max) + (y.max * y.max))
+points <- 100
 set.seed(2001)
-res <- optimPPL(points = 100, candi = candi, lags = 7, lags.base = 2,
+res <- optimPPL(points = points, candi = candi, lags = 7, lags.base = 2,
                 criterion = "distribution", lags.type = "exponential",
                 cutoff = cutoff, x.max = x.max, x.min = 40, y.max = y.max, 
-                y.min = 40, boundary = boundary, iterations = 100)
+                y.min = 40, boundary = boundary, iterations = 100, 
+                plotit = FALSE)
 str(res)
 pointsPerLag(points = res, lags = 7, lags.type = "exponential", lags.base = 2, 
              cutoff = cutoff)

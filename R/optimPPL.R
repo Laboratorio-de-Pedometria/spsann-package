@@ -141,7 +141,7 @@ optimPPL <-
             acceptance = list(initial = 0.99, cooling = iterations / 10),
             stopping = list(max.count = iterations / 10), plotit = TRUE,
             boundary, progress = TRUE, verbose = TRUE) {
-
+    
     # Check arguments
     # http://www.r-bloggers.com/a-warning-about-warning/
     check <- .spSANNcheck(points, candi, x.max, x.min, y.max, y.min,
@@ -151,12 +151,12 @@ optimPPL <-
     check <- .optimPPLcheck(lags, lags.type, lags.base, cutoff, criterion,
                             pre.distri)
     if (!is.null(check)) stop (check, call. = FALSE)
-
+    
     if (plotit) {
       par0 <- par()
       on.exit(suppressWarnings(par(par0)))
     }
-
+    
     # Prepare points
     n_candi <- nrow(candi)
     points <- .spsannPoints(points = points, candi = candi, n.candi = n_candi)
@@ -172,18 +172,15 @@ optimPPL <-
     }
     conf0 <- points
     old_conf <- conf0
-
+    
     # Initial energy state
     dm <- as.matrix(dist(conf0[, 2:3], method = "euclidean"))
-    point_per_lag <- .getPointsPerLag(lags = lags, dist.mat = dm)
-    energy0 <- .objPointsPerLag(points.per.lag = point_per_lag,
-                                      n.lags = n_lags, n.pts = n_pts,
-                                      criterion = criterion,
-                                      pre.distri = pre.distri)
-
+    ppl <- .getPointsPerLag(lags = lags, dist.mat = dm)
+    energy0 <- .objPointsPerLag(ppl = ppl, n.lags = n_lags, n.pts = n_pts,
+                                criterion = criterion, pre.distri = pre.distri)
+    
     # other settings for the simulated annealing algorithm
     old_dm <- dm
-    new_dm <- dm
     best_dm <- dm
     count <- 0
     old_energy <- energy0
@@ -194,39 +191,49 @@ optimPPL <-
     y_max0 <- y.max
     if (progress) pb <- txtProgressBar(min = 1, max = iterations, style = 3)
     time0 <- proc.time()
-
+    
     # begin the main loop
     for (k in 1:iterations) {
-
+      
       # jitter one of the points and update x.max and y.max
       wp <- sample(1:n_pts, 1)
       new_conf <- spJitterFinite(points = old_conf, candi = candi,
-                                     x.max = x.max, x.min = x.min, 
-                                     y.max = y.max, y.min = y.min, 
-                                     which.point = wp)
+                                 x.max = x.max, x.min = x.min, y.max = y.max,
+                                 y.min = y.min, which.point = wp)
       x.max <- x_max0 - (k / iterations) * (x_max0 - x.min)
       y.max <- y_max0 - (k / iterations) * (y_max0 - y.min)
-
+      
       # update the distance matrix and calculate the new energy state
-      new_dm <- .updatePPLCpp(x = new_conf[, 2:3], dm = old_dm,
-                                    idx = wp)
-      point_per_lag <- .getPointsPerLag(lags = lags, dist.mat = new_dm)
-      new_energy <- .objPointsPerLag(points.per.lag = point_per_lag, 
-                                           n.lags = n_lags, n.pts = n_pts,
-                                           criterion = criterion, 
-                                           pre.distri = pre.distri)
-
+      # ASR: The 'update' function is not working properly. We recalculate the
+      #      distance matrix every time.
+      # new_dm <- .updatePPLCpp(x = new_conf[, 2:3], y = old_dm, idx = wp)
+      new_dm <- SpatialTools::dist1(coords = new_conf[, 2:3])
+      ppl <- .getPointsPerLag(lags = lags, dist.mat = new_dm)
+      new_energy <- .objPointsPerLag(ppl = ppl, n.lags = n_lags, n.pts = n_pts,
+                                     criterion = criterion, 
+                                     pre.distri = pre.distri)      
+      
+      # ASR: This is to test the 'update' function
+      #a <- objPoints(points = new_conf, lags = lags, criterion = criterion)
+      #if (new_energy != a) {
+      #  print(new_energy)
+      #  print(a)
+      #  break
+      #}
+      
       # evaluate the new system configuration
       random_prob <- runif(1)
-      actual_prob <- acceptance[[1]] * exp(-k / acceptance[[2]])
+      actual_prob <- acceptance$initial * exp(-k / acceptance$cooling)
       accept_probs[k] <- actual_prob
       if (new_energy <= old_energy) {
+        # Always accepts a better energy
         old_conf   <- new_conf
         old_energy <- new_energy
         count      <- 0
-        old_dm <- new_dm
+        old_dm     <- new_dm
       } else {
-        if (new_energy > old_energy & random_prob <= actual_prob) {
+        if (new_energy > old_energy && random_prob <= actual_prob) {
+          # Accepts a worse energy depending on the probability
           old_conf   <- new_conf
           old_energy <- new_energy
           count      <- count + 1
@@ -239,14 +246,13 @@ optimPPL <-
           new_energy <- old_energy
           new_conf   <- old_conf
           count      <- count + 1
-          new_dm     <- old_dm
           if (verbose) {
             cat("\n", count, "iteration(s) with no improvement... stops at",
-                stopping[[1]], "\n")
+                stopping$max.count, "\n")
           }
         }
       }
-
+      
       # Best energy state
       energies[k] <- new_energy
       if (new_energy < best_energy / 1.0000001) {
@@ -261,25 +267,29 @@ optimPPL <-
 
       # Plotting
       if (plotit && any(round(seq(1, iterations, 10)) == k)) {
-        .spSANNplot(energy0, energies, k, acceptance,
-                    accept_probs, boundary, new_conf[, 2:3],
-                    conf0[, 2:3], y_max0, y.max, x_max0, x.max)
+      #if (plotit && pedometrics::is.numint(k / 10)) {
+        .spSANNplot(energy0 = energy0, energies = energies, k = k, 
+                    acceptance = acceptance, accept_probs = accept_probs,
+                    boundary = boundary, new_conf = new_conf[, 2:3], 
+                    conf0 = conf0[, 2:3], y_max0 = y_max0, y.max = y.max,
+                    x_max0 = x_max0, x.max = x.max)
       }
 
       # Freezing parameters
-      if (count == stopping[[1]]) {
+      if (count == stopping$max.count) {
         if (new_energy > best_energy * 1.000001) {
-          old_conf   <- old_conf
-          new_conf   <- best_conf
-          old_energy <- best_old_energy
-          new_energy <- best_energy
-          count      <- 0
-          new_dm     <- best_dm
-          old_dm     <- best_old_dm
+          old_conf    <- old_conf
+          new_conf    <- best_conf
+          old_energy  <- best_old_energy
+          new_energy  <- best_energy
+          count       <- 0
+          energies[k] <- new_energy
+          new_dm      <- best_dm
+          old_dm      <- best_old_dm
           cat("\n", "reached maximum count with suboptimal configuration\n")
           cat("\n", "restarting with previously best configuration\n")
           cat("\n", count, "iteration(s) with no improvement... stops at",
-              stopping[[1]], "\n")
+              stopping$max.count, "\n")
         } else {
           break
         }
@@ -287,7 +297,8 @@ optimPPL <-
       if (progress) setTxtProgressBar(pb, k)
     }
     if (progress) close(pb)
-    res <- .spSANNout(new_conf, energy0, energies, time0)
+    res <- .spSANNout(new_conf = new_conf, energy0 = energy0, 
+                      energies = energies, time0 = time0)
     return (res)
   }
 # FUNCTION - CALCULATE THE CRITERION VALUE #####################################
@@ -325,9 +336,8 @@ objPoints <-
 
     dm <- as.matrix(dist(points[, 2:3], method = "euclidean"))
     ppl <- .getPointsPerLag(lags = lags, dist.mat = dm)
-    res <- .objPointsPerLag(points.per.lag = ppl, n.lags = n_lags, 
-                            n.pts = n_pts, criterion = criterion, 
-                            pre.distri = pre.distri)
+    res <- .objPointsPerLag(ppl = ppl, n.lags = n_lags, n.pts = n_pts, 
+                            criterion = criterion, pre.distri = pre.distri)
     return (res)
   }
 # FUNCTION - POINTS PER LAG DISTANCE CLASS #####################################
@@ -417,15 +427,15 @@ pointsPerLag <-
   }
 # INTERNAL FUNCTION - CALCULATE THE CRITERION VALUE ############################
 .objPointsPerLag <-
-  function (points.per.lag, n.lags, n.pts, criterion, pre.distri = NULL) {
+  function (ppl, n.lags, n.pts, criterion, pre.distri = NULL) {
     if (criterion == "distribution") {
       if (is.null(pre.distri)) {
         pre.distri <- rep(n.pts, n.lags)
       }
-      res <- sum(pre.distri - points.per.lag)
+      res <- sum(pre.distri - ppl)
       } else {
         if (criterion == "minimum") {
-          res <- n.pts / (min(points.per.lag) + 1)
+          res <- n.pts / (min(ppl) + 1)
         }
       }
     return (res)
@@ -434,14 +444,14 @@ pointsPerLag <-
 # It is 3 times faster to use the for loop with function 'which' than when
 # using 'apply' with functions 'table' and 'cut'.
 # apply(X = dist.mat, 1, FUN = function (X) table(cut(X, breaks = lags)))
-# apply(X = point_per_lag, 1, FUN = function (X) sum(X != 0))
+# apply(X = ppl, 1, FUN = function (X) sum(X != 0))
 .getPointsPerLag <- function (lags, dist.mat) {
-  point_per_lag <- vector()
+  ppl <- vector()
   for (i in 1:c(length(lags) - 1)) {
     n <- which(dist.mat > lags[i] & dist.mat <= lags[i + 1], arr.ind = TRUE)
-    point_per_lag[i] <- length(unique(c(n)))
+    ppl[i] <- length(unique(c(n)))
   }
-  return (point_per_lag)
+  return (ppl)
 }
 # INTERNAL FUNCTION - BREAKS OF THE LAG DISTANCE CLASSES #######################
 .getLagBreaks <-
