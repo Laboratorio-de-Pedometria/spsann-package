@@ -74,17 +74,17 @@ optimMSSD <-
     n_pts <- nrow(points)
     conf0 <- points
     old_conf <- conf0
-
+    
     # Calculate the initial energy state. The distance matrix is calculated
-    # using the fields::rdist(). The function .calcMSSDCpp() does the squaring
-    # internaly.
+    # using the SpatialTools::dist2(). The function .calcMSSDCpp() does the
+    # squaring internaly.
     # ASR: write own distance function in C++
-    dm <- fields::rdist(candi[, 2:3], conf0[, 2:3])
+    dm <- SpatialTools::dist2(candi[, 2:3], conf0[, 2:3])
     energy0 <- .calcMSSDCpp(dm)
+    #energy0 <- mean(apply(dm, 1, min) ^ 2)
     
     # other settings for the simulated annealing algorithm
     old_dm        <- dm
-    new_dm        <- dm
     best_dm       <- dm
     count         <- 0
     old_energy    <- energy0
@@ -102,29 +102,47 @@ optimMSSD <-
       # Jitter one of the points and update x.max and y.max
       # ASR: spJitterFinite() can be improved implementing it in C++
       wp <- sample(c(1:n_pts), 1)
-      new_conf <- spJitterFinite(old_conf, candi, x.max,
-                                       x.min, y.max, y.min, wp)
+      new_conf <- spJitterFinite(old_conf, candi, x.max, x.min, y.max,
+                                 y.min, wp)
       x.max <- x_max0 - (k / iterations) * (x_max0 - x.min)
       y.max <- y_max0 - (k / iterations) * (y_max0 - y.min)
       
       # Update the distance matrix and calculate the new energy state
       x2 <- matrix(new_conf[wp, 2:3], nrow = 1)
+      
+      # Update the matrix of distances in C++
       new_dm <- .updateMSSDCpp(x1 = candi[, 2:3], x2 = x2, dm = old_dm, 
-                               idx = wp)
+                              idx = wp)
+      
+      # Update the matrix of distances in R
+      #x2 <- SpatialTools::dist2(coords = candi[, 2:3], coords2 = x2)
+      #new_dm <- old_dm
+      #new_dm[, wp] <- x2
+      
+      # Update the energy state
+      # new_energy <- mean(apply(new_dm, 1, min) ^ 2)
       new_energy <- .calcMSSDCpp(new_dm)
+      
+      # ASR: This is to test the 'update' function
+      #a <- objMSSD(candi = candi, points = new_conf)
+      #if (round(new_energy, 2) != round(a, 2)) {
+      # print(new_energy)
+      # print(a)
+      # break
+      #}
       
       # Evaluate the new system configuration
       random_prob     <- runif(1)
       actual_prob     <- acceptance[[1]] * exp(-k / acceptance[[2]])
       accept_probs[k] <- actual_prob
       if (new_energy <= old_energy) {
-        old_conf <- new_conf
+        old_conf   <- new_conf
         old_energy <- new_energy
         count      <- 0
         old_dm     <- new_dm
       } else {
         if (new_energy > old_energy & random_prob <= actual_prob) {
-          old_conf <- new_conf
+          old_conf   <- new_conf
           old_energy <- new_energy
           count      <- count + 1
           old_dm     <- new_dm
@@ -134,9 +152,8 @@ optimMSSD <-
           }
           } else {
             new_energy <- old_energy
-            new_conf <- old_conf
+            new_conf   <- old_conf
             count      <- count + 1
-            new_dm     <- old_dm
             if (verbose) {
               cat("\n", count, "iteration(s) with no improvement... stops at",
                   stopping[[1]], "\n")
@@ -194,8 +211,11 @@ optimMSSD <-
 #' @export
 objMSSD <-
   function (candi, points) {
-    dm <- fields::rdist(candi[, 2:3], points[, 2:3])
-    res <- .calcMSSDCpp(dm)
+    coords1 <- candi[, 2:3]
+    coords2 <- points[, 2:3]
+    dm <- SpatialTools::dist2(coords1 = coords1, coords2 = coords2)
+    res <- mean(apply(dm, 1, min) ^ 2)
+    #res <- .calcMSSDCpp(dm)
     return (res)
   }
 # INTERNAL FUNCTION - NEAREST POINT ############################################

@@ -174,7 +174,7 @@ optimPPL <-
     old_conf <- conf0
     
     # Initial energy state
-    dm <- as.matrix(dist(conf0[, 2:3], method = "euclidean"))
+    dm <- SpatialTools::dist1(conf0[, 2:3])
     ppl <- .getPointsPerLag(lags = lags, dist.mat = dm)
     energy0 <- .objPointsPerLag(ppl = ppl, n.lags = n_lags, n.pts = n_pts,
                                 criterion = criterion, pre.distri = pre.distri)
@@ -203,11 +203,20 @@ optimPPL <-
       x.max <- x_max0 - (k / iterations) * (x_max0 - x.min)
       y.max <- y_max0 - (k / iterations) * (y_max0 - y.min)
       
-      # update the distance matrix and calculate the new energy state
-      # ASR: The 'update' function is not working properly. We recalculate the
-      #      distance matrix every time.
-      # new_dm <- .updatePPLCpp(x = new_conf[, 2:3], y = old_dm, idx = wp)
-      new_dm <- SpatialTools::dist1(coords = new_conf[, 2:3])
+      # Update the distance matrix using a Cpp function
+      new_dm <- .updatePPLCpp(x = new_conf[, 2:3], dm = old_dm, idx = wp)
+      
+      # Recalculate the full distance matrix
+      #new_dm <- SpatialTools::dist1(coords = new_conf[, 2:3])
+      
+      # Update the distance matrix in R
+      #x2 <- matrix(new_conf[wp, 2:3], nrow = 1)
+      #x2 <- SpatialTools::dist2(coords = new_conf[, 2:3], coords2 = x2)
+      #new_dm <- old_dm
+      #new_dm[wp, ] <- x2
+      #new_dm[, wp] <- x2
+      
+      # Update the energy state
       ppl <- .getPointsPerLag(lags = lags, dist.mat = new_dm)
       new_energy <- .objPointsPerLag(ppl = ppl, n.lags = n_lags, n.pts = n_pts,
                                      criterion = criterion, 
@@ -216,9 +225,9 @@ optimPPL <-
       # ASR: This is to test the 'update' function
       #a <- objPoints(points = new_conf, lags = lags, criterion = criterion)
       #if (new_energy != a) {
-      #  print(new_energy)
-      #  print(a)
-      #  break
+      # print(new_energy)
+      # print(a)
+      # break
       #}
       
       # evaluate the new system configuration

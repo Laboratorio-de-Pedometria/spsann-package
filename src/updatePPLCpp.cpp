@@ -10,32 +10,62 @@ using namespace Rcpp;
 // [[Rcpp::export(".updatePPLCpp")]]
 
 NumericMatrix updatePPLCpp(NumericMatrix x, NumericMatrix dm, int idx) {
-  int ncol = x.ncol(), nrow = x.nrow(), i, j;
-  NumericVector d(nrow, 0.0000);
-  NumericMatrix x2(1, ncol);
+  int ncolx = x.ncol(), nrowx = x.nrow(), ncoldm = dm.ncol(), nrowdm = dm.nrow();
+  NumericVector d(nrowx, 0.0000);
+  NumericMatrix x2(1, ncolx);
+  NumericMatrix res(nrowdm, ncoldm);
   
-  /* matrix indexes beging at 0 in C++, while in R it starts at 1 */
+  // Get the data of the distance matrix
+  // This is needed so that the object passed to 'dm' is not replaced in the 
+  // global environment.
+  for (int i = 0; i < nrowdm; i++) {
+    for (int j = 0; j < ncoldm; j++) {
+      res(i, j) = dm(i, j);
+    }
+  }
+  
+  // Get the coordinates of the new point
   idx -= 1;
-  for (i = 0; i < ncol; i++) {
+  for (int i = 0; i < ncolx; i++) {
     x2(0, i) = x(idx, i);
   }
   
-  /* begin the main loop over the rows of the matrix of coordinates */
-  for (i = 0; i < nrow; i++) {
-    
-    /* begin the secondary loop over the columns of the matrix of coordinates */
-    for (j = 0; j < ncol; j++) {
-      d[i] += (x[nrow*j + i] - x2[j])*(x[nrow*j + i] - x2[j]);
+  // Calculate distances
+  for (int i = 0; i < nrowx; i++) {
+    for (int j = 0; j < ncolx; j++) {
+      d[i] += (x[nrowx * j + i] - x2[j]) * (x[nrowx * j + i] - x2[j]);
     }
-    
-    /* take the squared root */
     d[i] = pow(d[i], 0.5);
   }
   
-  /* replace the values in the distance matrix */
-  for (i = 0; i < nrow; i++) {
-    dm(i, idx) = d[i];
-    dm(idx, i) = d[i];
+  // replace the values in the distance matrix
+  for (int i = 0; i < nrowx; i++) {
+    res(i, idx) = d[i];
+    res(idx, i) = d[i];
   }
-  return (dm);
+  return (res);
 }
+/* Testing:
+rm(list = ls())
+Rcpp::sourceCpp('src/updatePPLCpp.cpp')
+old_x <- matrix(rnorm(8), nrow = 4)
+old_dm <- as.matrix(dist(old_x))
+idx <- 1
+new_x <- old_x
+new_x[idx, ] <- rnorm(2)
+#
+# the new and old data_mat are different
+setequal(new_x, old_x)
+new_x - old_x
+new_dm2 <- as.matrix(dist(new_x))
+#
+# the new and the old dist_mat are different
+setequal(new_dm2, old_dm)
+new_dm2 - old_dm
+#
+new_dm1 <- .updatePPLCpp(new_x, old_dm, idx)
+setequal(new_dm1, old_dm)
+new_dm1 - old_dm
+setequal(new_dm1, new_dm2)
+new_dm1 - new_dm2
+*/

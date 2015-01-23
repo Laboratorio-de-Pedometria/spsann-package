@@ -26,18 +26,18 @@ x.max <- diff(bbox(boundary)[1, ])
 y.max <- diff(bbox(boundary)[2, ])
 cutoff <- sqrt((x.max * x.max) + (y.max * y.max))
 points <- 100
-set.seed(2001)
+set.seed(2002)
 res <- optimPPL(points = points, candi = candi, lags = 7, lags.base = 2,
                 criterion = "distribution", lags.type = "exponential",
                 cutoff = cutoff, x.max = x.max, x.min = 40, y.max = y.max, 
-                y.min = 40, boundary = boundary, iterations = 100, 
-                plotit = FALSE)
+                y.min = 40, boundary = boundary, iterations = 1000, 
+                plotit = TRUE)
 str(res)
 pointsPerLag(points = res, lags = 7, lags.type = "exponential", lags.base = 2, 
              cutoff = cutoff)
 objPoints(points = res, lags = 7, lags.type = "exponential", lags.base = 2,
           cutoff = cutoff, criterion = "distribution")
-attr(res, "energy.state")
+tail(attr(res, "energy.state"), 1)
 # PREPARE DATA #################################################################
 data(meuse.grid)
 candi <- meuse.grid[, 1:2]
