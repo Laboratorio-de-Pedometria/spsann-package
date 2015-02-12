@@ -164,12 +164,15 @@ optimACDC <-
                          covars = covars, strata = strata)
       scm <- cor(sm, use = "complete.obs")
       energy0 <- .objNum(sm = sm, n.cov = n_cov, strata = strata, pcm = pcm, 
-                         scm = scm, nadir = nadir, weights = weights)
+                         scm = scm, nadir = nadir, weights = weights, 
+                         n.pts = n_pts)
 
     } else { # Factor covariates
       if (covars.type == "factor") {
         pcm <- pedometrics::cramer(covars)
-        pop_prop <- lapply(covars, function(x) table(x) / nrow(covars))
+        # ASR: now we multiply the proportions by 100 for numerical stability
+        #pop_prop <- lapply(covars, function(x) table(x) / nrow(covars))
+        pop_prop <- lapply(covars, function(x) table(x) / nrow(covars) * 100)
         nadir <- .facNadir(nadir = nadir, candi = candi, n.candi = n_candi,
                            n.pts = n_pts, n.cov = n_cov, covars = covars, 
                            pop.prop = pop_prop, pcm = pcm)
@@ -215,7 +218,7 @@ optimACDC <-
         new_scm <- cor(new_sm, use = "complete.obs")
         new_energy <- .objNum(sm = new_sm, n.cov = n_cov, strata = strata, 
                               pcm = pcm, scm = new_scm, nadir = nadir,
-                              weights = weights)
+                              weights = weights, n.pts = n_pts)
 
       } else { # Factor covariates
         if (covars.type == "factor") {
@@ -377,7 +380,10 @@ optimACDC <-
       breaks <- lapply(breaks, unique)
       count <- lapply(1:n_cov, function (i)
         hist(covars[, i], breaks[[i]], plot = FALSE)$counts)
-      count <- lapply(1:n_cov, function(i) count[[i]] / sum(count[[i]]) * n.pts)
+      # Now we use the proportion of points per sampling strata
+      #count <- lapply(1:n_cov, function(i) 
+      #  count[[i]] / sum(count[[i]]) * n.pts)
+      count <- lapply(1:n_cov, function(i) count[[i]] / sum(count[[i]]) * 100)
       strata <- list(breaks, count)
 
     } else {
@@ -393,8 +399,11 @@ optimACDC <-
         breaks <- lapply(breaks, unique)
         count <- lapply(1:n_cov, function (i)
           hist(covars[, i], breaks[[i]], plot = FALSE)$counts)
+        # Now we use the proportion of points per sampling strata
+        #count <- lapply(1:n_cov, function(i)
+        #  count[[i]] / sum(count[[i]]) * n.pts)
         count <- lapply(1:n_cov, function(i)
-          count[[i]] / sum(count[[i]]) * n.pts)
+          count[[i]] / sum(count[[i]]) * 100)
         # This was an option to merge null strata
         #breaks <- lapply(breaks, unique)
         #count <- lapply(1:n_cov, function (i)
@@ -501,11 +510,15 @@ optimACDC <-
   }
 # INTERNAL FUNCTION - CRITERION FOR NUMERIC COVARIATES #########################
 .objNum <-
-  function (sm, n.cov, strata, pcm, scm, nadir, weights) {
+  function (sm, n.cov, strata, pcm, scm, nadir, weights, n.pts) {
+    
     counts <- lapply(1:n.cov, function (i)
       hist(sm[, i], strata[[1]][[i]], plot = FALSE)$counts)
+    # ASR: now we use the proportion of points per sampling strata
+    #counts <- sapply(1:n.cov, function (i)
+    #  sum(abs(counts[[i]] - strata[[2]][[i]])))
     counts <- sapply(1:n.cov, function (i)
-      sum(abs(counts[[i]] - strata[[2]][[i]])))
+      sum(abs((counts[[i]] / n.pts * 100) - strata[[2]][[i]])))
     obj_cont <- sum(counts) / attr(nadir, "strata")
     obj_cont <- obj_cont * weights[[1]]
     obj_cor <- sum(abs(pcm - scm)) / attr(nadir, "correl")
@@ -530,7 +543,9 @@ optimACDC <-
         pts <- sample(1:n.candi, n.pts)
         sm <- covars[pts, ]
         scm <- pedometrics::cramer(sm)
-        samp_prop <- lapply(sm, function(x) table(x) / n.pts)
+        # ASR: Now we multiply the proportion by 100 for numerical stability
+        #samp_prop <- lapply(sm, function(x) table(x) / n.pts)
+        samp_prop <- lapply(sm, function(x) table(x) / n.pts * 100)
         samp_prop <- sapply(1:n.cov, function (i)
           sum(abs(samp_prop[[i]] - pop.prop[[i]])))
         strata_nadir[i] <- sum(samp_prop)
@@ -566,7 +581,9 @@ optimACDC <-
 .objFac <-
   function (sm, pop.prop, nadir, weights, pcm, scm, n.pts, n.cov) {
     
-    samp_prop <- lapply(sm, function(x) table(x) / n.pts)
+    # ASR: Now we multiply the proportions by 100 for numerical stability
+    #samp_prop <- lapply(sm, function(x) table(x) / n.pts)
+    samp_prop <- lapply(sm, function(x) table(x) / n.pts * 100)
     samp_prop <- sapply(1:n.cov, function (i)
       sum(abs(samp_prop[[i]] - pop.prop[[i]])))
     obj_cat <- sum(samp_prop) / attr(nadir, "strata")

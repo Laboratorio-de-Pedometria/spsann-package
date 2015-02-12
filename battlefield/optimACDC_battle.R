@@ -12,13 +12,13 @@ source('R/spJitter.R')
 Rcpp::sourceCpp('src/spJitterCpp.cpp')
 # 0) DEFAULT EXAMPLE ###########################################################
 data(meuse.grid)
-candidates <- meuse.grid[, 1:2]
-coordinates(candidates) <- ~ x + y
-gridded(candidates) <- TRUE
-boundary <- as(candidates, "SpatialPolygons")
+candi <- meuse.grid[, 1:2]
+coordinates(candi) <- ~ x + y
+gridded(candi) <- TRUE
+boundary <- as(candi, "SpatialPolygons")
 boundary <- gUnionCascaded(boundary)
-candidates <- coordinates(candidates)
-candidates <- matrix(cbind(1:dim(candidates)[1], candidates), ncol = 3)
+candi <- coordinates(candi)
+candi <- matrix(cbind(1:dim(candi)[1], candi), ncol = 3)
 str(meuse.grid)
 covars <- meuse.grid[, 5]
 x.max <- diff(bbox(boundary)[1, ])
@@ -27,7 +27,7 @@ y.max <- diff(bbox(boundary)[2, ])
 nadir <- list(sim = 10, save.sim = TRUE, user = NULL, abs = NULL)
 weights <- list(strata = 0.5, correl = 0.5)
 set.seed(2001)
-res <- optimACDC(points = 100, candidates = candidates, covars = covars, 
+res <- optimACDC(points = 100, candi = candi, covars = covars, 
                  use.coords = TRUE, covars.type = "numeric", weights = weights,
                  x.max = x.max, x.min = x.min, y.max = y.max, y.min = y.min,
                  boundary = boundary, nadir = nadir, iterations = 100)
