@@ -2,7 +2,7 @@
 #'
 #' Optimize a sample pattern for trend estimaton. The criterion used is
 #' matching the association/correlation and marginal distribution of the
-#' covariates (\code{optimACDC}).
+#' covariates (\bold{ACDC}).
 #'
 #' @template spJitter_doc
 #' @template spSANN_doc
@@ -14,9 +14,9 @@
 #' Defaults to \code{covars.type = "numeric"}.
 #'
 #' @param weights List with two named sub-arguments. The weights assigned to 
-#' the sampling strata/classes and the correlation/association measure. They
+#' correlation/association measure and the sampling strata/classes. They
 #' must be named and sum to unity. Defaults to 
-#' \code{weights = list(strata = 0.5, correl = 0.5)}.
+#' \code{weights = list(correl = 0.5, strata = 0.5)}.
 #'
 #' @param use.coords Logical. Should the coordinates be used as covariates?
 #' Defaults to \code{use.coords = FALSE}.
@@ -102,7 +102,7 @@
 # MAIN FUNCTION ################################################################
 optimACDC <-
   function (points, candi, covars, covars.type = "numeric",
-            weights = list(strata = 0.5, correl = 0.5), use.coords = FALSE,
+            weights = list(correl = 0.5, strata = 0.5), use.coords = FALSE,
             strata.type = "equal.area",
             nadir = list(sim = 1000, save.sim = TRUE, user = NULL, abs = NULL),
             x.max, x.min, y.max, y.min, iterations,
@@ -154,8 +154,6 @@ optimACDC <-
 
     # Base data and initial energy state (energy)
     if (covars.type == "numeric") { # Numeric covariates
-      # ASR: we should compute the true population correlation matrix (pcm)
-      #      and then compare it with the sample correlation matrix (scm)
       pcm <- cor(covars, use = "complete.obs")
       strata <- .numStrata(n.pts = n_pts, covars = covars, 
                            strata.type = strata.type)
