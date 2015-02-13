@@ -1,8 +1,8 @@
 #' Optimization of sample patterns for trend estimation
 #'
-#' Optimize a sample pattern for trend estimaton. The criterion used is
-#' matching the association/correlation and marginal distribution of the
-#' covariates (\bold{ACDC}).
+#' Optimize a sample pattern for trend estimaton. The criterion is defined so 
+#' that the sample matches the association/correlation and marginal
+#' distribution of the covariates (\bold{ACDC}).
 #'
 #' @template spJitter_doc
 #' @template spSANN_doc
@@ -22,8 +22,8 @@
 #' Defaults to \code{use.coords = FALSE}.
 #'
 #' @param strata.type Character value. The type of strata to be used with
-#' numeric covariates. Available options are \code{"equal.area"} and
-#' \code{"equal.range"}. Defaults to \code{strata.type = "equal.area"}. See
+#' numeric covariates. Available options are \code{"area"} for equal area and
+#' \code{"range"} for equal range. Defaults to \code{strata.type = "area"}. See
 #' \sQuote{Details} for more information.
 #'
 #' @param nadir List with four named sub-arguments: \code{sim} -- the number of
@@ -33,6 +33,12 @@
 #' \code{abs} -- logical for calculating the nadir point internally. Only
 #' simulations are implemented in the current version. Defaults to 
 #' \code{nadir = list(sim = 1000, save.sim = TRUE, user = NULL, abs = NULL)}.
+#' 
+#' @param utopia List with two named sub-arguments: \code{user} -- a 
+#' user-defined value; \code{abs} -- logical for calculating the nadir point
+#' internally. If chosen, \code{user} should be a list as follows:
+#' \code{user = list(correl = NULL, strata = NULL)}. Defaults to 
+#' \code{utopia = list(user = NULL, abs = NULL)}.
 #' 
 #' @details
 #' This method is also known as the conditioned Latin Hypercube of Minasny and
@@ -101,10 +107,11 @@
 #' str(res)
 # MAIN FUNCTION ################################################################
 optimACDC <-
-  function (points, candi, covars, covars.type = "numeric",
+  function (points, candi, covars, covars.type = "numeric", 
+            strata.type = "area",
             weights = list(correl = 0.5, strata = 0.5), use.coords = FALSE,
-            strata.type = "equal.area",
             nadir = list(sim = 1000, save.sim = TRUE, user = NULL, abs = NULL),
+            utopia = list(user = NULL, abs = NULL),
             x.max, x.min, y.max, y.min, iterations,
             acceptance = list(initial = 0.99, cooling = iterations / 10),
             stopping = list(max.count = iterations / 10), plotit = TRUE,
@@ -116,7 +123,7 @@ optimACDC <-
                           iterations, acceptance, stopping, plotit, boundary,
                           progress, verbose)
     if (!is.null(check)) stop (check, call. = FALSE)
-    check <- .optimACDCcheck(candi = candi, covars = covars, 
+    check <- .optimACDCcheck(candi = candi, covars = covars, nadir = nadir,
                              covars.type = covars.type, weights = weights, 
                              use.coords = use.coords, strata.type = strata.type)
     if (!is.null(check)) stop (check, call. = FALSE)
@@ -160,24 +167,26 @@ optimACDC <-
       nadir <- .numNadir(n.pts = n_pts, n.cov = n_cov, n.candi = n_candi, 
                          pcm = pcm, nadir = nadir, candi = candi, 
                          covars = covars, strata = strata)
+      utopia <- .numUtopia()
       scm <- cor(sm, use = "complete.obs")
       energy0 <- .objNum(sm = sm, n.cov = n_cov, strata = strata, pcm = pcm, 
                          scm = scm, nadir = nadir, weights = weights, 
-                         n.pts = n_pts)
+                         n.pts = n_pts, utopia = utopia)
 
     } else { # Factor covariates
       if (covars.type == "factor") {
         pcm <- pedometrics::cramer(covars)
-        # ASR: now we multiply the proportions by 100 for numerical stability
+        # ASR: We multiply the proportions by 100 for numerical stability
         #pop_prop <- lapply(covars, function(x) table(x) / nrow(covars))
         pop_prop <- lapply(covars, function(x) table(x) / nrow(covars) * 100)
         nadir <- .facNadir(nadir = nadir, candi = candi, n.candi = n_candi,
                            n.pts = n_pts, n.cov = n_cov, covars = covars, 
                            pop.prop = pop_prop, pcm = pcm)
+        utopia <- .facUtopia()
         scm <- pedometrics::cramer(sm)
         energy0 <- .objFac(sm = sm, pop.prop = pop_prop, nadir = nadir, 
                            weights = weights, pcm = pcm, scm = scm,
-                           n.pts = n_pts, n.cov = n_cov)
+                           n.pts = n_pts, n.cov = n_cov, utopia = utopia)
       }
     }
 
@@ -201,8 +210,7 @@ optimACDC <-
     # Begin the main loop
     for (k in 1:iterations) {
 
-      # Jitter one of the points and update x.max and y.max
-      # Which point (wp)?
+      # Jitter one of the points and update x.max and y.max; which point (wp)?
       wp <- sample(c(1:n_pts), 1)
       new_conf <- spJitterFinite(old_conf, candi, x.max, x.min, y.max,
                                  y.min, wp)
@@ -216,16 +224,16 @@ optimACDC <-
         new_scm <- cor(new_sm, use = "complete.obs")
         new_energy <- .objNum(sm = new_sm, n.cov = n_cov, strata = strata, 
                               pcm = pcm, scm = new_scm, nadir = nadir,
-                              weights = weights, n.pts = n_pts)
+                              weights = weights, n.pts = n_pts, utopia = utopia)
 
       } else { # Factor covariates
         if (covars.type == "factor") {
           new_row <- covars[new_conf[wp, 1], ]
           new_sm[wp, ] <- new_row
           new_scm <- pedometrics::cramer(new_sm)
-          new_energy <- .objFac(sm = new_sm, pop.prop = pop_prop, 
+          new_energy <- .objFac(sm = new_sm, pop.prop = pop_prop, scm = new_scm, 
                                 nadir = nadir, weights = weights, pcm = pcm, 
-                                scm = new_scm, n.pts = n_pts, n.cov = n_cov)
+                                n.pts = n_pts, n.cov = n_cov, utopia = utopia)
         }
       }
       
@@ -309,7 +317,8 @@ optimACDC <-
   }
 # INTERNAL FUNCTION - CHECK ARGUMENTS ##########################################
 .optimACDCcheck <-
-  function (candi, covars, covars.type, weights, use.coords, strata.type) {
+  function (candi, covars, covars.type, weights, use.coords, strata.type,
+            nadir) {
     
     # covars
     if (ncol(covars) < 2 && use.coords == FALSE) {
@@ -327,8 +336,8 @@ optimACDC <-
       res <- paste("'covars.type' is missing")
       return (res)
     } else {
-      ct <- match(covars.type, c("numeric", "factor"))
-      if (!ct) {
+      ct <- pmatch(covars.type, c("numeric", "factor"))
+      if (is.na(ct)) {
         res <- paste("'covars.type = ", covars.type, "' is not supported", 
                      sep = "")
         return (res)
@@ -339,7 +348,7 @@ optimACDC <-
     aa <- !is.list(weights)
     bb <- length(weights) != 2
     cc <- is.null(names(weights))
-    dd <- !all(c(names(weights) == c("strata", "correl")) == TRUE)
+    dd <- !all(c(names(weights) == c("correl", "strata")) == TRUE)
     if (aa || bb || cc || dd) {
       res <- paste("'weights' must be a list with two named sub-arguments:",
                    "'strata' and 'correl'", sep = "")
@@ -351,12 +360,37 @@ optimACDC <-
     }
     
     # strata.type
-    st <- c("equal.area", "equal.range")
-    st <- is.na(any(match(st, strata.type)))
-    if (st) {
+    st <- match(strata.type, c("area", "range"))
+    if (is.na(st) {
       res <- paste("'strata.type = ", strata.type, "' is not supported",
                    sep = "")
       return (res)
+    }
+    
+    # nadir
+    if (!is.list(nadir) || length(nadir) != 4) {
+      res <- paste("'nadir' must be a list with four sub-arguments")
+      return (res)
+    }
+    n <- !sapply(nadir, is.null)
+    if (n[[1]] == TRUE) {
+      if (n[[2]] == FALSE) {
+        res <- paste("you must inform if the simulations should be saved")
+        return (res)
+      }
+      if (n[[3]] == TRUE || n[[4]] == TRUE) {
+        res <- paste("you must choose a single nadir option")
+        return (res)
+      }
+    } else {
+      if (n[[3]] == TRUE) {
+        res <- paste("sorry but you cannot set the nadir point")
+        return (res)
+      }
+      if (n[[4]] == TRUE) {
+        res <- paste("sorry but the nadir point cannot be calculated")
+        return (res)
+      }
     }
   }
 # INTERNAL FUNCTION - BREAKS FOR NUMERIC COVARIATES ############################
@@ -368,17 +402,21 @@ optimACDC <-
   function (n.pts, covars, strata.type) {
 
     # equal area strata
-    if (strata.type == "equal.area") {
+    if (strata.type == "area") {
       n_cov <- ncol(covars)
       probs <- seq(0, 1, length.out = n.pts + 1)
       breaks <- lapply(covars, quantile, probs, na.rm = TRUE, type = 3)
+      
+      # ASR: This is an old implementation
       #count <- lapply(breaks, table)
       #count <- lapply(count, as.integer)
       #count <- lapply(count, function(x) {x[2] <- x[2] + x[1] - 1; x[-1L]})
+      
       breaks <- lapply(breaks, unique)
       count <- lapply(1:n_cov, function (i)
         hist(covars[, i], breaks[[i]], plot = FALSE)$counts)
-      # Now we use the proportion of points per sampling strata
+      
+      # ASR: We use the proportion of points per sampling strata
       #count <- lapply(1:n_cov, function(i) 
       #  count[[i]] / sum(count[[i]]) * n.pts)
       count <- lapply(1:n_cov, function(i) count[[i]] / sum(count[[i]]) * 100)
@@ -386,7 +424,7 @@ optimACDC <-
 
     } else {
       # equal range strata
-      if (strata.type == "equal.range") {
+      if (strata.type == "range") {
         n_cov <- ncol(covars)
         breaks <- lapply(1:n_cov, function(i)
           seq(min(covars[, i]), max(covars[, i]), length.out = n.pts + 1))
@@ -397,12 +435,14 @@ optimACDC <-
         breaks <- lapply(breaks, unique)
         count <- lapply(1:n_cov, function (i)
           hist(covars[, i], breaks[[i]], plot = FALSE)$counts)
-        # Now we use the proportion of points per sampling strata
+        
+        # ASR: We use the proportion of points per sampling strata
         #count <- lapply(1:n_cov, function(i)
         #  count[[i]] / sum(count[[i]]) * n.pts)
         count <- lapply(1:n_cov, function(i)
           count[[i]] / sum(count[[i]]) * 100)
-        # This was an option to merge null strata
+        
+        # ASR: This is an old implementation to merge null strata
         #breaks <- lapply(breaks, unique)
         #count <- lapply(1:n_cov, function (i)
         #  hist(covars[, i], breaks[[i]], plot = FALSE)$counts)
@@ -417,6 +457,7 @@ optimACDC <-
         #  maxi <- max(covars[, i])
         #  count[[i]] <- diff(breaks[[i]]) / ((maxi - mini) / n.pts)
         #}
+        
         strata <- list(breaks, count)
       }
     }
@@ -457,6 +498,9 @@ optimACDC <-
         scm <- cor(sm, use = "complete.obs")
         counts <- lapply(1:n.cov, function (i)
           hist(sm[, i], strata[[1]][[i]], plot = FALSE)$counts)
+        
+        # ASR: We use the proportion of points per sampling strata
+        counts <- lapply(1:n.cov, function(i) counts[[i]] / n.pts * 100)
         counts <- sapply(1:n.cov, function (i)
           sum(abs(counts[[i]] - strata[[2]][[i]])))
         strata_nadir[i] <- sum(counts)
@@ -508,19 +552,26 @@ optimACDC <-
   }
 # INTERNAL FUNCTION - CRITERION FOR NUMERIC COVARIATES #########################
 .objNum <-
-  function (sm, n.cov, strata, pcm, scm, nadir, weights, n.pts) {
+  function (sm, n.cov, strata, pcm, scm, nadir, weights, n.pts, utopia) {
     
     counts <- lapply(1:n.cov, function (i)
       hist(sm[, i], strata[[1]][[i]], plot = FALSE)$counts)
-    # ASR: now we use the proportion of points per sampling strata
-    #counts <- sapply(1:n.cov, function (i)
-    #  sum(abs(counts[[i]] - strata[[2]][[i]])))
-    counts <- sapply(1:n.cov, function (i)
-      sum(abs((counts[[i]] / n.pts * 100) - strata[[2]][[i]])))
+    
+    # ASR: We use the proportion of points per sampling strata
+    counts <- lapply(1:n.cov, function(i) counts[[i]] / n.pts * 100)
+    counts <- sapply(1:n.cov, function (i) 
+      sum(abs(counts[[i]] - strata[[2]][[i]])))
+    
     obj_cont <- sum(counts) / attr(nadir, "strata")
+    #obj_cont <- sum(counts) - utopia$strata / 
+    #  attr(nadir, "strata") - utopia$strata
     obj_cont <- obj_cont * weights[[1]]
+    
     obj_cor <- sum(abs(pcm - scm)) / attr(nadir, "correl")
+    #obj_cor <- sum(abs(pcm - scm)) - utopia$correl / 
+    #  attr(nadir, "correl") - utopia$correl
     obj_cor <- obj_cor * weights[[2]]
+    
     res <- obj_cont + obj_cor
     return (res)
   }
@@ -541,7 +592,8 @@ optimACDC <-
         pts <- sample(1:n.candi, n.pts)
         sm <- covars[pts, ]
         scm <- pedometrics::cramer(sm)
-        # ASR: Now we multiply the proportion by 100 for numerical stability
+        
+        # ASR: We multiply the proportion by 100 for numerical stability
         #samp_prop <- lapply(sm, function(x) table(x) / n.pts)
         samp_prop <- lapply(sm, function(x) table(x) / n.pts * 100)
         samp_prop <- sapply(1:n.cov, function (i)
@@ -577,17 +629,41 @@ optimACDC <-
   }
 # INTERNAL FUNCTION - CRITERION FOR FACTOR COVARIATES ##########################
 .objFac <-
-  function (sm, pop.prop, nadir, weights, pcm, scm, n.pts, n.cov) {
+  function (sm, pop.prop, nadir, weights, pcm, scm, n.pts, n.cov, utopia) {
     
-    # ASR: Now we multiply the proportions by 100 for numerical stability
+    # ASR: We multiply the proportions by 100 for numerical stability
     #samp_prop <- lapply(sm, function(x) table(x) / n.pts)
     samp_prop <- lapply(sm, function(x) table(x) / n.pts * 100)
     samp_prop <- sapply(1:n.cov, function (i)
       sum(abs(samp_prop[[i]] - pop.prop[[i]])))
     obj_cat <- sum(samp_prop) / attr(nadir, "strata")
+    #obj_cat <- sum(samp_prop) - utopia$strata / 
+    #  attr(nadir, "strata") - utopia$strata
     obj_cat <- obj_cat * weights[[1]]
+    
     obj_cor <- sum(abs(pcm - scm)) / attr(nadir, "correl")
+    #obj_cor <- sum(abs(pcm - scm)) - utopia$correl / 
+    #  attr(nadir, "correl") - utopia$correl
     obj_cor <- obj_cor * weights[[2]]
+    
     res <- obj_cat + obj_cor
     return (res)
+  }
+# INTERNAL FUNCTION - UTOPIA POINT FOR FACTOR COVARIATES #######################
+.facUtopia <-
+  function (utopia) {
+    if (!is.null(unlist(utopia$user))) {
+      utopia <- list(correl = utopia$user$correl, strata = utopia$user$strata)
+    } else {
+      message("sorry but the utopia point cannot be calculated")
+    }
+  }
+# INTERNAL FUNCTION - UTOPIA POINT FOR NUMERIC COVARIATES ######################
+.numUtopia <-
+  function (utopia) {
+    if (!is.null(unlist(utopia$user))) {
+      utopia <- list(correl = utopia$user$correl, strata = utopia$user$strata)
+    } else {
+      message("sorry but the utopia point cannot be calculated")
+    }
   }
