@@ -40,6 +40,11 @@
 #' \code{user = list(correl = NULL, strata = NULL)}. Defaults to 
 #' \code{utopia = list(user = NULL, abs = NULL)}.
 #' 
+#' @param scale List with two named sub-arguments: \code{type} -- the type of
+#' scaling that should be used, with available options \code{"upper} and
+#' \code{"upper-lower}; and \code{max} -- the maximum value after scaling.
+#' Defaults to \code{scale = list(type = "upper-lower", max = 100)}.
+#' 
 #' @details
 #' This method is also known as the conditioned Latin Hypercube of Minasny and
 #' McBratney (2006). Visit the package manual to see the corrections that we
@@ -108,10 +113,11 @@
 # MAIN FUNCTION ################################################################
 optimACDC <-
   function (points, candi, covars, covars.type = "numeric", 
-            strata.type = "area",
-            weights = list(correl = 0.5, strata = 0.5), use.coords = FALSE,
+            strata.type = "area", weights = list(correl = 0.5, strata = 0.5),
+            use.coords = FALSE,
             nadir = list(sim = 1000, save.sim = TRUE, user = NULL, abs = NULL),
-            utopia = list(user = NULL, abs = NULL),
+            utopia = list(user = NULL, abs = NULL), 
+            scale = list(type = "upper-lower", max = 100)
             x.max, x.min, y.max, y.min, iterations,
             acceptance = list(initial = 0.99, cooling = iterations / 10),
             stopping = list(max.count = iterations / 10), plotit = TRUE,
@@ -125,7 +131,8 @@ optimACDC <-
     if (!is.null(check)) stop (check, call. = FALSE)
     check <- .optimACDCcheck(candi = candi, covars = covars, nadir = nadir,
                              covars.type = covars.type, weights = weights, 
-                             use.coords = use.coords, strata.type = strata.type)
+                             use.coords = use.coords, strata.type = strata.type,
+                             utopia = utopia, scale = scale)
     if (!is.null(check)) stop (check, call. = FALSE)
 
     if (plotit) {
@@ -166,12 +173,12 @@ optimACDC <-
                            strata.type = strata.type)
       nadir <- .numNadir(n.pts = n_pts, n.cov = n_cov, n.candi = n_candi, 
                          pcm = pcm, nadir = nadir, candi = candi, 
-                         covars = covars, strata = strata)
+                         covars = covars, strata = strata, scale = scale)
       utopia <- .numUtopia()
       scm <- cor(sm, use = "complete.obs")
       energy0 <- .objNum(sm = sm, n.cov = n_cov, strata = strata, pcm = pcm, 
                          scm = scm, nadir = nadir, weights = weights, 
-                         n.pts = n_pts, utopia = utopia)
+                         n.pts = n_pts, utopia = utopia, scale = scale)
 
     } else { # Factor covariates
       if (covars.type == "factor") {
@@ -181,12 +188,13 @@ optimACDC <-
         pop_prop <- lapply(covars, function(x) table(x) / nrow(covars) * 100)
         nadir <- .facNadir(nadir = nadir, candi = candi, n.candi = n_candi,
                            n.pts = n_pts, n.cov = n_cov, covars = covars, 
-                           pop.prop = pop_prop, pcm = pcm)
+                           pop.prop = pop_prop, pcm = pcm, scale = scale)
         utopia <- .facUtopia()
         scm <- pedometrics::cramer(sm)
         energy0 <- .objFac(sm = sm, pop.prop = pop_prop, nadir = nadir, 
                            weights = weights, pcm = pcm, scm = scm,
-                           n.pts = n_pts, n.cov = n_cov, utopia = utopia)
+                           n.pts = n_pts, n.cov = n_cov, utopia = utopia,
+                           scale = scale)
       }
     }
 
@@ -224,7 +232,8 @@ optimACDC <-
         new_scm <- cor(new_sm, use = "complete.obs")
         new_energy <- .objNum(sm = new_sm, n.cov = n_cov, strata = strata, 
                               pcm = pcm, scm = new_scm, nadir = nadir,
-                              weights = weights, n.pts = n_pts, utopia = utopia)
+                              weights = weights, n.pts = n_pts, utopia = utopia,
+                              scale = scale)
 
       } else { # Factor covariates
         if (covars.type == "factor") {
@@ -233,7 +242,8 @@ optimACDC <-
           new_scm <- pedometrics::cramer(new_sm)
           new_energy <- .objFac(sm = new_sm, pop.prop = pop_prop, scm = new_scm, 
                                 nadir = nadir, weights = weights, pcm = pcm, 
-                                n.pts = n_pts, n.cov = n_cov, utopia = utopia)
+                                n.pts = n_pts, n.cov = n_cov, utopia = utopia,
+                                scale = scale)
         }
       }
       
@@ -481,7 +491,7 @@ optimACDC <-
 #   }
 # INTERNAL FUNCTION - NADIR FOR NUMERIC COVARIATES #############################
 .numNadir <-
-  function (n.pts, n.cov, n.candi, pcm, nadir, candi, covars, strata) {
+  function (n.pts, n.cov, n.candi, pcm, nadir, candi, covars, strata, scale) {
 
     if (!is.null(nadir[[1]]) && !is.null(nadir[[2]])) { # Simulate the nadir
       m <- paste("simulating ", nadir[[1]], " nadir values...", sep = "")
@@ -516,8 +526,8 @@ optimACDC <-
         res <- list(strata = "strata_nadir", correl = "correl_nadir")
       }
       a <- attributes(res)
-      a$strata_nadir <- mean(strata_nadir) / 100
-      a$correl_nadir <- mean(correl_nadir) / 100
+      a$strata_nadir <- mean(strata_nadir) / scale$max
+      a$correl_nadir <- mean(correl_nadir) / scale$max
       attributes(res) <- a
       
       # ASR: Other options are not available yet.
@@ -552,7 +562,7 @@ optimACDC <-
   }
 # INTERNAL FUNCTION - CRITERION FOR NUMERIC COVARIATES #########################
 .objNum <-
-  function (sm, n.cov, strata, pcm, scm, nadir, weights, n.pts, utopia) {
+  function (sm, n.cov, strata, pcm, scm, nadir, weights, n.pts, utopia, scale) {
     
     counts <- lapply(1:n.cov, function (i)
       hist(sm[, i], strata[[1]][[i]], plot = FALSE)$counts)
@@ -561,23 +571,27 @@ optimACDC <-
     counts <- lapply(1:n.cov, function(i) counts[[i]] / n.pts * 100)
     counts <- sapply(1:n.cov, function (i) 
       sum(abs(counts[[i]] - strata[[2]][[i]])))
+        
+    # scale the objective function values
+    if(scale$type == "upper-lower") {
+      obj_cont <- sum(counts) - utopia$strata / 
+        attr(nadir, "strata") - utopia$strata  
+      obj_cor <- sum(abs(pcm - scm)) - utopia$correl / 
+        attr(nadir, "correl") - utopia$correl
+    } else if (scale$type == "upper") {
+      obj_cont <- sum(counts) / attr(nadir, "strata")
+      obj_cor <- sum(abs(pcm - scm)) / attr(nadir, "correl")
+    }
     
-    obj_cont <- sum(counts) / attr(nadir, "strata")
-    #obj_cont <- sum(counts) - utopia$strata / 
-    #  attr(nadir, "strata") - utopia$strata
+    # aggregate the objective function values
     obj_cont <- obj_cont * weights[[1]]
-    
-    obj_cor <- sum(abs(pcm - scm)) / attr(nadir, "correl")
-    #obj_cor <- sum(abs(pcm - scm)) - utopia$correl / 
-    #  attr(nadir, "correl") - utopia$correl
     obj_cor <- obj_cor * weights[[2]]
-    
     res <- obj_cont + obj_cor
     return (res)
   }
 # INTERNAL FUNCTION - NADIR FOR FACTOR COVARIATES ##############################
 .facNadir <-
-  function (nadir, candi, n.candi, n.pts, n.cov, covars, pop.prop, pcm) {
+  function (nadir, candi, n.candi, n.pts, n.cov, covars, pop.prop, pcm, scale) {
     
     if (!is.null(nadir[[1]]) && !is.null(nadir[[2]])) { # Simulate the nadir
       m <- paste("simulating ", nadir[[1]], " nadir values...", sep = "")
@@ -611,8 +625,8 @@ optimACDC <-
         res <- list(strata = "strata_nadir", correl = "correl_nadir")
       }
       a <- attributes(res)
-      a$strata_nadir <- mean(strata_nadir) / 100
-      a$correl_nadir <- mean(correl_nadir) / 100
+      a$strata_nadir <- mean(strata_nadir) / scale$max
+      a$correl_nadir <- mean(correl_nadir) / scale$max
       attributes(res) <- a
       
       # ASR: Other options are not available yet.
@@ -629,23 +643,29 @@ optimACDC <-
   }
 # INTERNAL FUNCTION - CRITERION FOR FACTOR COVARIATES ##########################
 .objFac <-
-  function (sm, pop.prop, nadir, weights, pcm, scm, n.pts, n.cov, utopia) {
+  function (sm, pop.prop, nadir, weights, pcm, scm, n.pts, n.cov, utopia, 
+            scale) {
     
     # ASR: We multiply the proportions by 100 for numerical stability
     #samp_prop <- lapply(sm, function(x) table(x) / n.pts)
     samp_prop <- lapply(sm, function(x) table(x) / n.pts * 100)
     samp_prop <- sapply(1:n.cov, function (i)
       sum(abs(samp_prop[[i]] - pop.prop[[i]])))
-    obj_cat <- sum(samp_prop) / attr(nadir, "strata")
-    #obj_cat <- sum(samp_prop) - utopia$strata / 
-    #  attr(nadir, "strata") - utopia$strata
+    
+    # scale the objective function values
+    if(scale$type == "upper-lower") {
+      obj_cat <- sum(samp_prop) - utopia$strata / 
+        attr(nadir, "strata") - utopia$strata
+      obj_cor <- sum(abs(pcm - scm)) - utopia$correl / 
+        attr(nadir, "correl") - utopia$correl
+    } else if (scale$type == "upper") {
+      obj_cat <- sum(samp_prop) / attr(nadir, "strata")
+      obj_cor <- sum(abs(pcm - scm)) / attr(nadir, "correl")
+    }
+    
+    # aggregate the objective function values
     obj_cat <- obj_cat * weights[[1]]
-    
-    obj_cor <- sum(abs(pcm - scm)) / attr(nadir, "correl")
-    #obj_cor <- sum(abs(pcm - scm)) - utopia$correl / 
-    #  attr(nadir, "correl") - utopia$correl
     obj_cor <- obj_cor * weights[[2]]
-    
     res <- obj_cat + obj_cor
     return (res)
   }
