@@ -19,7 +19,6 @@ boundary <- as(candi, "SpatialPolygons")
 boundary <- gUnionCascaded(boundary)
 candi <- coordinates(candi)
 candi <- matrix(cbind(1:dim(candi)[1], candi), ncol = 3)
-str(meuse.grid)
 covars <- meuse.grid[, 5]
 x.max <- diff(bbox(boundary)[1, ])
 y.min <- x.min <- 40
@@ -27,7 +26,7 @@ y.max <- diff(bbox(boundary)[2, ])
 nadir <- list(sim = 10, save.sim = TRUE, user = NULL, abs = NULL)
 weights <- list(strata = 0.5, correl = 0.5)
 set.seed(2001)
-res <- optimACDC(points = 100, candi = candi, covars = covars, 
+res <- optimACDC(points = 100, candi = candi, covars = covars,
                  use.coords = TRUE, covars.type = "numeric", weights = weights,
                  x.max = x.max, x.min = x.min, y.max = y.max, y.min = y.min,
                  boundary = boundary, nadir = nadir, iterations = 100)

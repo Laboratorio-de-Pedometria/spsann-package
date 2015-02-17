@@ -117,7 +117,7 @@ optimACDC <-
             use.coords = FALSE,
             nadir = list(sim = 1000, save.sim = TRUE, user = NULL, abs = NULL),
             utopia = list(user = NULL, abs = NULL), 
-            scale = list(type = "upper-lower", max = 100)
+            scale = list(type = "upper-lower", max = 100),
             x.max, x.min, y.max, y.min, iterations,
             acceptance = list(initial = 0.99, cooling = iterations / 10),
             stopping = list(max.count = iterations / 10), plotit = TRUE,
@@ -371,7 +371,7 @@ optimACDC <-
     
     # strata.type
     st <- match(strata.type, c("area", "range"))
-    if (is.na(st) {
+    if (is.na(st)) {
       res <- paste("'strata.type = ", strata.type, "' is not supported",
                    sep = "")
       return (res)

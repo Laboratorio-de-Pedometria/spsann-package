@@ -119,8 +119,8 @@ optimCORR <-
     if (use.coords) {
       if (covars.type == "factor") {
         coords <- data.frame(candi[, 2:3])
-        breaks <- .coordStrata(n_pts, coords, strata.type)[[1]]
-        coords <- cont2cat(coords, breaks)
+        breaks <- .coordStrata(n_pts, coords, strata.type)
+        coords <- pedometrics::cont2cat(coords, breaks)
         covars <- data.frame(covars, coords)
       } else {
         covars <- data.frame(covars, candi[, 2:3])
@@ -339,8 +339,24 @@ objCORR <-
     if (!is.null(check)) stop (check, call. = FALSE)
     
     # Prepare sample points
+    n_candi <- nrow(candi)
     points <- .spsannPoints(points = points, candi = candi, n.candi = n_candi)
+    n_pts <- nrow(points)
     
+    # Prepare covariates (covars) and create the starting sample matrix (sm)
+    if (use.coords) {
+      if (covars.type == "factor") {
+        coords <- data.frame(candi[, 2:3])
+        breaks <- .coordStrata(n_pts, coords, strata.type)
+        coords <- cont2cat(coords, breaks)
+        covars <- data.frame(covars, coords)
+      } else {
+        covars <- data.frame(covars, candi[, 2:3])
+      }
+    }
+    sm <- covars[points[, 1], ]
+    
+    # Calculate the energy state
     if (covars.type == "numeric") { # Numeric covariates
       pcm <- cor(covars, use = "complete.obs")
       scm <- cor(sm, use = "complete.obs")
