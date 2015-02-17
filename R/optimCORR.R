@@ -2,7 +2,7 @@
 #'
 #' Optimize a sample pattern for trend estimaton. The criterion is defined so 
 #' that the sample reproduces the association/correlation between the covariates
-#' (\bold{ACBC}).
+#' (\bold{CORR}).
 #'
 #' @template spJitter_doc
 #' @template spSANN_doc
@@ -27,7 +27,7 @@
 #' have made in that method.
 #'
 #' @return
-#' \code{optimACBC} returns a matrix: the optimized sample pattern with
+#' \code{optimCORR} returns a matrix: the optimized sample pattern with
 #' the evolution of the energy state during the optimization as an attribute.
 #'
 #' @references
@@ -64,39 +64,41 @@
 #' require(rgeos)
 #' require(Hmisc)
 #' data(meuse.grid)
-#' candi <- meuse.grid[, 1:2]
+#' candi              <- meuse.grid[, 1:2]
 #' coordinates(candi) <- ~ x + y
-#' gridded(candi) <- TRUE
-#' boundary <- as(candi, "SpatialPolygons")
-#' boundary <- gUnionCascaded(boundary)
-#' candi <- coordinates(candi)
-#' candi <- matrix(cbind(1:dim(candi)[1], candi), ncol = 3)
-#' str(meuse.grid)
-#' covars <- meuse.grid[, 5]
-#' x.max <- diff(bbox(boundary)[1, ])
-#' y.min <- x.min <- 40
-#' y.max <- diff(bbox(boundary)[2, ])
+#' gridded(candi)     <- TRUE
+#' boundary           <- as(candi, "SpatialPolygons")
+#' boundary           <- gUnionCascaded(boundary)
+#' candi              <- coordinates(candi)
+#' candi              <- matrix(cbind(1:dim(candi)[1], candi), ncol = 3)
+#' covars             <- meuse.grid[, 5]
+#' x.max              <- diff(bbox(boundary)[1, ])
+#' y.max              <- diff(bbox(boundary)[2, ])
+#' y.min              <- 40
+#' x.min              <- 40
+#' x11()
 #' set.seed(2001)
-#' res <- optimACBC(points = 100, candi = candi, covars = covars, 
-#'                  use.coords = TRUE, covars.type = "numeric",
-#'                  x.max = x.max, x.min = x.min, y.max = y.max, y.min = y.min,
-#'                  boundary = boundary, iterations = 100)
+#' res <- optimCORR(points = 100, candi = candi, covars = covars, 
+#'                  use.coords = TRUE, covars.type = "numeric", x.max = x.max,
+#'                  x.min = x.min, y.max = y.max, y.min = y.min,
+#'                  boundary = boundary, iterations = 500)
 #' str(res)
 # MAIN FUNCTION ################################################################
-optimACBC <-
+optimCORR <-
   function (points, candi, covars, covars.type = "numeric", use.coords = FALSE, 
             strata.type = "area", x.max, x.min, y.max, y.min, iterations,
             acceptance = list(initial = 0.99, cooling = iterations / 10),
             stopping = list(max.count = iterations / 10), plotit = TRUE,
             boundary, progress = TRUE, verbose = TRUE) {
-
-    # Check arguments
+    
     if (!is.data.frame(covars)) covars <- as.data.frame(covars)
+    
+    # Check arguments
     check <- .spSANNcheck(points, candi, x.max, x.min, y.max, y.min,
                           iterations, acceptance, stopping, plotit, boundary,
                           progress, verbose)
     if (!is.null(check)) stop (check, call. = FALSE)
-    check <- .optimACBCcheck(candi = candi, covars = covars, 
+    check <- .optimCORRcheck(candi = candi, covars = covars, 
                              covars.type = covars.type, use.coords = use.coords,
                              strata.type = strata.type)
     if (!is.null(check)) stop (check, call. = FALSE)
@@ -262,7 +264,7 @@ optimACBC <-
     return (res)
   }
 # INTERNAL FUNCTION - CHECK ARGUMENTS ##########################################
-.optimACBCcheck <-
+.optimCORRcheck <-
   function (candi, covars, covars.type, use.coords, strata.type) {
     
     # covars
@@ -291,7 +293,7 @@ optimACBC <-
     
     # strata.type
     st <- match(strata.type, c("area", "range"))
-    if (is.na(st) {
+    if (is.na(st)) {
       res <- paste("'strata.type = ", strata.type, "' is not supported",
                    sep = "")
       return (res)
@@ -320,4 +322,35 @@ optimACBC <-
       }
     }
     return (breaks)
+  }
+# FUNCTION - CALCULATE ENERGY STATE ############################################
+#' @rdname optimCORR
+#' @export
+objCORR <-
+  function (points, candi, covars, covars.type = "numeric", use.coords = FALSE, 
+            strata.type = "area") {
+    
+    if (!is.data.frame(covars)) covars <- as.data.frame(covars)
+    
+    # Check arguments
+    check <- .optimCORRcheck(candi = candi, covars.type = covars.type,
+                             covars = covars, use.coords = use.coords,
+                             strata.type = strata.type)
+    if (!is.null(check)) stop (check, call. = FALSE)
+    
+    # Prepare sample points
+    points <- .spsannPoints(points = points, candi = candi, n.candi = n_candi)
+    
+    if (covars.type == "numeric") { # Numeric covariates
+      pcm <- cor(covars, use = "complete.obs")
+      scm <- cor(sm, use = "complete.obs")
+      energy <- sum(abs(pcm - scm))
+    } else { # Factor covariates
+      if (covars.type == "factor") {
+        pcm <- pedometrics::cramer(covars)
+        scm <- pedometrics::cramer(sm)
+        energy <- sum(abs(pcm - scm))
+      }
+    }
+    return (energy)
   }
