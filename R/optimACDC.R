@@ -156,14 +156,8 @@ optimACDC <-
 
     # Prepare covariates (covars) and create the starting sample matrix (sm)
     if (use.coords) {
-      if (covars.type == "factor") {
-        coords <- data.frame(candi[, 2:3])
-        breaks <- .numStrata(n_pts, coords, strata.type)[[1]]
-        coords <- cont2cat(coords, breaks)
-        covars <- data.frame(covars, coords)
-      } else {
-        covars <- data.frame(covars, candi[, 2:3])
-      }
+      covars <- .useCoords(covars.type = covars.type, candi = candi, 
+                           n.pts = n_pts, strata.type = strata.type)
     }
     n_cov <- ncol(covars)
     sm <- covars[points[, 1], ]
@@ -439,7 +433,7 @@ optimACDC <-
 # TODO: build a function is pedometrics
 .numStrata <-
   function (n.pts, covars, strata.type) {
-
+    
     # equal area strata
     if (strata.type == "area") {
       n_cov <- ncol(covars)
@@ -743,14 +737,8 @@ objACDC <-
     
     # Prepare covariates (covars) and create the starting sample matrix (sm)
     if (use.coords) {
-      if (covars.type == "factor") {
-        coords <- data.frame(candi[, 2:3])
-        breaks <- .numStrata(n_pts, coords, strata.type)[[1]]
-        coords <- cont2cat(coords, breaks)
-        covars <- data.frame(covars, coords)
-      } else {
-        covars <- data.frame(covars, candi[, 2:3])
-      }
+      covars <- .useCoords(covars.type = covars.type, candi = candi, 
+                           n.pts = n_pts, strata.type = strata.type)
     }
     n_cov <- ncol(covars)
     sm <- covars[points[, 1], ]
@@ -785,4 +773,17 @@ objACDC <-
       }
     }
     return (energy)
+  }
+# INTERNAL FUNCTION - USE THE COORDINATES AS COVARIATES ########################
+.useCoords <-
+  function (covars.type, candi, n.pts, strata.type) {
+    if (covars.type == "factor") {
+      coords <- data.frame(candi[, 2:3])
+      breaks <- .numStrata(n.pts, coords, strata.type)[[1]]
+      coords <- cont2cat(coords, breaks)
+      covars <- data.frame(covars, coords)
+    } else {
+      covars <- data.frame(covars, candi[, 2:3])
+    }
+    return (covars)
   }

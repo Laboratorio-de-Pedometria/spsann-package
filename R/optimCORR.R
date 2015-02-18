@@ -120,14 +120,8 @@ optimCORR <-
     
     # Prepare covariates (covars) and create the starting sample matrix (sm)
     if (use.coords) {
-      if (covars.type == "factor") {
-        coords <- data.frame(candi[, 2:3])
-        breaks <- .coordStrata(n_pts, coords, strata.type)
-        coords <- pedometrics::cont2cat(coords, breaks)
-        covars <- data.frame(covars, coords)
-      } else {
-        covars <- data.frame(covars, candi[, 2:3])
-      }
+      covars <- .useCoords(covars.type = covars.type, candi = candi, 
+                           n.pts = n_pts, strata.type = strata.type)
     }
     n_cov <- ncol(covars)
     sm <- covars[points[, 1], ]
@@ -302,30 +296,6 @@ optimCORR <-
       return (res)
     }
   }
-# INTERNAL FUNCTION - BREAKS FOR COORDINATES ###################################
-.coordStrata <-
-  function (n.pts, coords, strata.type) {
-    # equal area strata
-    if (strata.type == "area") {
-      n_cov <- 2
-      probs <- seq(0, 1, length.out = n.pts + 1)
-      breaks <- lapply(coords, quantile, probs, na.rm = TRUE, type = 3)
-      breaks <- lapply(breaks, unique)
-    } else {
-      # equal range strata
-      if (strata.type == "range") {
-        n_cov <- 2
-        breaks <- lapply(1:n_cov, function(i)
-          seq(min(covars[, i]), max(covars[, i]), length.out = n.pts + 1))
-        d <- lapply(1:n_cov, function(i)
-          SpatialTools::dist2(matrix(breaks[[i]]), matrix(covars[, i])))
-        d <- lapply(1:n_cov, function(i) apply(d[[i]], 1, which.min))
-        breaks <- lapply(1:n_cov, function(i) breaks[[i]] <- covars[d[[i]], i])
-        breaks <- lapply(breaks, unique)
-      }
-    }
-    return (breaks)
-  }
 # FUNCTION - CALCULATE ENERGY STATE ############################################
 #' @rdname optimCORR
 #' @export
@@ -348,14 +318,8 @@ objCORR <-
     
     # Prepare covariates (covars) and create the starting sample matrix (sm)
     if (use.coords) {
-      if (covars.type == "factor") {
-        coords <- data.frame(candi[, 2:3])
-        breaks <- .coordStrata(n_pts, coords, strata.type)
-        coords <- pedometrics::cont2cat(coords, breaks)
-        covars <- data.frame(covars, coords)
-      } else {
-        covars <- data.frame(covars, candi[, 2:3])
-      }
+      covars <- .useCoords(covars.type = covars.type, candi = candi, 
+                           n.pts = n_pts, strata.type = strata.type)
     }
     sm <- covars[points[, 1], ]
     

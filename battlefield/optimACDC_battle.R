@@ -36,50 +36,11 @@ res <- optimACDC(points = 100, candi = candi, covars = covars,
                  x.max = x.max, x.min = x.min, y.max = y.max, y.min = y.min,
                  boundary = boundary, nadir = nadir, iterations = 500,
                  utopia = utopia, scale = scale)
-tail(attr(res, "energy"))
+tail(attr(res, "energy"), 1) # 55.59217
 objACDC(points = res, candi = candi, covars = covars, use.coords = TRUE, 
         covars.type = "numeric", weights = weights, nadir = nadir,
-        utopia = utopia, scale = scale)
-# 1) NUMERIC COVARIATES USIGN THE COORDINATES ##################################
-rm(list = ls())
-gc()
-require(ASRtools)
-require(pedometrics)
-require(sp)
-require(rgeos)
-source('R/optimACDC.R')
-source('R/spSANNtools.R')
-source('R/spJitter.R')
-Rcpp::sourceCpp('src/spJitterCpp.cpp')
-data(meuse.grid)
-candi <- meuse.grid[, 1:2]
-coordinates(candi) <- ~ x + y
-gridded(candi) <- TRUE
-boundary <- as(candi, "SpatialPolygons")
-boundary <- gUnionCascaded(boundary)
-candi <- coordinates(candi)
-candi <- matrix(cbind(1:dim(candi)[1], candi), ncol = 3)
-covars <- meuse.grid[, 5]
-points <- 100
-x.max <- diff(bbox(boundary)[1, ])
-y.min <- x.min <- 40
-y.max <- diff(bbox(boundary)[2, ])
-iterations <- 100
-acceptance <- list(initial = 0.99, cooling = iterations / 10)
-weights <- list(strata = 0.5, correl = 0.5)
-continuous <- TRUE
-use.coords <- TRUE
-nadir <- list(sim = 10, save.sim = TRUE, user = NULL, abs = NULL)
-utopia <- list(user = list(correl = 0, strata = 0), abs = NULL)
-scale <- list(type = "upper-lower", max = 100)
-set.seed(2001)
-tmp <- optimACDC(points = points, candi = candi, covars = covars, 
-                 covars.type = "numeric", use.coords = use.coords, 
-                 x.max = x.max, x.min = x.min, y.max = y.max, y.min = y.min,
-                 boundary = boundary, iterations = iterations, 
-                 weights = weights, acceptance = acceptance, nadir = nadir,
-                 utopia = utopia, scale = scale)
-# 2) FACTOR COVARIATES #########################################################
+        utopia = utopia, scale = scale) # 55.59217
+# 1) FACTOR COVARIATES USING THE COORDINATES ###################################
 rm(list = ls())
 gc()
 require(ASRtools)
@@ -107,7 +68,7 @@ y.max <- diff(bbox(boundary)[2, ])
 iterations <- 100
 acceptance <- list(initial = 0.99, cooling = iterations / 10)
 weights <- list(strata = 0.5, correl = 0.5)
-use.coords <- FALSE
+use.coords <- TRUE
 nadir <- list(sim = 10, save.sim = TRUE, user = NULL, abs = NULL)
 utopia <- list(user = list(correl = 0, strata = 0), abs = NULL)
 scale <- list(type = "upper-lower", max = 100)
@@ -118,6 +79,10 @@ tmp <- optimACDC(points = points, candi = candi, covars = covars,
                  boundary = boundary, iterations = iterations, 
                  weights = weights, acceptance = acceptance, nadir = nadir,
                  utopia = utopia, scale = scale)
+tail(attr(tmp, "energy"), 1) # 60.25659
+objACDC(points = tmp, candi = candi, covars = covars, use.coords = use.coords, 
+        covars.type = covars.type, weights = weights, nadir = nadir,
+        utopia = utopia, scale = scale) # 60.25659
 # 3) FACTOR COVARIATES USING THE COORDINATES WITH A FEW POINTS #################
 # The following error appeared in an old version (before correcting for the 
 # number of strata) when the number of points is small (n = 5, seed = 2001):

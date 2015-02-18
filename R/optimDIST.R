@@ -1,6 +1,6 @@
 #' Optimization of sample patterns for trend estimation
 #'
-#' Optimize a sample pattern for trend estimation. The criterion is defined so 
+#' Optimize a sample pattern for trend estimation. A criterion is defined so 
 #' that the sample reproduces the marginal distribution of the covariates
 #' (\bold{DIST}).
 #'
@@ -22,14 +22,13 @@
 #' \sQuote{Details} for more information.
 #' 
 #' @details
-#' This method is also known as the conditioned Latin Hypercube of Minasny and
-#' McBratney (2006). Visit the package manual to see the corrections that we
-#' have made in that method.
+#' This method derives from the method known as the conditioned Latin Hypercube
+#' of Minasny and McBratney (2006). Visit the package manual to see the
+#' corrections that we have made in that method.
 #'
 #' @return
 #' \code{optimDIST} returns a matrix: the optimized sample pattern with
-#' the evolution of the energy state during the optimization as an attribute.
-#' 
+#' the evolution of the energy state during the optimization as an attribute. 
 #' \code{objDIST} returns a numeric value: the energy state of the point 
 #' pattern.
 #'
@@ -56,7 +55,6 @@
 #' @seealso \code{\link[clhs]{clhs}}
 #' @keywords spatial optimize
 #' @concept simulated annealing
-#' @importFrom pedometrics cramer
 #' @importFrom pedometrics is.numint
 #' @importFrom pedometrics cont2cat
 #' @importFrom SpatialTools dist2
@@ -96,6 +94,7 @@ optimDIST <-
             boundary, progress = TRUE, verbose = TRUE) {
     
     if (!is.data.frame(covars)) covars <- as.data.frame(covars)
+    
     # Check arguments
     check <- .spSANNcheck(points, candi, x.max, x.min, y.max, y.min,
                           iterations, acceptance, stopping, plotit, boundary,
@@ -117,17 +116,11 @@ optimDIST <-
     n_pts <- nrow(points)
     conf0 <- points
     old_conf <- conf0
-
+    
     # Prepare covariates (covars) and create the starting sample matrix (sm)
     if (use.coords) {
-      if (covars.type == "factor") {
-        coords <- data.frame(candi[, 2:3])
-        breaks <- .numStrata(n_pts, coords, strata.type)[[1]]
-        coords <- cont2cat(coords, breaks)
-        covars <- data.frame(covars, coords)
-      } else {
-        covars <- data.frame(covars, candi[, 2:3])
-      }
+      covars <- .useCoords(covars.type = covars.type, candi = candi, 
+                           n.pts = n_pts, strata.type = strata.type)
     }
     n_cov <- ncol(covars)
     sm <- covars[points[, 1], ]
@@ -334,14 +327,8 @@ objDIST <-
     
     # Prepare covariates (covars) and create the starting sample matrix (sm)
     if (use.coords) {
-      if (covars.type == "factor") {
-        coords <- data.frame(candi[, 2:3])
-        breaks <- .numStrata(n_pts, coords, strata.type)[[1]]
-        coords <- cont2cat(coords, breaks)
-        covars <- data.frame(covars, coords)
-      } else {
-        covars <- data.frame(covars, candi[, 2:3])
-      }
+      covars <- .useCoords(covars.type = covars.type, candi = candi, 
+                           n.pts = n_pts, strata.type = strata.type)
     }
     n_cov <- ncol(covars)
     sm <- covars[points[, 1], ]
