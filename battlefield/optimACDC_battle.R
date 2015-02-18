@@ -5,12 +5,14 @@ require(ASRtools)
 require(pedometrics)
 require(sp)
 require(rgeos)
-require(Hmisc)
 source('R/optimACDC.R')
 source('R/spSANNtools.R')
 source('R/spJitter.R')
 Rcpp::sourceCpp('src/spJitterCpp.cpp')
 # 0) DEFAULT EXAMPLE ###########################################################
+require(pedometrics)
+require(sp)
+require(rgeos)
 data(meuse.grid)
 candi <- meuse.grid[, 1:2]
 coordinates(candi) <- ~ x + y
@@ -21,29 +23,39 @@ candi <- coordinates(candi)
 candi <- matrix(cbind(1:dim(candi)[1], candi), ncol = 3)
 covars <- meuse.grid[, 5]
 x.max <- diff(bbox(boundary)[1, ])
-y.min <- x.min <- 40
+y.min <- 40
+x.min <- 40
 y.max <- diff(bbox(boundary)[2, ])
 nadir <- list(sim = 10, save.sim = TRUE, user = NULL, abs = NULL)
+utopia <- list(user = list(correl = 0, strata = 0), abs = NULL)
+scale <- list(type = "upper-lower", max = 100)
 weights <- list(strata = 0.5, correl = 0.5)
 set.seed(2001)
 res <- optimACDC(points = 100, candi = candi, covars = covars,
                  use.coords = TRUE, covars.type = "numeric", weights = weights,
                  x.max = x.max, x.min = x.min, y.max = y.max, y.min = y.min,
-                 boundary = boundary, nadir = nadir, iterations = 100)
+                 boundary = boundary, nadir = nadir, iterations = 500,
+                 utopia = utopia, scale = scale)
 str(res)
-#
-# PREPARE DATA #################################################################
+# 1) NUMERIC COVARIATES USIGN THE COORDINATES ##################################
+rm(list = ls())
+gc()
+require(ASRtools)
+require(pedometrics)
+require(sp)
+require(rgeos)
+source('R/optimACDC.R')
+source('R/spSANNtools.R')
+source('R/spJitter.R')
+Rcpp::sourceCpp('src/spJitterCpp.cpp')
 data(meuse.grid)
-candidates <- meuse.grid[, 1:2]
-coordinates(candidates) <- ~ x + y
-gridded(candidates) <- TRUE
-boundary <- as(candidates, "SpatialPolygons")
+candi <- meuse.grid[, 1:2]
+coordinates(candi) <- ~ x + y
+gridded(candi) <- TRUE
+boundary <- as(candi, "SpatialPolygons")
 boundary <- gUnionCascaded(boundary)
-candidates <- coordinates(candidates)
-candidates <- matrix(cbind(c(1:dim(candidates)[1]), candidates), ncol = 3)
-#
-
-# 1) CONTINUOUS COVARIATES USIGN THE COORDINATES ###############################
+candi <- coordinates(candi)
+candi <- matrix(cbind(1:dim(candi)[1], candi), ncol = 3)
 covars <- meuse.grid[, 5]
 points <- 100
 x.max <- diff(bbox(boundary)[1, ])
@@ -54,48 +66,108 @@ acceptance <- list(initial = 0.99, cooling = iterations / 10)
 weights <- list(strata = 0.5, correl = 0.5)
 continuous <- TRUE
 use.coords <- TRUE
-nadir <- list(100)
+nadir <- list(sim = 10, save.sim = TRUE, user = NULL, abs = NULL)
+utopia <- list(user = list(correl = 0, strata = 0), abs = NULL)
+scale <- list(type = "upper-lower", max = 100)
 set.seed(2001)
-tmp <- optimACDC(points = points, candidates = candidates, covars = covars, continuous = continuous, use.coords = use.coords, x.max = x.max, x.min = x.min, y.max = y.max, y.min = y.min, boundary = boundary, iterations = iterations, weights = weights, acceptance = acceptance, nadir = nadir)
-# 2) CATEGORICAL COVARIATES ####################################################
-covars <- meuse.grid[, c(6, 7)]
+tmp <- optimACDC(points = points, candi = candi, covars = covars, 
+                 covars.type = "numeric", use.coords = use.coords, 
+                 x.max = x.max, x.min = x.min, y.max = y.max, y.min = y.min,
+                 boundary = boundary, iterations = iterations, 
+                 weights = weights, acceptance = acceptance, nadir = nadir,
+                 utopia = utopia, scale = scale)
+# 2) FACTOR COVARIATES #########################################################
+rm(list = ls())
+gc()
+require(ASRtools)
+require(pedometrics)
+require(sp)
+require(rgeos)
+source('R/optimACDC.R')
+source('R/spSANNtools.R')
+source('R/spJitter.R')
+Rcpp::sourceCpp('src/spJitterCpp.cpp')
+data(meuse.grid)
+candi <- meuse.grid[, 1:2]
+coordinates(candi) <- ~ x + y
+gridded(candi) <- TRUE
+boundary <- as(candi, "SpatialPolygons")
+boundary <- gUnionCascaded(boundary)
+candi <- coordinates(candi)
+candi <- matrix(cbind(1:dim(candi)[1], candi), ncol = 3)
+covars <- meuse.grid[, 6:7]
+covars.type <- "factor"
 points <- 100
 x.max <- diff(bbox(boundary)[1, ])
 y.min <- x.min <- 40
 y.max <- diff(bbox(boundary)[2, ])
-iterations <- 500
+iterations <- 100
 acceptance <- list(initial = 0.99, cooling = iterations / 10)
 weights <- list(strata = 0.5, correl = 0.5)
-continuous <- FALSE
 use.coords <- FALSE
-sim.nadir <- 100
+nadir <- list(sim = 10, save.sim = TRUE, user = NULL, abs = NULL)
+utopia <- list(user = list(correl = 0, strata = 0), abs = NULL)
+scale <- list(type = "upper-lower", max = 100)
 set.seed(2001)
-tmp <- optimACDC(points = points, candidates = candidates, covars = covars, continuous = continuous, use.coords = use.coords, x.max = x.max, x.min = x.min, y.max = y.max, y.min = y.min, boundary = boundary, iterations = iterations, weights = weights, acceptance = acceptance, sim.nadir = sim.nadir)
-# 3) CATEGORICAL COVARIATES USING THE COORDINATES ##############################
-# The following error appeared when the number of points is small (n = 5, 
-# seed = 2001):
+tmp <- optimACDC(points = points, candi = candi, covars = covars, 
+                 covars.type = covars.type, use.coords = use.coords, 
+                 x.max = x.max, x.min = x.min, y.max = y.max, y.min = y.min,
+                 boundary = boundary, iterations = iterations, 
+                 weights = weights, acceptance = acceptance, nadir = nadir,
+                 utopia = utopia, scale = scale)
+# 3) FACTOR COVARIATES USING THE COORDINATES WITH A FEW POINTS #################
+# The following error appeared in an old version (before correcting for the 
+# number of strata) when the number of points is small (n = 5, seed = 2001):
 # Error in chisq.test(x[, i], x[, j], correct = FALSE) : 
 #  'x' and 'y' must have at least 2 levels
-# This error occurs because all points lie in the same class for one or more
-# covariates.
-covars <- meuse.grid[, c(6, 7)]
-points <- 100
+# This error seems to occur because all points lie in the same class for one 
+# or more covariates.
+# ERROR: The following error appears when the number of points is small (n < 10,
+# seed = 2001):
+# Error in if (new_energy <= old_energy) { : 
+# missing value where TRUE/FALSE needed
+rm(list = ls())
+gc()
+require(ASRtools)
+require(pedometrics)
+require(sp)
+require(rgeos)
+source('R/optimACDC.R')
+source('R/spSANNtools.R')
+source('R/spJitter.R')
+Rcpp::sourceCpp('src/spJitterCpp.cpp')
+data(meuse.grid)
+candi <- meuse.grid[, 1:2]
+coordinates(candi) <- ~ x + y
+gridded(candi) <- TRUE
+boundary <- as(candi, "SpatialPolygons")
+boundary <- gUnionCascaded(boundary)
+candi <- coordinates(candi)
+candi <- matrix(cbind(1:dim(candi)[1], candi), ncol = 3)
+covars <- meuse.grid[, 6:7]
+covars.type <- "factor"
+use.coords <- TRUE
 x.max <- diff(bbox(boundary)[1, ])
 y.min <- x.min <- 40
 y.max <- diff(bbox(boundary)[2, ])
-iterations <- 500
+iterations <- 100
 acceptance <- list(initial = 0.99, cooling = iterations / 10)
 weights <- list(strata = 0.5, correl = 0.5)
-continuous <- FALSE
-use.coords <- TRUE
-stopping <- list(max.count = iterations / 10)
-sim.nadir <- 10
-strata.type <- "equal.area"
-plotit <- TRUE
-progress <- TRUE
-verbose <- TRUE
+nadir <- list(sim = 10, save.sim = TRUE, user = NULL, abs = NULL)
+utopia <- list(user = list(correl = 0, strata = 0), abs = NULL)
+scale <- list(type = "upper-lower", max = 100)
+points <- 9
 set.seed(2001)
-tmp <- optimACDC(points = points, candidates = candidates, covars = covars, continuous = continuous, use.coords = use.coords, x.max = x.max, x.min = x.min, y.max = y.max, y.min = y.min, boundary = boundary, iterations = iterations, weights = weights, acceptance = acceptance, sim.nadir = sim.nadir, stopping = stopping, plotit = plotit, progress = progress, verbose = verbose, strata.type = strata.type)
+tmp <- optimACDC(points = points, candi = candi, covars = covars, 
+                 covars.type = covars.type, use.coords = use.coords, 
+                 x.max = x.max, x.min = x.min, y.max = y.max, y.min = y.min,
+                 boundary = boundary, iterations = iterations, 
+                 weights = weights, acceptance = acceptance, nadir = nadir,
+                 utopia = utopia, scale = scale)
+
+
+
+
 # 4) CATEGORICAL COVARIATES WITH MANY COVARIATES AND MANY POINTS ###############
 # The function table() in the functions cramer() and chisqTest() is the one
 # taking most of the time to run. Can we implement it in C++?

@@ -5,7 +5,6 @@ require(ASRtools)
 require(pedometrics)
 require(sp)
 require(rgeos)
-require(Hmisc)
 source('R/optimCORR.R')
 source('R/spSANNtools.R')
 source('R/spJitter.R')
@@ -14,7 +13,6 @@ Rcpp::sourceCpp('src/spJitterCpp.cpp')
 require(pedometrics)
 require(sp)
 require(rgeos)
-require(Hmisc)
 data(meuse.grid)
 candi              <- meuse.grid[, 1:2]
 coordinates(candi) <- ~ x + y
@@ -43,7 +41,6 @@ require(ASRtools)
 require(pedometrics)
 require(sp)
 require(rgeos)
-require(Hmisc)
 source('R/optimCORR.R')
 source('R/spSANNtools.R')
 source('R/spJitter.R')
@@ -76,7 +73,6 @@ require(ASRtools)
 require(pedometrics)
 require(sp)
 require(rgeos)
-require(Hmisc)
 source('R/optimCORR.R')
 source('R/spSANNtools.R')
 source('R/spJitter.R')
@@ -96,8 +92,9 @@ y.min              <- 40
 x.min              <- 40
 set.seed(2001)
 res <- optimCORR(points = 100, candi = candi, covars = covars, 
-                 strata.type = "area", use.coords = TRUE, covars.type = "factor",
-                 x.max = x.max, x.min = x.min, y.max = y.max, y.min = y.min,
+                 strata.type = "area", use.coords = TRUE, 
+                 covars.type = "factor", x.max = x.max, x.min = x.min, 
+                 y.max = y.max, y.min = y.min, 
                  boundary = boundary, iterations = 500)
 tail(attr(res, "energy"))
 objCORR(points = res, candi = candi, covars = covars, covars.type = "factor",
