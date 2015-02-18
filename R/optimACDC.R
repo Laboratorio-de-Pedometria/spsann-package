@@ -1,8 +1,8 @@
 #' Optimization of sample patterns for trend estimation
 #'
-#' Optimize a sample pattern for trend estimaton. The criterion is defined so 
-#' that the sample matches the association/correlation and marginal
-#' distribution of the covariates (\bold{ACDC}).
+#' Optimize a sample pattern for trend estimation. The criterion is defined so 
+#' that the sample reproduces the association/correlation between the
+#' covariates, as well as their marginal distribution (\bold{ACDC}).
 #'
 #' @template spJitter_doc
 #' @template spSANN_doc
@@ -18,8 +18,8 @@
 #' must be named and sum to unity. Defaults to 
 #' \code{weights = list(correl = 0.5, strata = 0.5)}.
 #'
-#' @param use.coords Logical. Should the coordinates be used as covariates?
-#' Defaults to \code{use.coords = FALSE}.
+#' @param use.coords Logical value. Should the coordinates be used as 
+#' covariates? Defaults to \code{use.coords = FALSE}.
 #'
 #' @param strata.type Character value. The type of strata to be used with
 #' numeric covariates. Available options are \code{"area"} for equal area and
@@ -34,11 +34,10 @@
 #' simulations are implemented in the current version. Defaults to 
 #' \code{nadir = list(sim = 1000, save.sim = TRUE, user = NULL, abs = NULL)}.
 #' 
-#' @param utopia List with two named sub-arguments: \code{user} -- a 
-#' user-defined value; \code{abs} -- logical for calculating the nadir point
-#' internally. If chosen, \code{user} should be a list as follows:
-#' \code{user = list(correl = NULL, strata = NULL)}. Defaults to 
-#' \code{utopia = list(user = NULL, abs = NULL)}.
+#' @param utopia List with two named sub-arguments: \code{user} -- a list of
+#' two user-defined values (\code{correl} and \code{strata}), and \code{abs} --
+#' a logical value for calculating the utopia point internally. Defaults to 
+#' \code{utopia = list(user = list(correl = NULL, strata = NULL), abs = NULL)}.
 #' 
 #' @param scale List with two named sub-arguments: \code{type} -- the type of
 #' scaling that should be used, with available options \code{"upper} and
@@ -71,7 +70,7 @@
 #'
 #' Roudier, P.; Beaudette, D.; Hewitt, A. A conditioned Latin hypercube sampling
 #' algorithm incorporating operational constraints. \emph{5th Global Workshop on
-#' Digital Soil Mapping}. Sydney: p. 227-231, 2012.
+#' Digital Soil Mapping}. Sydney, p. 227-231, 2012.
 #'
 #' @author Alessandro Samuel-Rosa \email{alessandrosamuelrosa@@gmail.com}
 #' @seealso \code{\link[clhs]{clhs}}
@@ -83,11 +82,9 @@
 #' @importFrom SpatialTools dist2
 #' @export
 #' @examples
-#' require(ASRtools)
 #' require(pedometrics)
 #' require(sp)
 #' require(rgeos)
-#' require(Hmisc)
 #' data(meuse.grid)
 #' candi <- meuse.grid[, 1:2]
 #' coordinates(candi) <- ~ x + y
@@ -96,19 +93,22 @@
 #' boundary <- gUnionCascaded(boundary)
 #' candi <- coordinates(candi)
 #' candi <- matrix(cbind(1:dim(candi)[1], candi), ncol = 3)
-#' str(meuse.grid)
 #' covars <- meuse.grid[, 5]
 #' x.max <- diff(bbox(boundary)[1, ])
-#' y.min <- x.min <- 40
+#' y.min <- 40
+#' x.min <- 40
 #' y.max <- diff(bbox(boundary)[2, ])
 #' nadir <- list(sim = 10, save.sim = TRUE, user = NULL, abs = NULL)
+#' utopia <- list(user = list(correl = 0, strata = 0), abs = NULL)
+#' scale <- list(type = "upper-lower", max = 100)
 #' weights <- list(strata = 0.5, correl = 0.5)
 #' set.seed(2001)
-#' res <- optimACDC(points = 100, candi = candi, covars = covars, 
+#' res <- optimACDC(points = 100, candi = candi, covars = covars,
 #'                  use.coords = TRUE, covars.type = "numeric", 
-#'                  weights = weights,
-#'                  x.max = x.max, x.min = x.min, y.max = y.max, y.min = y.min,
-#'                  boundary = boundary, nadir = nadir, iterations = 100)
+#'                  weights = weights, x.max = x.max, x.min = x.min, 
+#'                  y.max = y.max, y.min = y.min, boundary = boundary, 
+#'                  nadir = nadir, iterations = 500, utopia = utopia, 
+#'                  scale = scale)
 #' str(res)
 # MAIN FUNCTION ################################################################
 optimACDC <-
@@ -174,7 +174,7 @@ optimACDC <-
       nadir <- .numNadir(n.pts = n_pts, n.cov = n_cov, n.candi = n_candi, 
                          pcm = pcm, nadir = nadir, candi = candi, 
                          covars = covars, strata = strata, scale = scale)
-      utopia <- .numUtopia()
+      utopia <- .numUtopia(utopia = utopia)
       scm <- cor(sm, use = "complete.obs")
       energy0 <- .objNum(sm = sm, n.cov = n_cov, strata = strata, pcm = pcm, 
                          scm = scm, nadir = nadir, weights = weights, 
@@ -189,7 +189,7 @@ optimACDC <-
         nadir <- .facNadir(nadir = nadir, candi = candi, n.candi = n_candi,
                            n.pts = n_pts, n.cov = n_cov, covars = covars, 
                            pop.prop = pop_prop, pcm = pcm, scale = scale)
-        utopia <- .facUtopia()
+        utopia <- .facUtopia(utopia = utopia)
         scm <- pedometrics::cramer(sm)
         energy0 <- .objFac(sm = sm, pop.prop = pop_prop, nadir = nadir, 
                            weights = weights, pcm = pcm, scm = scm,
@@ -328,7 +328,33 @@ optimACDC <-
 # INTERNAL FUNCTION - CHECK ARGUMENTS ##########################################
 .optimACDCcheck <-
   function (candi, covars, covars.type, weights, use.coords, strata.type,
-            nadir) {
+            nadir, utopia, scale) {
+    
+    # utopia
+    aa <- !is.list(utopia)
+    bb <- length(utopia) != 2
+    cc <- is.null(names(utopia))
+    dd <- !all(c(names(utopia) == c("user", "abs")) == TRUE)
+    if (aa || bb || cc || dd) {
+      res <- paste("'utopia' must be a list with two named sub-arguments:",
+                   "'user' and 'abs'", sep = "")
+      return (res)
+    }
+    
+    # scale
+    aa <- !is.list(scale)
+    bb <- length(scale) != 2
+    cc <- is.null(names(scale))
+    dd <- !all(c(names(scale) == c("type", "max")) == TRUE)
+    if (aa || bb || cc || dd) {
+      res <- paste("'scale' must be a list with two named sub-arguments:",
+                   "'type' and 'max'", sep = "")
+      return (res)
+    }
+    if (!match(scale$type, c("upper", "upper-lower"))) {
+      res <- paste("'scale$type' must be 'upper' or 'upper-lower'", sep = "")
+      return (res)
+    }
     
     # covars
     if (ncol(covars) < 2 && use.coords == FALSE) {
@@ -358,7 +384,8 @@ optimACDC <-
     aa <- !is.list(weights)
     bb <- length(weights) != 2
     cc <- is.null(names(weights))
-    dd <- !all(c(names(weights) == c("correl", "strata")) == TRUE)
+    #dd <- !all(c(names(weights) == c("correl", "strata")) == TRUE)
+    #if (aa || bb || cc || dd) {
     if (aa || bb || cc || dd) {
       res <- paste("'weights' must be a list with two named sub-arguments:",
                    "'strata' and 'correl'", sep = "")
