@@ -92,7 +92,7 @@ y.min              <- 40
 x.min              <- 40
 set.seed(2001)
 res <- optimCORR(points = 100, candi = candi, covars = covars, 
-                 strata.type = "area", use.coords = TRUE, 
+                 strata.type = "area", use.coords = TRUE,
                  covars.type = "factor", x.max = x.max, x.min = x.min, 
                  y.max = y.max, y.min = y.min, 
                  boundary = boundary, iterations = 500)

@@ -52,6 +52,9 @@
 #' @return
 #' \code{optimACDC} returns a matrix: the optimized sample pattern with
 #' the evolution of the energy state during the optimization as an attribute.
+#' 
+#' \code{objACDC} returns a numeric value: the energy state of the point 
+#' pattern.
 #'
 #' @references
 #' Minasny, B.; McBratney, A. B. A conditioned Latin hypercube method for
@@ -109,22 +112,26 @@
 #'                  y.max = y.max, y.min = y.min, boundary = boundary, 
 #'                  nadir = nadir, iterations = 500, utopia = utopia, 
 #'                  scale = scale)
-#' str(res)
+#' tail(attr(res, "energy"))
+#' objACDC(points = res, candi = candi, covars = covars, use.coords = TRUE, 
+#'         covars.type = "numeric", weights = weights, nadir = nadir,
+#'         utopia = utopia, scale = scale)
 # MAIN FUNCTION ################################################################
 optimACDC <-
   function (points, candi, covars, covars.type = "numeric", 
             strata.type = "area", weights = list(correl = 0.5, strata = 0.5),
             use.coords = FALSE,
             nadir = list(sim = 1000, save.sim = TRUE, user = NULL, abs = NULL),
-            utopia = list(user = NULL, abs = NULL), 
+            utopia = list(user = list(correl = NULL, strata = NULL), 
+                          abs = NULL), 
             scale = list(type = "upper-lower", max = 100),
             x.max, x.min, y.max, y.min, iterations,
             acceptance = list(initial = 0.99, cooling = iterations / 10),
             stopping = list(max.count = iterations / 10), plotit = TRUE,
             boundary, progress = TRUE, verbose = TRUE) {
-
-    # Check arguments
+    
     if (!is.data.frame(covars)) covars <- as.data.frame(covars)
+    # Check arguments
     check <- .spSANNcheck(points, candi, x.max, x.min, y.max, y.min,
                           iterations, acceptance, stopping, plotit, boundary,
                           progress, verbose)
@@ -134,17 +141,12 @@ optimACDC <-
                              use.coords = use.coords, strata.type = strata.type,
                              utopia = utopia, scale = scale)
     if (!is.null(check)) stop (check, call. = FALSE)
-
+    
     if (plotit) {
       par0 <- par()
       on.exit(suppressWarnings(par(par0)))
     }
-
-    # ASR: this will be used to avoid calculating one of the measures in case
-    #      its weight is equal to zero
-    #use_strata <- ifelse(weights$strata == 0, "no", "yes")
-    #use_correl <- ifelse(weights$correl == 0, "no", "yes")
-
+    
     # Prepare sample points
     n_candi <- nrow(candi)
     points <- .spsannPoints(points = points, candi = candi, n.candi = n_candi)
@@ -713,4 +715,74 @@ optimACDC <-
     } else {
       message("sorry but the utopia point cannot be calculated")
     }
+  }
+# CALCULATE OBJECTIVE FUNCTION VALUE ###########################################
+#' @rdname optimACDC
+#' @export
+objACDC <-
+  function (points, candi, covars, covars.type = "numeric",
+            strata.type = "area", weights = list(correl = 0.5, strata = 0.5),
+            use.coords = FALSE, 
+            utopia = list(user = list(correl = NULL, strata = NULL),
+                          abs = NULL),
+            nadir = list(sim = 1000, save.sim = TRUE, user = NULL, abs = NULL),
+            scale = list(type = "upper-lower", max = 100)) {
+    
+    if (!is.data.frame(covars)) covars <- as.data.frame(covars)
+    # Check arguments
+    check <- .optimACDCcheck(candi = candi, covars = covars, nadir = nadir,
+                             covars.type = covars.type, weights = weights, 
+                             use.coords = use.coords, strata.type = strata.type,
+                             utopia = utopia, scale = scale)
+    if (!is.null(check)) stop (check, call. = FALSE)
+    
+    # Prepare sample points
+    n_candi <- nrow(candi)
+    points <- .spsannPoints(points = points, candi = candi, n.candi = n_candi)
+    n_pts <- nrow(points)
+    
+    # Prepare covariates (covars) and create the starting sample matrix (sm)
+    if (use.coords) {
+      if (covars.type == "factor") {
+        coords <- data.frame(candi[, 2:3])
+        breaks <- .numStrata(n_pts, coords, strata.type)[[1]]
+        coords <- cont2cat(coords, breaks)
+        covars <- data.frame(covars, coords)
+      } else {
+        covars <- data.frame(covars, candi[, 2:3])
+      }
+    }
+    n_cov <- ncol(covars)
+    sm <- covars[points[, 1], ]
+    
+    # Calculate the energy state
+    if (covars.type == "numeric") { # Numeric covariates
+      pcm <- cor(covars, use = "complete.obs")
+      strata <- .numStrata(n.pts = n_pts, covars = covars, 
+                           strata.type = strata.type)
+      nadir <- .numNadir(n.pts = n_pts, n.cov = n_cov, n.candi = n_candi, 
+                         pcm = pcm, nadir = nadir, candi = candi, 
+                         covars = covars, strata = strata, scale = scale)
+      utopia <- .numUtopia(utopia = utopia)
+      scm <- cor(sm, use = "complete.obs")
+      energy <- .objNum(sm = sm, n.cov = n_cov, strata = strata, pcm = pcm, 
+                         scm = scm, nadir = nadir, weights = weights, 
+                         n.pts = n_pts, utopia = utopia, scale = scale)
+      
+    } else { # Factor covariates
+      if (covars.type == "factor") {
+        pcm <- pedometrics::cramer(covars)
+        pop_prop <- lapply(covars, function(x) table(x) / nrow(covars) * 100)
+        nadir <- .facNadir(nadir = nadir, candi = candi, n.candi = n_candi,
+                           n.pts = n_pts, n.cov = n_cov, covars = covars, 
+                           pop.prop = pop_prop, pcm = pcm, scale = scale)
+        utopia <- .facUtopia(utopia = utopia)
+        scm <- pedometrics::cramer(sm)
+        energy <- .objFac(sm = sm, pop.prop = pop_prop, nadir = nadir, 
+                           weights = weights, pcm = pcm, scm = scm,
+                           n.pts = n_pts, n.cov = n_cov, utopia = utopia,
+                           scale = scale)
+      }
+    }
+    return (energy)
   }

@@ -36,7 +36,10 @@ res <- optimACDC(points = 100, candi = candi, covars = covars,
                  x.max = x.max, x.min = x.min, y.max = y.max, y.min = y.min,
                  boundary = boundary, nadir = nadir, iterations = 500,
                  utopia = utopia, scale = scale)
-str(res)
+tail(attr(res, "energy"))
+objACDC(points = res, candi = candi, covars = covars, use.coords = TRUE, 
+        covars.type = "numeric", weights = weights, nadir = nadir,
+        utopia = utopia, scale = scale)
 # 1) NUMERIC COVARIATES USIGN THE COORDINATES ##################################
 rm(list = ls())
 gc()
@@ -156,18 +159,17 @@ weights <- list(strata = 0.5, correl = 0.5)
 nadir <- list(sim = 10, save.sim = TRUE, user = NULL, abs = NULL)
 utopia <- list(user = list(correl = 0, strata = 0), abs = NULL)
 scale <- list(type = "upper-lower", max = 100)
-points <- 9
+points <- 10
 set.seed(2001)
-tmp <- optimACDC(points = points, candi = candi, covars = covars, 
-                 covars.type = covars.type, use.coords = use.coords, 
+tmp <- optimACDC(points = points, candi = candi, covars = covars,
+                 covars.type = covars.type, use.coords = use.coords,
                  x.max = x.max, x.min = x.min, y.max = y.max, y.min = y.min,
-                 boundary = boundary, iterations = iterations, 
+                 boundary = boundary, iterations = iterations,
                  weights = weights, acceptance = acceptance, nadir = nadir,
                  utopia = utopia, scale = scale)
-
-
-
-
+objACDC(points = points, candi = candi, covars = covars,
+        covars.type = covars.type, use.coords = use.coords, weights = weights,
+        nadir = nadir, utopia = utopia, scale = scale)
 # 4) CATEGORICAL COVARIATES WITH MANY COVARIATES AND MANY POINTS ###############
 # The function table() in the functions cramer() and chisqTest() is the one
 # taking most of the time to run. Can we implement it in C++?

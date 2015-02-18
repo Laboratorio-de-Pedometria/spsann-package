@@ -29,6 +29,9 @@
 #' @return
 #' \code{optimCORR} returns a matrix: the optimized sample pattern with
 #' the evolution of the energy state during the optimization as an attribute.
+#' 
+#' \code{objCORR} returns a numeric value: the energy state of the point 
+#' pattern.
 #'
 #' @references
 #' Minasny, B.; McBratney, A. B. A conditioned Latin hypercube method for
