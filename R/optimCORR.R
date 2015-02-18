@@ -1,6 +1,6 @@
 #' Optimization of sample patterns for trend estimation
 #'
-#' Optimize a sample pattern for trend estimaton. The criterion is defined so 
+#' Optimize a sample pattern for trend estimation. The criterion is defined so 
 #' that the sample reproduces the association/correlation between the covariates
 #' (\bold{CORR}).
 #'
@@ -13,13 +13,13 @@
 #' being used. Available options are \code{"numeric"} and \code{"factor"}.
 #' Defaults to \code{covars.type = "numeric"}.
 #'
-#' @param use.coords Logical. Should the coordinates be used as covariates?
-#' Defaults to \code{use.coords = FALSE}.
+#' @param use.coords Logical value. Should the coordinates be used as 
+#' covariates? Defaults to \code{use.coords = FALSE}.
 #'
 #' @param strata.type Character value. The type of strata to be used to 
-#' categorize the coordinates when the covariates are of type factor. Available
-#' options are \code{"area"} for equal area and \code{"range"} for equal range.
-#' Defaults to \code{strata.type = "area"}.
+#' categorize the coordinates when they are used with covariates of type factor.
+#' Available options are \code{"area"} for equal area and \code{"range"} for
+#' equal range. Defaults to \code{strata.type = "area"}.
 #' 
 #' @details
 #' This method was derived from the conditioned Latin Hypercube of Minasny and
@@ -47,7 +47,7 @@
 #'
 #' Roudier, P.; Beaudette, D.; Hewitt, A. A conditioned Latin hypercube sampling
 #' algorithm incorporating operational constraints. \emph{5th Global Workshop on
-#' Digital Soil Mapping}. Sydney: p. 227-231, 2012.
+#' Digital Soil Mapping}. Sydney, p. 227-231, 2012.
 #'
 #' @author Alessandro Samuel-Rosa \email{alessandrosamuelrosa@@gmail.com}
 #' @seealso \code{\link[clhs]{clhs}}
@@ -62,7 +62,6 @@
 #' require(pedometrics)
 #' require(sp)
 #' require(rgeos)
-#' require(Hmisc)
 #' data(meuse.grid)
 #' candi              <- meuse.grid[, 1:2]
 #' coordinates(candi) <- ~ x + y
@@ -76,13 +75,14 @@
 #' y.max              <- diff(bbox(boundary)[2, ])
 #' y.min              <- 40
 #' x.min              <- 40
-#' x11()
 #' set.seed(2001)
 #' res <- optimCORR(points = 100, candi = candi, covars = covars, 
-#'                  use.coords = TRUE, covars.type = "numeric", x.max = x.max,
+#'                  use.coords = TRUE, covars.type = "numeric", x.max = x.max, 
 #'                  x.min = x.min, y.max = y.max, y.min = y.min,
 #'                  boundary = boundary, iterations = 500)
-#' str(res)
+#' tail(attr(res, "energy"))
+#' objCORR(points = res, candi = candi, covars = covars, 
+#'         covars.type = "numeric", use.coords = TRUE)
 # MAIN FUNCTION ################################################################
 optimCORR <-
   function (points, candi, covars, covars.type = "numeric", use.coords = FALSE, 
@@ -164,7 +164,7 @@ optimCORR <-
 
       # Jitter one of the points and update x.max and y.max; which point (wp)?
       wp <- sample(c(1:n_pts), 1)
-      new_conf <- spJitterFinite(old_conf, candi, x.max, x.min, y.max,
+      new_conf <- spJitterFinite(old_conf, candi, x.max, x.min, y.max, 
                                  y.min, wp)
       x.max <- x_max0 - (k / iterations) * (x_max0 - x.min)
       y.max <- y_max0 - (k / iterations) * (y_max0 - y.min)
@@ -348,7 +348,7 @@ objCORR <-
       if (covars.type == "factor") {
         coords <- data.frame(candi[, 2:3])
         breaks <- .coordStrata(n_pts, coords, strata.type)
-        coords <- cont2cat(coords, breaks)
+        coords <- pedometrics::cont2cat(coords, breaks)
         covars <- data.frame(covars, coords)
       } else {
         covars <- data.frame(covars, candi[, 2:3])
