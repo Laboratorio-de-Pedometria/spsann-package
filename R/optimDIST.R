@@ -9,10 +9,6 @@
 #'
 #' @param covars Data frame or matrix with the covariates in the columns.
 #'
-#' @param covars.type Character value. The type of covariates that is
-#' being used. Available options are \code{"numeric"} and \code{"factor"}.
-#' Defaults to \code{covars.type = "numeric"}.
-#'
 #' @param use.coords Logical value. Should the coordinates be used as 
 #' covariates? Defaults to \code{use.coords = FALSE}.
 #'
@@ -57,6 +53,8 @@
 #' @concept simulated annealing
 #' @importFrom pedometrics is.numint
 #' @importFrom pedometrics cont2cat
+#' @importFrom pedometrics is.any.factor
+#' @importFrom pedometrics is.one.type
 #' @importFrom SpatialTools dist2
 #' @export
 #' @examples
@@ -81,13 +79,12 @@
 #'                  use.coords = TRUE, covars.type = "numeric", x.max = x.max, 
 #'                  x.min = x.min, y.max = y.max, y.min = y.min,
 #'                  boundary = boundary, iterations = 500)
-#' tail(attr(res, "energy"))
+#' tail(attr(res, "energy"), 1) # 115.0519
 #' objDIST(points = res, candi = candi, covars = covars, 
-#'         covars.type = "numeric", use.coords = TRUE)
+#'         covars.type = "numeric", use.coords = TRUE) # 115.0519
 # MAIN FUNCTION ################################################################
 optimDIST <-
-  function (points, candi, covars, covars.type = "numeric", 
-            strata.type = "area", use.coords = FALSE, 
+  function (points, candi, covars, strata.type = "area", use.coords = FALSE, 
             x.max, x.min, y.max, y.min, iterations,
             acceptance = list(initial = 0.99, cooling = iterations / 10),
             stopping = list(max.count = iterations / 10), plotit = TRUE,
@@ -101,8 +98,7 @@ optimDIST <-
                           progress, verbose)
     if (!is.null(check)) stop (check, call. = FALSE)
     check <- .optimDISTcheck(candi = candi, covars = covars, 
-                             covars.type = covars.type, use.coords = use.coords,
-                             strata.type = strata.type)
+                             use.coords = use.coords, strata.type = strata.type)
     if (!is.null(check)) stop (check, call. = FALSE)
     
     if (plotit) {
@@ -118,10 +114,11 @@ optimDIST <-
     old_conf <- conf0
     
     # Prepare covariates (covars) and create the starting sample matrix (sm)
-    if (use.coords) {
-      covars <- .useCoords(covars.type = covars.type, candi = candi, 
-                           n.pts = n_pts, strata.type = strata.type)
-    }
+    covars.type <- ifelse(pedometrics::is.any.factor(covars), "factor",
+                          "numeric")
+    covars <- .covarsACDC(covars = covars, covars.type = covars.type, 
+                          use.coords = use.coords, candi = candi, n.pts = n_pts,
+                          strata.type = strata.type)
     n_cov <- ncol(covars)
     sm <- covars[points[, 1], ]
     
@@ -251,7 +248,9 @@ optimDIST <-
   }
 # INTERNAL FUNCTION - CHECK ARGUMENTS ##########################################
 .optimDISTcheck <-
-  function (candi, covars, covars.type, use.coords, strata.type) {
+  function (candi, covars, 
+            #covars.type, 
+            use.coords, strata.type) {
     
     # covars
     if (ncol(covars) < 2 && use.coords == FALSE) {
@@ -265,17 +264,17 @@ optimDIST <-
     }
     
     # covars.type
-    if (missing(covars.type)) {
-      res <- paste("'covars.type' is missing")
-      return (res)
-    } else {
-      ct <- pmatch(covars.type, c("numeric", "factor"))
-      if (is.na(ct)) {
-        res <- paste("'covars.type = ", covars.type, "' is not supported", 
-                     sep = "")
-        return (res)
-      }
-    }
+#     if (missing(covars.type)) {
+#       res <- paste("'covars.type' is missing")
+#       return (res)
+#     } else {
+#       ct <- pmatch(covars.type, c("numeric", "factor"))
+#       if (is.na(ct)) {
+#         res <- paste("'covars.type = ", covars.type, "' is not supported", 
+#                      sep = "")
+#         return (res)
+#       }
+#     }
     
     # strata.type
     st <- match(strata.type, c("area", "range"))
@@ -285,7 +284,6 @@ optimDIST <-
       return (res)
     }
   }
-
 # INTERNAL FUNCTION - CRITERION FOR FACTOR COVARIATES ##########################
 .objDISTfac <-
   function (sm, pop.prop, n.pts, n.cov) {    
@@ -310,14 +308,13 @@ optimDIST <-
 #' @rdname optimDIST
 #' @export
 objDIST <-
-  function (points, candi, covars, covars.type = "numeric",
-            strata.type = "area", use.coords = FALSE) {
+  function (points, candi, covars, strata.type = "area", use.coords = FALSE) {
     
     if (!is.data.frame(covars)) covars <- as.data.frame(covars)
+    
     # Check arguments
     check <- .optimDISTcheck(candi = candi, covars = covars,
-                             covars.type = covars.type, use.coords = use.coords,
-                             strata.type = strata.type)
+                             use.coords = use.coords, strata.type = strata.type)
     if (!is.null(check)) stop (check, call. = FALSE)
     
     # Prepare sample points
@@ -326,10 +323,10 @@ objDIST <-
     n_pts <- nrow(points)
     
     # Prepare covariates (covars) and create the starting sample matrix (sm)
-    if (use.coords) {
-      covars <- .useCoords(covars.type = covars.type, candi = candi, 
-                           n.pts = n_pts, strata.type = strata.type)
-    }
+    covars.type <- ifelse(is.any.factor(covars), "factor", "numeric")
+    covars <- .covarsACDC(covars = covars, covars.type = covars.type, 
+                          use.coords = use.coords, candi = candi, n.pts = n_pts,
+                          strata.type = strata.type)
     n_cov <- ncol(covars)
     sm <- covars[points[, 1], ]
     

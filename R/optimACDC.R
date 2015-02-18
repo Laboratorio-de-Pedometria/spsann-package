@@ -9,10 +9,6 @@
 #'
 #' @param covars Data frame or matrix with the covariates in the columns.
 #'
-#' @param covars.type Character value. The type of covariates that is
-#' being used. Available options are \code{"numeric"} and \code{"factor"}.
-#' Defaults to \code{covars.type = "numeric"}.
-#'
 #' @param weights List with two named sub-arguments. The weights assigned to 
 #' correlation/association measure and the sampling strata/classes. They
 #' must be named and sum to unity. Defaults to 
@@ -118,9 +114,8 @@
 #'         utopia = utopia, scale = scale)
 # MAIN FUNCTION ################################################################
 optimACDC <-
-  function (points, candi, covars, covars.type = "numeric", 
-            strata.type = "area", weights = list(correl = 0.5, strata = 0.5),
-            use.coords = FALSE,
+  function (points, candi, covars, strata.type = "area", 
+            weights = list(correl = 0.5, strata = 0.5), use.coords = FALSE,
             nadir = list(sim = 1000, save.sim = TRUE, user = NULL, abs = NULL),
             utopia = list(user = list(correl = NULL, strata = NULL), 
                           abs = NULL), 
@@ -131,15 +126,16 @@ optimACDC <-
             boundary, progress = TRUE, verbose = TRUE) {
     
     if (!is.data.frame(covars)) covars <- as.data.frame(covars)
+    
     # Check arguments
     check <- .spSANNcheck(points, candi, x.max, x.min, y.max, y.min,
                           iterations, acceptance, stopping, plotit, boundary,
                           progress, verbose)
     if (!is.null(check)) stop (check, call. = FALSE)
     check <- .optimACDCcheck(candi = candi, covars = covars, nadir = nadir,
-                             covars.type = covars.type, weights = weights, 
-                             use.coords = use.coords, strata.type = strata.type,
-                             utopia = utopia, scale = scale)
+                             weights = weights, use.coords = use.coords, 
+                             strata.type = strata.type, utopia = utopia, 
+                             scale = scale)
     if (!is.null(check)) stop (check, call. = FALSE)
     
     if (plotit) {
@@ -153,12 +149,13 @@ optimACDC <-
     n_pts <- nrow(points)
     conf0 <- points
     old_conf <- conf0
-
+    
     # Prepare covariates (covars) and create the starting sample matrix (sm)
-    if (use.coords) {
-      covars <- .useCoords(covars.type = covars.type, candi = candi, 
-                           n.pts = n_pts, strata.type = strata.type)
-    }
+    covars.type <- ifelse(pedometrics::is.any.factor(covars), "factor",
+                          "numeric")
+    covars <- .covarsACDC(covars = covars, covars.type = covars.type, 
+                          use.coords = use.coords, candi = candi, n.pts = n_pts,
+                          strata.type = strata.type)
     n_cov <- ncol(covars)
     sm <- covars[points[, 1], ]
 
@@ -323,8 +320,8 @@ optimACDC <-
   }
 # INTERNAL FUNCTION - CHECK ARGUMENTS ##########################################
 .optimACDCcheck <-
-  function (candi, covars, covars.type, weights, use.coords, strata.type,
-            nadir, utopia, scale) {
+  function (candi, covars, weights, use.coords, strata.type, nadir, utopia,
+            scale) {
     
     # utopia
     aa <- !is.list(utopia)
@@ -361,19 +358,6 @@ optimACDC <-
       res <-
         paste("'candi' and 'covars' must have the same number of rows")
       return (res)
-    }
-    
-    # covars.type
-    if (missing(covars.type)) {
-      res <- paste("'covars.type' is missing")
-      return (res)
-    } else {
-      ct <- pmatch(covars.type, c("numeric", "factor"))
-      if (is.na(ct)) {
-        res <- paste("'covars.type = ", covars.type, "' is not supported", 
-                     sep = "")
-        return (res)
-      }
     }
     
     # weights
@@ -496,22 +480,6 @@ optimACDC <-
     }
     return (strata)
   }
-# INTERNAL FUNCTION - DISTRIBUTION FOR NUMERIC COVARIATES ######################
-# .contDistri <-
-#   function (pre.distri, n.pts) {
-#     if (length(pre.distri) > 1) {
-#       if (length(pre.distri) || sum(pre.distri) != n.pts) {
-#         stop(paste("'pre.distri' must be of length/sum ", n.pts, sep = ""))
-#       }
-#     }
-#     # Sample points covering the extremes of the marginal distribution
-#     if (pre.distri == 0.5) {
-#       pre.distri <- rep(0, n.pts)
-#       pre.distri[1] <- n.pts / 2
-#       pre.distri[n.pts] <- n.pts / 2
-#     }
-#     return (pre.distri)
-#   }
 # INTERNAL FUNCTION - NADIR FOR NUMERIC COVARIATES #############################
 .numNadir <-
   function (n.pts, n.cov, n.candi, pcm, nadir, candi, covars, strata, scale) {
@@ -736,10 +704,11 @@ objACDC <-
     n_pts <- nrow(points)
     
     # Prepare covariates (covars) and create the starting sample matrix (sm)
-    if (use.coords) {
-      covars <- .useCoords(covars.type = covars.type, candi = candi, 
-                           n.pts = n_pts, strata.type = strata.type)
-    }
+    covars.type <- ifelse(pedometrics::is.any.factor(covars), "factor",
+                          "numeric")
+    covars <- .covarsACDC(covars = covars, covars.type = covars.type, 
+                          use.coords = use.coords, candi = candi, n.pts = n_pts,
+                          strata.type = strata.type)
     n_cov <- ncol(covars)
     sm <- covars[points[, 1], ]
     
@@ -779,11 +748,37 @@ objACDC <-
   function (covars.type, candi, n.pts, strata.type) {
     if (covars.type == "factor") {
       coords <- data.frame(candi[, 2:3])
-      breaks <- .numStrata(n.pts, coords, strata.type)[[1]]
-      coords <- cont2cat(coords, breaks)
+      breaks <- .numStrata(n.pts = n.pts, covars = coords, 
+                           strata.type = strata.type)[[1]]
+      coords <- cont2cat(x = coords, breaks = breaks)
       covars <- data.frame(covars, coords)
     } else {
       covars <- data.frame(covars, candi[, 2:3])
+    }
+    return (covars)
+  }
+# INTERNAL FUNCTION - PREPARE THE COVARIATES ###################################
+.covarsACDC <-
+  function (covars, covars.type, use.coords, candi, n.pts, strata.type) {
+    
+    # factor covariates
+    if (covars.type == "factor") {
+      if (use.coords) {
+        covars <- data.frame(covars, candi[, 2:3])
+      }
+      if (!is.all.factor(covars)) {
+        i <- which(sapply(covars, is.factor) == FALSE)
+        num_covars <- data.frame(covars[, i])
+        breaks <- .numStrata(n.pts = n.pts, covars = num_covars, 
+                             strata.type = strata.type)[[1]]
+        num_covars <- cont2cat(x = num_covars, breaks = breaks)
+        covars[, i] <- num_covars
+      }
+      
+    } else { # numeric covariates
+      if (use.coords) {
+        covars <- data.frame(covars, candi[, 2:3])
+      }
     }
     return (covars)
   }
