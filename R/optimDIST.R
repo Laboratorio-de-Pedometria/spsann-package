@@ -53,8 +53,8 @@
 #' @concept simulated annealing
 #' @importFrom pedometrics is.numint
 #' @importFrom pedometrics cont2cat
+#' @importFrom pedometrics is.all.factor
 #' @importFrom pedometrics is.any.factor
-#' @importFrom pedometrics is.one.type
 #' @importFrom SpatialTools dist2
 #' @export
 #' @examples

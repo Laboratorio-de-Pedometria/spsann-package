@@ -78,6 +78,8 @@
 #' @importFrom pedometrics cramer
 #' @importFrom pedometrics is.numint
 #' @importFrom pedometrics cont2cat
+#' @importFrom pedometrics is.all.factor
+#' @importFrom pedometrics is.any.factor
 #' @importFrom SpatialTools dist2
 #' @export
 #' @examples
@@ -766,7 +768,7 @@ objACDC <-
       if (use.coords) {
         covars <- data.frame(covars, candi[, 2:3])
       }
-      if (!is.all.factor(covars)) {
+      if (!pedometrics::is.all.factor(covars)) {
         i <- which(sapply(covars, is.factor) == FALSE)
         num_covars <- data.frame(covars[, i])
         breaks <- .numStrata(n.pts = n.pts, covars = num_covars, 
