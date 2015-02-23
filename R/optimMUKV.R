@@ -1,12 +1,6 @@
-#' Optimization of sample patterns for variogram estimation
+#' Optimization of sample patterns with a known model
 #'
-#' Optimize a sample pattern for variogram estimation. The criterion used is
-#' the number of points or point-pairs per lag distance class (\code{optimPPL}).
-#' \code{pointsPerLag} and \code{pairsPerLag} count the number of points or
-#' point-pairs per lag distance class. \code{objPoints} and \code{objPairs}
-#' compute the deviation of the observed distribution of counts from a
-#' pre-specified distribution, or the minimum number of points or point pairs
-#' observed over all lag distance classes.
+#' Optimize a sample pattern with a known model.
 #'
 #' @template spJitter_doc
 #' @template spSANN_doc
@@ -39,48 +33,6 @@
 #' \code{criterion = "distribution"}. Defaults to a uniform distribution. See
 #' \sQuote{Details} for more information.
 #'
-#' @details
-#' \subsection{Distances}{
-#' Euclidean distances between points are calculated. This computation requires
-#' the coordinates to be projected. The user is responsible for making sure that
-#' this requirement is attained.
-#' }
-#' \subsection{Distribution}{
-#' Using the default uniform distribution means that the number of
-#' \strong{point-pairs} per lag is equal to
-#' \eqn{n \times (n - 1) / (2 \times lag)}, where \eqn{n} is the total number
-#' of points and \eqn{lag} is the number of lags.
-#'
-#' Using the default uniform distribution means that the number of
-#' \strong{points} per lag is equal to the total number of points. This is the
-#' same as expecting that each point contributes to every lag.
-#'
-#' Distributions other than the available options can be easily implemented
-#' changing the arguments \code{lags}, \code{lags.base} and \code{pre.distri}.
-#' }
-#' \subsection{Type of lags}{
-#' Two types of lags can be created by default. The first are evenly spaced
-#' lags (\code{lags.type = "equidistant"}). They are created by simply dividing
-#' the distance interval from 0.0001 to \code{cutoff} by the required number of
-#' lags. The minimum value of 0.0001 guarantees that a point does not form a
-#' pair with itself.
-#'
-#' The second type of lags is defined by exponential spacings
-#' (\code{lags.type = "exponential"}). The spacings are defined by the base
-#' \eqn{b} of the exponential expression \eqn{b^n}, where \eqn{n} is the
-#' required number of lags. The base is defined using the argument
-#' \code{lags.base}.
-#' }
-#' \subsection{Criteria}{
-#' There are two optimizing criteria implemented. The first is called using
-#' \code{criterion = "distribution"} and is used to minimize the sum of
-#' differences between a pre-specified distribution and the observed
-#' distribution of points or point-pairs per lag.
-#'
-#' The second criterion is called using \code{criterion = "minimum"}. It
-#' corresponds to maximizing the minimum number of points or point-pairs
-#' observed over all lags.
-#' }
 #' @return
 #' \code{optimPPL} returns a matrix: the optimized sample pattern with
 #' the evolution of the energy state during the optimization as an attribute.
@@ -117,7 +69,7 @@
 #'
 #' @author
 #' Alessandro Samuel-Rosa \email{alessandrosamuelrosa@@gmail.com}
-#' @aliases optimPPL pointsPerLag objPoints pairsPerLag objPairs
+#' @aliases optimMUKV
 #' @keywords spatial optimize
 #' @concept simulated annealing
 #' @export
@@ -128,19 +80,17 @@
 #' meuse <- matrix(cbind(c(1:dim(meuse)[1]), meuse), ncol = 3)
 #' pointsPerLag(meuse, cutoff = 1000)
 #' objPoints(meuse, cutoff = 1000)
-# UNIT TEST ####################################################################
-# Use \code{lags = 1} with \code{pointsPerLag} and \code{pairsPerLag} to check
-# that the functions are working correctly. They should return the total number
-# of points in \code{points} and the total possible number of point-pairs
-# \eqn{n \times (n - 1) / 2}, respectively.
 # FUNCTION - MAIN ##############################################################
-optimPPL <-
-  function (points, candi, lags = 7, lags.type = "exponential",
-            lags.base = 2, cutoff = NULL, criterion = "distribution",
-            pre.distri = NULL, x.max, x.min, y.max, y.min, iterations = 10000,
+optimMUKV <-
+  function (points, candi, covars, equation = z ~ 1, model, krige.stat = "mean",
+            x.max, x.min, y.max, y.min, iterations = 10000,
             acceptance = list(initial = 0.99, cooling = iterations / 10),
             stopping = list(max.count = iterations / 10), plotit = TRUE,
             boundary, progress = TRUE, verbose = TRUE) {
+    
+    if (!missing(covars)) {
+      if (!is.data.frame(covars)) covars <- as.data.frame(covars) 
+    }    
     
     # Check arguments
     # http://www.r-bloggers.com/a-warning-about-warning/
@@ -148,9 +98,9 @@ optimPPL <-
                           iterations, acceptance, stopping, plotit, boundary,
                           progress, verbose)
     if (!is.null(check)) stop (check, call. = FALSE)
-    check <- .optimPPLcheck(lags, lags.type, lags.base, cutoff, criterion,
-                            pre.distri)
-    if (!is.null(check)) stop (check, call. = FALSE)
+    
+    #check <- .optimMUKVcheck()
+    #if (!is.null(check)) stop (check, call. = FALSE)
     
     if (plotit) {
       par0 <- par()
@@ -161,27 +111,44 @@ optimPPL <-
     n_candi <- nrow(candi)
     points <- .spsannPoints(points = points, candi = candi, n.candi = n_candi)
     n_pts <- nrow(points)
-    
-    # Prepare lags
-    if (length(lags) >= 3) {
-      n_lags <- length(lags) - 1
-    } else {
-      n_lags <- lags
-      lags <- .getLagBreaks(lags = lags, lags.type = lags.type, 
-                            cutoff = cutoff, lags.base = lags.base)
-    }
     conf0 <- points
     old_conf <- conf0
     
+    # Prepare prediction grid (pg) with covars
+    if (terms(equation)[[3]] == 1) {
+      covars <- data.frame(candi[, 2:3])
+      colnames(covars) <- c("x", "y")
+    } else {
+      covars <- data.frame(candi[, 2:3], covars[, all.vars(equation)[-1]])
+      colnames(covars) <- c("x", "y", all.vars(equation)[-1])
+    }
+    
+    # Prepare starting sample matrix (sm)
+    z <- rep(1, n_pts)
+    if (terms(equation)[[3]] == 1) {
+      sm <- data.frame(z, points[, 2:3])
+      colnames(sm) <- c("z", "x", "y")
+    } else {
+      sm <- data.frame(z, points[, 2:3],
+                       covars[points[, 1], all.vars(equation)[-1]])
+      colnames(sm) <- c("z", "x", "y", all.vars(equation)[-1])
+    }
+    
     # Initial energy state
-    dm <- SpatialTools::dist1(conf0[, 2:3])
-    ppl <- .getPointsPerLag(lags = lags, dist.mat = dm)
-    energy0 <- .objPointsPerLag(ppl = ppl, n.lags = n_lags, n.pts = n_pts,
-                                criterion = criterion, pre.distri = pre.distri)
+    energy0 <- gstat::krige(formula = equation, locations = ~ x + y, data = sm,
+                            newdata = covars, model = model)$var1.var
+    if (krige.stat == "mean") {
+      energy0 <- mean(energy0)
+    } else {
+      if (krige.stat == "max") {
+        energy0 <- max(energy0)
+      }
+    }
     
     # other settings for the simulated annealing algorithm
-    old_dm <- dm
-    best_dm <- dm
+    old_sm <- sm
+    new_sm <- sm
+    best_sm <- sm
     count <- 0
     old_energy <- energy0
     best_energy <- Inf
@@ -203,65 +170,35 @@ optimPPL <-
       x.max <- x_max0 - (k / iterations) * (x_max0 - x.min)
       y.max <- y_max0 - (k / iterations) * (y_max0 - y.min)
       
-      # Update the distance matrix using a Cpp function
-      <<<<<<< HEAD
-      new_dm <- .updatePPLCpp(x = new_conf[, 2:3], dm = old_dm, idx = wp)
+      # Update sample matrix and energy state
+      new_row <- covars[new_conf[wp, 1], ]
+      new_sm[wp, ] <- new_row
+      new_energy <- gstat::krige(formula = equation, locations = ~ x + y, 
+                                 data = new_sm, newdata = covars, 
+                                 model = model, debug.level = 0)$var1.var
+      if (krige.stat == "mean") {
+        new_energy <- mean(new_energy)
+      } else {
+        if (krige.stat == "max") {
+          new_energy <- max(new_energy)
+        }
+      }
       
-      # Recalculate the full distance matrix
-      #new_dm <- SpatialTools::dist1(coords = new_conf[, 2:3])
-      
-      # Update the distance matrix in R
-      #x2 <- matrix(new_conf[wp, 2:3], nrow = 1)
-      #x2 <- SpatialTools::dist2(coords = new_conf[, 2:3], coords2 = x2)
-      #new_dm <- old_dm
-      #new_dm[wp, ] <- x2
-      #new_dm[, wp] <- x2
-      
-      # Update the energy state
-      =======
-        # The 'update' function is not working properly.
-        # new_dm <- .updatePPLCpp(x = new_conf[, 2:3], y = old_dm, idx = wp)
-        
-        # Recalculate the full distance matrix (this is working)
-        # new_dm <- SpatialTools::dist1(coords = new_conf[, 2:3])
-        
-        # Update the distance matrix in R
-        x2 <- matrix(new_conf[wp, 2:3], nrow = 1)
-      x2 <- SpatialTools::dist2(coords = new_conf[, 2:3], coords2 = x2)
-      new_dm <- old_dm
-      new_dm[wp, ] <- x2
-      new_dm[, wp] <- x2
-      >>>>>>> ea06f437efa26e8c0ab25ffa18885e7e431822a2
-      ppl <- .getPointsPerLag(lags = lags, dist.mat = new_dm)
-      new_energy <- .objPointsPerLag(ppl = ppl, n.lags = n_lags, n.pts = n_pts,
-                                     criterion = criterion, 
-                                     pre.distri = pre.distri)      
-      
-      # ASR: This is to test the 'update' function
-      #a <- objPoints(points = new_conf, lags = lags, criterion = criterion)
-      #if (new_energy != a) {
-      # print(new_energy)
-      # print(a)
-      # break
-      #}
-      
-      # evaluate the new system configuration
+      # Evaluate the new system configuration
       random_prob <- runif(1)
-      actual_prob <- acceptance$initial * exp(-k / acceptance$cooling)
+      actual_prob <- acceptance[[1]] * exp(-k / acceptance[[2]])
       accept_probs[k] <- actual_prob
       if (new_energy <= old_energy) {
-        # Always accepts a better energy
         old_conf   <- new_conf
         old_energy <- new_energy
         count      <- 0
-        old_dm     <- new_dm
+        old_sm     <- new_sm
       } else {
-        if (new_energy > old_energy && random_prob <= actual_prob) {
-          # Accepts a worse energy depending on the probability
+        if (new_energy > old_energy & random_prob <= actual_prob) {
           old_conf   <- new_conf
           old_energy <- new_energy
           count      <- count + 1
-          old_dm     <- new_dm
+          old_sm     <- new_sm
           if (verbose) {
             cat("\n", count, "iteration(s) with no improvement... p = ",
                 random_prob, "\n")
@@ -270,13 +207,13 @@ optimPPL <-
           new_energy <- old_energy
           new_conf   <- old_conf
           count      <- count + 1
+          new_sm     <- old_sm
           if (verbose) {
             cat("\n", count, "iteration(s) with no improvement... stops at",
-                stopping$max.count, "\n")
+                stopping[[1]], "\n")
           }
         }
       }
-      
       # Best energy state
       energies[k] <- new_energy
       if (new_energy < best_energy / 1.0000001) {
@@ -285,35 +222,31 @@ optimPPL <-
         best_energy     <- new_energy
         best_old_energy <- old_energy
         old_conf        <- old_conf
-        best_dm         <- new_dm
-        best_old_dm     <- old_dm
+        best_sm         <- new_sm
+        best_old_sm     <- old_sm
       }
-      
       # Plotting
       if (plotit && any(round(seq(1, iterations, 10)) == k)) {
-        #if (plotit && pedometrics::is.numint(k / 10)) {
         .spSANNplot(energy0 = energy0, energies = energies, k = k, 
                     acceptance = acceptance, accept_probs = accept_probs,
                     boundary = boundary, new_conf = new_conf[, 2:3], 
-                    conf0 = conf0[, 2:3], y_max0 = y_max0, y.max = y.max,
+                    conf0 = conf0[, 2:3], y_max0 = y_max0, y.max = y.max, 
                     x_max0 = x_max0, x.max = x.max)
       }
-      
       # Freezing parameters
-      if (count == stopping$max.count) {
+      if (count == stopping[[1]]) {
         if (new_energy > best_energy * 1.000001) {
-          old_conf    <- old_conf
-          new_conf    <- best_conf
-          old_energy  <- best_old_energy
-          new_energy  <- best_energy
-          count       <- 0
-          energies[k] <- new_energy
-          new_dm      <- best_dm
-          old_dm      <- best_old_dm
+          old_conf   <- old_conf
+          new_conf   <- best_conf
+          old_energy <- best_old_energy
+          new_energy <- best_energy
+          count      <- 0
+          new_sm     <- best_sm
+          old_sm     <- best_old_sm
           cat("\n", "reached maximum count with suboptimal configuration\n")
           cat("\n", "restarting with previously best configuration\n")
           cat("\n", count, "iteration(s) with no improvement... stops at",
-              stopping$max.count, "\n")
+              stopping[[1]], "\n")
         } else {
           break
         }
@@ -321,7 +254,65 @@ optimPPL <-
       if (progress) setTxtProgressBar(pb, k)
     }
     if (progress) close(pb)
-    res <- .spSANNout(new_conf = new_conf, energy0 = energy0, 
-                      energies = energies, time0 = time0)
+    res <- .spSANNout(new_conf, energy0, energies, time0)
+    return (res)
+  }
+# INTERNAL FUNCTION - CHECK ARGUMENTS ##########################################
+.optimmukvcheck <-
+  function () {
+    
+  }
+# FUNCTION - CANCLULATE THE OBJECTIVE FUNCTION VALUE ###########################
+objMUKV <-
+  function (points, candi, covars, equation, model, krige.stat = "mean") {
+    
+    if (!missing(covars)) {
+      if (!is.data.frame(covars)) covars <- as.data.frame(covars) 
+    }    
+    
+    # Check arguments
+    #check <- .spSANNcheck(points, candi)
+    #if (!is.null(check)) stop (check, call. = FALSE)
+    
+    #check <- .optimMUKVcheck()
+    #if (!is.null(check)) stop (check, call. = FALSE)
+    
+    # Prepare points
+    n_candi <- nrow(candi)
+    points <- .spsannPoints(points = points, candi = candi, n.candi = n_candi)
+    n_pts <- nrow(points)
+    conf0 <- points
+    old_conf <- conf0
+    
+    # Prepare prediction grid (pg) with covars
+    if (terms(equation)[[3]] == 1) {
+      covars <- data.frame(candi[, 2:3])
+      colnames(covars) <- c("x", "y")
+    } else {
+      covars <- data.frame(candi[, 2:3], covars[, all.vars(equation)[-1]])
+      colnames(covars) <- c("x", "y", all.vars(equation)[-1])
+    }
+    
+    # Prepare starting sample matrix (sm)
+    z <- rep(1, n_pts)
+    if (terms(equation)[[3]] == 1) {
+      sm <- data.frame(z, points[, 2:3])
+      colnames(sm) <- c("z", "x", "y")
+    } else {
+      sm <- data.frame(z, points[, 2:3],
+                       covars[points[, 1], all.vars(equation)[-1]])
+      colnames(sm) <- c("z", "x", "y", all.vars(equation)[-1])
+    }
+    
+    # Initial energy state
+    res <- gstat::krige(formula = equation, locations = ~ x + y, data = sm,
+                        newdata = covars, model = model)$var1.var
+    if (krige.stat == "mean") {
+      res <- mean(res)
+    } else {
+      if (krige.stat == "max") {
+        res <- max(res)
+      }
+    }
     return (res)
   }
