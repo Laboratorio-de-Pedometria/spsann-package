@@ -1,85 +1,53 @@
-#' Optimization of sample patterns with a known model
+#' Optimization of sample patterns for spatial interpolation
 #'
-#' Optimize a sample pattern with a known model.
+#' Optimize a sample pattern for spatial interpolation with a known linear 
+#' model. A criterion is defined so that the sample pattern minimizes the
+#' mean kriging variance 
 #'
 #' @template spJitter_doc
 #' @template spSANN_doc
 #' 
-#' @param lags Integer. The number of lag distance classes. Alternatively, a
-#' vector of numeric values with the lower and upper limits of each lag
-#' distance class. The lowest value must be larger than zero, e.g. 0.0001.
-#' Defaults to \code{lags = 7}.
+#' @param covars Data frame or matrix with the covariates in the columns.
 #' 
-#' @param lags.type Character. The type of lag distance classes. Available
-#' options are \code{"equidistant"} and \code{"exponential"}. Defaults to
-#' \code{lags.type = "exponential"}. See \sQuote{Details} for more information.
+#' @param equation Formula string that defines the dependent variable \code{z}
+#' as a linear model of independent variables. Defaults to 
+#' \code{equation = z ~ 1}. See the argument \code{formula} in the function
+#' \code{\link[gstat]{krige}} for more information.
 #'
-#' @param lags.base Numeric. Base of the exponential expression used to
-#' create the exponential lag distance classes. Defaults to
-#' \code{lags.base = 2}. See \sQuote{Details} for more information.
+#' @param model Object of class "variogramModel". See the argument 
+#' \code{model} in the function \code{\link[gstat]{krige}} for more information.
 #'
-#' @param cutoff Numeric value. The maximum distance up to which lag distance
-#' classes are created. Used only when \code{lags} is an integer. 
-#' See \sQuote{Details} for more information.
-#'
-#' @param criterion Character value. The measure to be used to describe the
-#' energy state of the current system configuration. Available options are
-#' \code{"minimum"} and \code{"distribution"}. Defaults to
-#' \code{objective = "minimum"}. See \sQuote{Details} for more information.
-#'
-#' @param pre.distri Numeric vector. The pre-specified distribution of points
-#' or point-pair with which the observed counts of points or point-pairs per
-#' lag distance class is compared. Used only when
-#' \code{criterion = "distribution"}. Defaults to a uniform distribution. See
-#' \sQuote{Details} for more information.
+#' @param krige.stat Character value defining the statistic that shoul be used
+#' to summarize the kriging variance. Available options are \code{"mean"} and
+#' \code{"max} for the mean and maximum krigig variance, respectively.
+#' Defaults to \code{krige.stat = "mean"}.
 #'
 #' @return
-#' \code{optimPPL} returns a matrix: the optimized sample pattern with
+#' \code{optimMUKV} returns a matrix: the optimized sample pattern with
 #' the evolution of the energy state during the optimization as an attribute.
 #'
-#' \code{pointsPerLag} and \code{pairsPerLag} return a data.frame with three
-#' columns: a) the lower and b) upper limits of each lag, and c) the number of
-#' points or point-pairs per lag.
-#'
-#' \code{objPoints} and \code{objPairs} return a numeric value depending on the
-#' choice of \code{criterion}. If \code{criterion = "distribution"}, the sum of
-#' the differences between the pre-specified and observed distribution of counts
-#' of points or point-pairs per lag. If \code{criterion = "minimum"}, the
-#' inverse of the minimum count of points or point pairs over all lags
-#' multiplied by a constant.
+#' \code{objMUKV} returns a numeric value depending on the choice of 
+#' \code{krige.stat}. If \code{krige.stat = "mean"}, the mean kriging variance.
+#' If \code{krige.stat = "max"}, the maximum kriging variance.
 #'
 #' @references
-#' Bresler, E.; Green, R. E. \emph{Soil parameters and sampling scheme for
-#' characterizing soil hydraulic properties of a watershed}. Honolulu:
-#' University of Hawaii at Manoa, p. 42, 1982.
-#'
-#' Marler, R. T.; Arora, J. S. Function-transformation methods for
-#' multi-objective optimization. \emph{Engineering Optimization}. v. 37, p.
-#' 551-570, 2005.
-#'
-#' Russo, D. Design of an optimal sampling network for estimating the variogram.
-#' \emph{Soil Science Society of America Journal}. v. 48, p. 708-716, 1984.
-#'
-#' Truong, P. N.; Heuvelink, G. B. M.; Gosling, J. P. Web-based tool for expert
-#' elicitation of the variogram. \emph{Computers and Geosciences}. v. 51, p.
-#' 390-399, 2013.
-#'
-#' Warrick, A. W.; Myers, D. E. Optimization of sampling locations for variogram
-#' calculations. \emph{Water Resources Research}. v. 23, p. 496-500, 1987.
-#'
+#' Brus, D. J. & Heuvelink, G. B. M. Optimization of sample patterns for
+#' universal kriging of environmental variables. \emph{Geoderma}. v. 138, 
+#' p. 86-95, 2007.
+#' 
+#' Heuvelink, G. B. M.; Brus, D. J. & de Gruijter, J. J. Optimization of sample
+#' configurations for digital mapping of soil properties with universal kriging.
+#' In: Lagacherie, P.; McBratney, A. & Voltz, M. (Eds.) \emph{Digital soil
+#' mapping - an introductory perspective}. Elsevier, v. 31, p. 137-151, 2006.
+#' 
 #' @author
 #' Alessandro Samuel-Rosa \email{alessandrosamuelrosa@@gmail.com}
 #' @aliases optimMUKV
 #' @keywords spatial optimize
 #' @concept simulated annealing
+#' @importFrom plyr is.formula
 #' @export
 #' @examples
-#' require(sp)
-#' data(meuse)
-#' meuse <- as.matrix(meuse[, 1:2])
-#' meuse <- matrix(cbind(c(1:dim(meuse)[1]), meuse), ncol = 3)
-#' pointsPerLag(meuse, cutoff = 1000)
-#' objPoints(meuse, cutoff = 1000)
 # FUNCTION - MAIN ##############################################################
 optimMUKV <-
   function (points, candi, covars, equation = z ~ 1, model, krige.stat = "mean",
@@ -93,14 +61,12 @@ optimMUKV <-
     }    
     
     # Check arguments
-    # http://www.r-bloggers.com/a-warning-about-warning/
     check <- .spSANNcheck(points, candi, x.max, x.min, y.max, y.min,
                           iterations, acceptance, stopping, plotit, boundary,
                           progress, verbose)
     if (!is.null(check)) stop (check, call. = FALSE)
-    
-    #check <- .optimMUKVcheck()
-    #if (!is.null(check)) stop (check, call. = FALSE)
+    check <- .optimMUKVcheck(covars, equation, model, krige.stat)
+    if (!is.null(check)) stop (check, call. = FALSE)
     
     if (plotit) {
       par0 <- par()
@@ -258,9 +224,43 @@ optimMUKV <-
     return (res)
   }
 # INTERNAL FUNCTION - CHECK ARGUMENTS ##########################################
-.optimmukvcheck <-
-  function () {
+.optimMUKVcheck <-
+  function (covars, equation, model, krige.stat) {
     
+    # covars
+    if (!missing(covars)) {
+      if (nrow(candi) != nrow(covars)) {
+        res <-
+          paste("'candi' and 'covars' must have the same number of rows")
+        return (res)
+      }
+    }
+    
+    # equation
+    bb <- !is.formula(equation)
+    cc <- all.vars(equation)[1] != "z"
+    if (bb || cc) {
+      res <-
+        paste("'equation' must be a formula with dependent variable 'z'")
+      return (res)
+    }
+    
+    # model
+    aa <- missing(model)
+    bb <- class(model)[1] != "variogramModel"
+    if (aa || bb) {
+      res <- paste("'model' must be of class 'variogramModel'")
+      return (res)
+    }
+    
+    # krige.stat
+    
+    aa <- match(krige.stat, c("mean", "max"))
+    if (is.na(aa)) {
+      res <- paste("'krige.stat = ", krige.stat, "' is not supported",
+                   sep = "")
+      return (res)
+    }
   }
 # FUNCTION - CANCLULATE THE OBJECTIVE FUNCTION VALUE ###########################
 objMUKV <-

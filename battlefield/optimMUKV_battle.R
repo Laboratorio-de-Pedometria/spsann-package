@@ -35,7 +35,7 @@ set.seed(2001)
 res <- optimMUKV(points = points, candi = candi, covars = covars, 
                  equation = equation, model = model, krige.stat = krige.stat, 
                  x.max = x.max, x.min = x.min, y.max = y.max, y.min = y.min,
-                 boundary = boundary, iterations = 100, plotit = TRUE)
+                 boundary = boundary, iterations = 10000, plotit = TRUE)
 tail(attr(res, "energy"), 1) # 11.79797
 objMUKV(points = res, candi = candi, covars = covars, equation = equation, 
         model = model, krige.stat = krige.stat) # 11.87138
