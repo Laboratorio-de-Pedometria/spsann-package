@@ -281,8 +281,6 @@ objMUKV <-
     n_candi <- nrow(candi)
     points <- .spsannPoints(points = points, candi = candi, n.candi = n_candi)
     n_pts <- nrow(points)
-    conf0 <- points
-    old_conf <- conf0
     
     # Prepare prediction grid (pg) with covars
     if (terms(equation)[[3]] == 1) {

@@ -204,7 +204,6 @@ optimPPL <-
       y.max <- y_max0 - (k / iterations) * (y_max0 - y.min)
       
       # Update the distance matrix using a Cpp function
-<<<<<<< HEAD
       new_dm <- .updatePPLCpp(x = new_conf[, 2:3], dm = old_dm, idx = wp)
       
       # Recalculate the full distance matrix
@@ -218,7 +217,6 @@ optimPPL <-
       #new_dm[, wp] <- x2
       
       # Update the energy state
-=======
       # The 'update' function is not working properly.
       # new_dm <- .updatePPLCpp(x = new_conf[, 2:3], y = old_dm, idx = wp)
       
@@ -231,7 +229,6 @@ optimPPL <-
       new_dm <- old_dm
       new_dm[wp, ] <- x2
       new_dm[, wp] <- x2
->>>>>>> ea06f437efa26e8c0ab25ffa18885e7e431822a2
       ppl <- .getPointsPerLag(lags = lags, dist.mat = new_dm)
       new_energy <- .objPointsPerLag(ppl = ppl, n.lags = n_lags, n.pts = n_pts,
                                      criterion = criterion, 

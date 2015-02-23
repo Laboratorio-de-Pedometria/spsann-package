@@ -28,7 +28,7 @@ y.max <- diff(bbox(boundary)[2, ])
 y.min <- 40
 x.min <- 40
 points <- 100
-equation <- z ~ 1
+equation <- z ~ dist
 model <- vgm(psill = 10, model = "Exp", range = 500, nugget = 8)
 krige.stat <- "mean"
 set.seed(2001)
@@ -36,6 +36,6 @@ res <- optimMUKV(points = points, candi = candi, covars = covars,
                  equation = equation, model = model, krige.stat = krige.stat, 
                  x.max = x.max, x.min = x.min, y.max = y.max, y.min = y.min,
                  boundary = boundary, iterations = 100, plotit = TRUE)
-tail(attr(res, "energy"), 1) # 11.79714
+tail(attr(res, "energy"), 1) # 11.79797
 objMUKV(points = res, candi = candi, covars = covars, equation = equation, 
-        model = model, krige.stat = krige.stat) # 11.82298
+        model = model, krige.stat = krige.stat) # 11.87138
