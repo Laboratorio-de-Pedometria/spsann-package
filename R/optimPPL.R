@@ -1,86 +1,71 @@
-#' Optimization of sample patterns for for variogram estimation
+#' Optimization of sample patterns for variogram estimation
 #'
-#' Optimize a sample pattern for variogram estimation. The criterion used is
-#' the number of points or point-pairs per lag distance class (\code{optimPPL}).
-#' \code{pointsPerLag} and \code{pairsPerLag} count the number of points or
-#' point-pairs per lag distance class. \code{objPoints} and \code{objPairs}
-#' compute the deviation of the observed distribution of counts from a
-#' pre-specified distribution, or the minimum number of points or point pairs
-#' observed over all lag distance classes.
-#'
+#' Optimize a sample pattern for variogram estimation. A criterion is defined so
+#' that the optimized sample pattern has a given number of points or point-pairs 
+#' contributing to each lag distance class.
+#' 
 #' @template spJitter_doc
 #' @template spSANN_doc
 #' 
-#' @param lags Integer. The number of lag distance classes. Alternatively, a
-#' vector of numeric values with the lower and upper limits of each lag
+#' @param lags Integer value. The number of lag distance classes. Alternatively,
+#' a vector of numeric values with the lower and upper limits of each lag
 #' distance class. The lowest value must be larger than zero, e.g. 0.0001.
 #' Defaults to \code{lags = 7}.
 #' 
-#' @param lags.type Character. The type of lag distance classes. Available
-#' options are \code{"equidistant"} and \code{"exponential"}. Defaults to
-#' \code{lags.type = "exponential"}. See \sQuote{Details} for more information.
+#' @param lags.type Character value. The type of lag distance classes, with
+#' options \code{"equidistant"} and \code{"exponential"}. Defaults to
+#' \code{lags.type = "exponential"}.
 #'
-#' @param lags.base Numeric. Base of the exponential expression used to
-#' create the exponential lag distance classes. Defaults to
-#' \code{lags.base = 2}. See \sQuote{Details} for more information.
+#' @param lags.base Numeric value. Base of the exponential expression used to
+#' create exponentially spaced lag distance classes. Used only when 
+#' \code{lags.type = "exponential"}. Defaults to \code{lags.base = 2}.
 #'
 #' @param cutoff Numeric value. The maximum distance up to which lag distance
-#' classes are created. Used only when \code{lags} is an integer. 
-#' See \sQuote{Details} for more information.
+#' classes are created. Used only when \code{lags} is an integer value. 
 #'
-#' @param criterion Character value. The measure to be used to describe the
-#' energy state of the current system configuration. Available options are
-#' \code{"minimum"} and \code{"distribution"}. Defaults to
-#' \code{objective = "minimum"}. See \sQuote{Details} for more information.
+#' @param criterion Character value. The measure used to describe the
+#' energy state of the current system configuration, with options 
+#' \code{"minimum"} and \code{"distribution"}. Defaults to 
+#' \code{objective = "distribution"}.
 #'
 #' @param pre.distri Numeric vector. The pre-specified distribution of points
 #' or point-pair with which the observed counts of points or point-pairs per
 #' lag distance class is compared. Used only when
-#' \code{criterion = "distribution"}. Defaults to a uniform distribution. See
-#' \sQuote{Details} for more information.
+#' \code{criterion = "distribution"}. Defaults to a uniform distribution.
 #'
 #' @details
-#' \subsection{Distances}{
-#' Euclidean distances between points are calculated. This computation requires
-#' the coordinates to be projected. The user is responsible for making sure that
-#' this requirement is attained.
-#' }
-#' \subsection{Distribution}{
-#' Using the default uniform distribution means that the number of
-#' \strong{point-pairs} per lag is equal to
+#' \strong{Distances}: Euclidean distances between points are calculated. This
+#' computation requires the coordinates to be projected. The user is responsible
+#' for making sure that this requirement is attained.
+#' 
+#' \strong{Distribution}: Using the default uniform distribution means that the
+#' number of point-pairs per lag is equal to 
 #' \eqn{n \times (n - 1) / (2 \times lag)}, where \eqn{n} is the total number
-#' of points and \eqn{lag} is the number of lags.
+#' of points and \eqn{lag} is the number of lags. Using the default uniform
+#' distribution means that the number of points per lag is equal to the total
+#' number of points. This is the same as expecting that each point contributes
+#' to every lag. Distributions other than the available options can be easily
+#' implemented changing the arguments \code{lags}, \code{lags.base} and
+#' \code{pre.distri}.
+#' 
+#' \strong{Type of lags}: Two types of lag distance classes can be created by
+#' default. The first are evenly spaced lags (\code{lags.type = "equidistant"}).
+#' They are created by simply dividing the distance interval from 0.0001 to
+#' \code{cutoff} by the required number of lags. The minimum value of 0.0001
+#' guarantees that a point does not form a pair with itself. The second type of
+#' lags is defined by exponential spacings (\code{lags.type = "exponential"}).
+#' The spacings are defined by the base \eqn{b} of the exponential expression
+#' \eqn{b^n}, where \eqn{n} is the required number of lags. The base is defined
+#' using the argument \code{lags.base}.
 #'
-#' Using the default uniform distribution means that the number of
-#' \strong{points} per lag is equal to the total number of points. This is the
-#' same as expecting that each point contributes to every lag.
-#'
-#' Distributions other than the available options can be easily implemented
-#' changing the arguments \code{lags}, \code{lags.base} and \code{pre.distri}.
-#' }
-#' \subsection{Type of lags}{
-#' Two types of lags can be created by default. The first are evenly spaced
-#' lags (\code{lags.type = "equidistant"}). They are created by simply dividing
-#' the distance interval from 0.0001 to \code{cutoff} by the required number of
-#' lags. The minimum value of 0.0001 guarantees that a point does not form a
-#' pair with itself.
-#'
-#' The second type of lags is defined by exponential spacings
-#' (\code{lags.type = "exponential"}). The spacings are defined by the base
-#' \eqn{b} of the exponential expression \eqn{b^n}, where \eqn{n} is the
-#' required number of lags. The base is defined using the argument
-#' \code{lags.base}.
-#' }
-#' \subsection{Criteria}{
-#' There are two optimizing criteria implemented. The first is called using
-#' \code{criterion = "distribution"} and is used to minimize the sum of
-#' differences between a pre-specified distribution and the observed
-#' distribution of points or point-pairs per lag.
-#'
-#' The second criterion is called using \code{criterion = "minimum"}. It
-#' corresponds to maximizing the minimum number of points or point-pairs
-#' observed over all lags.
-#' }
+#' \strong{Criteria}: There are two optimizing criteria implemented. The first
+#' is called using \code{criterion = "distribution"} and is used to minimize the
+#' sum of differences between a pre-specified distribution and the observed 
+#' distribution of points or point-pairs per lag distance class. The second
+#' criterion is called using \code{criterion = "minimum"}. It corresponds to
+#' maximizing the minimum number of points or point-pairs observed over all lag
+#' distance classes.
+#' 
 #' @return
 #' \code{optimPPL} returns a matrix: the optimized sample pattern with
 #' the evolution of the energy state during the optimization as an attribute.
@@ -122,12 +107,33 @@
 #' @concept simulated annealing
 #' @export
 #' @examples
+#' require(pedometrics)
 #' require(sp)
-#' data(meuse)
-#' meuse <- as.matrix(meuse[, 1:2])
-#' meuse <- matrix(cbind(c(1:dim(meuse)[1]), meuse), ncol = 3)
-#' pointsPerLag(meuse, cutoff = 1000)
-#' objPoints(meuse, cutoff = 1000)
+#' require(rgeos)
+#' require(SpatialTools)
+#' data(meuse.grid)
+#' candi <- meuse.grid[, 1:2]
+#' coordinates(candi) <- ~ x + y
+#' gridded(candi) <- TRUE
+#' boundary <- as(candi, "SpatialPolygons")
+#' boundary <- gUnionCascaded(boundary)
+#' candi <- coordinates(candi)
+#' candi <- matrix(cbind(1:nrow(candi), candi), ncol = 3)
+#' x.max <- diff(bbox(boundary)[1, ])
+#' y.max <- diff(bbox(boundary)[2, ])
+#' cutoff <- sqrt((x.max * x.max) + (y.max * y.max))
+#' points <- 100
+#' set.seed(2001)
+#' res <- optimPPL(points = points, candi = candi, lags = 7, lags.base = 2,
+#'                 criterion = "distribution", lags.type = "exponential",
+#'                 cutoff = cutoff, x.max = x.max, x.min = 40, y.max = y.max, 
+#'                 y.min = 40, boundary = boundary, iterations = 100, 
+#'                 plotit = TRUE)
+#' pointsPerLag(points = res, lags = 7, lags.type = "exponential", 
+#' lags.base = 2, cutoff = cutoff)
+#' tail(attr(res, "energy.state"), 1) # 92
+#' objPoints(points = res, lags = 7, lags.type = "exponential", lags.base = 2,
+#'           cutoff = cutoff, criterion = "distribution")
 # UNIT TEST ####################################################################
 # Use \code{lags = 1} with \code{pointsPerLag} and \code{pairsPerLag} to check
 # that the functions are working correctly. They should return the total number
@@ -217,18 +223,6 @@ optimPPL <-
       #new_dm[, wp] <- x2
       
       # Update the energy state
-      # The 'update' function is not working properly.
-      # new_dm <- .updatePPLCpp(x = new_conf[, 2:3], y = old_dm, idx = wp)
-      
-      # Recalculate the full distance matrix (this is working)
-      # new_dm <- SpatialTools::dist1(coords = new_conf[, 2:3])
-      
-      # Update the distance matrix in R
-      x2 <- matrix(new_conf[wp, 2:3], nrow = 1)
-      x2 <- SpatialTools::dist2(coords = new_conf[, 2:3], coords2 = x2)
-      new_dm <- old_dm
-      new_dm[wp, ] <- x2
-      new_dm[, wp] <- x2
       ppl <- .getPointsPerLag(lags = lags, dist.mat = new_dm)
       new_energy <- .objPointsPerLag(ppl = ppl, n.lags = n_lags, n.pts = n_pts,
                                      criterion = criterion, 

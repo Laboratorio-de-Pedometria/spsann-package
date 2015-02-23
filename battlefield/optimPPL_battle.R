@@ -12,8 +12,10 @@ source('R/optimPPL.R')
 Rcpp::sourceCpp('src/spJitterCpp.cpp')
 Rcpp::sourceCpp('src/updatePPLCpp.cpp')
 # 0) DEFAULT EXAMPLE ###########################################################
-# Check this! The optimization is returning an energy value different from that
-# returned by the function designed to calculate the energy
+require(pedometrics)
+require(sp)
+require(rgeos)
+require(SpatialTools)
 data(meuse.grid)
 candi <- meuse.grid[, 1:2]
 coordinates(candi) <- ~ x + y
@@ -26,18 +28,17 @@ x.max <- diff(bbox(boundary)[1, ])
 y.max <- diff(bbox(boundary)[2, ])
 cutoff <- sqrt((x.max * x.max) + (y.max * y.max))
 points <- 100
-set.seed(2002)
+set.seed(2001)
 res <- optimPPL(points = points, candi = candi, lags = 7, lags.base = 2,
                 criterion = "distribution", lags.type = "exponential",
                 cutoff = cutoff, x.max = x.max, x.min = 40, y.max = y.max, 
-                y.min = 40, boundary = boundary, iterations = 1000, 
+                y.min = 40, boundary = boundary, iterations = 100, 
                 plotit = TRUE)
-str(res)
 pointsPerLag(points = res, lags = 7, lags.type = "exponential", lags.base = 2, 
              cutoff = cutoff)
+tail(attr(res, "energy.state"), 1) # 92
 objPoints(points = res, lags = 7, lags.type = "exponential", lags.base = 2,
           cutoff = cutoff, criterion = "distribution")
-tail(attr(res, "energy.state"), 1)
 # PREPARE DATA #################################################################
 data(meuse.grid)
 candi <- meuse.grid[, 1:2]
