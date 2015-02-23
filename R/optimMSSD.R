@@ -41,13 +41,27 @@
 #' @importFrom fields rdist
 #' @export
 #' @examples
+#' require(pedometrics)
 #' require(sp)
+#' require(rgeos)
+#' require(SpatialTools)
 #' data(meuse.grid)
-#' meuse.grid <- as.matrix(meuse.grid[, 1:2])
-#' meuse.grid <- matrix(cbind(c(1:dim(meuse.grid)[1]), meuse.grid), ncol = 3)
-#' points <- sample(c(1:dim(meuse.grid)[1]), 155)
-#' points <- meuse.grid[points, ]
-#' objMSSD(meuse.grid, points)
+#' candi <- meuse.grid[, 1:2]
+#' coordinates(candi) <- ~ x + y
+#' gridded(candi) <- TRUE
+#' boundary <- as(candi, "SpatialPolygons")
+#' boundary <- gUnionCascaded(boundary)
+#' candi <- coordinates(candi)
+#' candi <- matrix(cbind(c(1:dim(candi)[1]), candi), ncol = 3)
+#' x.max <- diff(bbox(boundary)[1, ])
+#' y.max <- diff(bbox(boundary)[2, ])
+#' points <- 100
+#' set.seed(2001)
+#' res <- optimMSSD(points = points, candi = candi, x.max = x.max, x.min = 40,
+#'                  y.max = y.max, y.min = 40, iterations = 100,
+#'                  boundary = boundary)
+#' tail(attr(res, "energy.state"), 1) # 11981.18
+#' objMSSD(candi = candi, points = res)
 # FUNCTION - MAIN ##############################################################
 optimMSSD <-
   function (points, candi, x.max, x.min, y.max, y.min, iterations = 10000,
