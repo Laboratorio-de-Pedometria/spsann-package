@@ -2,25 +2,25 @@
 #'
 #' Optimize a sample pattern for variogram estimation. A criterion is defined so
 #' that the optimized sample pattern has a given number of points or point-pairs 
-#' contributing to each lag distance class.
+#' contributing to each lag-distance class.
 #' 
 #' @template spJitter_doc
 #' @template spSANN_doc
 #' 
-#' @param lags Integer value. The number of lag distance classes. Alternatively,
-#' a vector of numeric values with the lower and upper limits of each lag
-#' distance class. The lowest value must be larger than zero, e.g. 0.0001.
+#' @param lags Integer value. The number of lag-distance classes. Alternatively,
+#' a vector of numeric values with the lower and upper limits of each 
+#' lag-distance class. The lowest value must be larger than zero, e.g. 0.0001.
 #' Defaults to \code{lags = 7}.
 #' 
-#' @param lags.type Character value. The type of lag distance classes, with
+#' @param lags.type Character value. The type of lag-distance classes, with
 #' options \code{"equidistant"} and \code{"exponential"}. Defaults to
 #' \code{lags.type = "exponential"}.
 #'
 #' @param lags.base Numeric value. Base of the exponential expression used to
-#' create exponentially spaced lag distance classes. Used only when 
+#' create exponentially spaced lag-distance classes. Used only when 
 #' \code{lags.type = "exponential"}. Defaults to \code{lags.base = 2}.
 #'
-#' @param cutoff Numeric value. The maximum distance up to which lag distance
+#' @param cutoff Numeric value. The maximum distance up to which lag-distance
 #' classes are created. Used only when \code{lags} is an integer value. 
 #'
 #' @param criterion Character value. The measure used to describe the
@@ -30,7 +30,7 @@
 #'
 #' @param pre.distri Numeric vector. The pre-specified distribution of points
 #' or point-pair with which the observed counts of points or point-pairs per
-#' lag distance class is compared. Used only when
+#' lag-distance class is compared. Used only when
 #' \code{criterion = "distribution"}. Defaults to a uniform distribution.
 #'
 #' @details
@@ -48,7 +48,7 @@
 #' implemented changing the arguments \code{lags}, \code{lags.base} and
 #' \code{pre.distri}.
 #' 
-#' \strong{Type of lags}: Two types of lag distance classes can be created by
+#' \strong{Type of lags}: Two types of lag-distance classes can be created by
 #' default. The first are evenly spaced lags (\code{lags.type = "equidistant"}).
 #' They are created by simply dividing the distance interval from 0.0001 to
 #' \code{cutoff} by the required number of lags. The minimum value of 0.0001
@@ -61,7 +61,7 @@
 #' \strong{Criteria}: There are two optimizing criteria implemented. The first
 #' is called using \code{criterion = "distribution"} and is used to minimize the
 #' sum of differences between a pre-specified distribution and the observed 
-#' distribution of points or point-pairs per lag distance class. The second
+#' distribution of points or point-pairs per lag-distance class. The second
 #' criterion is called using \code{criterion = "minimum"}. It corresponds to
 #' maximizing the minimum number of points or point-pairs observed over all lag
 #' distance classes.
@@ -355,7 +355,7 @@ objPoints <-
                             criterion = criterion, pre.distri = pre.distri)
     return (res)
   }
-# FUNCTION - POINTS PER LAG DISTANCE CLASS #####################################
+# FUNCTION - POINTS PER lag-distance CLASS #####################################
 #' @rdname optimPPL
 #' @export
 pointsPerLag <-
@@ -455,7 +455,7 @@ pointsPerLag <-
       }
     return (res)
   }
-# INTERNAL FUNCTION - NUMBER OF POINTS PER LAG DISTANCE CLASS ##################
+# INTERNAL FUNCTION - NUMBER OF POINTS PER lag-distance CLASS ##################
 # It is 3 times faster to use the for loop with function 'which' than when
 # using 'apply' with functions 'table' and 'cut'.
 # apply(X = dist.mat, 1, FUN = function (X) table(cut(X, breaks = lags)))
@@ -468,7 +468,7 @@ pointsPerLag <-
   }
   return (ppl)
 }
-# INTERNAL FUNCTION - BREAKS OF THE LAG DISTANCE CLASSES #######################
+# INTERNAL FUNCTION - BREAKS OF THE lag-distance CLASSES #######################
 .getLagBreaks <-
   function (lags, lags.type, cutoff, lags.base) {
     if (length(lags) == 1) {
@@ -482,7 +482,7 @@ pointsPerLag <-
     }
     return (lags)
   }
-# # POINT PAIRS PER LAG DISTANCE CLASS
+# # POINT PAIRS PER lag-distance CLASS
 # .pairsPerLag <-
 #   function (points, lags, lags.type = "equidistant", lags.base = 2,
 #             cutoff = NULL) {
@@ -520,7 +520,7 @@ pointsPerLag <-
 #                       pairs = pairs[-length(lags)], lag.upper = lags[-1])
 #     return (res)
 #   }
-# # OBJECIVE FUNCTION - POINT PAIRS PER LAG DISTANCE CLASS
+# # OBJECIVE FUNCTION - POINT PAIRS PER lag-distance CLASS
 # .objPairs <-
 #   function (points, lags, lags.type = "equidistant", lags.base = 2,
 #             cutoff = NULL, criterion = "minimum", pre.distri) {
