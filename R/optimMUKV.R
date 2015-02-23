@@ -192,7 +192,8 @@ optimMUKV <-
         best_old_sm     <- old_sm
       }
       # Plotting
-      if (plotit && any(round(seq(1, iterations, 10)) == k)) {
+      #if (plotit && any(round(seq(1, iterations, 10)) == k)) {
+      if (plotit && pedometrics::is.numint(k / 10)) {
         .spSANNplot(energy0 = energy0, energies = energies, k = k, 
                     acceptance = acceptance, accept_probs = accept_probs,
                     boundary = boundary, new_conf = new_conf[, 2:3], 
