@@ -32,6 +32,10 @@
 #' or point-pair with which the observed counts of points or point-pairs per
 #' lag-distance class is compared. Used only when
 #' \code{criterion = "distribution"}. Defaults to a uniform distribution.
+#' 
+#' @param pairs Logical value. Should the sample pattern be optimized regarding
+#' the number of point-pairs per lag-distance class? Defaults to 
+#' \code{pairs = FALSE}.
 #'
 #' @details
 #' \strong{Distances}: Euclidean distances between points are calculated. This
@@ -143,7 +147,8 @@
 optimPPL <-
   function (points, candi, lags = 7, lags.type = "exponential",
             lags.base = 2, cutoff = NULL, criterion = "distribution",
-            pre.distri = NULL, x.max, x.min, y.max, y.min, iterations = 10000,
+            pre.distri = NULL, pairs = FALSE,
+            x.max, x.min, y.max, y.min, iterations = 10000,
             acceptance = list(initial = 0.99, cooling = iterations / 10),
             stopping = list(max.count = iterations / 10), plotit = TRUE,
             boundary, progress = TRUE, verbose = TRUE) {
@@ -179,11 +184,16 @@ optimPPL <-
     conf0 <- points
     old_conf <- conf0
     
-    # Initial energy state
+    # Initial energy state: points or point-pairs
     dm <- SpatialTools::dist1(conf0[, 2:3])
-    ppl <- .getPointsPerLag(lags = lags, dist.mat = dm)
-    energy0 <- .objPointsPerLag(ppl = ppl, n.lags = n_lags, n.pts = n_pts,
-                                criterion = criterion, pre.distri = pre.distri)
+    if (pairs) {
+      
+    } else {
+      ppl <- .getPointsPerLag(lags = lags, dist.mat = dm)
+      energy0 <- .objPointsPerLag(ppl = ppl, n.lags = n_lags, n.pts = n_pts,
+                                  criterion = criterion, 
+                                  pre.distri = pre.distri)
+    }
     
     # other settings for the simulated annealing algorithm
     old_dm <- dm
@@ -209,32 +219,36 @@ optimPPL <-
       x.max <- x_max0 - (k / iterations) * (x_max0 - x.min)
       y.max <- y_max0 - (k / iterations) * (y_max0 - y.min)
       
-      # Update the distance matrix using a Cpp function
-      new_dm <- .updatePPLCpp(x = new_conf[, 2:3], dm = old_dm, idx = wp)
-      
-      # Recalculate the full distance matrix
-      #new_dm <- SpatialTools::dist1(coords = new_conf[, 2:3])
-      
-      # Update the distance matrix in R
-      #x2 <- matrix(new_conf[wp, 2:3], nrow = 1)
-      #x2 <- SpatialTools::dist2(coords = new_conf[, 2:3], coords2 = x2)
-      #new_dm <- old_dm
-      #new_dm[wp, ] <- x2
-      #new_dm[, wp] <- x2
-      
-      # Update the energy state
-      ppl <- .getPointsPerLag(lags = lags, dist.mat = new_dm)
-      new_energy <- .objPointsPerLag(ppl = ppl, n.lags = n_lags, n.pts = n_pts,
-                                     criterion = criterion, 
-                                     pre.distri = pre.distri)      
-      
-      # ASR: This is to test the 'update' function
-      #a <- objPoints(points = new_conf, lags = lags, criterion = criterion)
-      #if (new_energy != a) {
-      # print(new_energy)
-      # print(a)
-      # break
-      #}
+      if (pairs) {
+        
+      } else {
+        # Update the distance matrix using a Cpp function
+        new_dm <- .updatePPLCpp(x = new_conf[, 2:3], dm = old_dm, idx = wp)
+        
+        # Recalculate the full distance matrix
+        #new_dm <- SpatialTools::dist1(coords = new_conf[, 2:3])
+        
+        # Update the distance matrix in R
+        #x2 <- matrix(new_conf[wp, 2:3], nrow = 1)
+        #x2 <- SpatialTools::dist2(coords = new_conf[, 2:3], coords2 = x2)
+        #new_dm <- old_dm
+        #new_dm[wp, ] <- x2
+        #new_dm[, wp] <- x2
+        
+        # Update the energy state
+        ppl <- .getPointsPerLag(lags = lags, dist.mat = new_dm)
+        new_energy <- .objPointsPerLag(ppl = ppl, n.lags = n_lags, 
+                                       n.pts = n_pts, criterion = criterion, 
+                                       pre.distri = pre.distri)      
+        
+        # ASR: This is to test the 'update' function
+        #a <- objPoints(points = new_conf, lags = lags, criterion = criterion)
+        #if (new_energy != a) {
+        # print(new_energy)
+        # print(a)
+        # break
+        #}
+      }
       
       # Evaluate the new system configuration
       random_prob <- runif(1)
@@ -385,8 +399,14 @@ pointsPerLag <-
   }
 # INTERNAL FUNCTION - CHECK ARGUMENTS ##########################################
 .optimPPLcheck <-
-  function (lags, lags.type, lags.base, cutoff, criterion, pre.distri) {
+  function (lags, lags.type, lags.base, cutoff, criterion, pre.distri, pairs) {
 
+    # pairs
+    if (!is.logical(pairs)) {
+      res <- paste("'pairs' must be a logical value")
+      return (res)
+    }
+    
     # lags and cutoff
     if (length(lags) == 1 && is.null(cutoff)) {
       res <- paste("'cutoff' is mandatory when the lag intervals are not set")
@@ -440,7 +460,7 @@ pointsPerLag <-
       }
     }
   }
-# INTERNAL FUNCTION - CALCULATE THE CRITERION VALUE ############################
+# INTERNAL FUNCTION - CALCULATE THE POINT CRITERION VALUE ######################
 .objPointsPerLag <-
   function (ppl, n.lags, n.pts, criterion, pre.distri = NULL) {
     if (criterion == "distribution") {
@@ -455,7 +475,7 @@ pointsPerLag <-
       }
     return (res)
   }
-# INTERNAL FUNCTION - NUMBER OF POINTS PER lag-distance CLASS ##################
+# INTERNAL FUNCTION - NUMBER OF POINTS PER LAG-DISTANCE CLASS ##################
 # It is 3 times faster to use the for loop with function 'which' than when
 # using 'apply' with functions 'table' and 'cut'.
 # apply(X = dist.mat, 1, FUN = function (X) table(cut(X, breaks = lags)))
