@@ -23,34 +23,32 @@
 #' @param cutoff Numeric value. The maximum distance up to which lag-distance
 #' classes are created. Used only when \code{lags} is an integer value. 
 #'
-#' @param criterion Character value. The measure used to describe the
-#' energy state of the current system configuration, with options 
-#' \code{"minimum"} and \code{"distribution"}. Defaults to 
-#' \code{objective = "distribution"}.
+#' @param criterion Character value. The feature used to describe the
+#' energy state of the system configuration, with options \code{"minimum"} and
+#' \code{"distribution"}. Defaults to \code{objective = "distribution"}.
 #'
-#' @param pre.distri Numeric vector. The pre-specified distribution of points
-#' or point-pair with which the observed counts of points or point-pairs per
-#' lag-distance class is compared. Used only when
-#' \code{criterion = "distribution"}. Defaults to a uniform distribution.
+#' @param distri Numeric vector. The distribution of points or point-pairs per
+#' lag-distance class that should be attained at the end of the optimization. 
+#' Used only when \code{criterion = "distribution"}. Defaults to a uniform
+#' distribution.
 #' 
 #' @param pairs Logical value. Should the sample pattern be optimized regarding
 #' the number of point-pairs per lag-distance class? Defaults to 
 #' \code{pairs = FALSE}.
 #'
 #' @details
-#' \strong{Distances}: Euclidean distances between points are calculated. This
-#' computation requires the coordinates to be projected. The user is responsible
-#' for making sure that this requirement is attained.
+#' \strong{Distance}: Euclidean distances between points are used. This 
+#' requires the coordinates to be projected. The user is responsible for making
+#' sure that this requirement is met.
 #' 
 #' \strong{Distribution}: Using the default uniform distribution means that the
-#' number of point-pairs per lag is equal to 
-#' \eqn{n \times (n - 1) / (2 \times lag)}, where \eqn{n} is the total number
-#' of points and \eqn{lag} is the number of lags. Using the default uniform
-#' distribution means that the number of points per lag is equal to the total
-#' number of points. This is the same as expecting that each point contributes
-#' to every lag. Distributions other than the available options can be easily
-#' implemented changing the arguments \code{lags}, \code{lags.base} and
-#' \code{pre.distri}.
+#' number of point-pairs per lag-distance class (\code{pairs = TRUE}) is equal
+#' to \eqn{n \times (n - 1) / (2 \times lag)}, where \eqn{n} is the total number
+#' of points and \eqn{lag} is the number of lags. If \code{pairs = FALSE}, then
+#' it means that the number of points per lag is equal to the total number of
+#' points. This is the same as expecting that each point contributes to every
+#' lag. Distributions other than the available options can be easily 
+#' implemented changing the arguments \code{lags} and \code{distri}.
 #' 
 #' \strong{Type of lags}: Two types of lag-distance classes can be created by
 #' default. The first are evenly spaced lags (\code{lags.type = "equidistant"}).
@@ -93,6 +91,9 @@
 #' Marler, R. T.; Arora, J. S. Function-transformation methods for
 #' multi-objective optimization. \emph{Engineering Optimization}. v. 37, p.
 #' 551-570, 2005.
+#' 
+#' Pettitt, A. N. & McBratney, A. B. Sampling designs for estimating spatial
+#' variance components. \emph{Applied Statistics}. v. 42, p. 185, 1993.
 #'
 #' Russo, D. Design of an optimal sampling network for estimating the variogram.
 #' \emph{Soil Science Society of America Journal}. v. 48, p. 708-716, 1984.
@@ -147,7 +148,7 @@
 optimPPL <-
   function (points, candi, lags = 7, lags.type = "exponential",
             lags.base = 2, cutoff = NULL, criterion = "distribution",
-            pre.distri = NULL, pairs = FALSE,
+            distri = NULL, pairs = FALSE,
             x.max, x.min, y.max, y.min, iterations = 10000,
             acceptance = list(initial = 0.99, cooling = iterations / 10),
             stopping = list(max.count = iterations / 10), plotit = TRUE,
@@ -155,12 +156,16 @@ optimPPL <-
     
     # Check arguments
     # http://www.r-bloggers.com/a-warning-about-warning/
-    check <- .spSANNcheck(points, candi, x.max, x.min, y.max, y.min,
-                          iterations, acceptance, stopping, plotit, boundary,
-                          progress, verbose)
+    check <- .spSANNcheck(points = points, candi = candi, x.max = x.max, 
+                          x.min = x.min, y.max = y.max, y.min = y.min, 
+                          iterations = iterations, acceptance = acceptance,
+                          stopping = stopping, plotit = plotit, 
+                          boundary = boundary, progress = progress, 
+                          verbose = verbose)
     if (!is.null(check)) stop (check, call. = FALSE)
-    check <- .optimPPLcheck(lags, lags.type, lags.base, cutoff, criterion,
-                            pre.distri)
+    check <- .optimPPLcheck(lags = lags, lags.type = lags.type, pairs = pairs,
+                            lags.base = lags.base, cutoff = cutoff, 
+                            criterion = criterion, distri = distri)
     if (!is.null(check)) stop (check, call. = FALSE)
     
     if (plotit) {
@@ -174,7 +179,7 @@ optimPPL <-
     n_pts <- nrow(points)
     
     # Prepare lags
-    if (length(lags) >= 3) {
+    if (length(lags) >= 2) {
       n_lags <- length(lags) - 1
     } else {
       n_lags <- lags
@@ -185,17 +190,19 @@ optimPPL <-
     old_conf <- conf0
     
     # Initial energy state: points or point-pairs
+    # ASR: implement a distance function in Cpp (pedometrics)
     dm <- SpatialTools::dist1(conf0[, 2:3])
     if (pairs) {
-      
+      ppl <- .getPairsPerLag(lags = lags, n.lags = n_lags, dist.mat = dm)
+      energy0 <- .objPairsPerLag(ppl = ppl, n.lags = n_lags, n.pts = n_pts,
+                                 criterion = criterion, distri = distri)
     } else {
-      ppl <- .getPointsPerLag(lags = lags, dist.mat = dm)
+      ppl <- .getPointsPerLag(lags = lags, n.lags = n_lags, dist.mat = dm)
       energy0 <- .objPointsPerLag(ppl = ppl, n.lags = n_lags, n.pts = n_pts,
-                                  criterion = criterion, 
-                                  pre.distri = pre.distri)
+                                  criterion = criterion, distri = distri)
     }
     
-    # other settings for the simulated annealing algorithm
+    # Other settings for the simulated annealing algorithm
     old_dm <- dm
     best_dm <- dm
     count <- 0
@@ -219,35 +226,29 @@ optimPPL <-
       x.max <- x_max0 - (k / iterations) * (x_max0 - x.min)
       y.max <- y_max0 - (k / iterations) * (y_max0 - y.min)
       
+      # Update the distance matrix using a Cpp function
+      new_dm <- .updatePPLCpp(x = new_conf[, 2:3], dm = old_dm, idx = wp)
+      
+      # Recalculate the full distance matrix
+      #new_dm <- SpatialTools::dist1(coords = new_conf[, 2:3])
+      
+      # Update the distance matrix in R
+      #x2 <- matrix(new_conf[wp, 2:3], nrow = 1)
+      #x2 <- SpatialTools::dist2(coords = new_conf[, 2:3], coords2 = x2)
+      #new_dm <- old_dm
+      #new_dm[wp, ] <- x2
+      #new_dm[, wp] <- x2
+      
+      # Update the energy state: points or point-pairs?
       if (pairs) {
-        
+        ppl <- .getPairsPerLag(lags = lags, n.lags = n_lags, dist.mat = new_dm)
+        new_energy <- .objPairsPerLag(ppl = ppl, n.lags = n_lags, n.pts = n_pts,
+                                      criterion = criterion, distri = distri)
       } else {
-        # Update the distance matrix using a Cpp function
-        new_dm <- .updatePPLCpp(x = new_conf[, 2:3], dm = old_dm, idx = wp)
-        
-        # Recalculate the full distance matrix
-        #new_dm <- SpatialTools::dist1(coords = new_conf[, 2:3])
-        
-        # Update the distance matrix in R
-        #x2 <- matrix(new_conf[wp, 2:3], nrow = 1)
-        #x2 <- SpatialTools::dist2(coords = new_conf[, 2:3], coords2 = x2)
-        #new_dm <- old_dm
-        #new_dm[wp, ] <- x2
-        #new_dm[, wp] <- x2
-        
-        # Update the energy state
-        ppl <- .getPointsPerLag(lags = lags, dist.mat = new_dm)
+        ppl <- .getPointsPerLag(lags = lags, n.lags = n_lags, dist.mat = new_dm)
         new_energy <- .objPointsPerLag(ppl = ppl, n.lags = n_lags, 
                                        n.pts = n_pts, criterion = criterion, 
-                                       pre.distri = pre.distri)      
-        
-        # ASR: This is to test the 'update' function
-        #a <- objPoints(points = new_conf, lags = lags, criterion = criterion)
-        #if (new_energy != a) {
-        # print(new_energy)
-        # print(a)
-        # break
-        #}
+                                       distri = distri)
       }
       
       # Evaluate the new system configuration
@@ -333,73 +334,97 @@ optimPPL <-
 # FUNCTION - CALCULATE THE CRITERION VALUE #####################################
 #' @rdname optimPPL
 #' @export
-objPoints <-
+objPPL <-
   function (points, candi, lags = 7, lags.type = "exponential",
             lags.base = 2, cutoff = NULL, criterion = "distribution",
-            pre.distri = NULL) {
+            distri = NULL, pairs = FALSE) {
 
     # Prepare points
-    if (is.integer(points) || is.numint(points)) {
-      n_candi <- nrow(candi)
-      if (length(points) > 1) {
-        n_pts <- length(points)
-        points <- candi[points, ]
-      }
-      if (length(points) == 1) {
-        n_pts <- points
-        points <- sample(1:n_candi, n_pts)
-        points <- candi[points, ] 
-      }
-    } else {
-      n_pts <- nrow(points)
-    }
+    if (!missing(candi)) n_candi <- nrow(candi)
+    points <- .spsannPoints(points = points, candi = candi, n.candi = n_candi)
+    n_pts <- nrow(points)
+    #     if (is.integer(points) || is.numint(points)) {
+    #       n_candi <- nrow(candi)
+    #       if (length(points) > 1) {
+    #         n_pts <- length(points)
+    #         points <- candi[points, ]
+    #       }
+    #       if (length(points) == 1) {
+    #         n_pts <- points
+    #         points <- sample(1:n_candi, n_pts)
+    #         points <- candi[points, ] 
+    #       }
+    #     } else {
+    #       n_pts <- nrow(points)
+    #     }
 
     # Prepare lags
-    if (length(lags) >= 3) {
+    if (length(lags) >= 2) {
       n_lags <- length(lags) - 1
     } else {
       n_lags <- lags
       lags <- .getLagBreaks(lags = lags, lags.type = lags.type, 
                             cutoff = cutoff, lags.base = lags.base)
     }
-
-    dm <- as.matrix(dist(points[, 2:3], method = "euclidean"))
-    ppl <- .getPointsPerLag(lags = lags, dist.mat = dm)
-    res <- .objPointsPerLag(ppl = ppl, n.lags = n_lags, n.pts = n_pts, 
-                            criterion = criterion, pre.distri = pre.distri)
+    
+    # Distance matrix and energy state
+    dm <- SpatialTools::dist1(points[, 2:3])
+    if (pairs) {
+      ppl <- .getPairsPerLag(lags = lags, n.lags = n_lags, dist.mat = dm)
+      res <- .objPairsPerLag(ppl = ppl, n.lags = n_lags, n.pts = n_pts, 
+                             criterion = criterion, distri = distri)
+    } else {
+      ppl <- .getPointsPerLag(lags = lags, n.lags = n_lags, dist.mat = dm)
+      res <- .objPointsPerLag(ppl = ppl, n.lags = n_lags, n.pts = n_pts, 
+                              criterion = criterion, distri = distri)
+    }
     return (res)
   }
-# FUNCTION - POINTS PER lag-distance CLASS #####################################
+# FUNCTION - POINTS PER LAG-DISTANCE CLASS #####################################
 #' @rdname optimPPL
 #' @export
-pointsPerLag <-
+countPPL <-
   function (points, candi, lags = 7, lags.type = "exponential",
-            lags.base = 2, cutoff = NULL) {
+            lags.base = 2, cutoff = NULL, pairs = FALSE) {
 
     # Prepare points
-    if (is.integer(points) || is.numint(points)) {
-      n_pts <- points
-      n_candi <- nrow(candi)
-      points <- sample(1:n_candi, n_pts)
-      points <- candi[points, ]
-    } else {
-      n_pts <- nrow(points)
-    }
+    if (!missing(candi)) n_candi <- nrow(candi)
+    points <- .spsannPoints(points = points, candi = candi, n.candi = n_candi)
+    n_pts <- nrow(points)
+    #     if (is.integer(points) || is.numint(points)) {
+    #       n_pts <- points
+    #       n_candi <- nrow(candi)
+    #       points <- sample(1:n_candi, n_pts)
+    #       points <- candi[points, ]
+    #     } else {
+    #       n_pts <- nrow(points)
+    #     }
 
     # Prepare lags
-    if (length(lags) == 1) {
-      lags <- .getLagBreaks(lags, lags.type, cutoff, lags.base)
+    if (length(lags) >= 2) {
+      n_lags <- length(lags) - 1
+    } else {
+      n_lags <- lags
+      lags <- .getLagBreaks(lags = lags, lags.type = lags.type, cutoff = cutoff,
+                            lags.base = lags.base)
     }
-
-    dm <- as.matrix(dist(points[, 2:3], method = "euclidean"))
-    res <- .getPointsPerLag(lags, dm)
-    res <- data.frame(lag.lower = lags[-length(lags)], points = res,
-                      lag.upper = lags[-1])
+    
+    # Distance matrix and counts
+    dm <- SpatialTools::dist1(points[, 2:3])
+    if (pairs) {
+      res <- .getPairsPerLag(lags = lags, n.lags = n_lags,  dist.mat = dm)
+      res <- data.frame(lag.lower = lags[-length(lags)], lag.upper = lags[-1],
+                        pairs = res)
+    } else {
+      res <- .getPointsPerLag(lags = lags, n.lags = n_lags, dist.mat = dm)
+      res <- data.frame(lag.lower = lags[-length(lags)], lag.upper = lags[-1],
+                        points = res)
+    }
     return (res)
   }
 # INTERNAL FUNCTION - CHECK ARGUMENTS ##########################################
 .optimPPLcheck <-
-  function (lags, lags.type, lags.base, cutoff, criterion, pre.distri, pairs) {
+  function (lags, lags.type, lags.base, cutoff, criterion, distri, pairs) {
 
     # pairs
     if (!is.logical(pairs)) {
@@ -445,22 +470,22 @@ pointsPerLag <-
       return (res)
     }
 
-    # pre.distri
-    if (!is.null(pre.distri)) {
-      if (!is.numeric(pre.distri)) {
-        res <- paste("'pre.distri' must be a numeric vector")
+    # distri
+    if (!is.null(distri)) {
+      if (!is.numeric(distri)) {
+        res <- paste("'distri' must be a numeric vector")
         return (res)
       }
       if (length(lags) == 1) {
-        if (length(pre.distri) != lags) {
-          res <- paste("'pre.distri' must be of length ", lags, sep = "")
+        if (length(distri) != lags) {
+          res <- paste("'distri' must be of length ", lags, sep = "")
           return (res)
         }
       }
       if (length(lags) > 2) {
         nl <- length(lags) - 1
-        if (length(pre.distri) != nl) {
-          res <- paste("'pre.distri' must be of length ", nl, sep = "")
+        if (length(distri) != nl) {
+          res <- paste("'distri' must be of length ", nl, sep = "")
           return (res)
         }
       }
@@ -468,12 +493,12 @@ pointsPerLag <-
   }
 # INTERNAL FUNCTION - CALCULATE THE POINT CRITERION VALUE ######################
 .objPointsPerLag <-
-  function (ppl, n.lags, n.pts, criterion, pre.distri = NULL) {
+  function (ppl, n.lags, n.pts, criterion, distri = NULL) {
     if (criterion == "distribution") {
-      if (is.null(pre.distri)) {
-        pre.distri <- rep(n.pts, n.lags)
+      if (is.null(distri)) {
+        distri <- rep(n.pts, n.lags)
       }
-      res <- sum(pre.distri - ppl)
+      res <- sum(distri - ppl)
       } else {
         if (criterion == "minimum") {
           res <- n.pts / (min(ppl) + 1)
@@ -486,9 +511,9 @@ pointsPerLag <-
 # using 'apply' with functions 'table' and 'cut'.
 # apply(X = dist.mat, 1, FUN = function (X) table(cut(X, breaks = lags)))
 # apply(X = ppl, 1, FUN = function (X) sum(X != 0))
-.getPointsPerLag <- function (lags, dist.mat) {
+.getPointsPerLag <- function (lags, n.lags, dist.mat) {
   ppl <- vector()
-  for (i in 1:c(length(lags) - 1)) {
+  for (i in 1:n.lags) {
     n <- which(dist.mat > lags[i] & dist.mat <= lags[i + 1], arr.ind = TRUE)
     ppl[i] <- length(unique(c(n)))
   }
@@ -508,87 +533,29 @@ pointsPerLag <-
     }
     return (lags)
   }
-# # POINT PAIRS PER lag-distance CLASS
-# .pairsPerLag <-
-#   function (points, lags, lags.type = "equidistant", lags.base = 2,
-#             cutoff = NULL) {
-#     if (missing(points)) {
-#       stop ("'points' is a mandatory argument")
-#     }
-#     if (missing(lags) || !is.numeric(lags)) {
-#       stop ("'lags' should be a numeric value or vector")
-#     }
-#     if (length(lags) == 1 && is.null(cutoff)) {
-#       stop ("'cutoff' is a mandatory when the lag intervals are not specified")
-#     }
-#     if (length(lags) > 1 && !is.null(cutoff)) {
-#       stop ("'cutoff' cannot be used when the lag intervals are specified")
-#     }
-#     d <- dist(points, method = "euclidean")
-#     if (length(lags) == 1) {
-#       if (lags.type == "equidistant") {
-#         lags <- seq(0, cutoff, length.out = lags + 1)
-#       }
-#       if (lags.type == "exponential") {
-#         idx <- vector()
-#         for (i in 1:lags - 1) {
-#           idx[i] <- lags.base ^ i
-#         }
-#         lags <- c(0, rev(cutoff / idx), cutoff)
-#       }
-#     }
-#     pairs <- vector()
-#     for (i in 1:length(lags)) {
-#       n <- which(d > lags[i] & d <= lags[i + 1])
-#       pairs[i] <- length(n)
-#     }
-#     res <- data.frame(lag.lower = lags[-length(lags)],
-#                       pairs = pairs[-length(lags)], lag.upper = lags[-1])
-#     return (res)
-#   }
-# # OBJECIVE FUNCTION - POINT PAIRS PER lag-distance CLASS
-# .objPairs <-
-#   function (points, lags, lags.type = "equidistant", lags.base = 2,
-#             cutoff = NULL, criterion = "minimum", pre.distri) {
-#     if (missing(points)) {
-#       stop ("'points' is a mandatory argument")
-#     }
-#     if (missing(lags) || !is.numeric(lags)) {
-#       stop ("'lags' should be a numeric value or vector")
-#     }
-#     if (length(lags) == 1 && is.null(cutoff)) {
-#       stop ("'cutoff' is a mandatory when the lag intervals are not specified")
-#     }
-#     if (length(lags) > 1 && !is.null(cutoff)) {
-#       stop ("'cutoff' cannot be used when the lag intervals are specified")
-#     }
-#     n_pts <- dim(points)[1]
-#     if (length(lags) > 1) {
-#       n_lags <- length(lags) - 1
-#     } else {
-#       n_lags <- lags
-#     }
-#     if (criterion == "distribution") {
-#       if (!missing(pre.distri)) {
-#         if (!is.numeric(pre.distri)) {
-#           stop ("pre.distri should be of class numeric")
-#         }
-#         if (length(pre.distri) != n_lags) {
-#           stop ("the length of 'pre.distri' should match the number of lags")
-#         }
-#       } else {
-#         pre.distri <- rep(n_pts * (n_pts - 1) / (2 * n_lags), n_lags)
-#       }
-#       pairs <- pairsPerLag(points, lags = lags, lags.type = lags.type,
-#                            lags.base = lags.base, cutoff = cutoff)
-#       res <- sum(pre.distri - pairs$pairs)
-#       return (res)
-#     }
-#     if (criterion == "minimum") {
-#       pairs <- pairsPerLag(points, lags = lags, cutoff = cutoff,
-#                            lags.type = lags.type, lags.base = lags.base)
-#       res <- 10000 * (min(pairs$pairs) + 1)
-#       return (res)
-#     }
-#   }
-# # End!
+# INTERNAL FUNCTION - NUMBER OF POINT-PAIRS PER LAG-DISTANCE CLASS #############
+.getPairsPerLag <-
+  function (lags, n.lags, dist.mat) {
+    pairs <- vector()
+    for (i in 1:n.lags) {
+      n <- which(dist.mat > lags[i] & dist.mat <= lags[i + 1])
+      pairs[i] <- length(n)
+    }
+    return (pairs)
+  }
+# INTERNAL FUNCTION - CALCULATE THE POINT-PAIR CRITERION VALUE #################
+.objPairsPerLag <-
+  function (ppl, n.lags, n.pts, criterion, distri = NULL) {
+    if (criterion == "distribution") {
+      if (is.null(distri)) {
+        distri <- rep(n.pts * (n.pts - 1) / (2 * n.lags), n.lags)
+      }
+      res <- sum(abs(distri - ppl))
+    } else {
+      if (criterion == "minimum") {
+        a <- n.pts * (n.pts - 1) / (2 * n.lags)
+        res <- a / (min(ppl) + 1)
+      }
+    }
+    return (res)
+  }
