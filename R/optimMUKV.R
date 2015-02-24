@@ -19,7 +19,7 @@
 #'
 #' @param krige.stat Character value defining the statistic that shoul be used
 #' to summarize the kriging variance. Available options are \code{"mean"} and
-#' \code{"max} for the mean and maximum krigig variance, respectively.
+#' \code{"max"} for the mean and maximum krigig variance, respectively.
 #' Defaults to \code{krige.stat = "mean"}.
 #'
 #' @return
@@ -47,7 +47,7 @@
 #' @concept simulated annealing
 #' @importFrom plyr is.formula
 #' @export
-#' @examples
+#' 
 # FUNCTION - MAIN ##############################################################
 optimMUKV <-
   function (points, candi, covars, equation = z ~ 1, model, krige.stat = "mean",
