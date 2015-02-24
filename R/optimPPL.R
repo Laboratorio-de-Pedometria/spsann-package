@@ -9,8 +9,8 @@
 #' 
 #' @param lags Integer value. The number of lag-distance classes. Alternatively,
 #' a vector of numeric values with the lower and upper limits of each 
-#' lag-distance class. The lowest value must be larger than zero, e.g. 0.0001.
-#' Defaults to \code{lags = 7}.
+#' lag-distance class. The lowest value must be larger than zero. Defaults to
+#' \code{lags = 7}.
 #' 
 #' @param lags.type Character value. The type of lag-distance classes, with
 #' options \code{"equidistant"} and \code{"exponential"}. Defaults to
@@ -408,15 +408,22 @@ pointsPerLag <-
     }
     
     # lags and cutoff
-    if (length(lags) == 1 && is.null(cutoff)) {
-      res <- paste("'cutoff' is mandatory when the lag intervals are not set")
-      return (res)
+    if (length(lags) == 1) {
+      if (is.null(cutoff)) {
+        res <- paste("'cutoff' is mandatory when the lag intervals are not set")
+        return (res)
+      }
+    } else {
+      if (!is.null(cutoff)) {
+        res <- paste("'cutoff' cannot be used when the lag intervals are set")
+        return (res)
+      }
+      if (lags[1] == 0) {
+        res <- paste("lowest lag value must be larger than zero")
+        return (res)
+      }
     }
-    if (length(lags) > 1 && !is.null(cutoff)) {
-      res <- paste("'cutoff' cannot be used when the lag intervals are set")
-      return (res)
-    }
-
+    
     # lags.type
     lt <- c("equidistant", "exponential")
     lt <- is.na(any(match(lt, lags.type)))
@@ -432,8 +439,7 @@ pointsPerLag <-
     }
 
     # criterion
-    cr <- c("distribution", "minimum")
-    cr <- is.na(any(match(cr, criterion)))
+    cr <- is.na(any(match(criterion, c("distribution", "minimum"))))
     if (cr) {
       res <- paste("'criterion = ", criterion, "' is not supported", sep = "")
       return (res)
