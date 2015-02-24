@@ -128,3 +128,38 @@ objPPL(points = points, candi = candi, lags = lags, lags.type = lags.type,
        pairs = pairs, lags.base = lags.base, cutoff = cutoff, 
        criterion = criterion)
 sum(length(points) - res$points)
+#
+# 3) Unit test #################################################################
+rm(list = ls())
+gc()
+source('R/spSANNtools.R')
+source('R/spJitter.R')
+source('R/optimPPL.R')
+Rcpp::sourceCpp('src/spJitterCpp.cpp')
+Rcpp::sourceCpp('src/updatePPLCpp.cpp')
+data(meuse.grid)
+candi <- meuse.grid[, 1:2]
+coordinates(candi) <- ~ x + y
+gridded(candi) <- TRUE
+boundary <- as(candi, "SpatialPolygons")
+boundary <- gUnionCascaded(boundary)
+candi <- coordinates(candi)
+candi <- matrix(cbind(1:nrow(candi), candi), ncol = 3)
+x.max <- diff(bbox(boundary)[1, ])
+y.max <- diff(bbox(boundary)[2, ])
+x.min <- 40
+y.min <- 40
+cutoff <- sqrt((x.max * x.max) + (y.max * y.max))
+points <- 100
+lags <- 1
+lags.base <- 2
+criterion <- "distribution"
+lags.type <- "exponential"
+pairs <- FALSE
+set.seed(2001)
+countPPL(points = points, candi = candi, lags = lags, lags.type = lags.type,
+         lags.base = lags.base, cutoff = cutoff, pairs = pairs)
+pairs <- TRUE
+set.seed(2001)
+countPPL(points = points, candi = candi, lags = lags, lags.type = lags.type,
+         lags.base = lags.base, cutoff = cutoff, pairs = pairs)

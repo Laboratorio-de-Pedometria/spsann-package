@@ -62,26 +62,22 @@
 #'
 #' \strong{Criteria}: There are two optimizing criteria implemented. The first
 #' is called using \code{criterion = "distribution"} and is used to minimize the
-#' sum of differences between a pre-specified distribution and the observed 
-#' distribution of points or point-pairs per lag-distance class. The second
-#' criterion is called using \code{criterion = "minimum"}. It corresponds to
-#' maximizing the minimum number of points or point-pairs observed over all lag
-#' distance classes.
+#' sum of the absolute differences between a pre-specified distribution and the
+#' observed distribution of points or point-pairs per lag-distance class. The
+#' second criterion is called using \code{criterion = "minimum"}. It corresponds
+#' to maximizing the minimum number of points or point-pairs observed over all
+#' lag-distance classes.
 #' 
 #' @return
 #' \code{optimPPL} returns a matrix: the optimized sample pattern with
 #' the evolution of the energy state during the optimization as an attribute.
 #'
-#' \code{pointsPerLag} and \code{pairsPerLag} return a data.frame with three
-#' columns: a) the lower and b) upper limits of each lag, and c) the number of
-#' points or point-pairs per lag.
+#' \code{countPPL} returns a data.frame with three columns: a) the lower and b)
+#' upper limits of each lag-distance class, and c) the number of points or 
+#' point-pairs per lag-distance class.
 #'
-#' \code{objPoints} and \code{objPairs} return a numeric value depending on the
-#' choice of \code{criterion}. If \code{criterion = "distribution"}, the sum of
-#' the differences between the pre-specified and observed distribution of counts
-#' of points or point-pairs per lag. If \code{criterion = "minimum"}, the
-#' inverse of the minimum count of points or point pairs over all lags
-#' multiplied by a constant.
+#' \code{objPPL} returns a numeric value: the energy state of the current
+#' system configuration - the objective function value.
 #'
 #' @references
 #' Bresler, E.; Green, R. E. \emph{Soil parameters and sampling scheme for
@@ -107,7 +103,7 @@
 #'
 #' @author
 #' Alessandro Samuel-Rosa \email{alessandrosamuelrosa@@gmail.com}
-#' @aliases optimPPL pointsPerLag objPoints pairsPerLag objPairs
+#' @aliases optimPPL countPPL objPPL
 #' @keywords spatial optimize
 #' @concept simulated annealing
 #' @export
@@ -126,24 +122,27 @@
 #' candi <- matrix(cbind(1:nrow(candi), candi), ncol = 3)
 #' x.max <- diff(bbox(boundary)[1, ])
 #' y.max <- diff(bbox(boundary)[2, ])
+#' x.min <- 40
+#' y.min <- 40
 #' cutoff <- sqrt((x.max * x.max) + (y.max * y.max))
+#' iterations <- 100
 #' points <- 100
+#' lags <- 7
+#' lags.base <- 2
+#' criterion <- "distribution"
+#' lags.type <- "exponential"
+#' pairs <- FALSE
 #' set.seed(2001)
-#' res <- optimPPL(points = points, candi = candi, lags = 7, lags.base = 2,
-#'                 criterion = "distribution", lags.type = "exponential",
-#'                 cutoff = cutoff, x.max = x.max, x.min = 40, y.max = y.max, 
-#'                 y.min = 40, boundary = boundary, iterations = 100, 
-#'                 plotit = TRUE)
-#' pointsPerLag(points = res, lags = 7, lags.type = "exponential", 
-#' lags.base = 2, cutoff = cutoff)
+#' res <- optimPPL(points = points, candi = candi, lags = lags, pairs = pairs,
+#'                 lags.base = lags.base, criterion = criterion, 
+#'                 cutoff = cutoff, lags.type = lags.type,  x.max = x.max, 
+#'                 x.min = x.min, y.max = y.max, y.min = y.min, 
+#'                 boundary = boundary, iterations = iterations)
+#' countPPL(points = res, lags = lags, lags.type = lags.type, pairs = pairs,
+#'          lags.base = lags.base, cutoff = cutoff)
 #' tail(attr(res, "energy.state"), 1) # 92
-#' objPoints(points = res, lags = 7, lags.type = "exponential", lags.base = 2,
-#'           cutoff = cutoff, criterion = "distribution")
-# UNIT TEST ####################################################################
-# Use \code{lags = 1} with \code{pointsPerLag} and \code{pairsPerLag} to check
-# that the functions are working correctly. They should return the total number
-# of points in \code{points} and the total possible number of point-pairs
-# \eqn{n \times (n - 1) / 2}, respectively.
+#' objPPL(points = res, lags = lags, lags.type = lags.type, pairs = pairs,
+#'        lags.base = lags.base, cutoff = cutoff, criterion = criterion)
 # FUNCTION - MAIN ##############################################################
 optimPPL <-
   function (points, candi, lags = 7, lags.type = "exponential",
