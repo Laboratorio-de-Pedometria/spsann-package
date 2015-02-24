@@ -31,13 +31,9 @@
 #' simulations are implemented in the current version. Defaults to 
 #' \code{nadir = list(sim = 1000, save.sim = TRUE, user = NULL, abs = NULL)}.
 #' 
-#' @details
-#' 
 #' @return
 #' \code{optimPAN} returns a matrix: the optimized sample pattern with
 #' the evolution of the energy state during the optimization as an attribute.
-#' 
-#' @references
 #' 
 #' @author Alessandro Samuel-Rosa \email{alessandrosamuelrosa@@gmail.com}
 #' @keywords spatial optimize
@@ -48,7 +44,6 @@
 #' @importFrom pedometrics cont2cat
 #' @importFrom SpatialTools dist2
 #' @export
-#' @examples
 # MAIN FUNCTION ################################################################
 optimPAN <-
   function (points, candi, x.max, x.min, y.max, y.min, iterations = 10000,

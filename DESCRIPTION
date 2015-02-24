@@ -1,8 +1,8 @@
 Package: spsann
 Type: Package
 Title: Optimization of sample patterns using spatial simulated annealing
-Version: 0.0.0.9000
-Date: 2015-01-08
+Version: 0.0.1.9000
+Date: 2015-02-24
 Author: Alessandro Samuel-Rosa
 Maintainer: Alessandro Samuel-Rosa <alessandrosamuelrosa@gmail.com>
 Description: spsann offers many optimizing criteria for sampling for variogram
@@ -14,7 +14,9 @@ Description: spsann offers many optimizing criteria for sampling for variogram
 License: GPL (>= 2)
 Imports:
     fields,
+    gstat,
     pedometrics,
+    plyr,
     Rcpp (>= 0.11.3),
     rgeos,
     sp,

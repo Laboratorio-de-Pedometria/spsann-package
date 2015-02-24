@@ -4,22 +4,26 @@
 \alias{spJitterFinite}
 \title{Random perturbation of spatial points}
 \usage{
-spJitterFinite(points, candidates, x.max, x.min, y.max, y.min, which.point)
+spJitterFinite(points, candi, x.max, x.min, y.max, y.min, which.point)
 }
 \arguments{
-\item{points}{Integer. The number of points. Alternatively, a data.frame or
-matrix with three columns: 1) the identification of each point
-(1, 2, ..., n), 2) the x coordinates, and 3) the y coordinates. The
-coordinates must be projected. If a data.frame or matrix is used,
-\code{points} must be a subset of \code{candidates}.}
+\item{points}{Integer value, integer vector, data frame or matrix. If
+\code{points} is an integer value, it defines the number of points that
+should be sampled from \code{candi}. If \code{points} is an integer vector,
+it contains the row indexes of \code{candi} that correspond to the points.
+If \code{points} is a data frame or matrix, it must have three
+columns: \code{[, 1]} the identification of each point (1, 2, ..., n),
+\code{[, 2]} the x coordinates, and \code{[, 3]} the y coordinates. The
+coordinates must be projected. If a data frame or matrix is used,
+\code{points} must be a subset of \code{candi}.}
 
-\item{candidates}{data.frame or matrix. The candidate locations for the
-sample points.}
+\item{candi}{Data frame or matrix with the candidate locations for the
+sample points. The coordinates must be projected.}
 
-\item{x.max,x.min,y.max,y.min}{Numeric. The minimum and maximum quantity of
-random noise to be added to the x and y coordinates. The minimum quantity
-must be equal to, at least, the minimum distance between two neighboring
-candidate locations. The units are the same as of the coordinates.}
+\item{x.max,x.min,y.max,y.min}{Numeric value. The minimum and maximum
+quantity of random noise to be added to the x and y coordinates. The minimum
+quantity must be equal to, at least, the minimum distance between two
+neighboring candidate locations. The units are the same as of the coordinates.}
 
 \item{which.point}{Integer values defining which point should be perturbed.
 The current version accepts only one point to be perturbed at a time. See
@@ -48,7 +52,7 @@ meuse.grid <- as.matrix(meuse.grid[, 1:2])
 meuse.grid <- matrix(cbind(1:dim(meuse.grid)[1], meuse.grid), ncol = 3)
 pts1 <- sample(c(1:dim(meuse.grid)[1]), 155)
 pts2 <- meuse.grid[pts1, ]
-pts3 <- spJitterFinite(points = pts2, candidates = meuse.grid, x.min = 40,
+pts3 <- spJitterFinite(points = pts2, candi = meuse.grid, x.min = 40,
                       x.max = 100, y.min = 40, y.max = 100, which.point = 10)
 plot(meuse.grid[, 2:3], asp = 1, pch = 15, col = "gray")
 points(pts2[, 2:3], col = "red", cex = 0.5)
