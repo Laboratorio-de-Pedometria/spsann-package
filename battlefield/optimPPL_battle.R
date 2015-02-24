@@ -82,7 +82,7 @@ tail(attr(res, "energy.state"), 1) # 7592.857
 objPPL(points = res, lags = lags, lags.type = lags.type, pairs = pairs,
        lags.base = lags.base, cutoff = cutoff, criterion = criterion)
 
-# 1) Points per lag - select sample points from candi ##########################
+# 2) Points per lag - select sample points from candi ##########################
 rm(list = ls())
 gc()
 source('R/spSANNtools.R')

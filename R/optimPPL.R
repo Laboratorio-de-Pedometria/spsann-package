@@ -165,7 +165,8 @@ optimPPL <-
     if (!is.null(check)) stop (check, call. = FALSE)
     check <- .optimPPLcheck(lags = lags, lags.type = lags.type, pairs = pairs,
                             lags.base = lags.base, cutoff = cutoff, 
-                            criterion = criterion, distri = distri)
+                            criterion = criterion, distri = distri, 
+                            fun = "optimPPL")
     if (!is.null(check)) stop (check, call. = FALSE)
     
     if (plotit) {
@@ -338,25 +339,18 @@ objPPL <-
   function (points, candi, lags = 7, lags.type = "exponential",
             lags.base = 2, cutoff = NULL, criterion = "distribution",
             distri = NULL, pairs = FALSE) {
-
+    
+    # Check arguments
+    check <- .optimPPLcheck(lags = lags, lags.type = lags.type, pairs = pairs, 
+                            lags.base = lags.base, cutoff = cutoff,
+                            criterion = criterion, distri = distri,
+                            fun = "objPPL")
+    if (!is.null(check)) stop (check, call. = FALSE)
+    
     # Prepare points
     if (!missing(candi)) n_candi <- nrow(candi)
     points <- .spsannPoints(points = points, candi = candi, n.candi = n_candi)
     n_pts <- nrow(points)
-    #     if (is.integer(points) || is.numint(points)) {
-    #       n_candi <- nrow(candi)
-    #       if (length(points) > 1) {
-    #         n_pts <- length(points)
-    #         points <- candi[points, ]
-    #       }
-    #       if (length(points) == 1) {
-    #         n_pts <- points
-    #         points <- sample(1:n_candi, n_pts)
-    #         points <- candi[points, ] 
-    #       }
-    #     } else {
-    #       n_pts <- nrow(points)
-    #     }
 
     # Prepare lags
     if (length(lags) >= 2) {
@@ -386,19 +380,17 @@ objPPL <-
 countPPL <-
   function (points, candi, lags = 7, lags.type = "exponential",
             lags.base = 2, cutoff = NULL, pairs = FALSE) {
-
+    
+    # Check arguments
+    check <- .optimPPLcheck(lags = lags, lags.type = lags.type, pairs = pairs,
+                            lags.base = lags.base, cutoff = cutoff,
+                            fun = "countPPL")
+    if (!is.null(check)) stop (check, call. = FALSE)
+    
     # Prepare points
     if (!missing(candi)) n_candi <- nrow(candi)
     points <- .spsannPoints(points = points, candi = candi, n.candi = n_candi)
     n_pts <- nrow(points)
-    #     if (is.integer(points) || is.numint(points)) {
-    #       n_pts <- points
-    #       n_candi <- nrow(candi)
-    #       points <- sample(1:n_candi, n_pts)
-    #       points <- candi[points, ]
-    #     } else {
-    #       n_pts <- nrow(points)
-    #     }
 
     # Prepare lags
     if (length(lags) >= 2) {
@@ -424,8 +416,8 @@ countPPL <-
   }
 # INTERNAL FUNCTION - CHECK ARGUMENTS ##########################################
 .optimPPLcheck <-
-  function (lags, lags.type, lags.base, cutoff, criterion, distri, pairs) {
-
+  function (lags, lags.type, lags.base, cutoff, criterion, distri, pairs, fun) {
+    
     # pairs
     if (!is.logical(pairs)) {
       res <- paste("'pairs' must be a logical value")
@@ -462,31 +454,33 @@ countPPL <-
       res <- paste("'lags.base' must be a numeric value")
       return (res)
     }
-
-    # criterion
-    cr <- is.na(any(match(criterion, c("distribution", "minimum"))))
-    if (cr) {
-      res <- paste("'criterion = ", criterion, "' is not supported", sep = "")
-      return (res)
-    }
-
-    # distri
-    if (!is.null(distri)) {
-      if (!is.numeric(distri)) {
-        res <- paste("'distri' must be a numeric vector")
+    
+    if (fun != "countPPL") {
+      # criterion
+      cr <- is.na(any(match(criterion, c("distribution", "minimum"))))
+      if (cr) {
+        res <- paste("'criterion = ", criterion, "' is not supported", sep = "")
         return (res)
       }
-      if (length(lags) == 1) {
-        if (length(distri) != lags) {
-          res <- paste("'distri' must be of length ", lags, sep = "")
+      
+      # distri
+      if (!is.null(distri)) {
+        if (!is.numeric(distri)) {
+          res <- paste("'distri' must be a numeric vector")
           return (res)
         }
-      }
-      if (length(lags) > 2) {
-        nl <- length(lags) - 1
-        if (length(distri) != nl) {
-          res <- paste("'distri' must be of length ", nl, sep = "")
-          return (res)
+        if (length(lags) == 1) {
+          if (length(distri) != lags) {
+            res <- paste("'distri' must be of length ", lags, sep = "")
+            return (res)
+          }
+        }
+        if (length(lags) > 2) {
+          nl <- length(lags) - 1
+          if (length(distri) != nl) {
+            res <- paste("'distri' must be of length ", nl, sep = "")
+            return (res)
+          }
         }
       }
     }
