@@ -55,12 +55,15 @@
 #' candi <- matrix(cbind(c(1:dim(candi)[1]), candi), ncol = 3)
 #' x.max <- diff(bbox(boundary)[1, ])
 #' y.max <- diff(bbox(boundary)[2, ])
+#' x.min <- 40
+#' y.min <- 40
+#' iterations <- 1000
 #' points <- 100
 #' set.seed(2001)
-#' res <- optimMSSD(points = points, candi = candi, x.max = x.max, x.min = 40,
-#'                  y.max = y.max, y.min = 40, iterations = 100,
+#' res <- optimMSSD(points = points, candi = candi, x.max = x.max, x.min = x.min,
+#'                  y.max = y.max, y.min = y.min, iterations = iterations,
 #'                  boundary = boundary)
-#' tail(attr(res, "energy.state"), 1) # 11981.18
+#' tail(attr(res, "energy.state"), 1) # 9896.487
 #' objMSSD(candi = candi, points = res)
 # FUNCTION - MAIN ##############################################################
 optimMSSD <-
@@ -94,7 +97,7 @@ optimMSSD <-
     # squaring internaly.
     # ASR: write own distance function in C++
     dm <- SpatialTools::dist2(candi[, 2:3], conf0[, 2:3])
-    energy0 <- .calcMSSDCpp(dm)
+    energy0 <- .calcMSSDCpp(x = dm)
     #energy0 <- mean(apply(dm, 1, min) ^ 2)
     
     # other settings for the simulated annealing algorithm
@@ -126,7 +129,7 @@ optimMSSD <-
       
       # Update the matrix of distances in C++
       new_dm <- .updateMSSDCpp(x1 = candi[, 2:3], x2 = x2, dm = old_dm, 
-                              idx = wp)
+                               idx = wp)
       
       # Update the matrix of distances in R
       #x2 <- SpatialTools::dist2(coords = candi[, 2:3], coords2 = x2)
@@ -143,7 +146,7 @@ optimMSSD <-
       # print(a)
       # break
       #}
-      
+            
       # Evaluate the new system configuration
       random_prob     <- runif(1)
       actual_prob     <- acceptance[[1]] * exp(-k / acceptance[[2]])
