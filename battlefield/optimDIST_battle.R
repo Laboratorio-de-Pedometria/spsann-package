@@ -6,10 +6,17 @@ require(pedometrics)
 require(sp)
 require(rgeos)
 source('R/optimDIST.R')
+<<<<<<< HEAD
 source('R/optimACDC.R')
 source('R/spSANNtools.R')
 source('R/spJitter.R')
 Rcpp::sourceCpp('src/spJitterCpp.cpp')
+=======
+source('R/spSANNtools.R')
+source('R/spJitter.R')
+Rcpp::sourceCpp('src/spJitterCpp.cpp')
+source("/home/alessandro/PROJECTS/r-packages/pedometrics/R/numint.R")
+>>>>>>> 56c2416631ebbbc6a1ed9b59e75b7f812e8a6432
 # 0) DEFAULT EXAMPLE ###########################################################
 require(pedometrics)
 require(sp)
