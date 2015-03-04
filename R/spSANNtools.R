@@ -85,13 +85,16 @@
 # INTERNAL FUNCTION - PLOTTING #################################################
 .spSANNplot <-
   function (energy0, energies, k, acceptance, accept_probs, boundary, new_conf,
-            conf0, y_max0, y.max, x_max0, x.max, ...) {
+            conf0, y_max0, y.max, x_max0, x.max, best.energy, best.k, ...) {
     par(mfrow = c(1, 2))
     
     # plot energy states
     a <- c(energy0, energies[1:k])
     plot(a ~ c(0:k), type = "l", xlab = "iteration", ylab = "energy state", ...)
-    abline(h = energy0, col = "red")
+    #abline(h = energy0, col = "red")
+    lines(x = c(-k, 0), y = rep(energy0, 2), col = "red")
+    #points(x = best.k, y = best.energy, col = "green", pch = 18)
+    lines(x = rep(best.k, 2), y = c(-5, best.energy), col = "green")
     
     # plot acceptance probability
     a <- c(acceptance[[1]], accept_probs[1:k])

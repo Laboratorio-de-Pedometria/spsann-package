@@ -327,7 +327,8 @@ optimPAN <-
       if (plotit && pedometrics::is.numint(k / 10)) {
         .spSANNplot(energy0, energies, k, acceptance,
                     accept_probs, boundary, new_conf[, 2:3],
-                    conf0[, 2:3], y_max0, y.max, x_max0, x.max)
+                    conf0[, 2:3], y_max0, y.max, x_max0, x.max,
+                    best.energy = best_energy, best.k = best_k)
       }
 
       # Freezing parameters

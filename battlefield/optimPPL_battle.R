@@ -23,8 +23,8 @@ x.max <- diff(bbox(boundary)[1, ])
 y.max <- diff(bbox(boundary)[2, ])
 x.min <- 40
 y.min <- 40
-cutoff <- sqrt((x.max * x.max) + (y.max * y.max))
-iterations <- 100
+cutoff <- sqrt((x.max * x.max) + (y.max * y.max)) / 2
+iterations <- 1000
 points <- 100
 lags <- 7
 lags.base <- 2
@@ -39,7 +39,7 @@ res <- optimPPL(points = points, candi = candi, lags = lags, pairs = pairs,
                 iterations = iterations)
 countPPL(points = res, lags = lags, lags.type = lags.type, pairs = pairs,
          lags.base = lags.base, cutoff = cutoff)
-tail(attr(res, "energy.state"), 1) # 92
+tail(attr(res, "energy.state"), 1) # 65
 objPPL(points = res, lags = lags, lags.type = lags.type, pairs = pairs,
        lags.base = lags.base, cutoff = cutoff, criterion = criterion)
 # 1) Point pairs ###############################################################
