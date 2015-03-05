@@ -92,12 +92,15 @@ candi <- coordinates(candi)
 candi <- matrix(cbind(c(1:dim(candi)[1]), candi), ncol = 3)
 x.max <- diff(bbox(boundary)[1, ])
 y.max <- diff(bbox(boundary)[2, ])
+x.min <- 40
+y.min <- 40
+iterations <- 1000
 points <- 100
 set.seed(2001)
-res <- optimMSSD(points = points, candi = candi, x.max = x.max, x.min = 40,
-                 y.max = y.max, y.min = 40, iterations = 100,
+res <- optimMSSD(points = points, candi = candi, x.max = x.max, x.min = x.min,
+                 y.max = y.max, y.min = y.min, iterations = iterations,
                  boundary = boundary)
-tail(attr(res, "energy.state"), 1) # 11981.18
+tail(attr(res, "energy.state"), 1) # 9896.487
 objMSSD(candi = candi, points = res)
 }
 \author{

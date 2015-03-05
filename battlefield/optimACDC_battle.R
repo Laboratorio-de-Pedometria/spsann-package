@@ -30,15 +30,18 @@ nadir <- list(sim = 10, save.sim = TRUE, user = NULL, abs = NULL)
 utopia <- list(user = list(correl = 0, strata = 0), abs = NULL)
 scale <- list(type = "upper-lower", max = 100)
 weights <- list(strata = 0.5, correl = 0.5)
+points <- 100
+use.coords <- TRUE
+iterations <- 500
 set.seed(2001)
-res <- optimACDC(points = 100, candi = candi, covars = covars,
-                 use.coords = TRUE, covars.type = "numeric", weights = weights,
+res <- optimACDC(points = points, candi = candi, covars = covars,
+                 use.coords = use.coords, weights = weights,
                  x.max = x.max, x.min = x.min, y.max = y.max, y.min = y.min,
-                 boundary = boundary, nadir = nadir, iterations = 500,
+                 boundary = boundary, nadir = nadir, iterations = iterations,
                  utopia = utopia, scale = scale)
 tail(attr(res, "energy"), 1) # 55.59217
 objACDC(points = res, candi = candi, covars = covars, use.coords = TRUE, 
-        covars.type = "numeric", weights = weights, nadir = nadir,
+        weights = weights, nadir = nadir,
         utopia = utopia, scale = scale) # 55.59217
 # 1) FACTOR COVARIATES USING THE COORDINATES ###################################
 rm(list = ls())

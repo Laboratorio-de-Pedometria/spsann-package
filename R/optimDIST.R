@@ -56,6 +56,8 @@
 #' @importFrom pedometrics is.all.factor
 #' @importFrom pedometrics is.any.factor
 #' @importFrom SpatialTools dist2
+#' @importFrom rgeos gUnionCascaded
+#' @import Rcpp
 #' @export
 #' @examples
 #' require(pedometrics)
@@ -217,12 +219,8 @@ optimDIST <-
         best_old_sm     <- old_sm
       }
       # Plotting
-<<<<<<< HEAD
       #if (plotit && any(round(seq(1, iterations, 10)) == k)) {
       if (plotit && pedometrics::is.numint(k / 10)) {
-=======
-      if (plotit && any(round(seq(1, iterations, 10)) == k)) {
->>>>>>> 56c2416631ebbbc6a1ed9b59e75b7f812e8a6432
         .spSANNplot(energy0, energies, k, acceptance,
                     accept_probs, boundary, new_conf[, 2:3],
                     conf0[, 2:3], y_max0, y.max, x_max0, x.max)

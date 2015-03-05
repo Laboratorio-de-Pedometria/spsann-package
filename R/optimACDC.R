@@ -685,9 +685,8 @@ optimACDC <-
 #' @rdname optimACDC
 #' @export
 objACDC <-
-  function (points, candi, covars, covars.type = "numeric",
-            strata.type = "area", weights = list(correl = 0.5, strata = 0.5),
-            use.coords = FALSE, 
+  function (points, candi, covars, strata.type = "area", 
+            weights = list(correl = 0.5, strata = 0.5), use.coords = FALSE, 
             utopia = list(user = list(correl = NULL, strata = NULL),
                           abs = NULL),
             nadir = list(sim = 1000, save.sim = TRUE, user = NULL, abs = NULL),
