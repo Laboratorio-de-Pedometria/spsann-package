@@ -770,13 +770,17 @@ objACDC <-
 .covarsACDC <-
   function (covars, covars.type, use.coords, candi, n.pts, strata.type) {
     
-    # factor covariates
+    # Factor covariates
     if (covars.type == "factor") {
       if (use.coords) {
         covars <- data.frame(covars, candi[, 2:3])
       }
+      # Convert numeric covariates to factor covariates
       if (!pedometrics::is.all.factor(covars)) {
         i <- which(sapply(covars, is.factor) == FALSE)
+        mes <- paste("converting ", length(i), 
+                     " numeric covariates to factor covariates", sep = "")
+        message(mes)
         num_covars <- data.frame(covars[, i])
         breaks <- .numStrata(n.pts = n.pts, covars = num_covars, 
                              strata.type = strata.type)[[1]]
@@ -784,7 +788,8 @@ objACDC <-
         covars[, i] <- num_covars
       }
       
-    } else { # numeric covariates
+      # Numeric covariates
+    } else {
       if (use.coords) {
         covars <- data.frame(covars, candi[, 2:3])
       }
