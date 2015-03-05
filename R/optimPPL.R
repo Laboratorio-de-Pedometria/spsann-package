@@ -134,10 +134,10 @@
 #' pairs <- FALSE
 #' set.seed(2001)
 #' res <- optimPPL(points = points, candi = candi, lags = lags, pairs = pairs,
-#'                 lags.base = lags.base, criterion = criterion, cutoff = cutoff,
-#'                 lags.type = lags.type,  x.max = x.max, x.min = x.min, 
-#'                 y.max = y.max, y.min = y.min, boundary = boundary,
-#'                 iterations = iterations)
+#'                 lags.base = lags.base, criterion = criterion, 
+#'                 cutoff = cutoff, lags.type = lags.type,  x.max = x.max, 
+#'                 x.min = x.min, y.max = y.max, y.min = y.min, 
+#'                 boundary = boundary, iterations = iterations)
 #' countPPL(points = res, lags = lags, lags.type = lags.type, pairs = pairs,
 #'          lags.base = lags.base, cutoff = cutoff)
 #' tail(attr(res, "energy.state"), 1) # 65
@@ -216,8 +216,9 @@ optimPPL <-
     time0 <- proc.time()
     
     # begin the main loop
-    for (k in 1:iterations) {
-      
+    k <- 1
+    #for (k in 1:iterations) {
+    while (k <= iterations) {
       # jitter one of the points and update x.max and y.max
       wp <- sample(1:n_pts, 1)
       new_conf <- spJitterFinite(points = old_conf, candi = candi,
@@ -326,6 +327,11 @@ optimPPL <-
         }
       }
       if (progress) setTxtProgressBar(pb, k)
+      
+      # ASR: It appears that the algorithm can enter in an infinite loop. We
+      #      force the loop to stop with the next line.
+      # if(k == iterations){break}
+      k <- k + 1
     }
     if (progress) close(pb)
     res <- .spSANNout(new_conf = new_conf, energy0 = energy0, 

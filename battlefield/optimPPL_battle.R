@@ -24,8 +24,8 @@ y.max <- diff(bbox(boundary)[2, ])
 x.min <- 40
 y.min <- 40
 cutoff <- sqrt((x.max * x.max) + (y.max * y.max)) / 2
-iterations <- 1000
-points <- 100
+iterations <- 50000
+points <- 400
 lags <- 7
 lags.base <- 2
 criterion <- "distribution"
