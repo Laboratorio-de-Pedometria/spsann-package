@@ -18,7 +18,6 @@ Imports:
     pedometrics,
     plyr,
     Rcpp (>= 0.11.3),
-    rgeos,
     sp,
     SpatialTools
 LinkingTo: Rcpp

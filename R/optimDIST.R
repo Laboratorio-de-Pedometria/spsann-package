@@ -19,14 +19,15 @@
 #' 
 #' @details
 #' This method derives from the method known as the conditioned Latin Hypercube
-#' of Minasny and McBratney (2006). Visit the package manual to see the
-#' corrections that we have made in that method.
+#' originally proposed by Minasny and McBratney (2006). Visit the package manual
+#' to see the improvements that we have made in that method.
 #'
 #' @return
 #' \code{optimDIST} returns a matrix: the optimized sample pattern with
-#' the evolution of the energy state during the optimization as an attribute. 
-#' \code{objDIST} returns a numeric value: the energy state of the point 
-#' pattern.
+#' the evolution of the energy state during the optimization as an attribute.
+#'  
+#' \code{objDIST} returns a numeric value: the energy state of the sample
+#' pattern - the objective function value.
 #'
 #' @references
 #' Minasny, B.; McBratney, A. B. A conditioned Latin hypercube method for
@@ -56,7 +57,6 @@
 #' @importFrom pedometrics is.all.factor
 #' @importFrom pedometrics is.any.factor
 #' @importFrom SpatialTools dist2
-#' @importFrom rgeos gUnionCascaded
 #' @import Rcpp
 #' @export
 #' @examples
@@ -76,14 +76,17 @@
 #' y.max <- diff(bbox(boundary)[2, ])
 #' y.min <- 40
 #' x.min <- 40
+#' points <- 100
+#' iterations <- 1000
+#' use.coords <- TRUE
 #' set.seed(2001)
-#' res <- optimDIST(points = 100, candi = candi, covars = covars, 
-#'                  use.coords = TRUE, covars.type = "numeric", x.max = x.max, 
-#'                  x.min = x.min, y.max = y.max, y.min = y.min,
-#'                  boundary = boundary, iterations = 500)
-#' tail(attr(res, "energy"), 1) # 115.0519
+#' res <- optimDIST(points = points, candi = candi, covars = covars, 
+#'                  use.coords = use.coords, x.max = x.max, x.min = x.min, 
+#'                  y.max = y.max, y.min = y.min, boundary = boundary, 
+#'                  iterations = iterations)
+#' tail(attr(res, "energy"), 1) # 0.9897776
 #' objDIST(points = res, candi = candi, covars = covars, 
-#'         covars.type = "numeric", use.coords = TRUE) # 115.0519
+#'         use.coords = use.coords)
 # MAIN FUNCTION ################################################################
 optimDIST <-
   function (points, candi, covars, strata.type = "area", use.coords = FALSE, 

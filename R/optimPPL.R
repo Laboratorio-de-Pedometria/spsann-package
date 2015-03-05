@@ -76,8 +76,8 @@
 #' upper limits of each lag-distance class, and c) the number of points or 
 #' point-pairs per lag-distance class.
 #'
-#' \code{objPPL} returns a numeric value: the energy state of the current
-#' system configuration - the objective function value.
+#' \code{objPPL} returns a numeric value: the energy state of the sample pattern
+#' - the objective function value.
 #'
 #' @references
 #' Bresler, E.; Green, R. E. \emph{Soil parameters and sampling scheme for
