@@ -1,6 +1,6 @@
 #' Optimization of sample patterns for trend estimation
 #'
-#' Optimize a sample pattern for trend estimation. The criterion is defined so 
+#' Optimize a sample pattern for trend estimation. A criterion is defined so 
 #' that the sample reproduces the association/correlation between the covariates
 #' (\bold{CORR}).
 #'
@@ -8,10 +8,6 @@
 #' @template spSANN_doc
 #'
 #' @param covars Data frame or matrix with the covariates in the columns.
-#'
-#' @param covars.type Character value. The type of covariates that is
-#' being used. Available options are \code{"numeric"} and \code{"factor"}.
-#' Defaults to \code{covars.type = "numeric"}.
 #'
 #' @param use.coords Logical value. Should the coordinates be used as 
 #' covariates? Defaults to \code{use.coords = FALSE}.
@@ -22,16 +18,16 @@
 #' equal range. Defaults to \code{strata.type = "area"}.
 #' 
 #' @details
-#' This method was derived from the conditioned Latin Hypercube of Minasny and
-#' McBratney (2006). Visit the package manual to see the corrections that we
-#' have made in that method.
+#' This method derives from the method known as the conditioned Latin Hypercube
+#' originally proposed by Minasny and McBratney (2006). Visit the package manual
+#' to see the improvements that we have made in that method.
 #'
 #' @return
 #' \code{optimCORR} returns a matrix: the optimized sample pattern with
 #' the evolution of the energy state during the optimization as an attribute.
 #' 
-#' \code{objCORR} returns a numeric value: the energy state of the point 
-#' pattern.
+#' \code{objCORR} returns a numeric value: the energy state of the sample
+#' pattern - the objective function value.
 #'
 #' @references
 #' Minasny, B.; McBratney, A. B. A conditioned Latin hypercube method for
@@ -88,8 +84,8 @@
 #'         covars.type = "numeric", use.coords = TRUE)
 # MAIN FUNCTION ################################################################
 optimCORR <-
-  function (points, candi, covars, covars.type = "numeric", use.coords = FALSE, 
-            strata.type = "area", x.max, x.min, y.max, y.min, iterations,
+  function (points, candi, covars, use.coords = FALSE, strata.type = "area", 
+            x.max, x.min, y.max, y.min, iterations,
             acceptance = list(initial = 0.99, cooling = iterations / 10),
             stopping = list(max.count = iterations / 10), plotit = TRUE,
             boundary, progress = TRUE, verbose = TRUE) {
@@ -97,13 +93,15 @@ optimCORR <-
     if (!is.data.frame(covars)) covars <- as.data.frame(covars)
     
     # Check arguments
-    check <- .spSANNcheck(points, candi, x.max, x.min, y.max, y.min,
-                          iterations, acceptance, stopping, plotit, boundary,
-                          progress, verbose)
+    check <- .spSANNcheck(points = points, candi = candi, x.max = x.max, 
+                          x.min = x.min, y.max = y.max, y.min = y.min, 
+                          iterations = iterations, acceptance = acceptance,
+                          stopping = stopping, plotit = plotit, 
+                          boundary = boundary, progress = progress, 
+                          verbose = verbose)
     if (!is.null(check)) stop (check, call. = FALSE)
     check <- .optimCORRcheck(candi = candi, covars = covars, 
-                             covars.type = covars.type, use.coords = use.coords,
-                             strata.type = strata.type)
+                             use.coords = use.coords, strata.type = strata.type)
     if (!is.null(check)) stop (check, call. = FALSE)
     
     if (plotit) {
@@ -119,10 +117,17 @@ optimCORR <-
     old_conf <- conf0
     
     # Prepare covariates (covars) and create the starting sample matrix (sm)
-    if (use.coords) {
-      covars <- .useCoords(covars.type = covars.type, candi = candi, 
-                           n.pts = n_pts, strata.type = strata.type)
-    }
+    #     if (use.coords) {
+    #       covars <- .useCoords(covars.type = covars.type, candi = candi, 
+    #                            n.pts = n_pts, strata.type = strata.type)
+    #     }
+    #     n_cov <- ncol(covars)
+    #     sm <- covars[points[, 1], ]
+    covars.type <- ifelse(pedometrics::is.any.factor(covars), "factor",
+                          "numeric")
+    covars <- .covarsACDC(covars = covars, covars.type = covars.type, 
+                          use.coords = use.coords, candi = candi, n.pts = n_pts,
+                          strata.type = strata.type)
     n_cov <- ncol(covars)
     sm <- covars[points[, 1], ]
     
@@ -231,9 +236,12 @@ optimCORR <-
       # Plotting
       #if (plotit && any(round(seq(1, iterations, 10)) == k)) {
       if (plotit && pedometrics::is.numint(k / 10)) {
-        .spSANNplot(energy0, energies, k, acceptance,
-                    accept_probs, boundary, new_conf[, 2:3],
-                    conf0[, 2:3], y_max0, y.max, x_max0, x.max)
+        .spSANNplot(energy0 = energy0, energies = energies, k = k, 
+                    acceptance = acceptance, accept_probs = accept_probs,
+                    boundary = boundary, new_conf = new_conf[, 2:3], 
+                    conf0 = conf0[, 2:3], y_max0 = y_max0, y.max = y.max, 
+                    x_max0 = x_max0, x.max = x.max, best.energy = best_energy,
+                    best.k = best_k)
       }
       # Freezing parameters
       if (count == stopping[[1]]) {
@@ -263,7 +271,9 @@ optimCORR <-
   }
 # INTERNAL FUNCTION - CHECK ARGUMENTS ##########################################
 .optimCORRcheck <-
-  function (candi, covars, covars.type, use.coords, strata.type) {
+  function (candi, covars,
+            #covars.type,
+            use.coords, strata.type) {
     
     # covars
     if (ncol(covars) < 2 && use.coords == FALSE) {
@@ -276,18 +286,18 @@ optimCORR <-
       return (res)
     }
     
-    # covars.type
-    if (missing(covars.type)) {
-      res <- paste("'covars.type' is missing")
-      return (res)
-    } else {
-      ct <- pmatch(covars.type, c("numeric", "factor"))
-      if (is.na(ct)) {
-        res <- paste("'covars.type = ", covars.type, "' is not supported", 
-                     sep = "")
-        return (res)
-      }
-    }
+    #     # covars.type
+    #     if (missing(covars.type)) {
+    #       res <- paste("'covars.type' is missing")
+    #       return (res)
+    #     } else {
+    #       ct <- pmatch(covars.type, c("numeric", "factor"))
+    #       if (is.na(ct)) {
+    #         res <- paste("'covars.type = ", covars.type, "' is not supported", 
+    #                      sep = "")
+    #         return (res)
+    #       }
+    #     }
     
     # strata.type
     st <- match(strata.type, c("area", "range"))
@@ -301,15 +311,13 @@ optimCORR <-
 #' @rdname optimCORR
 #' @export
 objCORR <-
-  function (points, candi, covars, covars.type = "numeric", use.coords = FALSE, 
-            strata.type = "area") {
+  function (points, candi, covars, use.coords = FALSE, strata.type = "area") {
     
     if (!is.data.frame(covars)) covars <- as.data.frame(covars)
     
     # Check arguments
-    check <- .optimCORRcheck(candi = candi, covars.type = covars.type,
-                             covars = covars, use.coords = use.coords,
-                             strata.type = strata.type)
+    check <- .optimCORRcheck(candi = candi, covars = covars, 
+                             use.coords = use.coords, strata.type = strata.type)
     if (!is.null(check)) stop (check, call. = FALSE)
     
     # Prepare sample points
@@ -318,10 +326,15 @@ objCORR <-
     n_pts <- nrow(points)
     
     # Prepare covariates (covars) and create the starting sample matrix (sm)
-    if (use.coords) {
-      covars <- .useCoords(covars.type = covars.type, candi = candi, 
-                           n.pts = n_pts, strata.type = strata.type)
-    }
+    #     if (use.coords) {
+    #       covars <- .useCoords(covars.type = covars.type, candi = candi, 
+    #                            n.pts = n_pts, strata.type = strata.type)
+    #     }
+    #     sm <- covars[points[, 1], ]
+    covars.type <- ifelse(is.any.factor(covars), "factor", "numeric")
+    covars <- .covarsACDC(covars = covars, covars.type = covars.type, 
+                          use.coords = use.coords, candi = candi, n.pts = n_pts,
+                          strata.type = strata.type)
     sm <- covars[points[, 1], ]
     
     # Calculate the energy state
