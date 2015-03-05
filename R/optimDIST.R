@@ -132,7 +132,8 @@ optimDIST <-
                              strata = strata)
     } else { # Factor covariates
       if (covars.type == "factor") {
-        pop_prop <- lapply(covars, function(x) table(x) / nrow(covars) * 100)
+        #pop_prop <- lapply(covars, function(x) table(x) / nrow(covars) * 100)
+        pop_prop <- lapply(covars, function(x) table(x) / nrow(covars))
         energy0 <- .objDISTfac(sm = sm, pop.prop = pop_prop, n.pts = n_pts,
                                 n.cov = n_cov)
       }
@@ -221,9 +222,12 @@ optimDIST <-
       # Plotting
       #if (plotit && any(round(seq(1, iterations, 10)) == k)) {
       if (plotit && pedometrics::is.numint(k / 10)) {
-        .spSANNplot(energy0, energies, k, acceptance,
-                    accept_probs, boundary, new_conf[, 2:3],
-                    conf0[, 2:3], y_max0, y.max, x_max0, x.max)
+        .spSANNplot(energy0 = energy0, energies = energies, k = k, 
+                    acceptance = acceptance, accept_probs = accept_probs,
+                    boundary = boundary, new_conf = new_conf[, 2:3], 
+                    conf0 = conf0[, 2:3], y_max0 = y_max0, y.max = y.max, 
+                    x_max0 = x_max0, x.max = x.max, best.energy = best_energy,
+                    best.k = best_k)
       }
       # Freezing parameters
       if (count == stopping[[1]]) {
@@ -290,7 +294,8 @@ optimDIST <-
 # INTERNAL FUNCTION - CRITERION FOR FACTOR COVARIATES ##########################
 .objDISTfac <-
   function (sm, pop.prop, n.pts, n.cov) {    
-    samp_prop <- lapply(sm, function(x) table(x) / n.pts * 100)
+    #samp_prop <- lapply(sm, function(x) table(x) / n.pts * 100)
+    samp_prop <- lapply(sm, function(x) table(x) / n.pts)
     samp_prop <- sapply(1:n.cov, function (i)
       sum(abs(samp_prop[[i]] - pop.prop[[i]])))
     energy <- sum(samp_prop)
@@ -301,7 +306,8 @@ optimDIST <-
   function (sm, n.pts, n.cov, strata) {
     counts <- lapply(1:n.cov, function (i)
       hist(sm[, i], strata[[1]][[i]], plot = FALSE)$counts)
-    counts <- lapply(1:n.cov, function(i) counts[[i]] / n.pts * 100)
+    #counts <- lapply(1:n.cov, function(i) counts[[i]] / n.pts * 100)
+    counts <- lapply(1:n.cov, function(i) counts[[i]] / n.pts)
     counts <- sapply(1:n.cov, function (i) 
       sum(abs(counts[[i]] - strata[[2]][[i]])))
     energy <- sum(counts)
@@ -341,7 +347,8 @@ objDIST <-
                             strata = strata)
     } else { # Factor covariates
       if (covars.type == "factor") {
-        pop_prop <- lapply(covars, function(x) table(x) / nrow(covars) * 100)
+        #pop_prop <- lapply(covars, function(x) table(x) / nrow(covars) * 100)
+        pop_prop <- lapply(covars, function(x) table(x) / nrow(covars))
         energy <- .objDISTfac(sm = sm, pop.prop = pop_prop, n.pts = n_pts,
                               n.cov = n_cov)
       }

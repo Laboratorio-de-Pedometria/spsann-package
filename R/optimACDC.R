@@ -178,8 +178,8 @@ optimACDC <-
       if (covars.type == "factor") {
         pcm <- pedometrics::cramer(covars)
         # ASR: We multiply the proportions by 100 for numerical stability
-        #pop_prop <- lapply(covars, function(x) table(x) / nrow(covars))
-        pop_prop <- lapply(covars, function(x) table(x) / nrow(covars) * 100)
+        pop_prop <- lapply(covars, function(x) table(x) / nrow(covars))
+        #pop_prop <- lapply(covars, function(x) table(x) / nrow(covars) * 100)
         nadir <- .facNadir(nadir = nadir, candi = candi, n.candi = n_candi,
                            n.pts = n_pts, n.cov = n_cov, covars = covars, 
                            pop.prop = pop_prop, pcm = pcm, scale = scale)
@@ -439,7 +439,9 @@ optimACDC <-
       # ASR: We use the proportion of points per sampling strata
       #count <- lapply(1:n_cov, function(i) 
       #  count[[i]] / sum(count[[i]]) * n.pts)
-      count <- lapply(1:n_cov, function(i) count[[i]] / sum(count[[i]]) * 100)
+      
+      #count <- lapply(1:n_cov, function(i) count[[i]] / sum(count[[i]]) * 100)
+      count <- lapply(1:n_cov, function(i) count[[i]] / sum(count[[i]]))
       strata <- list(breaks, count)
 
     } else {
@@ -460,7 +462,9 @@ optimACDC <-
         #count <- lapply(1:n_cov, function(i)
         #  count[[i]] / sum(count[[i]]) * n.pts)
         count <- lapply(1:n_cov, function(i)
-          count[[i]] / sum(count[[i]]) * 100)
+          #count[[i]] / sum(count[[i]]) * 100)
+          count[[i]] / sum(count[[i]]))
+        
         
         # ASR: This is an old implementation to merge null strata
         #breaks <- lapply(breaks, unique)
@@ -504,7 +508,8 @@ optimACDC <-
           hist(sm[, i], strata[[1]][[i]], plot = FALSE)$counts)
         
         # ASR: We use the proportion of points per sampling strata
-        counts <- lapply(1:n.cov, function(i) counts[[i]] / n.pts * 100)
+        #counts <- lapply(1:n.cov, function(i) counts[[i]] / n.pts * 100)
+        counts <- lapply(1:n.cov, function(i) counts[[i]] / n.pts)
         counts <- sapply(1:n.cov, function (i)
           sum(abs(counts[[i]] - strata[[2]][[i]])))
         strata_nadir[i] <- sum(counts)
@@ -562,7 +567,8 @@ optimACDC <-
       hist(sm[, i], strata[[1]][[i]], plot = FALSE)$counts)
     
     # ASR: We use the proportion of points per sampling strata
-    counts <- lapply(1:n.cov, function(i) counts[[i]] / n.pts * 100)
+    #counts <- lapply(1:n.cov, function(i) counts[[i]] / n.pts * 100)
+    counts <- lapply(1:n.cov, function(i) counts[[i]] / n.pts)
     counts <- sapply(1:n.cov, function (i) 
       sum(abs(counts[[i]] - strata[[2]][[i]])))
         
@@ -602,8 +608,8 @@ optimACDC <-
         scm <- pedometrics::cramer(sm)
         
         # ASR: We multiply the proportion by 100 for numerical stability
-        #samp_prop <- lapply(sm, function(x) table(x) / n.pts)
-        samp_prop <- lapply(sm, function(x) table(x) / n.pts * 100)
+        samp_prop <- lapply(sm, function(x) table(x) / n.pts)
+        #samp_prop <- lapply(sm, function(x) table(x) / n.pts * 100)
         samp_prop <- sapply(1:n.cov, function (i)
           sum(abs(samp_prop[[i]] - pop.prop[[i]])))
         strata_nadir[i] <- sum(samp_prop)
@@ -641,8 +647,8 @@ optimACDC <-
             scale) {
     
     # ASR: We multiply the proportions by 100 for numerical stability
-    #samp_prop <- lapply(sm, function(x) table(x) / n.pts)
-    samp_prop <- lapply(sm, function(x) table(x) / n.pts * 100)
+    samp_prop <- lapply(sm, function(x) table(x) / n.pts)
+    #samp_prop <- lapply(sm, function(x) table(x) / n.pts * 100)
     samp_prop <- sapply(1:n.cov, function (i)
       sum(abs(samp_prop[[i]] - pop.prop[[i]])))
     
@@ -731,7 +737,8 @@ objACDC <-
     } else { # Factor covariates
       if (covars.type == "factor") {
         pcm <- pedometrics::cramer(covars)
-        pop_prop <- lapply(covars, function(x) table(x) / nrow(covars) * 100)
+        #pop_prop <- lapply(covars, function(x) table(x) / nrow(covars) * 100)
+        pop_prop <- lapply(covars, function(x) table(x) / nrow(covars))
         nadir <- .facNadir(nadir = nadir, candi = candi, n.candi = n_candi,
                            n.pts = n_pts, n.cov = n_cov, covars = covars, 
                            pop.prop = pop_prop, pcm = pcm, scale = scale)

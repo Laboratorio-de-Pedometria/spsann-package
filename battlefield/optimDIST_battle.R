@@ -6,17 +6,10 @@ require(pedometrics)
 require(sp)
 require(rgeos)
 source('R/optimDIST.R')
-<<<<<<< HEAD
 source('R/optimACDC.R')
 source('R/spSANNtools.R')
 source('R/spJitter.R')
 Rcpp::sourceCpp('src/spJitterCpp.cpp')
-=======
-source('R/spSANNtools.R')
-source('R/spJitter.R')
-Rcpp::sourceCpp('src/spJitterCpp.cpp')
-source("/home/alessandro/PROJECTS/r-packages/pedometrics/R/numint.R")
->>>>>>> 56c2416631ebbbc6a1ed9b59e75b7f812e8a6432
 # 0) DEFAULT EXAMPLE ###########################################################
 require(pedometrics)
 require(sp)
@@ -34,12 +27,15 @@ x.max <- diff(bbox(boundary)[1, ])
 y.max <- diff(bbox(boundary)[2, ])
 y.min <- 40
 x.min <- 40
+points <- 100
+iterations <- 1000
+use.coords <- TRUE
 set.seed(2001)
-res <- optimDIST(points = 100, candi = candi, covars = covars, 
-                 use.coords = TRUE, x.max = x.max, x.min = x.min, 
+res <- optimDIST(points = points, candi = candi, covars = covars, 
+                 use.coords = use.coords, x.max = x.max, x.min = x.min, 
                  y.max = y.max, y.min = y.min, boundary = boundary, 
-                 iterations = 100)
-tail(attr(res, "energy"), 1) # 165.3155
+                 iterations = iterations)
+tail(attr(res, "energy"), 1) # 0.9897776
 objDIST(points = res, candi = candi, covars = covars, use.coords = TRUE)
 # 1) FACTOR COVARIATES WITH THE COORDINATES ####################################
 rm(list = ls())
