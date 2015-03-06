@@ -219,6 +219,7 @@ optimPPL <-
     k <- 1
     #for (k in 1:iterations) {
     while (k <= iterations) {
+      
       # jitter one of the points and update x.max and y.max
       wp <- sample(1:n_pts, 1)
       new_conf <- spJitterFinite(points = old_conf, candi = candi,
@@ -297,7 +298,6 @@ optimPPL <-
       }
 
       # Plotting
-      #if (plotit && any(round(seq(1, iterations, 10)) == k)) {
       if (plotit && pedometrics::is.numint(k / 10)) {
         .spSANNplot(energy0 = energy0, energies = energies, k = k, 
                     acceptance = acceptance, accept_probs = accept_probs,
@@ -327,10 +327,6 @@ optimPPL <-
         }
       }
       if (progress) setTxtProgressBar(pb, k)
-      
-      # ASR: It appears that the algorithm can enter in an infinite loop. We
-      #      force the loop to stop with the next line.
-      # if(k == iterations){break}
       k <- k + 1
     }
     if (progress) close(pb)

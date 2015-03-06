@@ -31,12 +31,12 @@ lags.base <- 2
 criterion <- "distribution"
 lags.type <- "exponential"
 pairs <- FALSE
-set.seed(2001)
+set.seed(1984)
 res <- optimPPL(points = points, candi = candi, lags = lags, pairs = pairs,
                 lags.base = lags.base, criterion = criterion, cutoff = cutoff,
                 lags.type = lags.type,  x.max = x.max, x.min = x.min, 
                 y.max = y.max, y.min = y.min, boundary = boundary,
-                iterations = iterations)
+                iterations = iterations, plotit = FALSE, verbose = FALSE)
 countPPL(points = res, lags = lags, lags.type = lags.type, pairs = pairs,
          lags.base = lags.base, cutoff = cutoff)
 tail(attr(res, "energy.state"), 1) # 65
