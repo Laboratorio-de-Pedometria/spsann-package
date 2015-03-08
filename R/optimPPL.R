@@ -215,10 +215,14 @@ optimPPL <-
     if (progress) pb <- txtProgressBar(min = 1, max = iterations, style = 3)
     time0 <- proc.time()
     
-    # begin the main loop
-    k <- 1
-    #for (k in 1:iterations) {
-    while (k <= iterations) {
+    # Begin the iterations
+    
+    # Use a while loop
+    #k <- 1
+    #while (k <= iterations) {
+    
+    # Use a for loop
+    for (k in 1:iterations) {
       
       # jitter one of the points and update x.max and y.max
       wp <- sample(1:n_pts, 1)
@@ -327,7 +331,9 @@ optimPPL <-
         }
       }
       if (progress) setTxtProgressBar(pb, k)
-      k <- k + 1
+      if (k == iterations) {message("spsann should stop now!")}
+      # Set counter for while loop
+      #k <- k + 1
     }
     if (progress) close(pb)
     res <- .spSANNout(new_conf = new_conf, energy0 = energy0, 

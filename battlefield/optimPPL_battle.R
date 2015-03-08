@@ -31,7 +31,7 @@ lags.base <- 2
 criterion <- "distribution"
 lags.type <- "exponential"
 pairs <- FALSE
-set.seed(1984)
+set.seed(2001)
 res <- optimPPL(points = points, candi = candi, lags = lags, pairs = pairs,
                 lags.base = lags.base, criterion = criterion, cutoff = cutoff,
                 lags.type = lags.type,  x.max = x.max, x.min = x.min, 

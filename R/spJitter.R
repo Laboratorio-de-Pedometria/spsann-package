@@ -48,6 +48,8 @@
 # FUNCTION #####################################################################
 spJitterFinite <-
   function (points, candi, x.max, x.min, y.max, y.min, which.point) {
+    
+    # Get candidate locations using Cpp
     pt1 <- .spJitterCpp(points[, 2:3], candi[, 2:3], x.max, x.min, y.max, 
                         y.min, which.point)
     
@@ -56,9 +58,16 @@ spJitterFinite <-
     pt2 <- candi[sample(pt1, 1), ]
     dup <- duplicated(rbind(pt2, points))
     if (any(dup)) {
-      while (any(dup)) {
-        pt2 <- candi[sample(pt1, 1), ]
-        dup <- duplicated(rbind(pt2, points))
+      if (all(dup)) {
+        # We return the old point as the new point.
+        # This is to avoid an infinite loop in the end of the optimization
+        # when the objective function results in clusters of points such as PPL
+        pt2 <- candi[which.point, ]
+      } else {
+        while (any(dup)) {
+          pt2 <- candi[sample(pt1, 1), ]
+          dup <- duplicated(rbind(pt2, points))
+        }
       }
     }
     res <- points
