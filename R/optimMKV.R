@@ -21,12 +21,16 @@
 #' to summarize the kriging variance. Available options are \code{"mean"} and
 #' \code{"max"} for the mean and maximum krigig variance, respectively.
 #' Defaults to \code{krige.stat = "mean"}.
+#' 
+#' @param greedy Logical value. Should the optimization be done using a greedy
+#' algorithm, that is, without accepting worse system configurations? Defaults
+#' to \code{greedy = FALSE}.
 #'
 #' @return
-#' \code{optimMUKV} returns a matrix: the optimized sample pattern with
+#' \code{optimMKV} returns a matrix: the optimized sample pattern with
 #' the evolution of the energy state during the optimization as an attribute.
 #'
-#' \code{objMUKV} returns a numeric value depending on the choice of 
+#' \code{objMKV} returns a numeric value depending on the choice of 
 #' \code{krige.stat}. If \code{krige.stat = "mean"}, the mean kriging variance.
 #' If \code{krige.stat = "max"}, the maximum kriging variance.
 #'
@@ -42,19 +46,19 @@
 #' 
 #' @author
 #' Alessandro Samuel-Rosa \email{alessandrosamuelrosa@@gmail.com}
-#' @aliases optimMUKV
+#' @aliases optimMKV
 #' @keywords spatial optimize
 #' @concept simulated annealing
 #' @importFrom plyr is.formula
 #' @export
 #' 
 # FUNCTION - MAIN ##############################################################
-optimMUKV <-
+optimMKV <-
   function (points, candi, covars, equation = z ~ 1, model, krige.stat = "mean",
             x.max, x.min, y.max, y.min, iterations = 10000,
             acceptance = list(initial = 0.99, cooling = iterations / 10),
             stopping = list(max.count = iterations / 10), plotit = TRUE,
-            boundary, progress = TRUE, verbose = TRUE) {
+            boundary, progress = TRUE, verbose = TRUE, greedy = FALSE) {
     
     if (!missing(covars)) {
       if (!is.data.frame(covars)) covars <- as.data.frame(covars) 
@@ -65,7 +69,7 @@ optimMUKV <-
                           iterations, acceptance, stopping, plotit, boundary,
                           progress, verbose)
     if (!is.null(check)) stop (check, call. = FALSE)
-    check <- .optimMUKVcheck(covars, equation, model, krige.stat)
+    check <- .optimMKVcheck(covars, equation, model, krige.stat)
     if (!is.null(check)) stop (check, call. = FALSE)
     
     if (plotit) {
@@ -151,7 +155,11 @@ optimMUKV <-
       }
       
       # Evaluate the new system configuration
-      random_prob <- runif(1)
+      if (greedy) {
+        random_prob <- 1
+      } else {
+        random_prob <- runif(1)
+      }
       actual_prob <- acceptance[[1]] * exp(-k / acceptance[[2]])
       accept_probs[k] <- actual_prob
       if (new_energy <= old_energy) {
@@ -194,11 +202,12 @@ optimMUKV <-
       # Plotting
       #if (plotit && any(round(seq(1, iterations, 10)) == k)) {
       if (plotit && pedometrics::is.numint(k / 10)) {
-        .spSANNplot(energy0 = energy0, energies = energies, k = k, 
+        .spSANNplot(energy0 = energy0, energies = energies, k = k,
                     acceptance = acceptance, accept_probs = accept_probs,
                     boundary = boundary, new_conf = new_conf[, 2:3], 
                     conf0 = conf0[, 2:3], y_max0 = y_max0, y.max = y.max, 
-                    x_max0 = x_max0, x.max = x.max)
+                    x_max0 = x_max0, x.max = x.max, best.k = best_k, 
+                    best.energy = best_energy)
       }
       # Freezing parameters
       if (count == stopping[[1]]) {
@@ -225,7 +234,7 @@ optimMUKV <-
     return (res)
   }
 # INTERNAL FUNCTION - CHECK ARGUMENTS ##########################################
-.optimMUKVcheck <-
+.optimMKVcheck <-
   function (covars, equation, model, krige.stat) {
     
     # covars
@@ -264,7 +273,7 @@ optimMUKV <-
     }
   }
 # FUNCTION - CANCLULATE THE OBJECTIVE FUNCTION VALUE ###########################
-objMUKV <-
+objMKV <-
   function (points, candi, covars, equation, model, krige.stat = "mean") {
     
     if (!missing(covars)) {
@@ -275,7 +284,7 @@ objMUKV <-
     #check <- .spSANNcheck(points, candi)
     #if (!is.null(check)) stop (check, call. = FALSE)
     
-    #check <- .optimMUKVcheck()
+    #check <- .optimMKVcheck()
     #if (!is.null(check)) stop (check, call. = FALSE)
     
     # Prepare points
