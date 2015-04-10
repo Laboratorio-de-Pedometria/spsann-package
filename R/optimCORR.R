@@ -66,33 +66,29 @@
 #' require(sp)
 #' require(rgeos)
 #' data(meuse.grid)
-#' candi              <- meuse.grid[, 1:2]
+#' candi <- meuse.grid[, 1:2]
 #' coordinates(candi) <- ~ x + y
-#' gridded(candi)     <- TRUE
-#' boundary           <- as(candi, "SpatialPolygons")
-#' boundary           <- gUnionCascaded(boundary)
-#' candi              <- coordinates(candi)
-#' candi              <- matrix(cbind(1:dim(candi)[1], candi), ncol = 3)
-#' covars             <- meuse.grid[, 5]
-#' x.max              <- diff(bbox(boundary)[1, ])
-#' y.max              <- diff(bbox(boundary)[2, ])
-#' y.min              <- 40
-#' x.min              <- 40
+#' gridded(candi) <- TRUE
+#' boundary <- as(candi, "SpatialPolygons")
+#' boundary <- gUnionCascaded(boundary)
+#' candi <- coordinates(candi)
+#' candi <- matrix(cbind(1:dim(candi)[1], candi), ncol = 3)
+#' covars <- meuse.grid[, 5]
+#' x.max <- diff(bbox(boundary)[1, ])
+#' y.max <- diff(bbox(boundary)[2, ])
 #' set.seed(2001)
 #' res <- optimCORR(points = 100, candi = candi, covars = covars, 
-#'                  use.coords = TRUE, covars.type = "numeric", x.max = x.max, 
-#'                  x.min = x.min, y.max = y.max, y.min = y.min,
-#'                  boundary = boundary, iterations = 500)
-#' tail(attr(res, "energy"))
-#' objCORR(points = res, candi = candi, covars = covars, 
-#'         covars.type = "numeric", use.coords = TRUE)
+#'                  use.coords = TRUE, x.max = x.max, x.min = 40, y.max = y.max, 
+#'                  y.min = 40, boundary = boundary, iterations = 500)
+#' tail(attr(res, "energy"), 1) # 0.001747814
+#' objCORR(points = res, candi = candi, covars = covars, use.coords = TRUE)
 # MAIN FUNCTION ################################################################
 optimCORR <-
   function (points, candi, covars, use.coords = FALSE, strata.type = "area", 
             x.max, x.min, y.max, y.min, iterations,
             acceptance = list(initial = 0.99, cooling = iterations / 10),
             stopping = list(max.count = iterations / 10), plotit = TRUE,
-            boundary, progress = TRUE, verbose = TRUE, greedy = TRUE) {
+            boundary, progress = TRUE, verbose = TRUE, greedy = FALSE) {
     
     if (!is.data.frame(covars)) covars <- as.data.frame(covars)
     

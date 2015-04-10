@@ -25,18 +25,13 @@ candi <- matrix(cbind(1:dim(candi)[1], candi), ncol = 3)
 covars <- meuse.grid[, 5]
 x.max <- diff(bbox(boundary)[1, ])
 y.max <- diff(bbox(boundary)[2, ])
-y.min <- 40
-x.min <- 40
-iterations <- 1000
-points <- 100
-use.coords <- TRUE
 set.seed(2001)
-res <- optimCORR(points = points, candi = candi, covars = covars, 
-                 use.coords = use.coords, x.max = x.max, x.min = x.min, 
-                 y.max = y.max, y.min = y.min, boundary = boundary, 
-                 iterations = iterations)
+res <- optimCORR(points = 100, candi = candi, covars = covars, 
+                 use.coords = TRUE, x.max = x.max, x.min = 40, y.max = y.max, 
+                 y.min = 40, boundary = boundary, iterations = 500)
 tail(attr(res, "energy"), 1) # 0.001747814
-objCORR(points = res, candi = candi, covars = covars, use.coords = use.coords)
+objCORR(points = res, candi = candi, covars = covars, use.coords = TRUE)
+
 # 1) FACTOR COVARIATES WITH THE COORDINATES ####################################
 rm(list = ls())
 gc()
