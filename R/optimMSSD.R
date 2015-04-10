@@ -6,6 +6,10 @@
 #'
 #' @template spJitter_doc
 #' @template spSANN_doc
+#' 
+#' @param greedy Logical value. Should the optimization be done using a greedy
+#' algorithm, that is, without accepting worse system configurations? Defaults
+#' to \code{greedy = FALSE}.
 #'
 #' @details
 #' Euclidean distances between points are calculated. This computation requires
@@ -55,13 +59,9 @@
 #' candi <- matrix(cbind(c(1:dim(candi)[1]), candi), ncol = 3)
 #' x.max <- diff(bbox(boundary)[1, ])
 #' y.max <- diff(bbox(boundary)[2, ])
-#' x.min <- 40
-#' y.min <- 40
-#' iterations <- 1000
-#' points <- 100
 #' set.seed(2001)
-#' res <- optimMSSD(points = points, candi = candi, x.max = x.max, x.min = x.min,
-#'                  y.max = y.max, y.min = y.min, iterations = iterations,
+#' res <- optimMSSD(points = 100, candi = candi, x.max = x.max, x.min = 40,
+#'                  y.max = y.max, y.min = 40, iterations = 1000,
 #'                  boundary = boundary)
 #' tail(attr(res, "energy.state"), 1) # 9896.487
 #' objMSSD(candi = candi, points = res)
@@ -70,7 +70,7 @@ optimMSSD <-
   function (points, candi, x.max, x.min, y.max, y.min, iterations = 10000,
             acceptance = list(initial = 0.99, cooling = iterations / 10),
             stopping = list(max.count = iterations / 10), plotit = TRUE,
-            boundary, progress = TRUE, verbose = TRUE) {
+            boundary, progress = TRUE, verbose = TRUE, greedy = FALSE) {
     
     check <- .spSANNcheck(points = points, candi = candi, 
                           x.max = x.max, x.min = x.min, y.max = y.max, 
@@ -148,20 +148,24 @@ optimMSSD <-
       #}
             
       # Evaluate the new system configuration
-      random_prob     <- runif(1)
-      actual_prob     <- acceptance[[1]] * exp(-k / acceptance[[2]])
+      if (greedy) {
+        random_prob <- 1
+      } else {
+        random_prob <- runif(1)
+      }
+      actual_prob <- acceptance[[1]] * exp(-k / acceptance[[2]])
       accept_probs[k] <- actual_prob
       if (new_energy <= old_energy) {
-        old_conf   <- new_conf
+        old_conf <- new_conf
         old_energy <- new_energy
-        count      <- 0
-        old_dm     <- new_dm
+        count <- 0
+        old_dm <- new_dm
       } else {
         if (new_energy > old_energy & random_prob <= actual_prob) {
-          old_conf   <- new_conf
+          old_conf <- new_conf
           old_energy <- new_energy
-          count      <- count + 1
-          old_dm     <- new_dm
+          count <- count + 1
+          old_dm <- new_dm
           if (verbose) {
             cat("\n", count, "iteration(s) with no improvement... p = ",
                 random_prob, "\n")
