@@ -65,11 +65,14 @@ optimMKV <-
     }    
     
     # Check arguments
-    check <- .spSANNcheck(points, candi, x.max, x.min, y.max, y.min,
-                          iterations, acceptance, stopping, plotit, boundary,
-                          progress, verbose)
+    check <- .spSANNcheck(points = points, candi = candi, x.max = x.max, 
+                          x.min = x.min, y.max = y.max, y.min = y.min, 
+                          iterations = iterations, acceptance = acceptance,
+                          stopping = stopping, plotit = plotit, 
+                          boundary = boundary, progress = progress, verbose = verbose)
     if (!is.null(check)) stop (check, call. = FALSE)
-    check <- .optimMKVcheck(covars, equation, model, krige.stat)
+    check <- .optimMKVcheck(covars = covars, equation = equation, model = model,
+                            krige.stat = krige.stat)
     if (!is.null(check)) stop (check, call. = FALSE)
     
     if (plotit) {
@@ -141,7 +144,8 @@ optimMKV <-
       y.max <- y_max0 - (k / iterations) * (y_max0 - y.min)
       
       # Update sample matrix and energy state
-      new_row <- covars[new_conf[wp, 1], ]
+      #new_row <- covars[new_conf[wp, 1], ]
+      new_row <- cbind(1, covars[new_conf[wp, 1], ])
       new_sm[wp, ] <- new_row
       new_energy <- gstat::krige(formula = equation, locations = ~ x + y, 
                                  data = new_sm, newdata = covars, 
