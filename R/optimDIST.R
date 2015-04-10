@@ -17,6 +17,10 @@
 #' \code{"range"} for equal range. Defaults to \code{strata.type = "area"}. See
 #' \sQuote{Details} for more information.
 #' 
+#' @param greedy Logical value. Should the optimization be done using a greedy
+#' algorithm, that is, without accepting worse system configurations? Defaults
+#' to \code{greedy = FALSE}.
+#' 
 #' @details
 #' This method derives from the method known as the conditioned Latin Hypercube
 #' originally proposed by Minasny and McBratney (2006). Visit the package manual
@@ -86,7 +90,7 @@ optimDIST <-
             x.max, x.min, y.max, y.min, iterations,
             acceptance = list(initial = 0.99, cooling = iterations / 10),
             stopping = list(max.count = iterations / 10), plotit = TRUE,
-            boundary, progress = TRUE, verbose = TRUE) {
+            boundary, progress = TRUE, verbose = TRUE, greedy = FALSE) {
     
     if (!is.data.frame(covars)) covars <- as.data.frame(covars)
     
@@ -175,7 +179,11 @@ optimDIST <-
       }
       
       # Evaluate the new system configuration
-      random_prob <- runif(1)
+      if (greedy) {
+        random_prob <- 1
+      } else {
+        random_prob <- runif(1)
+      }
       actual_prob <- acceptance[[1]] * exp(-k / acceptance[[2]])
       accept_probs[k] <- actual_prob
       if (new_energy <= old_energy) {
