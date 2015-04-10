@@ -322,7 +322,7 @@ optimPPL <-
         }
       }
       if (progress) setTxtProgressBar(pb, k)
-      if (k == iterations) {message("spsann should stop now!")}
+      #if (k == iterations) {message("spsann should stop now!")}
       # Set counter for while loop
       #k <- k + 1
     }

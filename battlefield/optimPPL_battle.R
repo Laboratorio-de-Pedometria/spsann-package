@@ -119,7 +119,7 @@ objPPL(points = points, candi = candi, lags = lags, lags.type = lags.type,
        pairs = pairs, lags.base = lags.base, cutoff = cutoff, 
        criterion = criterion)
 sum(length(points) - res$points)
-#
+
 # 3) Unit test #################################################################
 rm(list = ls())
 gc()
