@@ -23,26 +23,21 @@ candi <- coordinates(candi)
 candi <- matrix(cbind(1:dim(candi)[1], candi), ncol = 3)
 covars <- meuse.grid[, 5]
 x.max <- diff(bbox(boundary)[1, ])
-y.min <- 40
-x.min <- 40
 y.max <- diff(bbox(boundary)[2, ])
 nadir <- list(sim = 10, save.sim = TRUE, user = NULL, abs = NULL)
 utopia <- list(user = list(correl = 0, strata = 0), abs = NULL)
 scale <- list(type = "upper-lower", max = 100)
 weights <- list(strata = 0.5, correl = 0.5)
-points <- 100
-use.coords <- TRUE
-iterations <- 500
 set.seed(2001)
-res <- optimACDC(points = points, candi = candi, covars = covars,
-                 use.coords = use.coords, weights = weights,
-                 x.max = x.max, x.min = x.min, y.max = y.max, y.min = y.min,
-                 boundary = boundary, nadir = nadir, iterations = iterations,
+res <- optimACDC(points = 100, candi = candi, covars = covars,
+                 use.coords = TRUE, weights = weights, x.max = x.max, 
+                 x.min = 40, y.max = y.max, y.min = 40,
+                 boundary = boundary, nadir = nadir, iterations = 1000,
                  utopia = utopia, scale = scale)
 tail(attr(res, "energy"), 1) # 55.59217
 objACDC(points = res, candi = candi, covars = covars, use.coords = TRUE, 
-        weights = weights, nadir = nadir,
-        utopia = utopia, scale = scale) # 55.59217
+        weights = weights, nadir = nadir, utopia = utopia, scale = scale)
+
 # 1) FACTOR COVARIATES USING THE COORDINATES ###################################
 rm(list = ls())
 gc()
