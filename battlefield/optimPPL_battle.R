@@ -21,27 +21,18 @@ candi <- coordinates(candi)
 candi <- matrix(cbind(1:nrow(candi), candi), ncol = 3)
 x.max <- diff(bbox(boundary)[1, ])
 y.max <- diff(bbox(boundary)[2, ])
-x.min <- 40
-y.min <- 40
 cutoff <- sqrt((x.max * x.max) + (y.max * y.max)) / 2
-iterations <- 50000
-points <- 400
-lags <- 7
-lags.base <- 2
-criterion <- "distribution"
-lags.type <- "exponential"
-pairs <- FALSE
 set.seed(2001)
-res <- optimPPL(points = points, candi = candi, lags = lags, pairs = pairs,
-                lags.base = lags.base, criterion = criterion, cutoff = cutoff,
-                lags.type = lags.type,  x.max = x.max, x.min = x.min, 
-                y.max = y.max, y.min = y.min, boundary = boundary,
-                iterations = iterations, plotit = FALSE, verbose = FALSE)
-countPPL(points = res, lags = lags, lags.type = lags.type, pairs = pairs,
-         lags.base = lags.base, cutoff = cutoff)
+res <- optimPPL(points = 100, candi = candi, lags = 7, pairs = FALSE,
+                lags.base = 2, criterion = "distribution", cutoff = cutoff,
+                lags.type = "exponential", x.max = x.max, x.min = 40, 
+                y.max = y.max, y.min = 40, boundary = boundary,
+                iterations = 1000, plotit = TRUE, verbose = TRUE)
+countPPL(points = res, lags = 7, lags.type = "exponential", pairs = FALSE,
+         lags.base = 2, cutoff = cutoff)
 tail(attr(res, "energy.state"), 1) # 65
-objPPL(points = res, lags = lags, lags.type = lags.type, pairs = pairs,
-       lags.base = lags.base, cutoff = cutoff, criterion = criterion)
+objPPL(points = res, lags = 7, lags.type = "exponential", pairs = FALSE,
+       lags.base = 2, cutoff = cutoff, criterion = "distribution")
 # 1) Point pairs ###############################################################
 rm(list = ls())
 gc()
