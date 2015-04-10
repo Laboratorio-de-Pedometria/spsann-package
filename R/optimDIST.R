@@ -74,19 +74,12 @@
 #' covars <- meuse.grid[, 5]
 #' x.max <- diff(bbox(boundary)[1, ])
 #' y.max <- diff(bbox(boundary)[2, ])
-#' y.min <- 40
-#' x.min <- 40
-#' points <- 100
-#' iterations <- 1000
-#' use.coords <- TRUE
 #' set.seed(2001)
-#' res <- optimDIST(points = points, candi = candi, covars = covars, 
-#'                  use.coords = use.coords, x.max = x.max, x.min = x.min, 
-#'                  y.max = y.max, y.min = y.min, boundary = boundary, 
-#'                  iterations = iterations)
+#' res <- optimDIST(points = 100, candi = candi, covars = covars, 
+#'                  use.coords = TRUE, x.max = x.max, x.min = 40, y.max = y.max, 
+#'                  y.min = 40, boundary = boundary, iterations = 1000)
 #' tail(attr(res, "energy"), 1) # 0.9897776
-#' objDIST(points = res, candi = candi, covars = covars, 
-#'         use.coords = use.coords)
+#' objDIST(points = res, candi = candi, covars = covars, use.coords = TRUE)
 # MAIN FUNCTION ################################################################
 optimDIST <-
   function (points, candi, covars, strata.type = "area", use.coords = FALSE, 
