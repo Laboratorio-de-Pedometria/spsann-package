@@ -35,6 +35,10 @@
 #' @param pairs Logical value. Should the sample pattern be optimized regarding
 #' the number of point-pairs per lag-distance class? Defaults to 
 #' \code{pairs = FALSE}.
+#' 
+#' @param greedy Logical value. Should the optimization be done using a greedy
+#' algorithm, that is, without accepting worse system configurations? Defaults
+#' to \code{greedy = FALSE}.
 #'
 #' @details
 #' \strong{Distance}: Euclidean distances between points are used. This 
@@ -142,7 +146,7 @@ optimPPL <-
             x.max, x.min, y.max, y.min, iterations = 10000,
             acceptance = list(initial = 0.99, cooling = iterations / 10),
             stopping = list(max.count = iterations / 10), plotit = TRUE,
-            boundary, progress = TRUE, verbose = TRUE) {
+            boundary, progress = TRUE, verbose = TRUE, greedy = FALSE) {
     
     # Check arguments
     # http://www.r-bloggers.com/a-warning-about-warning/
@@ -249,7 +253,11 @@ optimPPL <-
       }
       
       # Evaluate the new system configuration
-      random_prob <- runif(1)
+      if (greedy) {
+        random_prob <- 1
+      } else {
+        random_prob <- runif(1)
+      }
       actual_prob <- acceptance$initial * exp(-k / acceptance$cooling)
       accept_probs[k] <- actual_prob
       if (new_energy <= old_energy) {
