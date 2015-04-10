@@ -5,5 +5,11 @@ date: "04/10/2015"
 output: html_document
 ---
 
-# optimCORR
-- [ ] Check problems with pedometrics::cramer()
+# Check functions before EGU2015
+- [x] optimPPL
+- [x] optimMSSD
+- [ ] optimCORR
+- [ ] optimDIST
+- [ ] optimACDC
+- [ ] optimPAN
+- [ ] optimMKV
