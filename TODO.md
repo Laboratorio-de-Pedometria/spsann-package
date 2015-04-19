@@ -5,7 +5,7 @@ date: "04/10/2015"
 output: html_document
 ---
 
-# Check functions before EGU2015
+# Check functions
 - [x] `optimPPL`
 - [x] `optimMSSD`
 - [ ] `optimCORR` (there is an issue with `pedometrics::cramer` and `bigtabulate`)
@@ -13,3 +13,6 @@ output: html_document
 - [ ] `optimACDC`
 - [ ] `optimPAN`
 - [x] `optimMKV`
+
+# Build new functions
+- [ ] `optimUSER` for user defined objective functions
