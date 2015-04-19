@@ -16,4 +16,5 @@
 #' @param x.max,x.min,y.max,y.min Numeric value. The minimum and maximum 
 #' quantity of random noise to be added to the x and y coordinates. The minimum
 #' quantity must be equal to, at least, the minimum distance between two
-#' neighboring candidate locations. The units are the same as of the coordinates.
+#' neighbouring candidate locations. The units are the same as of the 
+#' coordinates.

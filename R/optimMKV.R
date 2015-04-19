@@ -17,9 +17,9 @@
 #' @param model Object of class "variogramModel". See the argument 
 #' \code{model} in the function \code{\link[gstat]{krige}} for more information.
 #'
-#' @param krige.stat Character value defining the statistic that shoul be used
+#' @param krige.stat Character value defining the statistic that should be used
 #' to summarize the kriging variance. Available options are \code{"mean"} and
-#' \code{"max"} for the mean and maximum krigig variance, respectively.
+#' \code{"max"} for the mean and maximum kriging variance, respectively.
 #' Defaults to \code{krige.stat = "mean"}.
 #'
 #' @return
@@ -65,7 +65,8 @@ optimMKV <-
                           x.min = x.min, y.max = y.max, y.min = y.min, 
                           iterations = iterations, acceptance = acceptance,
                           stopping = stopping, plotit = plotit, 
-                          boundary = boundary, progress = progress, verbose = verbose)
+                          boundary = boundary, progress = progress, 
+                          verbose = verbose)
     if (!is.null(check)) stop (check, call. = FALSE)
     check <- .optimMKVcheck(covars = covars, equation = equation, model = model,
                             krige.stat = krige.stat)

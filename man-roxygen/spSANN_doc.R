@@ -12,12 +12,13 @@
 #' @param stopping List with one named sub-argument: \code{max.count} -- 
 #' integer value defining the maximum allowable number of iterations without 
 #' improvement of the objective function value. Defaults to 
-#' \code{stopping = list(max.count = iterations / 10)}.
+#' \code{stopping = list(max.count = iterations / 10)}. More options may be
+#' included in the future.
 #' 
-#' @param plotit Logical for ploting the optimization results. This includes 
+#' @param plotit Logical for plotting the optimization results. This includes 
 #' a) the progress of the objective function values and acceptance 
 #' probabilities, and b) the original points, the perturbed points and the 
-#' progress of the maximum perturbation in the x and y coordinates. The plots 
+#' progress of the maximum perturbation in the x- and y-coordinates. The plots 
 #' are updated at each 10 iterations. Defaults to \code{plotit = TRUE}.
 #' 
 #' @param boundary SpatialPolygon. The boundary of the spatial domain. 
