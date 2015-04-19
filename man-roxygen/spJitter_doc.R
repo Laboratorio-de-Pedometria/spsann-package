@@ -5,8 +5,8 @@
 #' should be sampled from \code{candi}. If \code{points} is an integer vector, 
 #' it contains the row indexes of \code{candi} that correspond to the points. 
 #' If \code{points} is a data frame or matrix, it must have three
-#' columns: \code{[, 1]} the identification of each point (1, 2, ..., n), 
-#' \code{[, 2]} the x coordinates, and \code{[, 3]} the y coordinates. The
+#' columns: \code{[, 1]} the identification of each sample point (1, 2, ..., n), 
+#' \code{[, 2]} the x-coordinates, and \code{[, 3]} the y-coordinates. The
 #' coordinates must be projected. If a data frame or matrix is used, 
 #' \code{points} must be a subset of \code{candi}.
 #'
