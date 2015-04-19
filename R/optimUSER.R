@@ -5,15 +5,25 @@
 #' @template spJitter_doc
 #' @template spSANN_doc
 #' 
-#' @param
+#' @param fun A function defining the objective function that should be
+#' used to evaluate the energy state of the system configuration at each 
+#' iteration. See \sQuote{Details} for more information.
+#' 
+#' @param ... Other arguments passed to the objective function. See 
+#' \sQuote{Details} for more information.
 #'
 #' @details
+#' The user-defined objective function has to be an object of class 
+#' \link[base]{function}. It has to include the argument \code{points}, which is
+#' defined internally as a matrix with three columns: \code{[, 1]} the 
+#' identification of each sample point (1, 2, ..., n), \code{[, 2]} the 
+#' x-coordinates, and \code{[, 3]} the y-coordinates. The identification is 
+#' useful to retrieve information from any data matrix used by the objective
+#' function defined by the user.
 #' 
 #' @return
 #' \code{optimUSER} returns a matrix: the optimized sample pattern with
 #' the evolution of the energy state during the optimization as an attribute.
-#'
-#' @references
 #'
 #' @author
 #' Alessandro Samuel-Rosa \email{alessandrosamuelrosa@@gmail.com}
@@ -22,7 +32,62 @@
 #' @concept simulated annealing
 #' @export
 #' @examples
+#' require(pedometrics)
+#' require(sp)
+#' require(rgeos)
+#' require(SpatialTools)
+#' data(meuse.grid)
+#' candi <- meuse.grid[, 1:2]
+#' coordinates(candi) <- ~ x + y
+#' gridded(candi) <- TRUE
+#' boundary <- as(candi, "SpatialPolygons")
+#' boundary <- gUnionCascaded(boundary)
+#' candi <- coordinates(candi)
+#' candi <- matrix(cbind(1:nrow(candi), candi), ncol = 3)
+#' x.max <- diff(bbox(boundary)[1, ])
+#' y.max <- diff(bbox(boundary)[2, ])
 #' 
+#' # Define the objective function - number of points per lag distance class
+#' objUSER <-
+#'   function (points, lags, n_lags, n_pts) {
+#'     dm <- SpatialTools::dist1(points[, 2:3])
+#'     ppl <- vector()
+#'     for (i in 1:n_lags) {
+#'       n <- which(dm > lags[i] & dm <= lags[i + 1], arr.ind = TRUE)
+#'       ppl[i] <- length(unique(c(n)))
+#'     }
+#'     distri <- rep(n_pts, n_lags)
+#'     res <- sum(distri - ppl)
+#'   }
+#' lags <- seq(1, 1000, length.out = 10)
+#' 
+#' # Run the optimization using the user-defined objective function
+#' set.seed(2001)
+#' timeUSER <- Sys.time()
+#' resUSER <- optimUSER(points = 100, fun = objUSER, lags = lags, 
+#'                      n_lags = 9, n_pts = 100,
+#'                      candi = candi, x.max = x.max, x.min = 40, y.max = y.max,
+#'                      y.min = 40, boundary = boundary, iterations = 1000)
+#' timeUSER <- Sys.time() - timeUSER
+#' 
+#' # Run the optimization using the respective function implemented in spsann
+#' set.seed(2001)
+#' timePPL <- Sys.time()
+#' resPPL <- optimPPL(points = 100, candi = candi, lags = lags,  
+#'                    criterion = "distribution", x.max = x.max, x.min = 40, 
+#'                    y.max = y.max, y.min = 40, boundary = boundary,
+#'                    iterations = 1000)
+#' timePPL <- Sys.time() - timePPL
+#' 
+#' # Compare results
+#' timeUSER
+#' timePPL
+#' lapply(list(resUSER, resPPL), countPPL, lags = lags, pairs = FALSE)
+#' x <- attr(resUSER, "energy.state")
+#' y <- attr(resPPL, "energy.state")
+#' sapply(list(x, y), tail, 1)
+#' plot(x, y, asp = 1)
+#' abline(0, 1, col = "red")
 # FUNCTION - MAIN ##############################################################
 optimUSER <-
   function (points, fun, ...,
@@ -54,7 +119,7 @@ optimUSER <-
     old_conf <- conf0
     
     # Initial energy state
-    energy0 <- .energyState(fun = fun, points = old_conf[, 2:3], ...)
+    energy0 <- .energyState(fun = fun, points = old_conf, ...)
     
     # Other settings for the simulated annealing algorithm
     count <- 0
@@ -79,7 +144,7 @@ optimUSER <-
       y.max <- y_max0 - (k / iterations) * (y_max0 - y.min)
       
       # New energy state
-      new_energy <- .energyState(fun = fun, points = new_conf[, 2:3], ...)
+      new_energy <- .energyState(fun = fun, points = new_conf, ...)
       
       # Evaluate the new system configuration
       if (greedy) {

@@ -4,7 +4,9 @@ gc()
 source('R/spSANNtools.R')
 source('R/spJitter.R')
 source('R/optimUSER.R')
+source('R/optimPPL.R')
 Rcpp::sourceCpp('src/spJitterCpp.cpp')
+Rcpp::sourceCpp('src/updatePPLCpp.cpp')
 # 0) DEFAULT EXAMPLE ###########################################################
 require(pedometrics)
 require(sp)
@@ -21,171 +23,44 @@ candi <- matrix(cbind(1:nrow(candi), candi), ncol = 3)
 x.max <- diff(bbox(boundary)[1, ])
 y.max <- diff(bbox(boundary)[2, ])
 
-cutoff <- sqrt((x.max * x.max) + (y.max * y.max)) / 2
-set.seed(2001)
-res <- optimPPL(points = 100, candi = candi, lags = 7, pairs = FALSE,
-                lags.base = 2, criterion = "distribution", cutoff = cutoff,
-                lags.type = "exponential", x.max = x.max, x.min = 40, 
-                y.max = y.max, y.min = 40, boundary = boundary,
-                iterations = 1000, plotit = TRUE, verbose = TRUE)
-countPPL(points = res, lags = 7, lags.type = "exponential", pairs = FALSE,
-         lags.base = 2, cutoff = cutoff)
-tail(attr(res, "energy.state"), 1) # 65
-objPPL(points = res, lags = 7, lags.type = "exponential", pairs = FALSE,
-       lags.base = 2, cutoff = cutoff, criterion = "distribution")
-# 1) Point pairs ###############################################################
-rm(list = ls())
-gc()
-source('R/spSANNtools.R')
-source('R/spJitter.R')
-source('R/optimPPL.R')
-Rcpp::sourceCpp('src/spJitterCpp.cpp')
-Rcpp::sourceCpp('src/updatePPLCpp.cpp')
-data(meuse.grid)
-candi <- meuse.grid[, 1:2]
-coordinates(candi) <- ~ x + y
-gridded(candi) <- TRUE
-boundary <- as(candi, "SpatialPolygons")
-boundary <- gUnionCascaded(boundary)
-candi <- coordinates(candi)
-candi <- matrix(cbind(1:nrow(candi), candi), ncol = 3)
-x.max <- diff(bbox(boundary)[1, ])
-y.max <- diff(bbox(boundary)[2, ])
-x.min <- 40
-y.min <- 40
-cutoff <- sqrt((x.max * x.max) + (y.max * y.max))
-iterations <- 100
-points <- 100
-lags <- 7
-lags.base <- 2
-criterion <- "distribution"
-lags.type <- "exponential"
-pairs <- TRUE
-set.seed(2001)
-res <- optimPPL(points = points, candi = candi, lags = lags, pairs = pairs,
-                lags.base = lags.base, criterion = criterion, cutoff = cutoff,
-                lags.type = lags.type,  x.max = x.max, x.min = x.min, 
-                y.max = y.max, y.min = y.min, boundary = boundary,
-                iterations = iterations)
-countPPL(points = res, lags = lags, lags.type = lags.type, 
-         lags.base = lags.base, cutoff = cutoff, pairs = pairs)
-tail(attr(res, "energy.state"), 1) # 7592.857
-objPPL(points = res, lags = lags, lags.type = lags.type, pairs = pairs,
-       lags.base = lags.base, cutoff = cutoff, criterion = criterion)
+# Define the objective function - number of points per lag distance class
+objUSER <-
+  function (points, lags, n_lags, n_pts) {
+  dm <- SpatialTools::dist1(points[, 2:3])
+  ppl <- vector()
+  for (i in 1:n_lags) {
+    n <- which(dm > lags[i] & dm <= lags[i + 1], arr.ind = TRUE)
+    ppl[i] <- length(unique(c(n)))
+  }
+  distri <- rep(n_pts, n_lags)
+  res <- sum(distri - ppl)
+}
+lags <- seq(1, 1000, length.out = 10)
 
-# 2) Points per lag - select sample points from candi ##########################
-rm(list = ls())
-gc()
-source('R/spSANNtools.R')
-source('R/spJitter.R')
-source('R/optimPPL.R')
-Rcpp::sourceCpp('src/spJitterCpp.cpp')
-Rcpp::sourceCpp('src/updatePPLCpp.cpp')
-data(meuse.grid)
-candi <- meuse.grid[, 1:2]
-coordinates(candi) <- ~ x + y
-gridded(candi) <- TRUE
-boundary <- as(candi, "SpatialPolygons")
-boundary <- gUnionCascaded(boundary)
-candi <- coordinates(candi)
-candi <- matrix(cbind(1:nrow(candi), candi), ncol = 3)
-x.max <- diff(bbox(boundary)[1, ])
-y.max <- diff(bbox(boundary)[2, ])
-x.min <- 40
-y.min <- 40
-cutoff <- sqrt((x.max * x.max) + (y.max * y.max))
-points <- 100
-lags <- 7
-lags.base <- 2
-criterion <- "distribution"
-lags.type <- "exponential"
-pairs <- FALSE
-# random selection
+# Run the optimization using the user-defined objective function
 set.seed(2001)
-res <- countPPL(points = points, candi = candi, lags = lags, 
-                lags.type = lags.type, lags.base = lags.base, cutoff = cutoff,
-                pairs = pairs)
-set.seed(2001)
-objPPL(points = points, candi = candi, lags = lags, lags.type = lags.type, 
-       pairs = pairs, lags.base = lags.base, cutoff = cutoff, 
-       criterion = criterion)
-sum(points - res$points)
-# vector of indexes
-points <- 1:100
-res <- countPPL(points = points, candi = candi, lags = lags, 
-                lags.type = lags.type, lags.base = lags.base, cutoff = cutoff,
-                pairs = pairs)
-objPPL(points = points, candi = candi, lags = lags, lags.type = lags.type, 
-       pairs = pairs, lags.base = lags.base, cutoff = cutoff, 
-       criterion = criterion)
-sum(length(points) - res$points)
+timeUSER <- Sys.time()
+resUSER <- optimUSER(points = 100, fun = objUSER, lags = lags, 
+                     n_lags = 9, n_pts = 100,
+                     candi = candi, x.max = x.max, x.min = 40, y.max = y.max,
+                     y.min = 40, boundary = boundary, iterations = 1000)
+timeUSER <- Sys.time() - timeUSER
 
-# 3) Unit test #################################################################
-rm(list = ls())
-gc()
-source('R/spSANNtools.R')
-source('R/spJitter.R')
-source('R/optimPPL.R')
-Rcpp::sourceCpp('src/spJitterCpp.cpp')
-Rcpp::sourceCpp('src/updatePPLCpp.cpp')
-data(meuse.grid)
-candi <- meuse.grid[, 1:2]
-coordinates(candi) <- ~ x + y
-gridded(candi) <- TRUE
-boundary <- as(candi, "SpatialPolygons")
-boundary <- gUnionCascaded(boundary)
-candi <- coordinates(candi)
-candi <- matrix(cbind(1:nrow(candi), candi), ncol = 3)
-x.max <- diff(bbox(boundary)[1, ])
-y.max <- diff(bbox(boundary)[2, ])
-x.min <- 40
-y.min <- 40
-cutoff <- sqrt((x.max * x.max) + (y.max * y.max))
-points <- 100
-lags <- 1
-lags.base <- 2
-criterion <- "distribution"
-lags.type <- "exponential"
-pairs <- FALSE
+# Run the optimization using the respective function implemented in spsann
 set.seed(2001)
-countPPL(points = points, candi = candi, lags = lags, lags.type = lags.type,
-         lags.base = lags.base, cutoff = cutoff, pairs = pairs)
-pairs <- TRUE
-set.seed(2001)
-countPPL(points = points, candi = candi, lags = lags, lags.type = lags.type,
-         lags.base = lags.base, cutoff = cutoff, pairs = pairs)
+timePPL <- Sys.time()
+resPPL <- optimPPL(points = 100, candi = candi, lags = lags,  
+                   criterion = "distribution", x.max = x.max, x.min = 40, 
+                   y.max = y.max, y.min = 40, boundary = boundary,
+                   iterations = 1000)
+timePPL <- Sys.time() - timePPL
 
-# 4) GREEDY ALGORITH ###########################################################
-rm(list = ls())
-gc()
-source('R/spSANNtools.R')
-source('R/spJitter.R')
-source('R/optimPPL.R')
-Rcpp::sourceCpp('src/spJitterCpp.cpp')
-Rcpp::sourceCpp('src/updatePPLCpp.cpp')
-require(pedometrics)
-require(sp)
-require(rgeos)
-require(SpatialTools)
-data(meuse.grid)
-candi <- meuse.grid[, 1:2]
-coordinates(candi) <- ~ x + y
-gridded(candi) <- TRUE
-boundary <- as(candi, "SpatialPolygons")
-boundary <- gUnionCascaded(boundary)
-candi <- coordinates(candi)
-candi <- matrix(cbind(1:nrow(candi), candi), ncol = 3)
-x.max <- diff(bbox(boundary)[1, ])
-y.max <- diff(bbox(boundary)[2, ])
-cutoff <- sqrt((x.max * x.max) + (y.max * y.max)) / 2
-set.seed(2001)
-res <- optimPPL(points = 100, candi = candi, lags = 7, pairs = FALSE,
-                lags.base = 2, criterion = "distribution", cutoff = cutoff,
-                lags.type = "exponential", x.max = x.max, x.min = 40, 
-                y.max = y.max, y.min = 40, boundary = boundary,
-                iterations = 1000, plotit = TRUE, verbose = TRUE, greedy = TRUE)
-countPPL(points = res, lags = 7, lags.type = "exponential", pairs = FALSE,
-         lags.base = 2, cutoff = cutoff)
-tail(attr(res, "energy.state"), 1) # 53
-objPPL(points = res, lags = 7, lags.type = "exponential", pairs = FALSE,
-       lags.base = 2, cutoff = cutoff, criterion = "distribution")
+# Compare results
+timeUSER
+timePPL
+lapply(list(resUSER, resPPL), countPPL, lags = lags, pairs = FALSE)
+x <- attr(resUSER, "energy.state")
+y <- attr(resPPL, "energy.state")
+sapply(list(x, y), tail, 1)
+plot(x, y, asp = 1)
+abline(0, 1, col = "red")
