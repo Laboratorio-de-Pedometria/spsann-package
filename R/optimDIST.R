@@ -17,10 +17,6 @@
 #' \code{"range"} for equal range. Defaults to \code{strata.type = "area"}. See
 #' \sQuote{Details} for more information.
 #' 
-#' @param greedy Logical value. Should the optimization be done using a greedy
-#' algorithm, that is, without accepting worse system configurations? Defaults
-#' to \code{greedy = FALSE}.
-#' 
 #' @details
 #' This method derives from the method known as the conditioned Latin Hypercube
 #' originally proposed by Minasny and McBratney (2006). Visit the package manual

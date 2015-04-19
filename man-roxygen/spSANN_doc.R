@@ -29,4 +29,8 @@
 #' @param verbose Logical for printing messages about the progress of the
 #' optimization.
 #' 
+#' @param greedy Logical value. Should the optimization be done using a greedy
+#' algorithm, that is, accepting only better system configurations? Defaults
+#' to \code{greedy = FALSE}.
+#' 
 #' @keywords spatial optimize

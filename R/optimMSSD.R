@@ -6,10 +6,6 @@
 #'
 #' @template spJitter_doc
 #' @template spSANN_doc
-#' 
-#' @param greedy Logical value. Should the optimization be done using a greedy
-#' algorithm, that is, without accepting worse system configurations? Defaults
-#' to \code{greedy = FALSE}.
 #'
 #' @details
 #' Euclidean distances between points are calculated. This computation requires

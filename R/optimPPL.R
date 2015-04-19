@@ -35,10 +35,6 @@
 #' @param pairs Logical value. Should the sample pattern be optimized regarding
 #' the number of point-pairs per lag-distance class? Defaults to 
 #' \code{pairs = FALSE}.
-#' 
-#' @param greedy Logical value. Should the optimization be done using a greedy
-#' algorithm, that is, without accepting worse system configurations? Defaults
-#' to \code{greedy = FALSE}.
 #'
 #' @details
 #' \strong{Distance}: Euclidean distances between points are used. This 

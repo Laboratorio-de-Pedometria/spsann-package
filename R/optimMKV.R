@@ -21,10 +21,6 @@
 #' to summarize the kriging variance. Available options are \code{"mean"} and
 #' \code{"max"} for the mean and maximum krigig variance, respectively.
 #' Defaults to \code{krige.stat = "mean"}.
-#' 
-#' @param greedy Logical value. Should the optimization be done using a greedy
-#' algorithm, that is, without accepting worse system configurations? Defaults
-#' to \code{greedy = FALSE}.
 #'
 #' @return
 #' \code{optimMKV} returns a matrix: the optimized sample pattern with
