@@ -1,7 +1,12 @@
-# Version 0.0.1.9000 (2015-02-24)
+# Version 0.0.0.9002 (2015-04-19)
+
+* new function to enable the user to define his/her own objective function;
+* grammar check and enhanced documentation;
+
+# Version 0.0.0.9001 (2015-02-24)
 
 * new functions derived from `optimACDC`: `optimDIST` and `optimCORR`;
-* new objective function: mean/maximum universal kriging variance;
+* new objective function: mean/maximum kriging variance;
 * review of the family of PPL functions;
 * using function tailored argument checking.
 

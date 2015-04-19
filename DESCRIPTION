@@ -1,16 +1,17 @@
 Package: spsann
 Type: Package
-Title: Optimization of sample patterns using spatial simulated annealing
-Version: 0.0.1.9000
-Date: 2015-02-24
+Title: Optimization of sample configurations using spatial simulated annealing
+Version: 0.0.0.9002
+Date: 2015-04-19
 Author: Alessandro Samuel-Rosa
 Maintainer: Alessandro Samuel-Rosa <alessandrosamuelrosa@gmail.com>
 Description: spsann offers many optimizing criteria for sampling for variogram
     estimation (PPL), trend estimation (ACDC), and spatial
     interpolation (MSSD). spsann also includes an optimizing criterion
-    for when the model of spatial variation is known (MUKV). PPL, ACDC
+    for when the model of spatial variation is known (MKV). PPL, ACDC
     and MSSD were combined (PAN) for sampling when we are ignorant
-    about the model of spatial variation.
+    about the model of spatial variation. The user can also define his/her own
+    objective function and plug it in the spatial simulated annealing algorithm.
 License: GPL (>= 2)
 Imports:
     fields,
