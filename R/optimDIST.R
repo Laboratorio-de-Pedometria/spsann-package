@@ -1,6 +1,6 @@
-#' Optimization of sample patterns for trend estimation
+#' Optimization of sample configurations for trend estimation
 #'
-#' Optimize a sample pattern for trend estimation. A criterion is defined so 
+#' Optimize a sample configuration for trend estimation. A criterion is defined so 
 #' that the sample reproduces the marginal distribution of the covariates
 #' (\bold{DIST}).
 #'
@@ -23,11 +23,11 @@
 #' to see the improvements that we have made in that method.
 #'
 #' @return
-#' \code{optimDIST} returns a matrix: the optimized sample pattern with
+#' \code{optimDIST} returns a matrix: the optimized sample configuration with
 #' the evolution of the energy state during the optimization as an attribute.
 #'  
 #' \code{objDIST} returns a numeric value: the energy state of the sample
-#' pattern - the objective function value.
+#' configuration - the objective function value.
 #'
 #' @references
 #' Minasny, B.; McBratney, A. B. A conditioned Latin hypercube method for

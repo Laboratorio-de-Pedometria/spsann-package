@@ -1,8 +1,8 @@
-#' Optimization of sample patterns for trend estimation
+#' Optimization of sample configurations for trend estimation
 #'
-#' Optimize a sample pattern for trend estimation. A criterion is defined so 
-#' that the sample reproduces the association/correlation between the covariates
-#' (\bold{CORR}).
+#' Optimize a sample cconfiguration for trend estimation. A criterion is defined
+#' so that the sample reproduces the association/correlation between the 
+#' covariates (\bold{CORR}).
 #'
 #' @template spJitter_doc
 #' @template spSANN_doc
@@ -23,11 +23,11 @@
 #' to see the improvements that we have made in that method.
 #'
 #' @return
-#' \code{optimCORR} returns a matrix: the optimized sample pattern with
+#' \code{optimCORR} returns a matrix: the optimized sample configuration with
 #' the evolution of the energy state during the optimization as an attribute.
 #' 
 #' \code{objCORR} returns a numeric value: the energy state of the sample
-#' pattern - the objective function value.
+#' configuration - the objective function value.
 #'
 #' @references
 #' Minasny, B.; McBratney, A. B. A conditioned Latin hypercube method for
@@ -56,6 +56,7 @@
 #' @importFrom pedometrics is.numint
 #' @importFrom pedometrics cont2cat
 #' @importFrom SpatialTools dist2
+#' @importFrom rgeos gUnionCascaded
 #' @export
 #' @examples
 #' require(pedometrics)
@@ -350,4 +351,110 @@ objCORR <-
       }
     }
     return (energy)
+  }
+
+# INTERNAL FUNCTION - PREPARE THE COVARIATES ###################################
+.covarsACDC <-
+  function (covars, covars.type, use.coords, candi, n.pts, strata.type) {
+    
+    # Factor covariates
+    if (covars.type == "factor") {
+      if (use.coords) {
+        covars <- data.frame(covars, candi[, 2:3])
+      }
+      # Convert numeric covariates to factor covariates
+      if (!pedometrics::is.all.factor(covars)) {
+        i <- which(sapply(covars, is.factor) == FALSE)
+        mes <- paste("converting ", length(i), 
+                     " numeric covariates to factor covariates", sep = "")
+        message(mes)
+        num_covars <- data.frame(covars[, i])
+        breaks <- .numStrata(n.pts = n.pts, covars = num_covars, 
+                             strata.type = strata.type)[[1]]
+        num_covars <- cont2cat(x = num_covars, breaks = breaks)
+        covars[, i] <- num_covars
+      }
+      
+      # Numeric covariates
+    } else {
+      if (use.coords) {
+        covars <- data.frame(covars, candi[, 2:3])
+      }
+    }
+    return (covars)
+  }
+
+# INTERNAL FUNCTION - BREAKS FOR NUMERIC COVARIATES ############################
+# Now we define the breaks and the distribution, and return it as a list
+# Quantiles now honour the fact that the data are discontinuous
+# NOTE: there is a problem when the number of unique values is small (3)
+# TODO: build a function is pedometrics
+.numStrata <-
+  function (n.pts, covars, strata.type) {
+    
+    # equal area strata
+    if (strata.type == "area") {
+      n_cov <- ncol(covars)
+      probs <- seq(0, 1, length.out = n.pts + 1)
+      breaks <- lapply(covars, quantile, probs, na.rm = TRUE, type = 3)
+      
+      # ASR: This is an old implementation
+      #count <- lapply(breaks, table)
+      #count <- lapply(count, as.integer)
+      #count <- lapply(count, function(x) {x[2] <- x[2] + x[1] - 1; x[-1L]})
+      
+      breaks <- lapply(breaks, unique)
+      count <- lapply(1:n_cov, function (i)
+        hist(covars[, i], breaks[[i]], plot = FALSE)$counts)
+      
+      # ASR: We use the proportion of points per sampling strata
+      #count <- lapply(1:n_cov, function(i) 
+      #  count[[i]] / sum(count[[i]]) * n.pts)
+      
+      #count <- lapply(1:n_cov, function(i) count[[i]] / sum(count[[i]]) * 100)
+      count <- lapply(1:n_cov, function(i) count[[i]] / sum(count[[i]]))
+      strata <- list(breaks, count)
+      
+    } else {
+      # equal range strata
+      if (strata.type == "range") {
+        n_cov <- ncol(covars)
+        breaks <- lapply(1:n_cov, function(i)
+          seq(min(covars[, i]), max(covars[, i]), length.out = n.pts + 1))
+        d <- lapply(1:n_cov, function(i)
+          SpatialTools::dist2(matrix(breaks[[i]]), matrix(covars[, i])))
+        d <- lapply(1:n_cov, function(i) apply(d[[i]], 1, which.min))
+        breaks <- lapply(1:n_cov, function(i) breaks[[i]] <- covars[d[[i]], i])
+        breaks <- lapply(breaks, unique)
+        count <- lapply(1:n_cov, function (i)
+          hist(covars[, i], breaks[[i]], plot = FALSE)$counts)
+        
+        # ASR: We use the proportion of points per sampling strata
+        #count <- lapply(1:n_cov, function(i)
+        #  count[[i]] / sum(count[[i]]) * n.pts)
+        count <- lapply(1:n_cov, function(i)
+          #count[[i]] / sum(count[[i]]) * 100)
+          count[[i]] / sum(count[[i]]))
+        
+        
+        # ASR: This is an old implementation to merge null strata
+        #breaks <- lapply(breaks, unique)
+        #count <- lapply(1:n_cov, function (i)
+        #  hist(covars[, i], breaks[[i]], plot = FALSE)$counts)
+        #zero <- sapply(1:n_cov, function (i) any(count[[i]] == 0))
+        #zero <- which(zero)
+        #for (i in zero) {
+        #  wz <- which(count[[i]] == 0)
+        #  breaks[[i]] <- breaks[[i]][-(wz + 1)]
+        #}
+        #for (i in 1:n_cov) {
+        #  mini <- min(covars[, i])
+        #  maxi <- max(covars[, i])
+        #  count[[i]] <- diff(breaks[[i]]) / ((maxi - mini) / n.pts)
+        #}
+        
+        strata <- list(breaks, count)
+      }
+    }
+    return (strata)
   }

@@ -1,6 +1,6 @@
-#' Optimization of sample patterns for spatial interpolation
+#' Optimization of sample configurations for spatial interpolation
 #'
-#' Optimize a sample pattern for spatial interpolation. The criterion used is
+#' Optimize a sample configuration for spatial interpolation. The criterion used is
 #' the mean squared shortest distance (\code{optimMSSD}). \code{objMSSD}
 #' computes the MSSD between a set of points and all grid cells.
 #'
@@ -15,7 +15,7 @@
 #' \code{objMSSD} returns a numeric value: the MSSD between a set of points and
 #' all grid cells.
 #'
-#' \code{optimMSSD} returns a matrix: the optimized sample pattern with
+#' \code{optimMSSD} returns a matrix: the optimized sample configuration with
 #' the evolution of the energy state during the optimization as an attribute.
 #'
 #' @references

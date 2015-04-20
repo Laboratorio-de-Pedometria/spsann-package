@@ -1,3 +1,10 @@
+# Version 0.0.0.9003 (2015-04-20)
+
+* Special version designed for the course on Spatial Sampling for Mapping, 
+22 - 24 April 2015, Wageningen University Campus, Wageningen, The Netherlands,
+Under the auspices of the Graduate School for Production Ecology and Resource 
+Conservation (PE&RC).
+
 # Version 0.0.0.9002 (2015-04-19)
 
 * new function to enable the user to define his/her own objective function;

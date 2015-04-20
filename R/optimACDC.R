@@ -81,7 +81,7 @@
 #' @importFrom pedometrics is.all.factor
 #' @importFrom pedometrics is.any.factor
 #' @importFrom SpatialTools dist2
-#' @export
+# @export
 #' @examples
 #' require(pedometrics)
 #' require(sp)
@@ -105,14 +105,14 @@
 #' weights <- list(strata = 0.5, correl = 0.5)
 #' set.seed(2001)
 #' res <- optimACDC(points = 100, candi = candi, covars = covars,
-#'                  use.coords = TRUE, covars.type = "numeric", 
+#'                  use.coords = TRUE,
 #'                  weights = weights, x.max = x.max, x.min = x.min, 
 #'                  y.max = y.max, y.min = y.min, boundary = boundary, 
 #'                  nadir = nadir, iterations = 500, utopia = utopia, 
 #'                  scale = scale)
 #' tail(attr(res, "energy"))
 #' objACDC(points = res, candi = candi, covars = covars, use.coords = TRUE, 
-#'         covars.type = "numeric", weights = weights, nadir = nadir,
+#'         weights = weights, nadir = nadir,
 #'         utopia = utopia, scale = scale)
 # MAIN FUNCTION ################################################################
 optimACDC <-
@@ -688,8 +688,8 @@ optimACDC <-
     }
   }
 # CALCULATE OBJECTIVE FUNCTION VALUE ###########################################
-#' @rdname optimACDC
-#' @export
+# @rdname optimACDC
+# @export
 objACDC <-
   function (points, candi, covars, strata.type = "area", 
             weights = list(correl = 0.5, strata = 0.5), use.coords = FALSE, 
@@ -701,7 +701,7 @@ objACDC <-
     if (!is.data.frame(covars)) covars <- as.data.frame(covars)
     # Check arguments
     check <- .optimACDCcheck(candi = candi, covars = covars, nadir = nadir,
-                             covars.type = covars.type, weights = weights, 
+                             weights = weights, 
                              use.coords = use.coords, strata.type = strata.type,
                              utopia = utopia, scale = scale)
     if (!is.null(check)) stop (check, call. = FALSE)

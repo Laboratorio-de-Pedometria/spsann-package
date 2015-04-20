@@ -1,6 +1,6 @@
-#' Optimization of sample patterns using a user-defined objective function
+#' Optimization of sample configurations using a user-defined objective function
 #'
-#' Optimize a sample pattern using a user-defined objective function.
+#' Optimize a sample configuration using a user-defined objective function.
 #' 
 #' @template spJitter_doc
 #' @template spSANN_doc
@@ -22,7 +22,7 @@
 #' function defined by the user.
 #' 
 #' @return
-#' \code{optimUSER} returns a matrix: the optimized sample pattern with
+#' \code{optimUSER} returns a matrix: the optimized sample configuration with
 #' the evolution of the energy state during the optimization as an attribute.
 #'
 #' @author

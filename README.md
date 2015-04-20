@@ -1,4 +1,4 @@
 spsann
 ======
 
-Optimization of sample configurations using spatial simulated annealing
+Optimization of Sample Configurations using Spatial Simulated Annealing

@@ -19,7 +19,7 @@
 #' D.T. Hristopulos, S.J. Melles and G. Spiliopoulos (2013). 
 #' \emph{intamapInteractive: procedures for automated interpolation - methods 
 #' only to be used interactively, not included in intamap package.} R package 
-#' version 1.1-10. \url{http://CRAN.R-project.org/package=intamapInteractive}
+#' version 1.1-10.
 #' 
 #' van Groenigen, J.-W. \emph{Constrained optimization of spatial sampling: 
 #' a geostatistical approach.} Wageningen: Wageningen University, p. 148, 1999.

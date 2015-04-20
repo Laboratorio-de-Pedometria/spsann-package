@@ -1,7 +1,7 @@
-#' Optimization of sample patterns for spatial interpolation
+#' Optimization of sample configurations for spatial interpolation
 #'
-#' Optimize a sample pattern for spatial interpolation with a known linear 
-#' model. A criterion is defined so that the sample pattern minimizes the
+#' Optimize a sample configuration for spatial interpolation with a known linear 
+#' model. A criterion is defined so that the sample configuration minimizes the
 #' mean kriging variance 
 #'
 #' @template spJitter_doc
@@ -23,7 +23,7 @@
 #' Defaults to \code{krige.stat = "mean"}.
 #'
 #' @return
-#' \code{optimMKV} returns a matrix: the optimized sample pattern with
+#' \code{optimMKV} returns a matrix: the optimized sample configuration with
 #' the evolution of the energy state during the optimization as an attribute.
 #'
 #' \code{objMKV} returns a numeric value depending on the choice of 
@@ -69,7 +69,7 @@ optimMKV <-
                           verbose = verbose)
     if (!is.null(check)) stop (check, call. = FALSE)
     check <- .optimMKVcheck(covars = covars, equation = equation, model = model,
-                            krige.stat = krige.stat)
+                            krige.stat = krige.stat, candi = candi)
     if (!is.null(check)) stop (check, call. = FALSE)
     
     if (plotit) {
@@ -236,7 +236,7 @@ optimMKV <-
   }
 # INTERNAL FUNCTION - CHECK ARGUMENTS ##########################################
 .optimMKVcheck <-
-  function (covars, equation, model, krige.stat) {
+  function (covars, equation, model, krige.stat, candi) {
     
     # covars
     if (!missing(covars)) {

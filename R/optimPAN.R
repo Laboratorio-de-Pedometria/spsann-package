@@ -1,7 +1,7 @@
-#' Optimization of sample patterns for variogram and trend estimation,
+#' Optimization of sample configurations for variogram and trend estimation,
 #' and spatial interpolation
 #'
-#' Optimize a sample pattern for variogram and trend estimation, and spatial
+#' Optimize a sample configuration for variogram and trend estimation, and spatial
 #' interpolation. The criteria used are the number of points or point-pairs per
 #' lag distance class (PPL), matching the association/correlation and marginal
 #' distribution of the covariates (ACDC), and the mean squared shortest
@@ -11,11 +11,11 @@
 #' @template spSANN_doc
 #' 
 #' @param PPL List with six named sub-arguments. The parameters used to optimize 
-#' the sample pattern to the number of points or point-pairs per lag. See
+#' the sample configuration to the number of points or point-pairs per lag. See
 #' \code{optimPPL} for more info.
 #' 
 #' @param ACDC List with five named sub-arguments. The paramters used to 
-#' optimize the sample pattern regardig the association/correlation and 
+#' optimize the sample configuration regardig the association/correlation and 
 #' marginal distribution of the covariates. See \code{optimACDC} for more info.
 #' 
 #' @param PAN List with two named sub-arguments: \code{weights} and 
@@ -26,13 +26,13 @@
 #' with four named sub-arguments: \code{sim} -- the number of
 #' random realizations to estimate the nadir point; \code{save.sim} -- logical 
 #' for saving the simulated values and returning them as an attribute of the 
-#' optimized sample pattern; \code{user} -- a user-defined value;
+#' optimized sample configuration; \code{user} -- a user-defined value;
 #' \code{abs} -- logical for calculating the nadir point internally. Only
 #' simulations are implemented in the current version. Defaults to 
 #' \code{nadir = list(sim = 1000, save.sim = TRUE, user = NULL, abs = NULL)}.
 #' 
 #' @return
-#' \code{optimPAN} returns a matrix: the optimized sample pattern with
+#' \code{optimPAN} returns a matrix: the optimized sample configuration with
 #' the evolution of the energy state during the optimization as an attribute.
 #' 
 #' @author Alessandro Samuel-Rosa \email{alessandrosamuelrosa@@gmail.com}
@@ -43,7 +43,7 @@
 #' @importFrom pedometrics is.numint
 #' @importFrom pedometrics cont2cat
 #' @importFrom SpatialTools dist2
-#' @export
+# @export
 # MAIN FUNCTION ################################################################
 optimPAN <-
   function (points, candi, x.max, x.min, y.max, y.min, iterations = 10000,

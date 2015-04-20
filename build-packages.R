@@ -4,17 +4,20 @@
 
 # Load packages
 library(devtools)
+library(Rcpp)
+require(Rd2roxygen)
 
 # Build Rcpp files
-library(Rcpp)
 Rcpp::compileAttributes()
 
 # Generate documentation using Rd2oxygen2 ######################################
-require(Rd2roxygen)
 roxygen2::roxygenise()
 
+# Built and check package ######################################################
+setwd("~/PROJECTS/r-packages") # Laptop
+setwd("~/alessandro") # ISRIC desktop
 
-# Built and check package
-setwd("~/PROJECTS/r-packages")
 system("R CMD build spsann")
-system("R CMD check --as-cran spsann_0.0.0.9000.tar.gz")
+system("R CMD check --as-cran spsann_0.0.0.9002.tar.gz")
+
+setwd("~/alessandro/spsann") # ISRIC desktop

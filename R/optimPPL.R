@@ -1,7 +1,7 @@
-#' Optimization of sample patterns for variogram estimation
+#' Optimization of sample configurations for variogram estimation
 #'
-#' Optimize a sample pattern for variogram estimation. A criterion is defined so
-#' that the optimized sample pattern has a given number of points or point-pairs 
+#' Optimize a sample configuration for variogram estimation. A criterion is defined so
+#' that the optimized sample configuration has a given number of points or point-pairs 
 #' contributing to each lag-distance class.
 #' 
 #' @template spJitter_doc
@@ -32,7 +32,7 @@
 #' Used only when \code{criterion = "distribution"}. Defaults to a uniform
 #' distribution.
 #' 
-#' @param pairs Logical value. Should the sample pattern be optimized regarding
+#' @param pairs Logical value. Should the sample configuration be optimized regarding
 #' the number of point-pairs per lag-distance class? Defaults to 
 #' \code{pairs = FALSE}.
 #'
@@ -69,14 +69,14 @@
 #' lag-distance classes.
 #' 
 #' @return
-#' \code{optimPPL} returns a matrix: the optimized sample pattern with
+#' \code{optimPPL} returns a matrix: the optimized sample configuration with
 #' the evolution of the energy state during the optimization as an attribute.
 #'
 #' \code{countPPL} returns a data.frame with three columns: a) the lower and b)
 #' upper limits of each lag-distance class, and c) the number of points or 
 #' point-pairs per lag-distance class.
 #'
-#' \code{objPPL} returns a numeric value: the energy state of the sample pattern
+#' \code{objPPL} returns a numeric value: the energy state of the sample configuration
 #' - the objective function value.
 #'
 #' @references
