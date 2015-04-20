@@ -9,3 +9,7 @@
 .Rproj.user/
 .Rproj.user
 Rprof.out
+
+# Cpp files
+src/*.o
+src/*.so
