@@ -8,7 +8,7 @@ output: html_document
 # Check functions before EGU2015
 - [x] `optimPPL`
 - [x] `optimMSSD`
-- [ ] `optimCORR` (there is an issue with `pedometrics::cramer` and `bigtabulate`)
+- [x] `optimCORR`
 - [x] `optimDIST`
 - [ ] `optimACDC`
 - [ ] `optimPAN`

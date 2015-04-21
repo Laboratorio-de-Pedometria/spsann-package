@@ -1,11 +1,11 @@
-#' Optimization of sample configurations for variogram and trend estimation,
-#' and spatial interpolation
+#' Optimization of sample configurations for variogram and spatial trend 
+#' estimation, and spatial interpolation
 #'
-#' Optimize a sample configuration for variogram and trend estimation, and spatial
-#' interpolation. The criteria used are the number of points or point-pairs per
-#' lag distance class (PPL), matching the association/correlation and marginal
-#' distribution of the covariates (ACDC), and the mean squared shortest
-#' distance (MSSD).
+#' Optimize a sample configuration for variogram and spatial trend estimation, 
+#' and spatial interpolation. The criteria used are the number of points (or 
+#' point-pairs) per lag-distance class (PPL), matching the 
+#' association/correlation and marginal distribution of the covariates (ACDC), 
+#' and the mean squared shortest distance (MSSD).
 #'
 #' @template spJitter_doc
 #' @template spSANN_doc

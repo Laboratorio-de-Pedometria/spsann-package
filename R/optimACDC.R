@@ -14,19 +14,6 @@
 #' marginal distribution of covariates (\bold{DIST}). The weights must be larger
 #' than 0 and sum to unity. Defaults to \code{CORR = 0.5} and 
 #' \code{DIST = 0.5)}.
-#'
-#' @param nadir List with four named sub-arguments: \code{sim} -- the number of
-#' random realizations to estimate the nadir point; \code{save.sim} -- logical 
-#' for saving the simulated values and returning them as an attribute of the 
-#' optimized sample configuration; \code{user} -- a user-defined value;
-#' \code{abs} -- logical for calculating the nadir point internally. Only
-#' simulations are implemented in the current version. Defaults to 
-#' \code{nadir = list(sim = 1000, save.sim = TRUE, user = NULL, abs = NULL)}.
-#' 
-#' @param utopia List with two named sub-arguments: \code{user} -- a list of
-#' two user-defined values (\code{correl} and \code{strata}), and \code{abs} --
-#' a logical value for calculating the utopia point internally. Defaults to 
-#' \code{utopia = list(user = list(correl = NULL, strata = NULL), abs = NULL)}.
 #' 
 #' @param scale List with two named sub-arguments: \code{type} -- the type of
 #' scaling that should be used, with available options \code{"upper} and
@@ -86,23 +73,26 @@
 # MAIN FUNCTION ################################################################
 optimACDC <-
   function (points, candi, covars, strata.type = "area", 
-            #weights = list(correl = 0.5, strata = 0.5), use.coords = FALSE,
             weights = list(CORR = 0.5, DIST = 0.5), use.coords = FALSE,
             nadir = list(sim = 1000, save.sim = TRUE, user = NULL, abs = NULL),
-            utopia = list(user = list(correl = NULL, strata = NULL), abs = NULL), 
+            utopia = list(user = NULL, abs = NULL), 
             scale = list(type = "upper-lower", max = 100),
             x.max, x.min, y.max, y.min, iterations,
             acceptance = list(initial = 0.99, cooling = iterations / 10),
             stopping = list(max.count = iterations / 10), plotit = TRUE,
-            boundary, progress = TRUE, verbose = TRUE) {
+            boundary, progress = TRUE, verbose = TRUE, greedy = FALSE) {
     
     if (!is.data.frame(covars)) covars <- as.data.frame(covars)
     
     # Check arguments
-    check <- .spSANNcheck(points, candi, x.max, x.min, y.max, y.min,
-                          iterations, acceptance, stopping, plotit, boundary,
-                          progress, verbose)
+    check <- .spSANNcheck(points = points, candi = candi, x.max = x.max, 
+                          x.min = x.min, y.max = y.max, y.min = y.min, 
+                          iterations = iterations, acceptance = acceptance,
+                          stopping = stopping, plotit = plotit, 
+                          boundary = boundary, progress = progress,
+                          verbose = verbose)
     if (!is.null(check)) stop (check, call. = FALSE)
+    
     check <- .optimACDCcheck(candi = candi, covars = covars, nadir = nadir,
                              weights = weights, use.coords = use.coords, 
                              strata.type = strata.type, utopia = utopia, 
@@ -147,9 +137,7 @@ optimACDC <-
     } else { # Factor covariates
       if (covars.type == "factor") {
         pcm <- pedometrics::cramer(covars)
-        # ASR: We multiply the proportions by 100 for numerical stability
         pop_prop <- lapply(covars, function(x) table(x) / nrow(covars))
-        #pop_prop <- lapply(covars, function(x) table(x) / nrow(covars) * 100)
         nadir <- .facNadir(nadir = nadir, candi = candi, n.candi = n_candi,
                            n.pts = n_pts, n.cov = n_cov, covars = covars, 
                            pop.prop = pop_prop, pcm = pcm, scale = scale)
@@ -163,19 +151,19 @@ optimACDC <-
     }
 
     # Other settings for the simulated annealing algorithm
-    old_scm      <- scm
-    new_scm      <- scm
-    best_scm     <- scm
-    old_sm       <- sm
-    new_sm       <- sm
-    best_sm      <- sm
-    count        <- 0
-    old_energy   <- energy0
-    best_energy  <- Inf
-    energies     <- vector()
+    old_scm <- scm
+    new_scm <- scm
+    best_scm <- scm
+    old_sm <- sm
+    new_sm <- sm
+    best_sm <- sm
+    count <- 0
+    old_energy <- energy0
+    best_energy <- Inf
+    energies <- vector()
     accept_probs <- vector()
-    x_max0       <- x.max
-    y_max0       <- y.max
+    x_max0 <- x.max
+    y_max0 <- y.max
     if (progress) pb <- txtProgressBar(min = 1, max = iterations, style = 3)
     time0 <- proc.time()
 
@@ -184,8 +172,9 @@ optimACDC <-
 
       # Jitter one of the points and update x.max and y.max; which point (wp)?
       wp <- sample(c(1:n_pts), 1)
-      new_conf <- spJitterFinite(old_conf, candi, x.max, x.min, y.max,
-                                 y.min, wp)
+      new_conf <- spJitterFinite(points = old_conf, candi = candi, 
+                                 x.max = x.max, x.min = x.min, y.max = y.max, 
+                                 y.min = y.min, which.point = wp)
       x.max <- x_max0 - (k / iterations) * (x_max0 - x.min)
       y.max <- y_max0 - (k / iterations) * (y_max0 - y.min)
 
@@ -212,71 +201,79 @@ optimACDC <-
       }
       
       # Evaluate the new system configuration
-      random_prob <- runif(1)
+      if (greedy) {
+        random_prob <- 1
+      } else {
+        random_prob <- runif(1)
+      }
       actual_prob <- acceptance[[1]] * exp(-k / acceptance[[2]])
       accept_probs[k] <- actual_prob
       if (new_energy <= old_energy) {
-        old_conf   <- new_conf
+        old_conf <- new_conf
         old_energy <- new_energy
-        count      <- 0
-        old_sm     <- new_sm
-        old_scm    <- new_scm
+        count <- 0
+        old_sm <- new_sm
+        old_scm <- new_scm
       } else {
         if (new_energy > old_energy & random_prob <= actual_prob) {
-          old_conf   <- new_conf
+          old_conf <- new_conf
           old_energy <- new_energy
-          count      <- count + 1
-          old_sm     <- new_sm
-          old_scm    <- new_scm
+          count <- count + 1
+          old_sm <- new_sm
+          old_scm <- new_scm
           if (verbose) {
             cat("\n", count, "iteration(s) with no improvement... p = ",
                 random_prob, "\n")
           }
         } else {
           new_energy <- old_energy
-          new_conf   <- old_conf
-          count      <- count + 1
-          new_sm     <- old_sm
-          new_scm    <- old_scm
+          new_conf <- old_conf
+          count <- count + 1
+          new_sm <- old_sm
+          new_scm <- old_scm
           if (verbose) {
             cat("\n", count, "iteration(s) with no improvement... stops at",
                 stopping[[1]], "\n")
           }
         }
       }
+      
       # Best energy state
       energies[k] <- new_energy
       if (new_energy < best_energy / 1.0000001) {
-        best_k          <- k
-        best_conf       <- new_conf
-        best_energy     <- new_energy
+        best_k <- k
+        best_conf <- new_conf
+        best_energy <- new_energy
         best_old_energy <- old_energy
-        old_conf        <- old_conf
-        best_sm         <- new_sm
-        best_old_sm     <- old_sm
-        best_scm        <- new_scm
-        best_old_scm    <- old_scm
+        old_conf <- old_conf
+        best_sm <- new_sm
+        best_old_sm <- old_sm
+        best_scm <- new_scm
+        best_old_scm <- old_scm
       }
+      
       # Plotting
-      #if (plotit && any(round(seq(1, iterations, 10)) == k)) {
       if (plotit && pedometrics::is.numint(k / 10)) {
-        .spSANNplot(energy0, energies, k, acceptance,
-                    accept_probs, boundary, new_conf[, 2:3],
-                    conf0[, 2:3], y_max0, y.max, x_max0, x.max, 
-                    best.energy = best_energy, best.k = best_k)
+        .spSANNplot(energy0 = energy0, energies = energies, k = k, 
+                    acceptance = acceptance, accept_probs = accept_probs, 
+                    boundary = boundary, new_conf = new_conf[, 2:3],
+                    conf0 = conf0[, 2:3], y_max0 = y_max0, y.max = y.max, 
+                    x_max0 = x_max0, x.max = x.max, best.energy = best_energy,
+                    best.k = best_k)
       }
+      
       # Freezing parameters
       if (count == stopping[[1]]) {
         if (new_energy > best_energy * 1.000001) {
-          old_conf   <- old_conf
-          new_conf   <- best_conf
+          old_conf <- old_conf
+          new_conf <- best_conf
           old_energy <- best_old_energy
           new_energy <- best_energy
-          count      <- 0
-          new_sm     <- best_sm
-          new_scm    <- best_scm
-          old_sm     <- best_old_sm
-          old_scm    <- best_old_scm
+          count <- 0
+          new_sm <- best_sm
+          new_scm <- best_scm
+          old_sm <- best_old_sm
+          old_scm <- best_old_scm
           cat("\n", "reached maximum count with suboptimal configuration\n")
           cat("\n", "restarting with previously best configuration\n")
           cat("\n", count, "iteration(s) with no improvement... stops at",
@@ -379,8 +376,8 @@ optimACDC <-
       }
     } else {
       if (n[[3]] == TRUE) {
-        res <- paste("sorry but you cannot set the nadir point")
-        return (res)
+        #res <- paste("sorry but you cannot set the nadir point")
+        #return (res)
       }
       if (n[[4]] == TRUE) {
         res <- paste("sorry but the nadir point cannot be calculated")
@@ -466,16 +463,17 @@ optimACDC <-
 .numNadir <-
   function (n.pts, n.cov, n.candi, pcm, nadir, candi, covars, strata, scale) {
 
-    if (!is.null(nadir[[1]]) && !is.null(nadir[[2]])) { # Simulate the nadir
-      m <- paste("simulating ", nadir[[1]], " nadir values...", sep = "")
+    # Simulate the nadir
+    if (!is.null(nadir$sim) && !is.null(nadir$save.sim)) { 
+      m <- paste("simulating ", nadir$sim, " nadir values...", sep = "")
       message(m)
       
-      # SET VARIABLES
+      # set variables
       strata_nadir <- vector()
       correl_nadir <- vector()
       
-      # BEGIN THE SIMULATION
-      for (i in 1:nadir[[1]]) {
+      # begin the simulation
+      for (i in 1:nadir$sim) { 
         pts <- sample(1:n.candi, n.pts)
         sm <- covars[pts, ]
         scm <- cor(sm, use = "complete.obs")
@@ -494,7 +492,7 @@ optimACDC <-
       # SHOULD WE SAVE AND RETURN THE SIMULATED VALUES?
       # ASR: We compute the mean simulated value and return it as an attribute
       #      because we want to explore the simulated values in the future.
-      if (nadir[[2]]) {
+      if (nadir$save.sim) { 
         res <- list(strata = strata_nadir, correl = correl_nadir)
       } else {
         res <- list(strata = "strata_nadir", correl = "correl_nadir")
@@ -503,13 +501,18 @@ optimACDC <-
       a$strata_nadir <- mean(strata_nadir) / scale$max
       a$correl_nadir <- mean(correl_nadir) / scale$max
       attributes(res) <- a
-      
-      # ASR: Other options are not available yet.
+            
     } else {
-      if (!is.null(nadir[[3]])) {
-        message("sorry but you cannot set the nadir point")
+      
+      # User-defined nadir values
+      if (!is.null(nadir$user)) { 
+        res <- list(strata = "strata_nadir", correl = "correl_nadir")
+        a <- attributes(res)
+        a$strata_nadir <- nadir$user$DIST
+        a$correl_nadir <- nadir$user$CORR
+        attributes(res) <- a
       } else {
-        if (!is.null(nadir[[4]])) {
+        if (!is.null(nadir$abs)) { 
           message("sorry but the nadir point cannot be calculated")
         }
         # Maximum absolute value: upper bound is equal to 100
@@ -549,18 +552,16 @@ optimACDC <-
         
     # scale the objective function values
     if(scale$type == "upper-lower") {
-      obj_cont <- sum(counts) - utopia$strata / 
-        attr(nadir, "strata") - utopia$strata  
-      obj_cor <- sum(abs(pcm - scm)) - utopia$correl / 
-        attr(nadir, "correl") - utopia$correl
+      obj_cont <- sum(counts) - utopia$DIST / 
+        attr(nadir, "strata") - utopia$DIST  
+      obj_cor <- sum(abs(pcm - scm)) - utopia$CORR / 
+        attr(nadir, "correl") - utopia$CORR
     } else if (scale$type == "upper") {
       obj_cont <- sum(counts) / attr(nadir, "strata")
       obj_cor <- sum(abs(pcm - scm)) / attr(nadir, "correl")
     }
     
     # aggregate the objective function values
-    #obj_cont <- obj_cont * weights[[1]]
-    #obj_cor <- obj_cor * weights[[2]]
     obj_cont <- obj_cont * weights$DIST
     obj_cor <- obj_cor * weights$CORR
     res <- obj_cont + obj_cor
@@ -570,16 +571,17 @@ optimACDC <-
 .facNadir <-
   function (nadir, candi, n.candi, n.pts, n.cov, covars, pop.prop, pcm, scale) {
     
-    if (!is.null(nadir[[1]]) && !is.null(nadir[[2]])) { # Simulate the nadir
-      m <- paste("simulating ", nadir[[1]], " nadir values...", sep = "")
+    # Simulate the nadir
+    if (!is.null(nadir$sim) && !is.null(nadir$save.sim)) {
+      m <- paste("simulating ", nadir$sim, " nadir values...", sep = "")
       message(m)
       
-      # SET VARIABLES
+      # set variables
       strata_nadir <- vector()
       correl_nadir <- vector()
       
-      # BEGIN THE SIMULATION
-      for (i in 1:nadir[[1]]) {
+      # begin the simulation
+      for (i in 1:nadir$sim) { 
         pts <- sample(1:n.candi, n.pts)
         sm <- covars[pts, ]
         scm <- pedometrics::cramer(sm)
@@ -596,7 +598,7 @@ optimACDC <-
       # SHOULD WE SAVE AND RETURN THE SIMULATED VALUES?
       # ASR: We compute the mean simulated value and return it as an attribute
       #      because we want to explore the simulated values in the future.
-      if (nadir[[2]]) {
+      if (nadir$save.sim) { 
         res <- list(strata = strata_nadir, correl = correl_nadir)
       } else {
         res <- list(strata = "strata_nadir", correl = "correl_nadir")
@@ -608,10 +610,14 @@ optimACDC <-
       
       # ASR: Other options are not available yet.
       } else {
-        if (!is.null(nadir[[3]])) {
-          message("sorry but you cannot set the nadir point")
+        if (!is.null(nadir$user)) {
+          res <- list(strata = "strata_nadir", correl = "correl_nadir")
+          a <- attributes(res)
+          a$strata_nadir <- nadir$user$DIST
+          a$correl_nadir <- nadir$user$CORR
+          attributes(res) <- a
           } else {
-            if (!is.null(nadir[[4]])) {
+            if (!is.null(nadir$abs)) { 
               message("sorry but the nadir point cannot be calculated")
             }
           }
@@ -631,18 +637,16 @@ optimACDC <-
     
     # scale the objective function values
     if(scale$type == "upper-lower") {
-      obj_cat <- sum(samp_prop) - utopia$strata / 
-        attr(nadir, "strata") - utopia$strata
-      obj_cor <- sum(abs(pcm - scm)) - utopia$correl / 
-        attr(nadir, "correl") - utopia$correl
+      obj_cat <- sum(samp_prop) - utopia$DIST / 
+        attr(nadir, "strata") - utopia$DIST
+      obj_cor <- sum(abs(pcm - scm)) - utopia$CORR / 
+        attr(nadir, "correl") - utopia$CORR
     } else if (scale$type == "upper") {
       obj_cat <- sum(samp_prop) / attr(nadir, "strata")
       obj_cor <- sum(abs(pcm - scm)) / attr(nadir, "correl")
     }
     
     # aggregate the objective function values
-    #obj_cat <- obj_cat * weights[[1]]
-    #obj_cor <- obj_cor * weights[[2]]
     obj_cat <- obj_cat * weights$DIST
     obj_cor <- obj_cor * weights$CORR
     res <- obj_cat + obj_cor
@@ -652,7 +656,7 @@ optimACDC <-
 .facUtopia <-
   function (utopia) {
     if (!is.null(unlist(utopia$user))) {
-      utopia <- list(correl = utopia$user$correl, strata = utopia$user$strata)
+      utopia <- list(CORR = utopia$user$CORR, DIST = utopia$user$DIST)
     } else {
       message("sorry but the utopia point cannot be calculated")
     }
@@ -661,7 +665,7 @@ optimACDC <-
 .numUtopia <-
   function (utopia) {
     if (!is.null(unlist(utopia$user))) {
-      utopia <- list(correl = utopia$user$correl, strata = utopia$user$strata)
+      utopia <- list(CORR = utopia$user$CORR, DIST = utopia$user$DIST)
     } else {
       message("sorry but the utopia point cannot be calculated")
     }
@@ -671,10 +675,8 @@ optimACDC <-
 # @export
 objACDC <-
   function (points, candi, covars, strata.type = "area", 
-            #weights = list(correl = 0.5, strata = 0.5), use.coords = FALSE, 
             weights = list(CORR = 0.5, DIST = 0.5), use.coords = FALSE, 
-            utopia = list(user = list(correl = NULL, strata = NULL),
-                          abs = NULL),
+            utopia = list(user = NULL, abs = NULL),
             nadir = list(sim = 1000, save.sim = TRUE, user = NULL, abs = NULL),
             scale = list(type = "upper-lower", max = 100)) {
     
