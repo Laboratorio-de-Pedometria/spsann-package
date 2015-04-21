@@ -35,3 +35,5 @@
 #' to \code{greedy = FALSE}.
 #' 
 #' @keywords spatial optimize
+#' 
+#' @concept simulated annealing

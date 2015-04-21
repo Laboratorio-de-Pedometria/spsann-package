@@ -1,31 +1,24 @@
-#' Optimization of sample patterns for trend estimation
+#' Optimization of sample configurations for spatial trend estimation
 #'
-#' Optimize a sample pattern for trend estimation. The criterion is defined so 
-#' that the sample reproduces the association/correlation between the
+#' Optimize a sample configuration for spatial trend estimation. A criterion is 
+#' defined so that the sample reproduces the association/correlation between the
 #' covariates, as well as their marginal distribution (\bold{ACDC}).
 #'
 #' @template spJitter_doc
 #' @template spSANN_doc
+#' @template ACDC_doc
 #'
-#' @param covars Data frame or matrix with the covariates in the columns.
-#'
-#' @param weights List with two named sub-arguments. The weights assigned to 
-#' correlation/association measure and the sampling strata/classes. They
-#' must be named and sum to unity. Defaults to 
-#' \code{weights = list(correl = 0.5, strata = 0.5)}.
-#'
-#' @param use.coords Logical value. Should the coordinates be used as 
-#' covariates? Defaults to \code{use.coords = FALSE}.
-#'
-#' @param strata.type Character value. The type of strata to be used with
-#' numeric covariates. Available options are \code{"area"} for equal area and
-#' \code{"range"} for equal range. Defaults to \code{strata.type = "area"}. See
-#' \sQuote{Details} for more information.
+#' @param weights List with two named sub-arguments. The weights assigned to two
+#' objective functions combined to form \bold{ACDC}: the association/correlation
+#' measure between covariates (\bold{CORR}), and the reproduction of the 
+#' marginal distribution of covariates (\bold{DIST}). The weights must be larger
+#' than 0 and sum to unity. Defaults to \code{CORR = 0.5} and 
+#' \code{DIST = 0.5)}.
 #'
 #' @param nadir List with four named sub-arguments: \code{sim} -- the number of
 #' random realizations to estimate the nadir point; \code{save.sim} -- logical 
 #' for saving the simulated values and returning them as an attribute of the 
-#' optimized sample pattern; \code{user} -- a user-defined value;
+#' optimized sample configuration; \code{user} -- a user-defined value;
 #' \code{abs} -- logical for calculating the nadir point internally. Only
 #' simulations are implemented in the current version. Defaults to 
 #' \code{nadir = list(sim = 1000, save.sim = TRUE, user = NULL, abs = NULL)}.
@@ -41,40 +34,16 @@
 #' Defaults to \code{scale = list(type = "upper-lower", max = 100)}.
 #' 
 #' @details
-#' This method is also known as the conditioned Latin Hypercube of Minasny and
-#' McBratney (2006). Visit the package manual to see the corrections that we
-#' have made in that method.
 #'
 #' @return
-#' \code{optimACDC} returns a matrix: the optimized sample pattern with
+#' \code{optimACDC} returns a matrix: the optimized sample configuration with
 #' the evolution of the energy state during the optimization as an attribute.
 #' 
 #' \code{objACDC} returns a numeric value: the energy state of the point 
-#' pattern.
-#'
-#' @references
-#' Minasny, B.; McBratney, A. B. A conditioned Latin hypercube method for
-#' sampling in the presence of ancillary information. \emph{Computers &
-#' Geosciences}, v. 32, p. 1378-1388, 2006.
-#'
-#' Minasny, B.; McBratney, A. B. Conditioned Latin Hypercube Sampling for
-#' calibrating soil sensor data to soil properties. Chapter 9. Viscarra Rossel,
-#' R. A.; McBratney, A. B.; Minasny, B. (Eds.) \emph{Proximal Soil Sensing}.
-#' Amsterdam: Springer, p. 111-119, 2010.
-#'
-#' Mulder, V. L.; de Bruin, S.; Schaepman, M. E. Representing major soil
-#' variability at regional scale by constrained Latin hypercube sampling of
-#' remote sensing data. \emph{International Journal of Applied Earth Observation
-#' and Geoinformation}, v. 21, p. 301-310, 2013.
-#'
-#' Roudier, P.; Beaudette, D.; Hewitt, A. A conditioned Latin hypercube sampling
-#' algorithm incorporating operational constraints. \emph{5th Global Workshop on
-#' Digital Soil Mapping}. Sydney, p. 227-231, 2012.
+#' configuration.
 #'
 #' @author Alessandro Samuel-Rosa \email{alessandrosamuelrosa@@gmail.com}
-#' @seealso \code{\link[clhs]{clhs}}
-#' @keywords spatial optimize
-#' @concept simulated annealing
+#' @seealso \code{\link[clhs]{clhs}}, \code{\link[pedometrics]{cramer}}
 #' @importFrom pedometrics cramer
 #' @importFrom pedometrics is.numint
 #' @importFrom pedometrics cont2cat
@@ -102,7 +71,7 @@
 #' nadir <- list(sim = 10, save.sim = TRUE, user = NULL, abs = NULL)
 #' utopia <- list(user = list(correl = 0, strata = 0), abs = NULL)
 #' scale <- list(type = "upper-lower", max = 100)
-#' weights <- list(strata = 0.5, correl = 0.5)
+#' weights <- list(DIST = 0.5, CORR = 0.5)
 #' set.seed(2001)
 #' res <- optimACDC(points = 100, candi = candi, covars = covars,
 #'                  use.coords = TRUE,
@@ -117,7 +86,8 @@
 # MAIN FUNCTION ################################################################
 optimACDC <-
   function (points, candi, covars, strata.type = "area", 
-            weights = list(correl = 0.5, strata = 0.5), use.coords = FALSE,
+            #weights = list(correl = 0.5, strata = 0.5), use.coords = FALSE,
+            weights = list(CORR = 0.5, DIST = 0.5), use.coords = FALSE,
             nadir = list(sim = 1000, save.sim = TRUE, user = NULL, abs = NULL),
             utopia = list(user = list(correl = NULL, strata = NULL), abs = NULL), 
             scale = list(type = "upper-lower", max = 100),
@@ -370,15 +340,20 @@ optimACDC <-
     #dd <- !all(c(names(weights) == c("correl", "strata")) == TRUE)
     #if (aa || bb || cc || dd) {
     if (aa || bb || cc || dd) {
+      #res <- paste("'weights' must be a list with two named sub-arguments:",
+      #             "'strata' and 'correl'", sep = "")
       res <- paste("'weights' must be a list with two named sub-arguments:",
-                   "'strata' and 'correl'", sep = "")
-      return (res)
-    }
-    if (sum(unlist(weights)) != 1) {
-      res <- paste("the 'weights' must sum to 1")
+                   "'DIST' and 'CORR'", sep = "")
       return (res)
     }
     
+    aa <- sum(unlist(weights)) != 1
+    bb <- any(unlist(weights) == 0)
+    if (aa || bb) {
+      res <- paste("the 'weights' must be larger than 0 and sum to 1")
+      return (res)
+    }
+        
     # strata.type
     st <- match(strata.type, c("area", "range"))
     if (is.na(st)) {
@@ -584,8 +559,10 @@ optimACDC <-
     }
     
     # aggregate the objective function values
-    obj_cont <- obj_cont * weights[[1]]
-    obj_cor <- obj_cor * weights[[2]]
+    #obj_cont <- obj_cont * weights[[1]]
+    #obj_cor <- obj_cor * weights[[2]]
+    obj_cont <- obj_cont * weights$DIST
+    obj_cor <- obj_cor * weights$CORR
     res <- obj_cont + obj_cor
     return (res)
   }
@@ -664,8 +641,10 @@ optimACDC <-
     }
     
     # aggregate the objective function values
-    obj_cat <- obj_cat * weights[[1]]
-    obj_cor <- obj_cor * weights[[2]]
+    #obj_cat <- obj_cat * weights[[1]]
+    #obj_cor <- obj_cor * weights[[2]]
+    obj_cat <- obj_cat * weights$DIST
+    obj_cor <- obj_cor * weights$CORR
     res <- obj_cat + obj_cor
     return (res)
   }
@@ -692,7 +671,8 @@ optimACDC <-
 # @export
 objACDC <-
   function (points, candi, covars, strata.type = "area", 
-            weights = list(correl = 0.5, strata = 0.5), use.coords = FALSE, 
+            #weights = list(correl = 0.5, strata = 0.5), use.coords = FALSE, 
+            weights = list(CORR = 0.5, DIST = 0.5), use.coords = FALSE, 
             utopia = list(user = list(correl = NULL, strata = NULL),
                           abs = NULL),
             nadir = list(sim = 1000, save.sim = TRUE, user = NULL, abs = NULL),

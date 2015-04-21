@@ -87,4 +87,4 @@ res <- optimCORR(points = 100, candi = candi, covars = covars,
                  y.max = y.max, y.min = 40, 
                  boundary = boundary, iterations = 1000)
 tail(attr(res, "energy"), 1) # 0.01085086
-objCORR(points = res, candi = candi, covars = covars, use.coords = use.coords)
+objCORR(points = res, candi = candi, covars = covars, use.coords = FALSE)

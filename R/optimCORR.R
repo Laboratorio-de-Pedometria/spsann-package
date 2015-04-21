@@ -1,26 +1,31 @@
 #' Optimization of sample configurations for trend estimation
 #'
-#' Optimize a sample cconfiguration for trend estimation. A criterion is defined
+#' Optimize a sample configuration for trend estimation. A criterion is defined
 #' so that the sample reproduces the association/correlation between the 
 #' covariates (\bold{CORR}).
 #'
 #' @template spJitter_doc
 #' @template spSANN_doc
-#'
-#' @param covars Data frame or matrix with the covariates in the columns.
-#'
-#' @param use.coords Logical value. Should the coordinates be used as 
-#' covariates? Defaults to \code{use.coords = FALSE}.
-#'
-#' @param strata.type Character value. The type of strata to be used to 
-#' categorize the coordinates when they are used with covariates of type factor.
-#' Available options are \code{"area"} for equal area and \code{"range"} for
-#' equal range. Defaults to \code{strata.type = "area"}.
+#' @template ACDC_doc
 #' 
 #' @details
-#' This method derives from the method known as the conditioned Latin Hypercube
-#' originally proposed by Minasny and McBratney (2006). Visit the package manual
-#' to see the improvements that we have made in that method.
+#' The correlation between two numeric covariates is measured using the 
+#' Pearson's r, a descriptive statistic that ranges from -1 to +1. 
+#' This statistic is also known as the linear correlation coefficient.
+#' 
+#' When the set of covariates includes factor covariates, any numeric covariate 
+#' is transformed into a factor covariate. The numeric covariates are 
+#' categorized using the sampling strata defined using one of the two methods 
+#' available (equal-area or equal-range strata) (see more details at
+#' \code{\link[spsann]{optimDist}}).
+#' 
+#' The association between two factor covariates is measured using the Cramér's 
+#' v, a descriptive statistic that ranges from 0 to 1. The closer to 1 the 
+#' Cramér's v is, the stronger the association between two factor covariates. 
+#' The main weakness of using the Cramér's v is that, while the Pearson's r 
+#' shows the degree and direction of the association between two covariates 
+#' (negative or positive), the Cramér's v only measures the degree (weak or 
+#' strong).
 #'
 #' @return
 #' \code{optimCORR} returns a matrix: the optimized sample configuration with
@@ -29,29 +34,8 @@
 #' \code{objCORR} returns a numeric value: the energy state of the sample
 #' configuration - the objective function value.
 #'
-#' @references
-#' Minasny, B.; McBratney, A. B. A conditioned Latin hypercube method for
-#' sampling in the presence of ancillary information. \emph{Computers &
-#' Geosciences}, v. 32, p. 1378-1388, 2006.
-#'
-#' Minasny, B.; McBratney, A. B. Conditioned Latin Hypercube Sampling for
-#' calibrating soil sensor data to soil properties. Chapter 9. Viscarra Rossel,
-#' R. A.; McBratney, A. B.; Minasny, B. (Eds.) \emph{Proximal Soil Sensing}.
-#' Amsterdam: Springer, p. 111-119, 2010.
-#'
-#' Mulder, V. L.; de Bruin, S.; Schaepman, M. E. Representing major soil
-#' variability at regional scale by constrained Latin hypercube sampling of
-#' remote sensing data. \emph{International Journal of Applied Earth Observation
-#' and Geoinformation}, v. 21, p. 301-310, 2013.
-#'
-#' Roudier, P.; Beaudette, D.; Hewitt, A. A conditioned Latin hypercube sampling
-#' algorithm incorporating operational constraints. \emph{5th Global Workshop on
-#' Digital Soil Mapping}. Sydney, p. 227-231, 2012.
-#'
 #' @author Alessandro Samuel-Rosa \email{alessandrosamuelrosa@@gmail.com}
-#' @seealso \code{\link[clhs]{clhs}}
-#' @keywords spatial optimize
-#' @concept simulated annealing
+#' @seealso \code{\link[clhs]{clhs}}, \code{\link[pedometrics]{cramer}}
 #' @importFrom pedometrics cramer
 #' @importFrom pedometrics is.numint
 #' @importFrom pedometrics cont2cat

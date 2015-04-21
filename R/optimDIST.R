@@ -1,27 +1,49 @@
 #' Optimization of sample configurations for trend estimation
 #'
-#' Optimize a sample configuration for trend estimation. A criterion is defined so 
-#' that the sample reproduces the marginal distribution of the covariates
+#' Optimize a sample configuration for trend estimation. A criterion is defined 
+#' so #' that the sample reproduces the marginal distribution of the covariates
 #' (\bold{DIST}).
 #'
 #' @template spJitter_doc
 #' @template spSANN_doc
-#'
-#' @param covars Data frame or matrix with the covariates in the columns.
-#'
-#' @param use.coords Logical value. Should the coordinates be used as 
-#' covariates? Defaults to \code{use.coords = FALSE}.
-#'
-#' @param strata.type Character value. The type of strata to be used with
-#' numeric covariates. Available options are \code{"area"} for equal area and
-#' \code{"range"} for equal range. Defaults to \code{strata.type = "area"}. See
-#' \sQuote{Details} for more information.
+#' @template ACDC_doc
 #' 
 #' @details
-#' This method derives from the method known as the conditioned Latin Hypercube
-#' originally proposed by Minasny and McBratney (2006). Visit the package manual
-#' to see the improvements that we have made in that method.
-#'
+#' Reproducing the marginal distribution of the numeric covariates depends upon
+#' the definition of sampling strata. These sampling strata are also used to 
+#' categorize any numeric covariate when they are passed together with 
+#' categorical covariates (see more details at \code{\link[spsann]{optimDist}}).
+#' Two types of sampling strata can be used. \emph{Equal-area} sampling strata 
+#' are defined using the sample quantiles estimated with \code{quantile()} using
+#' a discontinuous function (\code{type = 3}). This is to avoid creating 
+#' breakpoints that do not occur in the population of existing covariate values.
+#' 
+#' The function \code{quantile()} commonly produces repeated break points. A
+#' break point will always be repeated if that value has a relatively
+#' high frequency in the population of covariate values. The number of repeated
+#' break points increases with the number of sampling strata. Only unique
+#' break points are used to create sampling strata.
+#' 
+#' \emph{Equal-range} sampling strata are defined breaking the range of 
+#' covariate values into pieces of equal size. This method usually creates
+#' breakpoints that do not occur in the population of existing covariate values.
+#' Such breakpoints are replaced by the nearest existing covariate value 
+#' identified using Euclidean distances.
+#' 
+#' Both stratification methods can produce sampling strata that cover a range of
+#' values that do not exist in the population of covariate value. Any empty 
+#' sampling strata is merged with the closest non-empty sampling strata. These
+#' are identified using Euclidean distances.
+#' 
+#' The approaches used to define the sampling strata result in each numeric 
+#' covariate having a different number of sampling strata, some of them with 
+#' different area/size. Because the goal is to have a sample that reproduces the
+#' marginal distribution of the covariate, each sampling strata will have a
+#' different number of sample points. The wanted distribution of the number of 
+#' sample points per strata is estimated empirically computing the proportion of
+#' points of the population of existing covariate values that fall in each
+#' sampling strata.
+#' 
 #' @return
 #' \code{optimDIST} returns a matrix: the optimized sample configuration with
 #' the evolution of the energy state during the optimization as an attribute.
@@ -29,29 +51,8 @@
 #' \code{objDIST} returns a numeric value: the energy state of the sample
 #' configuration - the objective function value.
 #'
-#' @references
-#' Minasny, B.; McBratney, A. B. A conditioned Latin hypercube method for
-#' sampling in the presence of ancillary information. \emph{Computers &
-#' Geosciences}, v. 32, p. 1378-1388, 2006.
-#'
-#' Minasny, B.; McBratney, A. B. Conditioned Latin Hypercube Sampling for
-#' calibrating soil sensor data to soil properties. Chapter 9. Viscarra Rossel,
-#' R. A.; McBratney, A. B.; Minasny, B. (Eds.) \emph{Proximal Soil Sensing}.
-#' Amsterdam: Springer, p. 111-119, 2010.
-#'
-#' Mulder, V. L.; de Bruin, S.; Schaepman, M. E. Representing major soil
-#' variability at regional scale by constrained Latin hypercube sampling of
-#' remote sensing data. \emph{International Journal of Applied Earth Observation
-#' and Geoinformation}, v. 21, p. 301-310, 2013.
-#'
-#' Roudier, P.; Beaudette, D.; Hewitt, A. A conditioned Latin hypercube sampling
-#' algorithm incorporating operational constraints. \emph{5th Global Workshop on
-#' Digital Soil Mapping}. Sydney, p. 227-231, 2012.
-#'
 #' @author Alessandro Samuel-Rosa \email{alessandrosamuelrosa@@gmail.com}
 #' @seealso \code{\link[clhs]{clhs}}
-#' @keywords spatial optimize
-#' @concept simulated annealing
 #' @importFrom pedometrics is.numint
 #' @importFrom pedometrics cont2cat
 #' @importFrom pedometrics is.all.factor
