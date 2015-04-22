@@ -464,61 +464,54 @@ optimACDC <-
 .numNadir <-
   function (n.pts, n.cov, n.candi, pcm, nadir, candi, covars, strata, scale) {
 
-    # Simulate the nadir
+    # Simulate the nadir point
     if (!is.null(nadir$sim) && !is.null(nadir$save.sim)) { 
       m <- paste("simulating ", nadir$sim, " nadir values...", sep = "")
       message(m)
       
-      # set variables
-      #strata_nadir <- vector()
+      # Set variables
       nadirDIST <- vector()
-      correl_nadir <- vector()
+      nadirCORR <- vector()
       
-      # begin the simulation
+      # Begin the simulation
       for (i in 1:nadir$sim) { 
         pts <- sample(1:n.candi, n.pts)
         sm <- covars[pts, ]
         scm <- cor(sm, use = "complete.obs")
+        
+        # Count the proportion of points per sampling strata
         counts <- lapply(1:n.cov, function (i)
           hist(sm[, i], strata[[1]][[i]], plot = FALSE)$counts)
-        
-        # ASR: We use the proportion of points per sampling strata
-        #counts <- lapply(1:n.cov, function(i) counts[[i]] / n.pts * 100)
         counts <- lapply(1:n.cov, function(i) counts[[i]] / n.pts)
         counts <- sapply(1:n.cov, function (i)
           sum(abs(counts[[i]] - strata[[2]][[i]])))
-        #strata_nadir[i] <- sum(counts)
+        
+        # Compute the nadir point
         nadirDIST[i] <- sum(counts)
-        correl_nadir[i] <- sum(abs(pcm - scm))
+        nadirCORR[i] <- sum(abs(pcm - scm))
       }
       
-      # SHOULD WE SAVE AND RETURN THE SIMULATED VALUES?
-      # ASR: We compute the mean simulated value and return it as an attribute
-      #      because we want to explore the simulated values in the future.
+      # Return all simulated nadir values?
       if (nadir$save.sim) { 
-        #res <- list(strata = strata_nadir, correl = correl_nadir)
-        res <- list(DIST = nadirDIST, correl = correl_nadir)
+        res <- list(DIST = nadirDIST, CORR = nadirCORR)
       } else {
-        #res <- list(strata = "strata_nadir", correl = "correl_nadir")
-        res <- list(DIST = "nadirDIST", correl = "correl_nadir")
+        res <- list(DIST = "nadirDIST", CORR = "nadirCORR")
       }
       a <- attributes(res)
-      #a$strata_nadir <- mean(strata_nadir) / scale$max
       a$DIST <- mean(nadirDIST) / scale$max
-      a$correl_nadir <- mean(correl_nadir) / scale$max
+      a$CORR <- mean(nadirCORR) / scale$max
       attributes(res) <- a
             
     } else {
       
       # User-defined nadir values
       if (!is.null(nadir$user)) { 
-        #res <- list(strata = "strata_nadir", correl = "correl_nadir")
-        res <- list(DIST = "nadirDIST", correl = "correl_nadir")
+        res <- list(DIST = "nadirDIST", CORR = "nadirCORR")
         a <- attributes(res)
-        #a$strata_nadir <- nadir$user$DIST
         a$DIST <- nadir$user$DIST
-        a$correl_nadir <- nadir$user$CORR
+        a$CORR <- nadir$user$CORR
         attributes(res) <- a
+        
       } else {
         if (!is.null(nadir$abs)) { 
           message("sorry but the nadir point cannot be calculated")
@@ -549,83 +542,79 @@ optimACDC <-
 .objNum <-
   function (sm, n.cov, strata, pcm, scm, nadir, weights, n.pts, utopia, scale) {
     
+    # Count the proportion of points per sampling strata
     counts <- lapply(1:n.cov, function (i)
       hist(sm[, i], strata[[1]][[i]], plot = FALSE)$counts)
-    
-    # ASR: We use the proportion of points per sampling strata
-    #counts <- lapply(1:n.cov, function(i) counts[[i]] / n.pts * 100)
     counts <- lapply(1:n.cov, function(i) counts[[i]] / n.pts)
     counts <- sapply(1:n.cov, function (i) 
       sum(abs(counts[[i]] - strata[[2]][[i]])))
         
-    # scale the objective function values
+    # Scale the objective function values
     if(scale$type == "upper-lower") {
       obj_cont <- sum(counts) - utopia$DIST / 
-        #attr(nadir, "strata") - utopia$DIST
         attr(nadir, "DIST") - utopia$DIST
       obj_cor <- sum(abs(pcm - scm)) - utopia$CORR / 
-        attr(nadir, "correl") - utopia$CORR
+        attr(nadir, "CORR") - utopia$CORR
     } else if (scale$type == "upper") {
-      #obj_cont <- sum(counts) / attr(nadir, "strata")
       obj_cont <- sum(counts) / attr(nadir, "DIST")
-      obj_cor <- sum(abs(pcm - scm)) / attr(nadir, "correl")
+      obj_cor <- sum(abs(pcm - scm)) / attr(nadir, "CORR")
     }
     
-    # aggregate the objective function values
+    # Aggregate the objective function values
     obj_cont <- obj_cont * weights$DIST
     obj_cor <- obj_cor * weights$CORR
     res <- obj_cont + obj_cor
+    
     return (res)
   }
 # INTERNAL FUNCTION - NADIR FOR FACTOR COVARIATES ##############################
 .facNadir <-
   function (nadir, candi, n.candi, n.pts, n.cov, covars, pop.prop, pcm, scale) {
     
-    # Simulate the nadir
+    # Simulate the nadir point
     if (!is.null(nadir$sim) && !is.null(nadir$save.sim)) {
       m <- paste("simulating ", nadir$sim, " nadir values...", sep = "")
       message(m)
       
-      # set variables
-      strata_nadir <- vector()
-      correl_nadir <- vector()
+      # Set variables
+      nadirDIST <- vector()
+      nadirCORR <- vector()
       
-      # begin the simulation
+      # Begin the simulation
       for (i in 1:nadir$sim) { 
         pts <- sample(1:n.candi, n.pts)
         sm <- covars[pts, ]
         scm <- pedometrics::cramer(sm)
         
-        # ASR: We multiply the proportion by 100 for numerical stability
         samp_prop <- lapply(sm, function(x) table(x) / n.pts)
-        #samp_prop <- lapply(sm, function(x) table(x) / n.pts * 100)
         samp_prop <- sapply(1:n.cov, function (i)
           sum(abs(samp_prop[[i]] - pop.prop[[i]])))
-        strata_nadir[i] <- sum(samp_prop)
-        correl_nadir[i] <- sum(abs(pcm - scm))
+        nadirDIST[i] <- sum(samp_prop)
+        nadirCORR[i] <- sum(abs(pcm - scm))
       }
       
       # SHOULD WE SAVE AND RETURN THE SIMULATED VALUES?
       # ASR: We compute the mean simulated value and return it as an attribute
       #      because we want to explore the simulated values in the future.
       if (nadir$save.sim) { 
-        res <- list(strata = strata_nadir, correl = correl_nadir)
+        res <- list(DIST = nadirDIST, CORR = nadirCORR)
       } else {
-        res <- list(strata = "strata_nadir", correl = "correl_nadir")
+        res <- list(DIST = "nadirDIST", CORR = "nadirCORR")
       }
       a <- attributes(res)
-      a$strata_nadir <- mean(strata_nadir) / scale$max
-      a$correl_nadir <- mean(correl_nadir) / scale$max
+      a$DIST <- mean(nadirDIST) / scale$max
+      a$CORR <- mean(nadirCORR) / scale$max
       attributes(res) <- a
       
-      # ASR: Other options are not available yet.
       } else {
+        # User-defined nadir values
         if (!is.null(nadir$user)) {
-          res <- list(strata = "strata_nadir", correl = "correl_nadir")
+          res <- list(DIST = "nadirDIST", CORR = "nadirCORR")
           a <- attributes(res)
-          a$strata_nadir <- nadir$user$DIST
-          a$correl_nadir <- nadir$user$CORR
+          a$DIST <- nadir$user$DIST
+          a$CORR <- nadir$user$CORR
           attributes(res) <- a
+          
           } else {
             if (!is.null(nadir$abs)) { 
               message("sorry but the nadir point cannot be calculated")
@@ -639,34 +628,36 @@ optimACDC <-
   function (sm, pop.prop, nadir, weights, pcm, scm, n.pts, n.cov, utopia, 
             scale) {
     
-    # ASR: We multiply the proportions by 100 for numerical stability
     samp_prop <- lapply(sm, function(x) table(x) / n.pts)
-    #samp_prop <- lapply(sm, function(x) table(x) / n.pts * 100)
     samp_prop <- sapply(1:n.cov, function (i)
       sum(abs(samp_prop[[i]] - pop.prop[[i]])))
     
-    # scale the objective function values
+    # Scale the objective function values
     if(scale$type == "upper-lower") {
       obj_cat <- sum(samp_prop) - utopia$DIST / 
-        attr(nadir, "strata") - utopia$DIST
+        attr(nadir, "DIST") - utopia$DIST
       obj_cor <- sum(abs(pcm - scm)) - utopia$CORR / 
-        attr(nadir, "correl") - utopia$CORR
+        attr(nadir, "CORR") - utopia$CORR
+      
     } else if (scale$type == "upper") {
-      obj_cat <- sum(samp_prop) / attr(nadir, "strata")
-      obj_cor <- sum(abs(pcm - scm)) / attr(nadir, "correl")
+      obj_cat <- sum(samp_prop) / attr(nadir, "DIST")
+      obj_cor <- sum(abs(pcm - scm)) / attr(nadir, "CORR")
     }
     
-    # aggregate the objective function values
+    # Aggregate the objective function values
     obj_cat <- obj_cat * weights$DIST
     obj_cor <- obj_cor * weights$CORR
     res <- obj_cat + obj_cor
+    
     return (res)
   }
 # INTERNAL FUNCTION - UTOPIA POINT FOR FACTOR COVARIATES #######################
 .facUtopia <-
   function (utopia) {
+    
     if (!is.null(unlist(utopia$user))) {
       utopia <- list(CORR = utopia$user$CORR, DIST = utopia$user$DIST)
+      
     } else {
       message("sorry but the utopia point cannot be calculated")
     }
@@ -674,8 +665,10 @@ optimACDC <-
 # INTERNAL FUNCTION - UTOPIA POINT FOR NUMERIC COVARIATES ######################
 .numUtopia <-
   function (utopia) {
+    
     if (!is.null(unlist(utopia$user))) {
       utopia <- list(CORR = utopia$user$CORR, DIST = utopia$user$DIST)
+      
     } else {
       message("sorry but the utopia point cannot be calculated")
     }
@@ -691,6 +684,7 @@ objACDC <-
             scale = list(type = "upper-lower", max = 100)) {
     
     if (!is.data.frame(covars)) covars <- as.data.frame(covars)
+    
     # Check arguments
     check <- .optimACDCcheck(candi = candi, covars = covars, nadir = nadir,
                              weights = weights, 
@@ -729,7 +723,6 @@ objACDC <-
     } else { # Factor covariates
       if (covars.type == "factor") {
         pcm <- pedometrics::cramer(covars)
-        #pop_prop <- lapply(covars, function(x) table(x) / nrow(covars) * 100)
         pop_prop <- lapply(covars, function(x) table(x) / nrow(covars))
         nadir <- .facNadir(nadir = nadir, candi = candi, n.candi = n_candi,
                            n.pts = n_pts, n.cov = n_cov, covars = covars, 
@@ -747,12 +740,14 @@ objACDC <-
 # INTERNAL FUNCTION - USE THE COORDINATES AS COVARIATES ########################
 .useCoords <-
   function (covars.type, candi, n.pts, strata.type) {
+    
     if (covars.type == "factor") {
       coords <- data.frame(candi[, 2:3])
       breaks <- .numStrata(n.pts = n.pts, covars = coords, 
                            strata.type = strata.type)[[1]]
       coords <- pedometrics::cont2cat(x = coords, breaks = breaks)
       covars <- data.frame(covars, coords)
+      
     } else {
       covars <- data.frame(covars, candi[, 2:3])
     }
@@ -767,6 +762,7 @@ objACDC <-
       if (use.coords) {
         covars <- data.frame(covars, candi[, 2:3])
       }
+      
       # Convert numeric covariates to factor covariates
       if (!pedometrics::is.all.factor(covars)) {
         i <- which(sapply(covars, is.factor) == FALSE)
