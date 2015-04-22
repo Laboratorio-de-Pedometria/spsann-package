@@ -105,7 +105,7 @@ covars <- meuse.grid[, 6:7]
 x.max <- diff(bbox(boundary)[1, ])
 y.max <- diff(bbox(boundary)[2, ])
 nadir <- list(sim = 10, save.sim = TRUE, user = NULL, abs = NULL)
-utopia <- list(user = list(correl = 0, strata = 0), abs = NULL)
+utopia <- list(user = list(CORR = 0, DIST = 0), abs = NULL)
 scale <- list(type = "upper-lower", max = 100)
 set.seed(2001)
 tmp <- optimACDC(points = 10, candi = candi, covars = covars, use.coords = TRUE,
@@ -141,7 +141,7 @@ covars <- meuse.grid[, rep(c(6, 7), 10)]
 x.max <- diff(bbox(boundary)[1, ])
 y.max <- diff(bbox(boundary)[2, ])
 nadir <- list(sim = 10, save.sim = TRUE, user = NULL, abs = NULL)
-utopia <- list(user = list(correl = 0, strata = 0), abs = NULL)
+utopia <- list(user = list(CORR = 0, DIST = 0), abs = NULL)
 scale <- list(type = "upper-lower", max = 100)
 set.seed(2001)
 tmp <- optimACDC(points = 500, candi = candi, covars = covars, 

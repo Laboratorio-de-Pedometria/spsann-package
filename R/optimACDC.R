@@ -364,6 +364,7 @@ optimACDC <-
       res <- paste("'nadir' must be a list with four sub-arguments")
       return (res)
     }
+    
     n <- !sapply(nadir, is.null)
     if (n[[1]] == TRUE) {
       if (n[[2]] == FALSE) {
@@ -469,7 +470,8 @@ optimACDC <-
       message(m)
       
       # set variables
-      strata_nadir <- vector()
+      #strata_nadir <- vector()
+      nadirDIST <- vector()
       correl_nadir <- vector()
       
       # begin the simulation
@@ -485,7 +487,8 @@ optimACDC <-
         counts <- lapply(1:n.cov, function(i) counts[[i]] / n.pts)
         counts <- sapply(1:n.cov, function (i)
           sum(abs(counts[[i]] - strata[[2]][[i]])))
-        strata_nadir[i] <- sum(counts)
+        #strata_nadir[i] <- sum(counts)
+        nadirDIST[i] <- sum(counts)
         correl_nadir[i] <- sum(abs(pcm - scm))
       }
       
@@ -493,12 +496,15 @@ optimACDC <-
       # ASR: We compute the mean simulated value and return it as an attribute
       #      because we want to explore the simulated values in the future.
       if (nadir$save.sim) { 
-        res <- list(strata = strata_nadir, correl = correl_nadir)
+        #res <- list(strata = strata_nadir, correl = correl_nadir)
+        res <- list(DIST = nadirDIST, correl = correl_nadir)
       } else {
-        res <- list(strata = "strata_nadir", correl = "correl_nadir")
+        #res <- list(strata = "strata_nadir", correl = "correl_nadir")
+        res <- list(DIST = "nadirDIST", correl = "correl_nadir")
       }
       a <- attributes(res)
-      a$strata_nadir <- mean(strata_nadir) / scale$max
+      #a$strata_nadir <- mean(strata_nadir) / scale$max
+      a$DIST <- mean(nadirDIST) / scale$max
       a$correl_nadir <- mean(correl_nadir) / scale$max
       attributes(res) <- a
             
@@ -506,9 +512,11 @@ optimACDC <-
       
       # User-defined nadir values
       if (!is.null(nadir$user)) { 
-        res <- list(strata = "strata_nadir", correl = "correl_nadir")
+        #res <- list(strata = "strata_nadir", correl = "correl_nadir")
+        res <- list(DIST = "nadirDIST", correl = "correl_nadir")
         a <- attributes(res)
-        a$strata_nadir <- nadir$user$DIST
+        #a$strata_nadir <- nadir$user$DIST
+        a$DIST <- nadir$user$DIST
         a$correl_nadir <- nadir$user$CORR
         attributes(res) <- a
       } else {
@@ -553,11 +561,13 @@ optimACDC <-
     # scale the objective function values
     if(scale$type == "upper-lower") {
       obj_cont <- sum(counts) - utopia$DIST / 
-        attr(nadir, "strata") - utopia$DIST  
+        #attr(nadir, "strata") - utopia$DIST
+        attr(nadir, "DIST") - utopia$DIST
       obj_cor <- sum(abs(pcm - scm)) - utopia$CORR / 
         attr(nadir, "correl") - utopia$CORR
     } else if (scale$type == "upper") {
-      obj_cont <- sum(counts) / attr(nadir, "strata")
+      #obj_cont <- sum(counts) / attr(nadir, "strata")
+      obj_cont <- sum(counts) / attr(nadir, "DIST")
       obj_cor <- sum(abs(pcm - scm)) / attr(nadir, "correl")
     }
     
@@ -741,7 +751,7 @@ objACDC <-
       coords <- data.frame(candi[, 2:3])
       breaks <- .numStrata(n.pts = n.pts, covars = coords, 
                            strata.type = strata.type)[[1]]
-      coords <- cont2cat(x = coords, breaks = breaks)
+      coords <- pedometrics::cont2cat(x = coords, breaks = breaks)
       covars <- data.frame(covars, coords)
     } else {
       covars <- data.frame(covars, candi[, 2:3])
@@ -766,7 +776,7 @@ objACDC <-
         num_covars <- data.frame(covars[, i])
         breaks <- .numStrata(n.pts = n.pts, covars = num_covars, 
                              strata.type = strata.type)[[1]]
-        num_covars <- cont2cat(x = num_covars, breaks = breaks)
+        num_covars <- pedometrics::cont2cat(x = num_covars, breaks = breaks)
         covars[, i] <- num_covars
       }
       
