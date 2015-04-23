@@ -1,13 +1,13 @@
 #  Template documentation for multi-objective optimization problems (MOOP)
 ################################################################################
-#' @param nadir List with four named sub-arguments: \code{sim} -- the number of
-#' random realizations to estimate the nadir point; \code{save.sim} -- logical 
-#' for saving the simulated values and returning them as an attribute of the 
-#' optimized sample configuration; \code{user} -- a list of user-defined 
-#' values named after the objective function to which they apply; 
-#' \code{abs} -- logical for calculating the nadir point internally. 
-#' Defaults to \code{sim = 1000}, \code{save.sim = TRUE}, \code{user = NULL}, 
-#' and \code{abs = NULL}.
+#'
+#' @param nadir List with named sub-arguments. Three options are available: 
+#' 1) \code{sim} -- the number of random realizations to estimate the nadir 
+#' point, and \code{save.sim} -- logical for saving the simulated values and 
+#' returning them as an attribute of the optimized sample configuration; 2) 
+#' \code{user} -- a list of user-defined values named after the objective 
+#' function to which they apply; 3) \code{abs} -- logical for calculating the 
+#' nadir point internally.
 #'
 #' @param weights List with named sub-arguments. The weights assigned to each of
 #' the objective functions combined to form the multi-objective optimization

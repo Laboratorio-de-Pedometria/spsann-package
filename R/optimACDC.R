@@ -67,7 +67,7 @@
 optimACDC <-
   function (points, candi, covars, strata.type = "area", 
             weights = list(CORR = 0.5, DIST = 0.5), use.coords = FALSE,
-            nadir = list(sim = 1000, save.sim = TRUE, user = NULL, abs = NULL),
+            nadir = list(sim = NULL, save.sim = NULL, user = NULL, abs = NULL),
             utopia = list(user = NULL, abs = NULL), 
             scale = list(type = "upper-lower", max = 100),
             x.max, x.min, y.max, y.min, iterations,
@@ -327,11 +327,7 @@ optimACDC <-
     aa <- !is.list(weights)
     bb <- length(weights) != 2
     cc <- is.null(names(weights))
-    #dd <- !all(c(names(weights) == c("correl", "strata")) == TRUE)
-    #if (aa || bb || cc || dd) {
     if (aa || bb || cc || dd) {
-      #res <- paste("'weights' must be a list with two named sub-arguments:",
-      #             "'strata' and 'correl'", sep = "")
       res <- paste("'weights' must be a list with two named sub-arguments:",
                    "'DIST' and 'CORR'", sep = "")
       return (res)
@@ -353,27 +349,25 @@ optimACDC <-
     }
     
     # nadir
-    if (!is.list(nadir) || length(nadir) != 4) {
-      res <- paste("'nadir' must be a list with four sub-arguments")
+    aa <- !is.list(nadir)
+    if (aa) {
+      res <- paste("'nadir' must be a list with named components")
       return (res)
     }
     
-    n <- !sapply(nadir, is.null)
-    if (n[[1]] == TRUE) {
-      if (n[[2]] == FALSE) {
-        res <- paste("you must inform if the simulations should be saved")
-        return (res)
-      }
-      if (n[[3]] == TRUE || n[[4]] == TRUE) {
+    bb <- names(nadir)
+    if (length(bb) >= 2) {
+      if (length(bb) > 2) {
         res <- paste("you must choose a single nadir option")
         return (res)
       }
     } else {
-      if (n[[3]] == TRUE) {
-        #res <- paste("sorry but you cannot set the nadir point")
-        #return (res)
+      if (bb == "sim" || bb == "save.sim") {
+        res <- paste("you must set the number of simulations and if they ",
+                     "should be saved", sep = "")
+        return (res)
       }
-      if (n[[4]] == TRUE) {
+      if (bb == "abs") {
         res <- paste("sorry but the nadir point cannot be calculated")
         return (res)
       }
@@ -667,13 +661,13 @@ optimACDC <-
     }
   }
 # CALCULATE OBJECTIVE FUNCTION VALUE ###########################################
-# @rdname optimACDC
-# @export
+@rdname optimACDC
+@export
 objACDC <-
   function (points, candi, covars, strata.type = "area", 
             weights = list(CORR = 0.5, DIST = 0.5), use.coords = FALSE, 
             utopia = list(user = NULL, abs = NULL),
-            nadir = list(sim = 1000, save.sim = TRUE, user = NULL, abs = NULL),
+            nadir = list(sim = NULL, save.sim = NULL, user = NULL, abs = NULL),
             scale = list(type = "upper-lower", max = 100)) {
     
     if (!is.data.frame(covars)) covars <- as.data.frame(covars)
