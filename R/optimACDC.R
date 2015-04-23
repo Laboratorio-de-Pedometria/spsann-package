@@ -7,11 +7,6 @@
 #' @template spJitter_doc
 #' @template spSANN_doc
 #' @template ACDC_doc
-#'
-#' @param scale List with two named sub-arguments: \code{type} -- the type of
-#' scaling that should be used, with available options \code{"upper} and
-#' \code{"upper-lower}; and \code{max} -- the maximum value after scaling.
-#' Defaults to \code{scale = list(type = "upper-lower", max = 100)}.
 #' 
 #' @details
 #'
@@ -65,12 +60,10 @@
 #'         utopia = utopia, scale = scale)
 # MAIN FUNCTION ################################################################
 optimACDC <-
-  function (points, candi, covars, strata.type = "area", 
+  function (points, candi, covars, strata.type = "area", iterations,
             weights = list(CORR = 0.5, DIST = 0.5), use.coords = FALSE,
             nadir = list(sim = NULL, save.sim = NULL, user = NULL, abs = NULL),
-            utopia = list(user = NULL, abs = NULL), 
-            scale = list(type = "upper-lower", max = 100),
-            x.max, x.min, y.max, y.min, iterations,
+            utopia = list(user = NULL, abs = NULL), x.max, x.min, y.max, y.min,
             acceptance = list(initial = 0.99, cooling = iterations / 10),
             stopping = list(max.count = iterations / 10), plotit = TRUE,
             boundary, progress = TRUE, verbose = TRUE, greedy = FALSE) {
@@ -88,8 +81,7 @@ optimACDC <-
     
     check <- .optimACDCcheck(candi = candi, covars = covars, nadir = nadir,
                              weights = weights, use.coords = use.coords, 
-                             strata.type = strata.type, utopia = utopia, 
-                             scale = scale)
+                             strata.type = strata.type, utopia = utopia)
     if (!is.null(check)) stop (check, call. = FALSE)
     
     if (plotit) {
@@ -120,12 +112,12 @@ optimACDC <-
                            strata.type = strata.type)
       nadir <- .numNadir(n.pts = n_pts, n.cov = n_cov, n.candi = n_candi, 
                          pcm = pcm, nadir = nadir, candi = candi, 
-                         covars = covars, strata = strata, scale = scale)
+                         covars = covars, strata = strata)
       utopia <- .numUtopia(utopia = utopia)
       scm <- cor(sm, use = "complete.obs")
       energy0 <- .objNum(sm = sm, n.cov = n_cov, strata = strata, pcm = pcm, 
                          scm = scm, nadir = nadir, weights = weights, 
-                         n.pts = n_pts, utopia = utopia, scale = scale)
+                         n.pts = n_pts, utopia = utopia)
 
     } else { # Factor covariates
       if (covars.type == "factor") {
@@ -133,13 +125,12 @@ optimACDC <-
         pop_prop <- lapply(covars, function(x) table(x) / nrow(covars))
         nadir <- .facNadir(nadir = nadir, candi = candi, n.candi = n_candi,
                            n.pts = n_pts, n.cov = n_cov, covars = covars, 
-                           pop.prop = pop_prop, pcm = pcm, scale = scale)
+                           pop.prop = pop_prop, pcm = pcm)
         utopia <- .facUtopia(utopia = utopia)
         scm <- pedometrics::cramer(sm)
         energy0 <- .objFac(sm = sm, pop.prop = pop_prop, nadir = nadir, 
                            weights = weights, pcm = pcm, scm = scm,
-                           n.pts = n_pts, n.cov = n_cov, utopia = utopia,
-                           scale = scale)
+                           n.pts = n_pts, n.cov = n_cov, utopia = utopia)
       }
     }
 
@@ -178,8 +169,7 @@ optimACDC <-
         new_scm <- cor(new_sm, use = "complete.obs")
         new_energy <- .objNum(sm = new_sm, n.cov = n_cov, strata = strata, 
                               pcm = pcm, scm = new_scm, nadir = nadir,
-                              weights = weights, n.pts = n_pts, utopia = utopia,
-                              scale = scale)
+                              weights = weights, n.pts = n_pts, utopia = utopia)
 
       } else { # Factor covariates
         if (covars.type == "factor") {
@@ -188,8 +178,7 @@ optimACDC <-
           new_scm <- pedometrics::cramer(new_sm)
           new_energy <- .objFac(sm = new_sm, pop.prop = pop_prop, scm = new_scm, 
                                 nadir = nadir, weights = weights, pcm = pcm, 
-                                n.pts = n_pts, n.cov = n_cov, utopia = utopia,
-                                scale = scale)
+                                n.pts = n_pts, n.cov = n_cov, utopia = utopia)
         }
       }
       
@@ -283,33 +272,14 @@ optimACDC <-
   }
 # INTERNAL FUNCTION - CHECK ARGUMENTS ##########################################
 .optimACDCcheck <-
-  function (candi, covars, weights, use.coords, strata.type, nadir, utopia,
-            scale) {
+  function (candi, covars, weights, use.coords, strata.type, nadir, utopia) {
     
     # utopia
     aa <- !is.list(utopia)
-    bb <- length(utopia) != 2
+    bb <- !length(utopia) == 1
     cc <- is.null(names(utopia))
-    dd <- !all(c(names(utopia) == c("user", "abs")) == TRUE)
-    if (aa || bb || cc || dd) {
-      res <- paste("'utopia' must be a list with two named sub-arguments:",
-                   "'user' and 'abs'", sep = "")
-      return (res)
-    }
-    
-    # scale
-    aa <- !is.list(scale)
-    bb <- length(scale) != 2
-    cc <- is.null(names(scale))
-    dd <- !all(c(names(scale) == c("type", "max")) == TRUE)
-    if (aa || bb || cc || dd) {
-      res <- paste("'scale' must be a list with two named sub-arguments:",
-                   "'type' and 'max'", sep = "")
-      return (res)
-    }
-    if (!match(scale$type, c("upper", "upper-lower"))) {
-      res <- paste("'scale$type' must be 'upper' or 'upper-lower'", sep = "")
-      return (res)
+    if (aa || bb || cc) {
+      res <- paste("'utopia' must be a list with a named component")
     }
     
     # covars
@@ -327,11 +297,12 @@ optimACDC <-
     aa <- !is.list(weights)
     bb <- length(weights) != 2
     cc <- is.null(names(weights))
-    if (aa || bb || cc || dd) {
+    if (aa || bb || cc) {
       res <- paste("'weights' must be a list with two named sub-arguments:",
                    "'DIST' and 'CORR'", sep = "")
       return (res)
     }
+    rm(aa, bb, cc)
     
     aa <- sum(unlist(weights)) != 1
     bb <- any(unlist(weights) == 0)
@@ -339,14 +310,16 @@ optimACDC <-
       res <- paste("the 'weights' must be larger than 0 and sum to 1")
       return (res)
     }
+    rm(aa, bb)
         
     # strata.type
-    st <- match(strata.type, c("area", "range"))
-    if (is.na(st)) {
+    aa <- match(strata.type, c("area", "range"))
+    if (is.na(aa)) {
       res <- paste("'strata.type = ", strata.type, "' is not supported",
                    sep = "")
       return (res)
     }
+    rm(aa)
     
     # nadir
     aa <- !is.list(nadir)
@@ -354,24 +327,26 @@ optimACDC <-
       res <- paste("'nadir' must be a list with named components")
       return (res)
     }
+    rm(aa)
     
-    bb <- names(nadir)
-    if (length(bb) >= 2) {
-      if (length(bb) > 2) {
+    aa <- names(nadir)
+    if (length(aa) >= 2) {
+      if (length(aa) > 2) {
         res <- paste("you must choose a single nadir option")
         return (res)
       }
     } else {
-      if (bb == "sim" || bb == "save.sim") {
+      if (aa == "sim" || aa == "save.sim") {
         res <- paste("you must set the number of simulations and if they ",
                      "should be saved", sep = "")
         return (res)
       }
-      if (bb == "abs") {
+      if (aa == "abs") {
         res <- paste("sorry but the nadir point cannot be calculated")
         return (res)
       }
     }
+    rm(aa)
   }
 # INTERNAL FUNCTION - BREAKS FOR NUMERIC COVARIATES ############################
 # Now we define the breaks and the distribution, and return it as a list
@@ -392,15 +367,10 @@ optimACDC <-
       #count <- lapply(count, as.integer)
       #count <- lapply(count, function(x) {x[2] <- x[2] + x[1] - 1; x[-1L]})
       
+      # Compute the proportion of points per sampling strata
       breaks <- lapply(breaks, unique)
       count <- lapply(1:n_cov, function (i)
         hist(covars[, i], breaks[[i]], plot = FALSE)$counts)
-      
-      # ASR: We use the proportion of points per sampling strata
-      #count <- lapply(1:n_cov, function(i) 
-      #  count[[i]] / sum(count[[i]]) * n.pts)
-      
-      #count <- lapply(1:n_cov, function(i) count[[i]] / sum(count[[i]]) * 100)
       count <- lapply(1:n_cov, function(i) count[[i]] / sum(count[[i]]))
       strata <- list(breaks, count)
 
@@ -418,14 +388,9 @@ optimACDC <-
         count <- lapply(1:n_cov, function (i)
           hist(covars[, i], breaks[[i]], plot = FALSE)$counts)
         
-        # ASR: We use the proportion of points per sampling strata
-        #count <- lapply(1:n_cov, function(i)
-        #  count[[i]] / sum(count[[i]]) * n.pts)
-        count <- lapply(1:n_cov, function(i)
-          #count[[i]] / sum(count[[i]]) * 100)
-          count[[i]] / sum(count[[i]]))
-        
-        
+        # Compute the proportion of points per sampling strata
+        count <- lapply(1:n_cov, function (i) {count[[i]] / sum(count[[i]])})
+                
         # ASR: This is an old implementation to merge null strata
         #breaks <- lapply(breaks, unique)
         #count <- lapply(1:n_cov, function (i)
@@ -449,7 +414,7 @@ optimACDC <-
   }
 # INTERNAL FUNCTION - NADIR FOR NUMERIC COVARIATES #############################
 .numNadir <-
-  function (n.pts, n.cov, n.candi, pcm, nadir, candi, covars, strata, scale) {
+  function (n.pts, n.cov, n.candi, pcm, nadir, candi, covars, strata) {
 
     # Simulate the nadir point
     if (!is.null(nadir$sim) && !is.null(nadir$save.sim)) { 
@@ -485,8 +450,8 @@ optimACDC <-
         res <- list(DIST = "nadirDIST", CORR = "nadirCORR")
       }
       a <- attributes(res)
-      a$DIST <- mean(nadirDIST) / scale$max
-      a$CORR <- mean(nadirCORR) / scale$max
+      a$DIST <- mean(nadirDIST)
+      a$CORR <- mean(nadirCORR)
       attributes(res) <- a
             
     } else {
@@ -527,7 +492,7 @@ optimACDC <-
   }
 # INTERNAL FUNCTION - CRITERION FOR NUMERIC COVARIATES #########################
 .objNum <-
-  function (sm, n.cov, strata, pcm, scm, nadir, weights, n.pts, utopia, scale) {
+  function (sm, n.cov, strata, pcm, scm, nadir, weights, n.pts, utopia) {
     
     # Count the proportion of points per sampling strata
     counts <- lapply(1:n.cov, function (i)
@@ -537,16 +502,10 @@ optimACDC <-
       sum(abs(counts[[i]] - strata[[2]][[i]])))
         
     # Scale the objective function values
-    if(scale$type == "upper-lower") {
-      obj_cont <- sum(counts) - utopia$DIST / 
-        attr(nadir, "DIST") - utopia$DIST
-      obj_cor <- sum(abs(pcm - scm)) - utopia$CORR / 
-        attr(nadir, "CORR") - utopia$CORR
-    } else if (scale$type == "upper") {
-      obj_cont <- sum(counts) / attr(nadir, "DIST")
-      obj_cor <- sum(abs(pcm - scm)) / attr(nadir, "CORR")
-    }
-    
+    obj_cont <- sum(counts) - utopia$DIST / attr(nadir, "DIST") - utopia$DIST
+    obj_cor <- sum(abs(pcm - scm)) - utopia$CORR / 
+      attr(nadir, "CORR") - utopia$CORR
+      
     # Aggregate the objective function values
     obj_cont <- obj_cont * weights$DIST
     obj_cor <- obj_cor * weights$CORR
@@ -556,7 +515,7 @@ optimACDC <-
   }
 # INTERNAL FUNCTION - NADIR FOR FACTOR COVARIATES ##############################
 .facNadir <-
-  function (nadir, candi, n.candi, n.pts, n.cov, covars, pop.prop, pcm, scale) {
+  function (nadir, candi, n.candi, n.pts, n.cov, covars, pop.prop, pcm) {
     
     # Simulate the nadir point
     if (!is.null(nadir$sim) && !is.null(nadir$save.sim)) {
@@ -589,8 +548,8 @@ optimACDC <-
         res <- list(DIST = "nadirDIST", CORR = "nadirCORR")
       }
       a <- attributes(res)
-      a$DIST <- mean(nadirDIST) / scale$max
-      a$CORR <- mean(nadirCORR) / scale$max
+      a$DIST <- mean(nadirDIST)
+      a$CORR <- mean(nadirCORR)
       attributes(res) <- a
       
       } else {
@@ -612,24 +571,16 @@ optimACDC <-
   }
 # INTERNAL FUNCTION - CRITERION FOR FACTOR COVARIATES ##########################
 .objFac <-
-  function (sm, pop.prop, nadir, weights, pcm, scm, n.pts, n.cov, utopia, 
-            scale) {
+  function (sm, pop.prop, nadir, weights, pcm, scm, n.pts, n.cov, utopia) {
     
     samp_prop <- lapply(sm, function(x) table(x) / n.pts)
     samp_prop <- sapply(1:n.cov, function (i)
       sum(abs(samp_prop[[i]] - pop.prop[[i]])))
     
     # Scale the objective function values
-    if(scale$type == "upper-lower") {
-      obj_cat <- sum(samp_prop) - utopia$DIST / 
-        attr(nadir, "DIST") - utopia$DIST
-      obj_cor <- sum(abs(pcm - scm)) - utopia$CORR / 
-        attr(nadir, "CORR") - utopia$CORR
-      
-    } else if (scale$type == "upper") {
-      obj_cat <- sum(samp_prop) / attr(nadir, "DIST")
-      obj_cor <- sum(abs(pcm - scm)) / attr(nadir, "CORR")
-    }
+    obj_cat <- sum(samp_prop) - utopia$DIST / attr(nadir, "DIST") - utopia$DIST
+    obj_cor <- sum(abs(pcm - scm)) - utopia$CORR / 
+      attr(nadir, "CORR") - utopia$CORR
     
     # Aggregate the objective function values
     obj_cat <- obj_cat * weights$DIST
@@ -661,14 +612,13 @@ optimACDC <-
     }
   }
 # CALCULATE OBJECTIVE FUNCTION VALUE ###########################################
-@rdname optimACDC
-@export
+# @rdname optimACDC
+# @export
 objACDC <-
   function (points, candi, covars, strata.type = "area", 
             weights = list(CORR = 0.5, DIST = 0.5), use.coords = FALSE, 
             utopia = list(user = NULL, abs = NULL),
-            nadir = list(sim = NULL, save.sim = NULL, user = NULL, abs = NULL),
-            scale = list(type = "upper-lower", max = 100)) {
+            nadir = list(sim = NULL, save.sim = NULL, user = NULL, abs = NULL)) {
     
     if (!is.data.frame(covars)) covars <- as.data.frame(covars)
     
@@ -676,7 +626,7 @@ objACDC <-
     check <- .optimACDCcheck(candi = candi, covars = covars, nadir = nadir,
                              weights = weights, 
                              use.coords = use.coords, strata.type = strata.type,
-                             utopia = utopia, scale = scale)
+                             utopia = utopia)
     if (!is.null(check)) stop (check, call. = FALSE)
     
     # Prepare sample points
@@ -700,12 +650,12 @@ objACDC <-
                            strata.type = strata.type)
       nadir <- .numNadir(n.pts = n_pts, n.cov = n_cov, n.candi = n_candi, 
                          pcm = pcm, nadir = nadir, candi = candi, 
-                         covars = covars, strata = strata, scale = scale)
+                         covars = covars, strata = strata)
       utopia <- .numUtopia(utopia = utopia)
       scm <- cor(sm, use = "complete.obs")
       energy <- .objNum(sm = sm, n.cov = n_cov, strata = strata, pcm = pcm, 
                          scm = scm, nadir = nadir, weights = weights, 
-                         n.pts = n_pts, utopia = utopia, scale = scale)
+                         n.pts = n_pts, utopia = utopia)
       
     } else { # Factor covariates
       if (covars.type == "factor") {
@@ -713,13 +663,12 @@ objACDC <-
         pop_prop <- lapply(covars, function(x) table(x) / nrow(covars))
         nadir <- .facNadir(nadir = nadir, candi = candi, n.candi = n_candi,
                            n.pts = n_pts, n.cov = n_cov, covars = covars, 
-                           pop.prop = pop_prop, pcm = pcm, scale = scale)
+                           pop.prop = pop_prop, pcm = pcm)
         utopia <- .facUtopia(utopia = utopia)
         scm <- pedometrics::cramer(sm)
         energy <- .objFac(sm = sm, pop.prop = pop_prop, nadir = nadir, 
                            weights = weights, pcm = pcm, scm = scm,
-                           n.pts = n_pts, n.cov = n_cov, utopia = utopia,
-                           scale = scale)
+                           n.pts = n_pts, n.cov = n_cov, utopia = utopia)
       }
     }
     return (energy)
