@@ -88,13 +88,31 @@
             conf0, y_max0, y.max, x_max0, x.max, best.energy, best.k) {
     par(mfrow = c(1, 2))
     
-    # plot energy states
-    a <- c(energy0, energies[1:k])
-    plot(a ~ c(0:k), type = "l", xlab = "iteration", ylab = "energy state")
-    #abline(h = energy0, col = "red")
-    lines(x = c(-k, 0), y = rep(energy0, 2), col = "red")
-    #points(x = best.k, y = best.energy, col = "green", pch = 18)
-    lines(x = rep(best.k, 2), y = c(-5, best.energy), col = "green")
+    MOOP <- ifelse(!is.null(attributes(energy0)), TRUE, FALSE)
+    
+    # PLOT THE ENERGY STATES
+    # Multi-objective optimization problem
+    if (MOOP) {
+      n <- ncol(energy0)
+      l <- colnames(energy0)
+      a <- rbind(energy0, energies)
+      plot(1, type = 'n', xlim = c(0, k), ylim = c(min(a), max(a)), 
+           xlab = "iteration", ylab = "energy state")
+      legend("topright", legend = l, lwd = 1, lty = 1:n)
+      
+      for(i in 1:ncol(a)) {
+        lines(a[, i] ~ c(0:k), type = "l", lty = i)
+      }
+      lines(x = c(-k, 0), y = rep(energy0[1], 2), col = "red")
+      lines(x = rep(best.k, 2), y = c(-5, best.energy[1]), col = "green")
+      
+      # Single-objective optimization problem
+    } else {
+      a <- c(energy0, energies[1:k])
+      plot(a ~ c(0:k), type = "l", xlab = "iteration", ylab = "energy state")
+      lines(x = c(-k, 0), y = rep(energy0, 2), col = "red")
+      lines(x = rep(best.k, 2), y = c(-5, best.energy), col = "green") 
+    }
     
     # plot acceptance probability
     a <- c(acceptance[[1]], accept_probs[1:k])

@@ -143,8 +143,10 @@ optimACDC <-
     best_sm <- sm
     count <- 0
     old_energy <- energy0
-    best_energy <- Inf
-    energies <- vector()
+    #best_energy <- Inf
+    #energies <- vector()
+    best_energy <- data.frame(obj = Inf, CORR = Inf, DIST = Inf)
+    energies <- data.frame(obj = NA, CORR = NA, DIST = NA)
     accept_probs <- vector()
     x_max0 <- x.max
     y_max0 <- y.max
@@ -190,14 +192,14 @@ optimACDC <-
       }
       actual_prob <- acceptance[[1]] * exp(-k / acceptance[[2]])
       accept_probs[k] <- actual_prob
-      if (new_energy <= old_energy) {
+      if (new_energy[1] <= old_energy[1]) {
         old_conf <- new_conf
         old_energy <- new_energy
         count <- 0
         old_sm <- new_sm
         old_scm <- new_scm
       } else {
-        if (new_energy > old_energy & random_prob <= actual_prob) {
+        if (new_energy[1] > old_energy[1] & random_prob <= actual_prob) {
           old_conf <- new_conf
           old_energy <- new_energy
           count <- count + 1
@@ -221,8 +223,8 @@ optimACDC <-
       }
       
       # Best energy state
-      energies[k] <- new_energy
-      if (new_energy < best_energy / 1.0000001) {
+      energies[k, ] <- new_energy
+      if (new_energy[1] < best_energy[1] / 1.0000001) {
         best_k <- k
         best_conf <- new_conf
         best_energy <- new_energy
@@ -246,7 +248,7 @@ optimACDC <-
       
       # Freezing parameters
       if (count == stopping[[1]]) {
-        if (new_energy > best_energy * 1.000001) {
+        if (new_energy[1] > best_energy[1] * 1.000001) {
           old_conf <- old_conf
           new_conf <- best_conf
           old_energy <- best_old_energy
@@ -502,14 +504,15 @@ optimACDC <-
       sum(abs(counts[[i]] - strata[[2]][[i]])))
         
     # Scale the objective function values
-    obj_cont <- sum(counts) - utopia$DIST / attr(nadir, "DIST") - utopia$DIST
-    obj_cor <- sum(abs(pcm - scm)) - utopia$CORR / 
-      attr(nadir, "CORR") - utopia$CORR
+    obj_cont <- (sum(counts) - utopia$DIST) / 
+      (attr(nadir, "DIST") - utopia$DIST)
+    obj_cor <- (sum(abs(pcm - scm)) - utopia$CORR) / 
+      (attr(nadir, "CORR") - utopia$CORR)
       
     # Aggregate the objective function values
     obj_cont <- obj_cont * weights$DIST
     obj_cor <- obj_cor * weights$CORR
-    res <- obj_cont + obj_cor
+    res <- data.frame(obj = obj_cont + obj_cor, CORR = obj_cor, DIST = obj_cont)
     
     return (res)
   }
@@ -578,14 +581,16 @@ optimACDC <-
       sum(abs(samp_prop[[i]] - pop.prop[[i]])))
     
     # Scale the objective function values
-    obj_cat <- sum(samp_prop) - utopia$DIST / attr(nadir, "DIST") - utopia$DIST
-    obj_cor <- sum(abs(pcm - scm)) - utopia$CORR / 
-      attr(nadir, "CORR") - utopia$CORR
+    obj_cat <- (sum(samp_prop) - utopia$DIST) / 
+      (attr(nadir, "DIST") - utopia$DIST)
+    obj_cor <- (sum(abs(pcm - scm)) - utopia$CORR) / 
+      (attr(nadir, "CORR") - utopia$CORR)
     
     # Aggregate the objective function values
     obj_cat <- obj_cat * weights$DIST
     obj_cor <- obj_cor * weights$CORR
     res <- obj_cat + obj_cor
+    res <- data.frame(obj = obj_cat + obj_cor, CORR = obj_cor, DIST = obj_cat)
     
     return (res)
   }
