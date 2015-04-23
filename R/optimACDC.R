@@ -8,13 +8,6 @@
 #' @template spSANN_doc
 #' @template ACDC_doc
 #'
-#' @param weights List with two named sub-arguments. The weights assigned to two
-#' objective functions combined to form \bold{ACDC}: the association/correlation
-#' measure between covariates (\bold{CORR}), and the reproduction of the 
-#' marginal distribution of covariates (\bold{DIST}). The weights must be larger
-#' than 0 and sum to unity. Defaults to \code{CORR = 0.5} and 
-#' \code{DIST = 0.5)}.
-#' 
 #' @param scale List with two named sub-arguments: \code{type} -- the type of
 #' scaling that should be used, with available options \code{"upper} and
 #' \code{"upper-lower}; and \code{max} -- the maximum value after scaling.

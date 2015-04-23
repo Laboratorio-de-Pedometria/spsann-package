@@ -9,6 +9,12 @@
 #' Defaults to \code{sim = 1000}, \code{save.sim = TRUE}, \code{user = NULL}, 
 #' and \code{abs = NULL}.
 #'
+#' @param weights List with named sub-arguments. The weights assigned to each of
+#' the objective functions combined to form the multi-objective optimization
+#' problem (MOOP). They must be named after the objective function to which
+#' they apply. The weights must be larger than 0 and sum to 1. The default
+#' option gives equal weights to all objective functions.
+#'
 #' @param utopia List with two named sub-arguments: \code{user} -- a list of
 #' user-defined values named after the objective function to which they apply, 
 #' and \code{abs} -- logical for calculating the utopia point internally. 
