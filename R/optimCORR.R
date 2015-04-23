@@ -98,12 +98,6 @@ optimCORR <-
     old_conf <- conf0
     
     # Prepare covariates (covars) and create the starting sample matrix (sm)
-    #     if (use.coords) {
-    #       covars <- .useCoords(covars.type = covars.type, candi = candi, 
-    #                            n.pts = n_pts, strata.type = strata.type)
-    #     }
-    #     n_cov <- ncol(covars)
-    #     sm <- covars[points[, 1], ]
     covars.type <- ifelse(pedometrics::is.any.factor(covars), "factor",
                           "numeric")
     covars <- .covarsACDC(covars = covars, covars.type = covars.type, 
@@ -126,6 +120,7 @@ optimCORR <-
     }
 
     # Other settings for the simulated annealing algorithm
+    MOOP <- FALSE
     old_scm      <- scm
     new_scm      <- scm
     best_scm     <- scm
@@ -218,16 +213,17 @@ optimCORR <-
         best_scm        <- new_scm
         best_old_scm    <- old_scm
       }
+      
       # Plotting
-      #if (plotit && any(round(seq(1, iterations, 10)) == k)) {
       if (plotit && pedometrics::is.numint(k / 10)) {
         .spSANNplot(energy0 = energy0, energies = energies, k = k, 
                     acceptance = acceptance, accept_probs = accept_probs,
                     boundary = boundary, new_conf = new_conf[, 2:3], 
                     conf0 = conf0[, 2:3], y_max0 = y_max0, y.max = y.max, 
                     x_max0 = x_max0, x.max = x.max, best.energy = best_energy,
-                    best.k = best_k)
+                    best.k = best_k, MOOP = MOOP)
       }
+      
       # Freezing parameters
       if (count == stopping[[1]]) {
         if (new_energy > best_energy * 1.000001) {
@@ -251,14 +247,13 @@ optimCORR <-
       if (progress) setTxtProgressBar(pb, k)
     }
     if (progress) close(pb)
-    res <- .spSANNout(new_conf, energy0, energies, time0)
+    res <- .spSANNout(new_conf = new_conf, energy0 = energy0, 
+                      energies = energies, time0 = time0, MOOP = MOOP)
     return (res)
   }
 # INTERNAL FUNCTION - CHECK ARGUMENTS ##########################################
 .optimCORRcheck <-
-  function (candi, covars,
-            #covars.type,
-            use.coords, strata.type) {
+  function (candi, covars, use.coords, strata.type) {
     
     # covars
     if (ncol(covars) < 2 && use.coords == FALSE) {
@@ -270,19 +265,6 @@ optimCORR <-
         paste("'candi' and 'covars' must have the same number of rows")
       return (res)
     }
-    
-    #     # covars.type
-    #     if (missing(covars.type)) {
-    #       res <- paste("'covars.type' is missing")
-    #       return (res)
-    #     } else {
-    #       ct <- pmatch(covars.type, c("numeric", "factor"))
-    #       if (is.na(ct)) {
-    #         res <- paste("'covars.type = ", covars.type, "' is not supported", 
-    #                      sep = "")
-    #         return (res)
-    #       }
-    #     }
     
     # strata.type
     st <- match(strata.type, c("area", "range"))

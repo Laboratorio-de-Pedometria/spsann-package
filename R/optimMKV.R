@@ -116,6 +116,7 @@ optimMKV <-
     }
     
     # other settings for the simulated annealing algorithm
+    MOOP <- FALSE
     old_sm <- sm
     new_sm <- sm
     best_sm <- sm
@@ -208,7 +209,7 @@ optimMKV <-
                     boundary = boundary, new_conf = new_conf[, 2:3], 
                     conf0 = conf0[, 2:3], y_max0 = y_max0, y.max = y.max, 
                     x_max0 = x_max0, x.max = x.max, best.k = best_k, 
-                    best.energy = best_energy)
+                    best.energy = best_energy, MOOP = FALSE)
       }
       # Freezing parameters
       if (count == stopping[[1]]) {
@@ -231,7 +232,7 @@ optimMKV <-
       if (progress) setTxtProgressBar(pb, k)
     }
     if (progress) close(pb)
-    res <- .spSANNout(new_conf, energy0, energies, time0)
+    res <- .spSANNout(new_conf, energy0, energies, time0, MOOP = FALSE)
     return (res)
   }
 # INTERNAL FUNCTION - CHECK ARGUMENTS ##########################################

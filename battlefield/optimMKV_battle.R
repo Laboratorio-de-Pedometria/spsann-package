@@ -93,6 +93,6 @@ res <- optimMKV(points = 100, candi = candi, covars = covars,
                 krige.stat = "mean", x.max = x.max, x.min = 40, y.max = y.max, 
                 y.min = 40, boundary = boundary, iterations = 1000, 
                 plotit = TRUE)
-tail(attr(res, "energy"), 1) # 11.55729
-objMKV(points = res, candi = candi, covars = covars, equation = z ~ dist, 
-       model = model, krige.stat = "mean")
+tail(attr(res, "energy"), 1) # 11.90331
+objMKV(points = res, candi = candi, covars = covars, krige.stat = "mean",
+       equation = z ~ dist + soil + ffreq + x + y, model = model)

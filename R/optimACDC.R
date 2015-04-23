@@ -135,6 +135,7 @@ optimACDC <-
     }
 
     # Other settings for the simulated annealing algorithm
+    MOOP <- TRUE # this is a multi-objective optimization problem
     old_scm <- scm
     new_scm <- scm
     best_scm <- scm
@@ -143,8 +144,6 @@ optimACDC <-
     best_sm <- sm
     count <- 0
     old_energy <- energy0
-    #best_energy <- Inf
-    #energies <- vector()
     best_energy <- data.frame(obj = Inf, CORR = Inf, DIST = Inf)
     energies <- data.frame(obj = NA, CORR = NA, DIST = NA)
     accept_probs <- vector()
@@ -192,6 +191,7 @@ optimACDC <-
       }
       actual_prob <- acceptance[[1]] * exp(-k / acceptance[[2]])
       accept_probs[k] <- actual_prob
+      
       if (new_energy[1] <= old_energy[1]) {
         old_conf <- new_conf
         old_energy <- new_energy
@@ -243,7 +243,7 @@ optimACDC <-
                     boundary = boundary, new_conf = new_conf[, 2:3],
                     conf0 = conf0[, 2:3], y_max0 = y_max0, y.max = y.max, 
                     x_max0 = x_max0, x.max = x.max, best.energy = best_energy,
-                    best.k = best_k)
+                    best.k = best_k, MOOP = MOOP)
       }
       
       # Freezing parameters
@@ -269,7 +269,8 @@ optimACDC <-
       if (progress) setTxtProgressBar(pb, k)
     }
     if (progress) close(pb)
-    res <- .spSANNout(new_conf, energy0, energies, time0)
+    res <- .spSANNout(new_conf = new_conf, energy0 = energy0, 
+                      energies = energies, time0 = time0, MOOP = MOOP)
     return (res)
   }
 # INTERNAL FUNCTION - CHECK ARGUMENTS ##########################################
@@ -512,7 +513,8 @@ optimACDC <-
     # Aggregate the objective function values
     obj_cont <- obj_cont * weights$DIST
     obj_cor <- obj_cor * weights$CORR
-    res <- data.frame(obj = obj_cont + obj_cor, CORR = obj_cor, DIST = obj_cont)
+    res <- obj_cont + obj_cor
+    res <- data.frame(obj = res, CORR = obj_cor, DIST = obj_cont)
     
     return (res)
   }
@@ -590,7 +592,7 @@ optimACDC <-
     obj_cat <- obj_cat * weights$DIST
     obj_cor <- obj_cor * weights$CORR
     res <- obj_cat + obj_cor
-    res <- data.frame(obj = obj_cat + obj_cor, CORR = obj_cor, DIST = obj_cat)
+    res <- data.frame(obj = res, CORR = obj_cor, DIST = obj_cat)
     
     return (res)
   }
@@ -629,9 +631,8 @@ objACDC <-
     
     # Check arguments
     check <- .optimACDCcheck(candi = candi, covars = covars, nadir = nadir,
-                             weights = weights, 
-                             use.coords = use.coords, strata.type = strata.type,
-                             utopia = utopia)
+                             weights = weights, use.coords = use.coords, 
+                             strata.type = strata.type, utopia = utopia)
     if (!is.null(check)) stop (check, call. = FALSE)
     
     # Prepare sample points
@@ -658,9 +659,9 @@ objACDC <-
                          covars = covars, strata = strata)
       utopia <- .numUtopia(utopia = utopia)
       scm <- cor(sm, use = "complete.obs")
-      energy <- .objNum(sm = sm, n.cov = n_cov, strata = strata, pcm = pcm, 
-                         scm = scm, nadir = nadir, weights = weights, 
-                         n.pts = n_pts, utopia = utopia)
+      energy <- .objNum(sm = sm, n.cov = n_cov, strata = strata, pcm = pcm,
+                        scm = scm, nadir = nadir, weights = weights,
+                        n.pts = n_pts, utopia = utopia)
       
     } else { # Factor covariates
       if (covars.type == "factor") {

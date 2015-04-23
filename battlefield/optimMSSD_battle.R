@@ -1,5 +1,4 @@
 # Initial settings
-
 require(ASRtools)
 require(pedometrics)
 require(SpatialTools)

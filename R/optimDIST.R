@@ -137,6 +137,7 @@ optimDIST <-
     }
 
     # Other settings for the simulated annealing algorithm
+    MOOP <- FALSE
     old_sm       <- sm
     new_sm       <- sm
     best_sm      <- sm
@@ -228,7 +229,7 @@ optimDIST <-
                     boundary = boundary, new_conf = new_conf[, 2:3], 
                     conf0 = conf0[, 2:3], y_max0 = y_max0, y.max = y.max, 
                     x_max0 = x_max0, x.max = x.max, best.energy = best_energy,
-                    best.k = best_k)
+                    best.k = best_k, MOOP = MOOP)
       }
       # Freezing parameters
       if (count == stopping[[1]]) {
@@ -251,7 +252,7 @@ optimDIST <-
       if (progress) setTxtProgressBar(pb, k)
     }
     if (progress) close(pb)
-    res <- .spSANNout(new_conf, energy0, energies, time0)
+    res <- .spSANNout(new_conf, energy0, energies, time0, MOOP = MOOP)
     return (res)
   }
 # INTERNAL FUNCTION - CHECK ARGUMENTS ##########################################

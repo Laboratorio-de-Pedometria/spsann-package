@@ -85,10 +85,8 @@
 # INTERNAL FUNCTION - PLOTTING #################################################
 .spSANNplot <-
   function (energy0, energies, k, acceptance, accept_probs, boundary, new_conf,
-            conf0, y_max0, y.max, x_max0, x.max, best.energy, best.k) {
+            conf0, y_max0, y.max, x_max0, x.max, best.energy, best.k, MOOP) {
     par(mfrow = c(1, 2))
-    
-    MOOP <- ifelse(!is.null(attributes(energy0)), TRUE, FALSE)
     
     # PLOT THE ENERGY STATES
     # Multi-objective optimization problem
@@ -157,14 +155,25 @@
   }
 # INTERNAL FUNCTION - PREPARE RESULTS ##########################################
 .spSANNout <-
-  function (new_conf, energy0, energies, time0, nadir) {
+  function (new_conf, energy0, energies, time0, nadir, MOOP) {
     res <- new_conf
-    criterion <- c(energy0, energies)
     
-    # Prepare attributes: energy states and running time
-    a <- attributes(res)
-    a$energy.state <- criterion
-    a$iterations <- length(energies)
+    # Multi-objective optimization problem
+    if (MOOP) {
+      criterion <- rbind(energy0, energies)
+      a <- attributes(res)
+      a$energy.state <- criterion
+      a$iterations <- nrow(energies)
+    
+      # Single-objective optimization problem
+    } else {
+      criterion <- c(energy0, energies)
+      a <- attributes(res)
+      a$energy.state <- criterion
+      a$iterations <- length(energies)
+            
+    }
+    
     running_time <- (proc.time() - time0) / 60
     a$running.time <- running_time
     if (!missing(nadir)) {

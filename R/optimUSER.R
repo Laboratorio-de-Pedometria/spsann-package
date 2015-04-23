@@ -122,6 +122,7 @@ optimUSER <-
     energy0 <- .energyState(fun = fun, points = old_conf, ...)
     
     # Other settings for the simulated annealing algorithm
+    MOOP <- FALSE
     count <- 0
     old_energy <- energy0
     best_energy <- Inf
@@ -197,7 +198,7 @@ optimUSER <-
                     boundary = boundary, new_conf = new_conf[, 2:3], 
                     conf0 = conf0[, 2:3], y_max0 = y_max0, y.max = y.max,
                     x_max0 = x_max0, x.max = x.max, best.energy = best_energy,
-                    best.k = best_k)
+                    best.k = best_k, MOOP = MOOP)
       }
       
       # Freezing parameters
@@ -220,7 +221,7 @@ optimUSER <-
       if (progress) setTxtProgressBar(pb, k)
     }
     if (progress) close(pb)
-    res <- .spSANNout(new_conf = new_conf, energy0 = energy0, 
+    res <- .spSANNout(new_conf = new_conf, energy0 = energy0, MOOP = MOOP,
                       energies = energies, time0 = time0)
     return (res)
   }

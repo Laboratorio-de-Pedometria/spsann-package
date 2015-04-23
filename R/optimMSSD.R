@@ -97,6 +97,7 @@ optimMSSD <-
     #energy0 <- mean(apply(dm, 1, min) ^ 2)
     
     # other settings for the simulated annealing algorithm
+    MOOP = FALSE
     old_dm        <- dm
     best_dm       <- dm
     count         <- 0
@@ -196,7 +197,7 @@ optimMSSD <-
           .spSANNplot(energy0, energy_states, k, acceptance,
                       accept_probs, boundary, new_conf[, 2:3],
                       conf0[, 2:3], y_max0, y.max, x_max0, x.max,
-                      best.energy = best_energy, best.k = best_k)
+                      best.energy = best_energy, best.k = best_k, MOOP = MOOP)
         }
       }
 
@@ -221,7 +222,7 @@ optimMSSD <-
       if (progress) setTxtProgressBar(pb, k)
     }
     if (progress) close(pb)
-    res <- .spSANNout(new_conf, energy0, energy_states, time0)
+    res <- .spSANNout(new_conf, energy0, energy_states, time0, MOOP = MOOP)
     return (res)
   }
 # FUNCTION - CALCULATE THE CRITERION VALUE #####################################

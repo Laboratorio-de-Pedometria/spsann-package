@@ -27,13 +27,12 @@ set.seed(2001)
 res <- optimACDC(points = 100, candi = candi, covars = meuse.grid[, 5],
                  use.coords = TRUE, x.max = x.max, x.min = 40, y.max = y.max, 
                  y.min = 40, boundary = boundary, iterations = 1000,
-                 nadir = list(sim = 10, save.sim = TRUE),
+                 nadir = list(sim = 10, save.sim = FALSE),
                  utopia = list(user = list(DIST = 0, CORR = 0)))
-str(res)
-tail(attr(res, "energy")$obj, 1) # 1.488403
+tail(attr(res, "energy")$obj, 1) # 0.4087331
 objACDC(points = res, candi = candi, covars = meuse.grid[, 5],
-        use.coords = TRUE, nadir = list(sim = 10, save.sim = TRUE), 
-        utopia = list(user = list(DIST = 0, CORR = 0)))
+        use.coords = TRUE, nadir = list(sim = 10, save.sim = FALSE), 
+        utopia = list(user = list(DIST = 0, CORR = 0))) # 0.411831
 
 # 1) FACTOR COVARIATES USING THE COORDINATES, WITH USER-DEFINED NADIR ##########
 rm(list = ls())
@@ -59,7 +58,7 @@ tmp <- optimACDC(points = 100, candi = candi, covars = meuse.grid[, 6:7],
                  use.coords = TRUE, x.max = x.max, x.min = 40, 
                  y.max = y.max, y.min = 40, boundary = boundary, 
                  iterations = 100, nadir = nadir, utopia = utopia)
-tail(attr(tmp, "energy"), 3)[1] # 1.724632
+tail(attr(tmp, "energy")$obj, 1) # 1.724632
 objACDC(points = tmp, candi = candi, covars = meuse.grid[, 6:7], 
         use.coords = TRUE, nadir = nadir, utopia = utopia)
 
@@ -97,7 +96,7 @@ tmp <- optimACDC(points = 10, candi = candi, covars = meuse.grid[, 6:7],
                  use.coords = TRUE, x.max = x.max, x.min = 40, y.max = y.max, 
                  y.min = 40, boundary = boundary, iterations = 100, 
                  nadir = nadir, utopia = utopia)
-tail(attr(tmp, "energy"), 3)[1] # 2.084277
+tail(attr(tmp, "energy")$obj, 1) # 2.084277
 objACDC(points = tmp, candi = candi, covars = meuse.grid[, 6:7], 
         use.coords = TRUE, nadir = nadir, utopia = utopia)
 
@@ -127,7 +126,7 @@ tmp <- optimACDC(points = 500, candi = candi,
                  y.min = 40, boundary = boundary, iterations = 100, 
                  nadir = list(sim = 10, save.sim = TRUE), 
                  utopia = list(user = list(CORR = 0, DIST = 0)))
-tail(attr(tmp, "energy"), 3)[1] # 4.75408
+tail(attr(tmp, "energy")$obj, 1) # 4.75408
 objACDC(points = tmp, candi = candi, covars = meuse.grid[, rep(c(6, 7), 10)],
         use.coords = TRUE, nadir = list(sim = 10, save.sim = TRUE), 
         utopia = list(user = list(CORR = 0, DIST = 0)))

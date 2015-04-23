@@ -33,6 +33,7 @@ countPPL(points = res, lags = 7, lags.type = "exponential", pairs = FALSE,
 tail(attr(res, "energy.state"), 1) # 65
 objPPL(points = res, lags = 7, lags.type = "exponential", pairs = FALSE,
        lags.base = 2, cutoff = cutoff, criterion = "distribution")
+
 # 1) Point pairs ###############################################################
 rm(list = ls())
 gc()

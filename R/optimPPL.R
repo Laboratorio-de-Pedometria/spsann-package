@@ -194,6 +194,7 @@ optimPPL <-
     }
     
     # Other settings for the simulated annealing algorithm
+    MOOP <- FALSE
     old_dm <- dm
     best_dm <- dm
     count <- 0
@@ -303,7 +304,7 @@ optimPPL <-
                     boundary = boundary, new_conf = new_conf[, 2:3], 
                     conf0 = conf0[, 2:3], y_max0 = y_max0, y.max = y.max,
                     x_max0 = x_max0, x.max = x.max, best.energy = best_energy,
-                    best.k = best_k)
+                    best.k = best_k, MOOP = MOOP)
       }
 
       # Freezing parameters
@@ -326,12 +327,10 @@ optimPPL <-
         }
       }
       if (progress) setTxtProgressBar(pb, k)
-      #if (k == iterations) {message("spsann should stop now!")}
-      # Set counter for while loop
-      #k <- k + 1
+      
     }
     if (progress) close(pb)
-    res <- .spSANNout(new_conf = new_conf, energy0 = energy0, 
+    res <- .spSANNout(new_conf = new_conf, energy0 = energy0, MOOP = MOOP,
                       energies = energies, time0 = time0)
     return (res)
   }
