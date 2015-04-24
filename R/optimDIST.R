@@ -1,4 +1,4 @@
-#' Optimization of sample configurations for trend estimation
+#' Optimization of sample configurations for spatial trend estimation
 #'
 #' Optimize a sample configuration for trend estimation. A criterion is defined 
 #' so #' that the sample reproduces the marginal distribution of the covariates
@@ -12,7 +12,7 @@
 #' Reproducing the marginal distribution of the numeric covariates depends upon
 #' the definition of sampling strata. These sampling strata are also used to 
 #' categorize any numeric covariate when they are passed together with 
-#' categorical covariates (see more details at \code{\link[spsann]{optimDist}}).
+#' categorical covariates (see more details at \code{optimDist}).
 #' Two types of sampling strata can be used. \emph{Equal-area} sampling strata 
 #' are defined using the sample quantiles estimated with \code{quantile()} using
 #' a discontinuous function (\code{type = 3}). This is to avoid creating 

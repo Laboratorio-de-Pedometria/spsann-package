@@ -2,8 +2,8 @@
 % Please edit documentation in R/optimPAN.R
 \name{optimPAN}
 \alias{optimPAN}
-\title{Optimization of sample configurations for variogram and trend estimation,
-and spatial interpolation}
+\title{Optimization of sample configurations for variogram and spatial trend
+estimation, and spatial interpolation}
 \usage{
 optimPAN(points, candi, x.max, x.min, y.max, y.min, iterations = 10000,
   acceptance = list(initial = 0.99, cooling = iterations/10),
@@ -16,95 +16,119 @@ optimPAN(points, candi, x.max, x.min, y.max, y.min, iterations = 10000,
   boundary, progress = TRUE, verbose = TRUE)
 }
 \arguments{
-\item{points}{Integer value, integer vector, data frame or matrix. If
-\code{points} is an integer value, it defines the number of points that
-should be sampled from \code{candi}. If \code{points} is an integer vector,
-it contains the row indexes of \code{candi} that correspond to the points.
-If \code{points} is a data frame or matrix, it must have three
-columns: \code{[, 1]} the identification of each sample point (1, 2, ..., n),
-\code{[, 2]} the x-coordinates, and \code{[, 3]} the y-coordinates. The
-coordinates must be projected. If a data frame or matrix is used,
-\code{points} must be a subset of \code{candi}.}
+  \item{points}{Integer value, integer vector, data frame
+  or matrix. If \code{points} is an integer value, it
+  defines the number of points that should be sampled from
+  \code{candi}. If \code{points} is an integer vector, it
+  contains the row indexes of \code{candi} that correspond
+  to the points. If \code{points} is a data frame or
+  matrix, it must have three columns: \code{[, 1]} the
+  identification of each sample point (1, 2, ..., n),
+  \code{[, 2]} the x-coordinates, and \code{[, 3]} the
+  y-coordinates. The coordinates must be projected. If a
+  data frame or matrix is used, \code{points} must be a
+  subset of \code{candi}.}
 
-\item{candi}{Data frame or matrix with the candidate locations for the
-sample points. The coordinates must be projected.}
+  \item{candi}{Data frame or matrix with the candidate
+  locations for the sample points. The coordinates must be
+  projected.}
 
-\item{x.max,x.min,y.max,y.min}{Numeric value. The minimum and maximum
-quantity of random noise to be added to the x and y coordinates. The minimum
-quantity must be equal to, at least, the minimum distance between two
-neighbouring candidate locations. The units are the same as of the
-coordinates.}
+  \item{x.max,x.min,y.max,y.min}{Numeric value. The minimum
+  and maximum quantity of random noise to be added to the x
+  and y coordinates. The minimum quantity must be equal to,
+  at least, the minimum distance between two neighbouring
+  candidate locations. The units are the same as of the
+  coordinates.}
 
-\item{iterations}{Integer. The maximum number of iterations that should be
-used for the optimization.}
+  \item{iterations}{Integer. The maximum number of
+  iterations that should be used for the optimization.}
 
-\item{acceptance}{List with two named sub-arguments: \code{initial} --
-numeric value between 0 and 1 defining the initial acceptance probability,
-and \code{cooling} -- a numeric value defining the exponential factor by
-witch the acceptance probability decreases at each iteration. Defaults to
-\code{acceptance = list(initial = 0.99, cooling = iterations / 10)}.}
+  \item{acceptance}{List with two named sub-arguments:
+  \code{initial} -- numeric value between 0 and 1 defining
+  the initial acceptance probability, and \code{cooling} --
+  a numeric value defining the exponential factor by witch
+  the acceptance probability decreases at each iteration.
+  Defaults to \code{acceptance = list(initial = 0.99,
+  cooling = iterations / 10)}.}
 
-\item{stopping}{List with one named sub-argument: \code{max.count} --
-integer value defining the maximum allowable number of iterations without
-improvement of the objective function value. Defaults to
-\code{stopping = list(max.count = iterations / 10)}. More options may be
-included in the future.}
+  \item{stopping}{List with one named sub-argument:
+  \code{max.count} -- integer value defining the maximum
+  allowable number of iterations without improvement of the
+  objective function value. Defaults to \code{stopping =
+  list(max.count = iterations / 10)}. More options may be
+  included in the future.}
 
-\item{PPL}{List with six named sub-arguments. The parameters used to optimize
-the sample configuration to the number of points or point-pairs per lag. See
-\code{optimPPL} for more info.}
+  \item{PPL}{List with six named sub-arguments. The
+  parameters used to optimize the sample configuration to
+  the number of points or point-pairs per lag. See
+  \code{optimPPL} for more info.}
 
-\item{ACDC}{List with five named sub-arguments. The paramters used to
-optimize the sample configuration regardig the association/correlation and
-marginal distribution of the covariates. See \code{optimACDC} for more info.}
+  \item{ACDC}{List with five named sub-arguments. The
+  paramters used to optimize the sample configuration
+  regardig the association/correlation and marginal
+  distribution of the covariates. See \code{optimACDC} for
+  more info.}
 
-\item{PAN}{List with two named sub-arguments: \code{weights} and
-\code{nadir}. \code{weights} is a list with two named sub-arguments. It
-contains the weights assigned to each objective function (PPL, ACDC, and
-MSSD). They must be named and sum to unity. Defaults to
-\code{weights = list(PPL = 1/3, ACDC = 1/3, MSSD = 1/3)}. \code{nadir} is a
-with four named sub-arguments: \code{sim} -- the number of
-random realizations to estimate the nadir point; \code{save.sim} -- logical
-for saving the simulated values and returning them as an attribute of the
-optimized sample configuration; \code{user} -- a user-defined value;
-\code{abs} -- logical for calculating the nadir point internally. Only
-simulations are implemented in the current version. Defaults to
-\code{nadir = list(sim = 1000, save.sim = TRUE, user = NULL, abs = NULL)}.}
+  \item{PAN}{List with two named sub-arguments:
+  \code{weights} and \code{nadir}. \code{weights} is a list
+  with two named sub-arguments. It contains the weights
+  assigned to each objective function (PPL, ACDC, and
+  MSSD). They must be named and sum to unity. Defaults to
+  \code{weights = list(PPL = 1/3, ACDC = 1/3, MSSD = 1/3)}.
+  \code{nadir} is a with four named sub-arguments:
+  \code{sim} -- the number of random realizations to
+  estimate the nadir point; \code{save.sim} -- logical for
+  saving the simulated values and returning them as an
+  attribute of the optimized sample configuration;
+  \code{user} -- a user-defined value; \code{abs} --
+  logical for calculating the nadir point internally. Only
+  simulations are implemented in the current version.
+  Defaults to \code{nadir = list(sim = 1000, save.sim =
+  TRUE, user = NULL, abs = NULL)}.}
 
-\item{plotit}{Logical for plotting the optimization results. This includes
-a) the progress of the objective function values and acceptance
-probabilities, and b) the original points, the perturbed points and the
-progress of the maximum perturbation in the x- and y-coordinates. The plots
-are updated at each 10 iterations. Defaults to \code{plotit = TRUE}.}
+  \item{plotit}{Logical for plotting the optimization
+  results. This includes a) the progress of the objective
+  function values and acceptance probabilities, and b) the
+  original points, the perturbed points and the progress of
+  the maximum perturbation in the x- and y-coordinates. The
+  plots are updated at each 10 iterations. Defaults to
+  \code{plotit = TRUE}.}
 
-\item{boundary}{SpatialPolygon. The boundary of the spatial domain.
-Mandatory if \code{plotit = TRUE}.}
+  \item{boundary}{SpatialPolygon. The boundary of the
+  spatial domain. Mandatory if \code{plotit = TRUE}.}
 
-\item{progress}{Logical for printing a progress bar. Defaults to
-\code{progress = TRUE}.}
+  \item{progress}{Logical for printing a progress bar.
+  Defaults to \code{progress = TRUE}.}
 
-\item{verbose}{Logical for printing messages about the progress of the
-optimization.}
+  \item{verbose}{Logical for printing messages about the
+  progress of the optimization.}
 
-\item{greedy}{Logical value. Should the optimization be done using a greedy
-algorithm, that is, accepting only better system configurations? Defaults
-to \code{greedy = FALSE}.}
+  \item{greedy}{Logical value. Should the optimization be
+  done using a greedy algorithm, that is, accepting only
+  better system configurations? Defaults to \code{greedy =
+  FALSE}.}
 }
 \value{
-\code{optimPAN} returns a matrix: the optimized sample configuration with
-the evolution of the energy state during the optimization as an attribute.
+\code{optimPAN} returns a matrix: the optimized sample
+configuration with the evolution of the energy state during
+the optimization as an attribute.
 }
 \description{
-Optimize a sample configuration for variogram and trend estimation, and spatial
-interpolation. The criteria used are the number of points or point-pairs per
-lag distance class (PPL), matching the association/correlation and marginal
-distribution of the covariates (ACDC), and the mean squared shortest
-distance (MSSD).
+Optimize a sample configuration for variogram and spatial
+trend estimation, and spatial interpolation. The criteria
+used are the number of points (or point-pairs) per
+lag-distance class (PPL), matching the
+association/correlation and marginal distribution of the
+covariates (ACDC), and the mean squared shortest distance
+(MSSD).
 }
 \author{
-Alessandro Samuel-Rosa \email{alessandrosamuelrosa@gmail.com}
+Alessandro Samuel-Rosa
+\email{alessandrosamuelrosa@gmail.com}
 }
 \concept{
+simulated annealing
+
 simulated annealing
 }
 \keyword{optimize}

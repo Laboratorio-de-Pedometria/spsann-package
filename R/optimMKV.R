@@ -275,6 +275,8 @@ optimMKV <-
     }
   }
 # FUNCTION - CANCLULATE THE OBJECTIVE FUNCTION VALUE ###########################
+#' @export
+#' @rdname optimMKV
 objMKV <-
   function (points, candi, covars, equation, model, krige.stat = "mean") {
     

@@ -8,7 +8,6 @@ battlefield
 build-packages.R
 Rprof.out
 
-TODO.md
 
 # Cpp files
 src/*.o
@@ -16,8 +15,8 @@ src/*.so
 
 # R files
 R/optimPAN.R
-R/optimACDC.R
+
 
 # Rd files
 man/optimPAN.Rd
-man/optimACDC.Rd
+

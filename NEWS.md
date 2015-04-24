@@ -1,3 +1,10 @@
+# Version 0.0.0.9004 (2015-04-24)
+
+* New version of `optimACDC()`, including new argument definitions;
+* In the multi-objective optimization problem case, now the graphical display 
+includes the many objective functions being optimized along with the utility
+function.
+
 # Version 0.0.0.9003 (2015-04-20)
 
 * Special version designed for the course on Spatial Sampling for Mapping, 

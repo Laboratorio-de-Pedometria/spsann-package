@@ -7,44 +7,54 @@
 spJitterFinite(points, candi, x.max, x.min, y.max, y.min, which.point)
 }
 \arguments{
-\item{points}{Integer value, integer vector, data frame or matrix. If
-\code{points} is an integer value, it defines the number of points that
-should be sampled from \code{candi}. If \code{points} is an integer vector,
-it contains the row indexes of \code{candi} that correspond to the points.
-If \code{points} is a data frame or matrix, it must have three
-columns: \code{[, 1]} the identification of each sample point (1, 2, ..., n),
-\code{[, 2]} the x-coordinates, and \code{[, 3]} the y-coordinates. The
-coordinates must be projected. If a data frame or matrix is used,
-\code{points} must be a subset of \code{candi}.}
+  \item{points}{Integer value, integer vector, data frame
+  or matrix. If \code{points} is an integer value, it
+  defines the number of points that should be sampled from
+  \code{candi}. If \code{points} is an integer vector, it
+  contains the row indexes of \code{candi} that correspond
+  to the points. If \code{points} is a data frame or
+  matrix, it must have three columns: \code{[, 1]} the
+  identification of each sample point (1, 2, ..., n),
+  \code{[, 2]} the x-coordinates, and \code{[, 3]} the
+  y-coordinates. The coordinates must be projected. If a
+  data frame or matrix is used, \code{points} must be a
+  subset of \code{candi}.}
 
-\item{candi}{Data frame or matrix with the candidate locations for the
-sample points. The coordinates must be projected.}
+  \item{candi}{Data frame or matrix with the candidate
+  locations for the sample points. The coordinates must be
+  projected.}
 
-\item{x.max,x.min,y.max,y.min}{Numeric value. The minimum and maximum
-quantity of random noise to be added to the x and y coordinates. The minimum
-quantity must be equal to, at least, the minimum distance between two
-neighbouring candidate locations. The units are the same as of the
-coordinates.}
+  \item{x.max,x.min,y.max,y.min}{Numeric value. The minimum
+  and maximum quantity of random noise to be added to the x
+  and y coordinates. The minimum quantity must be equal to,
+  at least, the minimum distance between two neighbouring
+  candidate locations. The units are the same as of the
+  coordinates.}
 
-\item{which.point}{Integer values defining which point should be perturbed.
-The current version accepts only one point to be perturbed at a time. See
-\sQuote{Details} for more information.}
+  \item{which.point}{Integer values defining which point
+  should be perturbed. The current version accepts only one
+  point to be perturbed at a time. See \sQuote{Details} for
+  more information.}
 }
 \value{
 A matrix with the jittered coordinates of the points.
 }
 \description{
-Perturbate the coordinates of spatial points (\sQuote{jittering}).
+Perturbate the coordinates of spatial points
+(\sQuote{jittering}).
 }
 \details{
-There are two ways of jittering the coordinates. They differ on how the the
-set of candidate locations is defined. The first method uses a finite set of
-candidate locations for the perturbed points. The current version does not
-accept using an infinite set of candidate locations.
+There are two ways of jittering the coordinates. They
+differ on how the the set of candidate locations is
+defined. The first method uses a finite set of candidate
+locations for the perturbed points. The current version
+does not accept using an infinite set of candidate
+locations.
 }
 \note{
-The current version does not accept using an infinite set of candidate
-locations or to perturb more than one point at a time.
+The current version does not accept using an infinite set
+of candidate locations or to perturb more than one point at
+a time.
 }
 \examples{
 require(sp)
@@ -60,17 +70,20 @@ points(pts2[, 2:3], col = "red", cex = 0.5)
 points(pts3[, 2:3], pch = 19, col = "blue", cex = 0.5)
 }
 \author{
-Alessandro Samuel-Rosa \email{alessandrosamuelrosa@gmail.com}
+Alessandro Samuel-Rosa
+\email{alessandrosamuelrosa@gmail.com}
 }
 \references{
-Edzer Pebesma, Jon Skoien with contributions from Olivier Baume, A. Chorti,
-D.T. Hristopulos, S.J. Melles and G. Spiliopoulos (2013).
-\emph{intamapInteractive: procedures for automated interpolation - methods
-only to be used interactively, not included in intamap package.} R package
+Edzer Pebesma, Jon Skoien with contributions from Olivier
+Baume, A. Chorti, D.T. Hristopulos, S.J. Melles and G.
+Spiliopoulos (2013). \emph{intamapInteractive: procedures
+for automated interpolation - methods only to be used
+interactively, not included in intamap package.} R package
 version 1.1-10.
 
-van Groenigen, J.-W. \emph{Constrained optimization of spatial sampling:
-a geostatistical approach.} Wageningen: Wageningen University, p. 148, 1999.
+van Groenigen, J.-W. \emph{Constrained optimization of
+spatial sampling: a geostatistical approach.} Wageningen:
+Wageningen University, p. 148, 1999.
 }
 \seealso{
 \code{ssaOptim}, \code{\link[sp]{zerodist}},

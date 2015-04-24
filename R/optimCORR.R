@@ -1,4 +1,4 @@
-#' Optimization of sample configurations for trend estimation
+#' Optimization of sample configurations for spatial trend estimation
 #'
 #' Optimize a sample configuration for trend estimation. A criterion is defined
 #' so that the sample reproduces the association/correlation between the 
@@ -17,7 +17,7 @@
 #' is transformed into a factor covariate. The numeric covariates are 
 #' categorized using the sampling strata defined using one of the two methods 
 #' available (equal-area or equal-range strata) (see more details at
-#' \code{\link[spsann]{optimDist}}).
+#' \code{optimDist}).
 #' 
 #' The association between two factor covariates is measured using the Cramér's 
 #' v, a descriptive statistic that ranges from 0 to 1. The closer to 1 the 

@@ -1,8 +1,8 @@
 Package: spsann
 Type: Package
 Title: Optimization of Sample Configurations using Spatial Simulated Annealing
-Version: 0.0.0.9003
-Date: 2015-04-20
+Version: 0.0.0.9004
+Date: 2015-04-24
 Author: Alessandro Samuel-Rosa
 Maintainer: Alessandro Samuel-Rosa <alessandrosamuelrosa@gmail.com>
 Description: Methods to optimize sample configurations using spatial simulated 
@@ -22,3 +22,4 @@ Imports:
     SpatialTools
 LinkingTo: Rcpp
 Encoding: UTF-8
+Roxygen: list(wrap = TRUE)
