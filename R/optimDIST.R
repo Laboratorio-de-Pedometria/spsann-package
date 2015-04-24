@@ -1,7 +1,7 @@
 #' Optimization of sample configurations for spatial trend estimation
 #'
 #' Optimize a sample configuration for trend estimation. A criterion is defined 
-#' so #' that the sample reproduces the marginal distribution of the covariates
+#' so that the sample reproduces the marginal distribution of the covariates
 #' (\bold{DIST}).
 #'
 #' @template spJitter_doc

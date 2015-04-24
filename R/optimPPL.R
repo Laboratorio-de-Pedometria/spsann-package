@@ -1,8 +1,8 @@
 #' Optimization of sample configurations for variogram estimation
 #'
-#' Optimize a sample configuration for variogram estimation. A criterion is defined so
-#' that the optimized sample configuration has a given number of points or point-pairs 
-#' contributing to each lag-distance class.
+#' Optimize a sample configuration for variogram estimation. A criterion is
+#' defined so that the optimized sample configuration has a given number of
+#' points or point-pairs contributing to each lag-distance class.
 #' 
 #' @template spJitter_doc
 #' @template spSANN_doc
@@ -32,8 +32,8 @@
 #' Used only when \code{criterion = "distribution"}. Defaults to a uniform
 #' distribution.
 #' 
-#' @param pairs Logical value. Should the sample configuration be optimized regarding
-#' the number of point-pairs per lag-distance class? Defaults to 
+#' @param pairs Logical value. Should the sample configuration be optimized
+#' regarding the number of point-pairs per lag-distance class? Defaults to 
 #' \code{pairs = FALSE}.
 #'
 #' @details

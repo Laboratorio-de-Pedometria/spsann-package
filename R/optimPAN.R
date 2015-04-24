@@ -2,34 +2,13 @@
 #' estimation, and spatial interpolation
 #'
 #' Optimize a sample configuration for variogram and spatial trend estimation, 
-#' and spatial interpolation. The criteria used are the number of points (or 
-#' point-pairs) per lag-distance class (PPL), matching the 
-#' association/correlation and marginal distribution of the covariates (ACDC), 
-#' and the mean squared shortest distance (MSSD).
+#' and spatial interpolation. A utility function is defined aggregating four 
+#' objective functions: \bold{CORR}, \bold{DIST}, \bold{PPL}, and \bold{MSSD}.
 #'
 #' @template spJitter_doc
 #' @template spSANN_doc
-#' 
-#' @param PPL List with six named sub-arguments. The parameters used to optimize 
-#' the sample configuration to the number of points or point-pairs per lag. See
-#' \code{optimPPL} for more info.
-#' 
-#' @param ACDC List with five named sub-arguments. The paramters used to 
-#' optimize the sample configuration regardig the association/correlation and 
-#' marginal distribution of the covariates. See \code{optimACDC} for more info.
-#' 
-#' @param PAN List with two named sub-arguments: \code{weights} and 
-#' \code{nadir}. \code{weights} is a list with two named sub-arguments. It 
-#' contains the weights assigned to each objective function (PPL, ACDC, and 
-#' MSSD). They must be named and sum to unity. Defaults to 
-#' \code{weights = list(PPL = 1/3, ACDC = 1/3, MSSD = 1/3)}. \code{nadir} is a
-#' with four named sub-arguments: \code{sim} -- the number of
-#' random realizations to estimate the nadir point; \code{save.sim} -- logical 
-#' for saving the simulated values and returning them as an attribute of the 
-#' optimized sample configuration; \code{user} -- a user-defined value;
-#' \code{abs} -- logical for calculating the nadir point internally. Only
-#' simulations are implemented in the current version. Defaults to 
-#' \code{nadir = list(sim = 1000, save.sim = TRUE, user = NULL, abs = NULL)}.
+#' @template MOOP_doc
+#' @template ACDC_doc
 #' 
 #' @return
 #' \code{optimPAN} returns a matrix: the optimized sample configuration with
@@ -46,19 +25,16 @@
 # @export
 # MAIN FUNCTION ################################################################
 optimPAN <-
-  function (points, candi, x.max, x.min, y.max, y.min, iterations = 10000,
+  function (points, candi, lags = 7, lags.type = "exponential", lags.base = 2,
+            cutoff = NULL, criterion = "distribution", distri = NULL, 
+            pairs = FALSE, covars, strata.type = "equal.area", 
+            use.coords = FALSE, x.max, x.min, y.max, y.min, iterations,
             acceptance = list(initial = 0.99, cooling = iterations / 10),
             stopping = list(max.count = iterations / 10),
-            PPL = list(lags = 7, lags.type = "exponential", lags.base = 2,
-                        cutoff = NULL, criterion = "distribution",
-                        pre.distri = NULL),
-            ACDC = list(covars, covars.type = "numeric",
-                        strata.type = "equal.area", use.coords = FALSE,
-                        weights = list(strata = 0.5, correl = 0.5)),
-            PAN = list(weights = list(PPL = 1/3, ACDC = 1/3, MSSD = 1/3),
-                       nadir = list(sim = 1000, save.sim = TRUE, user = NULL,
-                                    abs = NULL)),
-            plotit = TRUE, boundary, progress = TRUE, verbose = TRUE) {
+            weights = list(CORR = 1/3/2, DIST = 1/3/2, PPL = 1/3, MSSD = 1/3),
+            nadir = list(sim = NULL, seeds = NULL, user = NULL, abs = NULL),
+            plotit = TRUE, boundary, progress = TRUE, verbose = TRUE, 
+            greedy = FALSE) {
 
     # Check arguments
     if (!is.data.frame(ACDC$covars)) ACDC$covars <- as.data.frame(ACDC$covars)
