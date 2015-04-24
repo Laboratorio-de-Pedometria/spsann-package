@@ -62,7 +62,7 @@
 optimACDC <-
   function (points, candi, covars, strata.type = "area", iterations,
             weights = list(CORR = 0.5, DIST = 0.5), use.coords = FALSE,
-            nadir = list(sim = NULL, save.sim = NULL, user = NULL, abs = NULL),
+            nadir = list(sim = NULL, seeds = NULL, user = NULL, abs = NULL),
             utopia = list(user = NULL, abs = NULL), x.max, x.min, y.max, y.min,
             acceptance = list(initial = 0.99, cooling = iterations / 10),
             stopping = list(max.count = iterations / 10), plotit = TRUE,
@@ -339,9 +339,9 @@ optimACDC <-
         return (res)
       }
     } else {
-      if (aa == "sim" || aa == "save.sim") {
-        res <- paste("you must set the number of simulations and if they ",
-                     "should be saved", sep = "")
+      if (aa == "sim" || aa == "seeds") { 
+        res <- paste("you must set the number of random simulations and their ",
+                     "seeds", sep = "")
         return (res)
       }
       if (aa == "abs") {
@@ -420,7 +420,7 @@ optimACDC <-
   function (n.pts, n.cov, n.candi, pcm, nadir, candi, covars, strata) {
 
     # Simulate the nadir point
-    if (!is.null(nadir$sim) && !is.null(nadir$save.sim)) { 
+    if (!is.null(nadir$sim) && !is.null(nadir$seeds)) { 
       m <- paste("simulating ", nadir$sim, " nadir values...", sep = "")
       message(m)
       
@@ -429,7 +429,8 @@ optimACDC <-
       nadirCORR <- vector()
       
       # Begin the simulation
-      for (i in 1:nadir$sim) { 
+      for (i in 1:nadir$sim) {
+        set.seed(nadir$seeds[i])
         pts <- sample(1:n.candi, n.pts)
         sm <- covars[pts, ]
         scm <- cor(sm, use = "complete.obs")
@@ -444,28 +445,14 @@ optimACDC <-
         # Compute the nadir point
         nadirDIST[i] <- sum(counts)
         nadirCORR[i] <- sum(abs(pcm - scm))
-      }
-      
-      # Return all simulated nadir values?
-      if (nadir$save.sim) { 
-        res <- list(DIST = nadirDIST, CORR = nadirCORR)
-      } else {
-        res <- list(DIST = "nadirDIST", CORR = "nadirCORR")
-      }
-      a <- attributes(res)
-      a$DIST <- mean(nadirDIST)
-      a$CORR <- mean(nadirCORR)
-      attributes(res) <- a
+      }  
+      res <- list(DIST = mean(nadirDIST), CORR = mean(nadirCORR))
             
     } else {
       
       # User-defined nadir values
       if (!is.null(nadir$user)) { 
-        res <- list(DIST = "nadirDIST", CORR = "nadirCORR")
-        a <- attributes(res)
-        a$DIST <- nadir$user$DIST
-        a$CORR <- nadir$user$CORR
-        attributes(res) <- a
+        res <- list(DIST = nadir$user$DIST, CORR = nadir$user$CORR)
         
       } else {
         if (!is.null(nadir$abs)) { 
@@ -505,10 +492,8 @@ optimACDC <-
       sum(abs(counts[[i]] - strata[[2]][[i]])))
         
     # Scale the objective function values
-    obj_cont <- (sum(counts) - utopia$DIST) / 
-      (attr(nadir, "DIST") - utopia$DIST)
-    obj_cor <- (sum(abs(pcm - scm)) - utopia$CORR) / 
-      (attr(nadir, "CORR") - utopia$CORR)
+    obj_cont <- (sum(counts) - utopia$DIST) / (nadir$DIST - utopia$DIST)
+    obj_cor <- (sum(abs(pcm - scm)) - utopia$CORR) / (nadir$CORR - utopia$CORR)
       
     # Aggregate the objective function values
     obj_cont <- obj_cont * weights$DIST
@@ -523,7 +508,7 @@ optimACDC <-
   function (nadir, candi, n.candi, n.pts, n.cov, covars, pop.prop, pcm) {
     
     # Simulate the nadir point
-    if (!is.null(nadir$sim) && !is.null(nadir$save.sim)) {
+    if (!is.null(nadir$sim) && !is.null(nadir$seeds)) {
       m <- paste("simulating ", nadir$sim, " nadir values...", sep = "")
       message(m)
       
@@ -533,10 +518,10 @@ optimACDC <-
       
       # Begin the simulation
       for (i in 1:nadir$sim) { 
+        set.seed(nadir$seeds[i])
         pts <- sample(1:n.candi, n.pts)
         sm <- covars[pts, ]
         scm <- pedometrics::cramer(sm)
-        
         samp_prop <- lapply(sm, function(x) table(x) / n.pts)
         samp_prop <- sapply(1:n.cov, function (i)
           sum(abs(samp_prop[[i]] - pop.prop[[i]])))
@@ -544,27 +529,12 @@ optimACDC <-
         nadirCORR[i] <- sum(abs(pcm - scm))
       }
       
-      # SHOULD WE SAVE AND RETURN THE SIMULATED VALUES?
-      # ASR: We compute the mean simulated value and return it as an attribute
-      #      because we want to explore the simulated values in the future.
-      if (nadir$save.sim) { 
-        res <- list(DIST = nadirDIST, CORR = nadirCORR)
-      } else {
-        res <- list(DIST = "nadirDIST", CORR = "nadirCORR")
-      }
-      a <- attributes(res)
-      a$DIST <- mean(nadirDIST)
-      a$CORR <- mean(nadirCORR)
-      attributes(res) <- a
+      res <- list(DIST = mean(nadirDIST), CORR = mean(nadirCORR))
       
       } else {
         # User-defined nadir values
         if (!is.null(nadir$user)) {
-          res <- list(DIST = "nadirDIST", CORR = "nadirCORR")
-          a <- attributes(res)
-          a$DIST <- nadir$user$DIST
-          a$CORR <- nadir$user$CORR
-          attributes(res) <- a
+          res <- list(DIST = nadir$user$DIST, CORR = nadir$user$CORR)
           
           } else {
             if (!is.null(nadir$abs)) { 
@@ -583,10 +553,8 @@ optimACDC <-
       sum(abs(samp_prop[[i]] - pop.prop[[i]])))
     
     # Scale the objective function values
-    obj_cat <- (sum(samp_prop) - utopia$DIST) / 
-      (attr(nadir, "DIST") - utopia$DIST)
-    obj_cor <- (sum(abs(pcm - scm)) - utopia$CORR) / 
-      (attr(nadir, "CORR") - utopia$CORR)
+    obj_cat <- (sum(samp_prop) - utopia$DIST) / (nadir$DIST - utopia$DIST)
+    obj_cor <- (sum(abs(pcm - scm)) - utopia$CORR) / (nadir$CORR - utopia$CORR)
     
     # Aggregate the objective function values
     obj_cat <- obj_cat * weights$DIST
@@ -625,8 +593,9 @@ objACDC <-
   function (points, candi, covars, strata.type = "area", 
             weights = list(CORR = 0.5, DIST = 0.5), use.coords = FALSE, 
             utopia = list(user = NULL, abs = NULL),
-            nadir = list(sim = NULL, save.sim = NULL, user = NULL, abs = NULL)) {
-    
+            #nadir = list(sim = NULL, save.sim = NULL, user = NULL, abs = NULL)) {
+            nadir = list(sim = NULL, seeds = NULL, user = NULL, abs = NULL)) {
+        
     if (!is.data.frame(covars)) covars <- as.data.frame(covars)
     
     # Check arguments
