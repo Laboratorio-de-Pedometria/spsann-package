@@ -72,14 +72,8 @@ optimPAN <-
     old_conf <- conf0
 
     # BASE VARIABLES AND DATASETS, NADIR POINT AND INITIAL ENERGY STATE
-    nadir      <- PAN$nadir
-    # ppl
-    lags       <- PPL$lags
-    lags.type  <- PPL$lags.type
-    cutoff     <- PPL$cutoff
-    lags.base  <- PPL$lags.base
-    criterion  <- PPL$criterion
-    pre.distri <- PPL$pre.distri
+    
+    # PPL
     if (length(lags) >= 3) {
       n_lags <- length(lags) - 1
     } else {
@@ -88,52 +82,48 @@ optimPAN <-
     }
     dm_ppl <- as.matrix(dist(conf0[, 2:3], method = "euclidean"))
     ppl <- .getPointsPerLag(lags, dm_ppl)
-    energy0_ppl <- .objPointsPerLag(ppl, n_lags, n_pts, criterion, pre.distri)
+    energy0_ppl <- .objPointsPerLag(ppl = ppl, n.lags = n_lags, n.pts = n_pts,
+                                    criterion = criterion, distri = distri)
 
-    # mssd
+    # MSSD
     dm_mssd <- fields::rdist(candi[, 2:3], conf0[, 2:3])
 
-    # acdc
-    use.coords  <- ACDC$use.coords
-    covars.type <- ACDC$covars.type
-    strata.type <- ACDC$strata.type
-    if (use.coords) {
-      if (covars.type == "factor") {
-        coords <- data.frame(candi[, 2:3])
-        breaks <- .numStrata(n_pts, coords, strata.type)[[1]]
-        coords <- pedometrics::cont2cat(coords, breaks)
-        ACDC$covars <- data.frame(ACDC$covars, coords)
-      } else {
-        if (covars.type == "numeric")
-          ACDC$covars <- data.frame(ACDC$covars, candi[, 2:3])
-      }
-    }
-    n_cov <- ncol(ACDC$covars)
-    sm <- ACDC$covars[points[, 1], ]
+    # ACDC
+    # Prepare covariates (covars) and create the starting sample matrix (sm)
+    covars.type <- ifelse(pedometrics::is.any.factor(covars), "factor",
+                          "numeric")
+    covars <- .covarsACDC(covars = covars, covars.type = covars.type, 
+                          use.coords = use.coords, candi = candi, n.pts = n_pts,
+                          strata.type = strata.type)
+    n_cov <- ncol(covars)
+    sm <- covars[points[, 1], ]
+    
+    # Base data and initial energy state (energy)
     if (covars.type == "numeric") { # Numeric covariates
-      pcm <- cor(ACDC$covars, use = "complete.obs")
-      strata <- .numStrata(n.pts = n_pts, covars = ACDC$covars,
-                            strata.type = strata.type)
+      pcm <- cor(covars, use = "complete.obs")
+      strata <- .numStrata(n.pts = n_pts, covars = covars,
+                           strata.type = strata.type)
       nadir <- .panNadir(n.pts = n_pts, n.candi = n_candi, candi = candi,
                          n.lags = n_lags, lags = lags, criterion = criterion,
                          pre.distri = pre.distri, nadir = nadir, n.cov = n_cov,
-                         covars = ACDC$covars, covars.type = covars.type,
+                         covars = covars, covars.type = covars.type,
                          pcm = pcm, strata = strata)
       scm <- cor(sm, use = "complete.obs")
       energy0_acdc <- .objNum(sm = sm, n.cov = n_cov, strata = strata,
-                               pcm = pcm, scm = scm, nadir = nadir,
-                               weights = ACDC$weights)
+                              pcm = pcm, scm = scm, nadir = nadir,
+                              weights = weights, n.pts = n_pts, utopia = utopia)
+      
     } else { # Factor covariates
-      pcm <- pedometrics::cramer(ACDC$covars)
-      pop_prop <- lapply(ACDC$covars, function(x) table(x) / n_candi)
+      pcm <- pedometrics::cramer(covars)
+      pop_prop <- lapply(covars, function(x) table(x) / n_candi)
       nadir <- .panNadir(n.pts = n_pts, n.candi = n_candi, candi = candi,
                          n.lags = n_lags, lags = lags, criterion = criterion,
                          pre.distri = pre.distri, nadir = nadir, n.cov = n_cov,
-                         covars = ACDC$covars, covars.type, pcm, pop.prop)
+                         covars = covars, covars.type, pcm, pop.prop)
       scm <- pedometrics::cramer(sm)
       energy0_acdc <- .objFac(sm = sm, pop.prop = pop_prop, nadir = nadir,
-                              weights = ACDC$weights, pcm = pcm, scm = scm,
-                              n.pts = n_pts, n.cov = n_cov)
+                              weights = weights, pcm = pcm, scm = scm,
+                              n.pts = n_pts, n.cov = n_cov, utopia = utopia)
     }
     energy0_ppl <- energy0_ppl / attr(nadir, "ppl")
     energy0_mssd <- .calcMSSDCpp(x = dm_mssd) / attr(nadir, "mssd")
@@ -147,6 +137,7 @@ optimPAN <-
     energy0      <- energy0_ppl + energy0_acdc + energy0_mssd
 
     # OTHER SETTINGS FOR THE SIMULATED ANNEALING ALGORITHM
+    MOOP <- TRUE # this is a multi-objective optimization problem
     # ppl
     old_dm_ppl   <- dm_ppl
     new_dm_ppl   <- dm_ppl
