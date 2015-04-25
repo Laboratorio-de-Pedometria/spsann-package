@@ -74,9 +74,11 @@ optimACDC <-
                           verbose = verbose)
     if (!is.null(check)) stop (check, call. = FALSE)
     
-    check <- .optimACDCcheck(candi = candi, covars = covars, nadir = nadir,
-                             weights = weights, use.coords = use.coords, 
-                             strata.type = strata.type, utopia = utopia)
+    check <- .optimACDCcheck(candi = candi, covars = covars, 
+                             use.coords = use.coords, strata.type = strata.type)
+    if (!is.null(check)) stop (check, call. = FALSE)
+    
+    check <- .MOOPcheck(weights = weights, nadir = nadir, utopia = utopia)
     if (!is.null(check)) stop (check, call. = FALSE)
     
     if (plotit) {
@@ -270,15 +272,7 @@ optimACDC <-
   }
 # INTERNAL FUNCTION - CHECK ARGUMENTS ##########################################
 .optimACDCcheck <-
-  function (candi, covars, weights, use.coords, strata.type, nadir, utopia) {
-    
-    # utopia
-    aa <- !is.list(utopia)
-    bb <- !length(utopia) == 1
-    cc <- is.null(names(utopia))
-    if (aa || bb || cc) {
-      res <- paste("'utopia' must be a list with a named component")
-    }
+  function (candi, covars, use.coords, strata.type) {
     
     # covars
     if (ncol(covars) < 2 && use.coords == FALSE) {
@@ -290,25 +284,6 @@ optimACDC <-
         paste("'candi' and 'covars' must have the same number of rows")
       return (res)
     }
-    
-    # weights
-    aa <- !is.list(weights)
-    bb <- length(weights) != 2
-    cc <- is.null(names(weights))
-    if (aa || bb || cc) {
-      res <- paste("'weights' must be a list with two named sub-arguments:",
-                   "'DIST' and 'CORR'", sep = "")
-      return (res)
-    }
-    rm(aa, bb, cc)
-    
-    aa <- sum(unlist(weights)) != 1
-    bb <- any(unlist(weights) == 0)
-    if (aa || bb) {
-      res <- paste("the 'weights' must be larger than 0 and sum to 1")
-      return (res)
-    }
-    rm(aa, bb)
         
     # strata.type
     aa <- match(strata.type, c("area", "range"))
@@ -319,32 +294,6 @@ optimACDC <-
     }
     rm(aa)
     
-    # nadir
-    aa <- !is.list(nadir)
-    if (aa) {
-      res <- paste("'nadir' must be a list with named components")
-      return (res)
-    }
-    rm(aa)
-    
-    aa <- names(nadir)
-    if (length(aa) >= 2) {
-      if (length(aa) > 2) {
-        res <- paste("you must choose a single nadir option")
-        return (res)
-      }
-    } else {
-      if (aa == "sim" || aa == "seeds") { 
-        res <- paste("you must set the number of random simulations and their ",
-                     "seeds", sep = "")
-        return (res)
-      }
-      if (aa == "abs") {
-        res <- paste("sorry but the nadir point cannot be calculated")
-        return (res)
-      }
-    }
-    rm(aa)
   }
 # INTERNAL FUNCTION - BREAKS FOR NUMERIC COVARIATES ############################
 # Now we define the breaks and the distribution, and return it as a list

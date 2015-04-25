@@ -1,4 +1,62 @@
 #' @importFrom sp bbox
+# INTERNAL FUNCTION - CHECK MOOP ARGUMENTS #####################################
+.MOOPcheck <-
+  function (weights, utopia, nadir) {
+    
+    # utopia
+    aa <- !is.list(utopia)
+    bb <- !length(utopia) == 1
+    cc <- is.null(names(utopia))
+    if (aa || bb || cc) {
+      res <- paste("'utopia' must be a list with a named component")
+    }
+    rm(aa, bb, cc)
+    
+    # weights
+    aa <- !is.list(weights)
+    bb <- is.null(names(weights))
+    if (aa || bb) {
+      res <- paste("'weights' must be a list with named components")
+      return (res)
+    }
+    rm(aa, bb)
+    
+    aa <- sum(unlist(weights)) != 1
+    bb <- any(unlist(weights) == 0)
+    if (aa || bb) {
+      res <- paste("the 'weights' must be larger than 0 and sum to 1")
+      return (res)
+    }
+    rm(aa, bb)
+    
+    # nadir
+    aa <- !is.list(nadir)
+    if (aa) {
+      res <- paste("'nadir' must be a list with named components")
+      return (res)
+    }
+    rm(aa)
+    
+    aa <- names(nadir)
+    if (length(aa) >= 2) {
+      if (length(aa) > 2) {
+        res <- paste("you must choose a single nadir option")
+        return (res)
+      }
+    } else {
+      if (aa == "sim" || aa == "seeds") { 
+        res <- paste("you must set the number of random simulations and their ",
+                     "seeds", sep = "")
+        return (res)
+      }
+      if (aa == "abs") {
+        res <- paste("sorry but the nadir point cannot be calculated")
+        return (res)
+      }
+    }
+    rm(aa)
+  }
+  
 # INTERNAL FUNCTION - PREPARE POINTS ###########################################
 .spsannPoints <-
   function (points, candi, n.candi) {

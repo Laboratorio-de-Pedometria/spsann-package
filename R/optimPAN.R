@@ -2,7 +2,7 @@
 #' estimation, and spatial interpolation
 #'
 #' Optimize a sample configuration for variogram and spatial trend estimation, 
-#' and spatial interpolation. A utility function is defined aggregating four 
+#' and spatial interpolation. An utility function is defined aggregating four 
 #' objective functions: \bold{CORR}, \bold{DIST}, \bold{PPL}, and \bold{MSSD}.
 #'
 #' @template spJitter_doc
@@ -37,26 +37,25 @@ optimPAN <-
             greedy = FALSE) {
 
     # Check arguments
-    if (!is.data.frame(ACDC$covars)) ACDC$covars <- as.data.frame(ACDC$covars)
-    check <- .spSANNcheck(points = points, candi = candi,
-                          x.max = x.max, x.min = x.min, y.max = y.max,
-                          y.min = y.min, iterations = iterations,
-                          acceptance = acceptance, stopping = stopping,
-                          plotit = plotit, boundary = boundary,
-                          progress = progress, verbose = verbose)
+    if (!is.data.frame(covars)) covars <- as.data.frame(covars) 
+    
+    check <- .spSANNcheck(points = points, candi = candi, x.max = x.max, 
+                          x.min = x.min, y.max = y.max, verbose = verbose,
+                          iterations = iterations, acceptance = acceptance,
+                          stopping = stopping, plotit = plotit, y.min = y.min, 
+                          boundary = boundary, progress = progress)
     if (!is.null(check)) stop (check, call. = FALSE)
-    check <- .optimPPLcheck(lags = PPL$lags, lags.type = PPL$lags.type,
-                            lags.base = PPL$lags.base, cutoff = PPL$cutoff,
-                            criterion = PPL$criterion,
-                            pre.distri = PPL$pre.distri)
+    
+    check <- .optimPPLcheck(lags = lags, lags.type = lags.type, pairs = pairs,
+                            lags.base = lags.base, cutoff = cutoff, 
+                            criterion = criterion, distri = distri)
     if (!is.null(check)) stop (check, call. = FALSE)
-    check <- .optimACDCcheck(candi = candi, covars = ACDC$covars,
-                             covar.type = ACDC$covars.type,
-                             weights = ACDC$weights,
-                             use.coords = ACDC$use.coords,
-                             strata.type = ACDC$strata.type)
+    
+    check <- .optimACDCcheck(candi = candi, covars = covars,
+                             use.coords = use.coords, strata.type = strata.type)
     if (!is.null(check)) stop (check, call. = FALSE)
-    check <- .optimPANcheck(weights = PAN$weights, nadir = PAN$nadir)
+    
+    check <- .MOOPcheck(weights = weights, nadir = nadir, utopia = utopia)
     if (!is.null(check)) stop (check, call. = FALSE)
 
     # PLOTTING
@@ -339,47 +338,6 @@ optimPAN <-
     if (progress) close(pb)
     res <- .spSANNout(new_conf, energy0, energies, time0)
     return (res)
-  }
-# INTERNAL FUNCTION - CHECK ARGUMENTS ##########################################
-.optimPANcheck <-
-  function (weights, nadir) {
-
-    # PAN$weights
-    if (!is.list(weights) || length(weights) != 3 ||
-          is.null(names(weights))) {
-      res <- paste("'PAN$weights' must be a list with 3 named sub-arguments")
-      return (res)
-    }
-    if (sum(unlist(weights)) != 1) {
-      res <- paste("the 'PAN$weights' must sum to 1")
-      return (res)
-    }
-
-    # nadir
-    if (!is.list(nadir) || length(nadir) != 4) {
-      res <- paste("'nadir' must be a list with four sub-arguments")
-      return (res)
-    }
-    n <- !sapply(nadir, is.null)
-    if (n[[1]] == TRUE) {
-      if (n[[2]] == FALSE) {
-        res <- paste("you must inform if the simulations should be saved")
-        return (res)
-      }
-      if (n[[3]] == TRUE || n[[4]] == TRUE) {
-        res <- paste("you must choose a single nadir option")
-        return (res)
-      }
-    } else {
-      if (n[[3]] == TRUE) {
-        res <- paste("sorry but you cannot set the nadir point")
-        return (res)
-      }
-      if (n[[4]] == TRUE) {
-       res <- paste("sorry but the nadir point cannot be calculated")
-       return (res)
-      }
-    }
   }
 # INTERNAL FUNCTION - CALCULATE NADIR ##########################################
 .panNadir <-
