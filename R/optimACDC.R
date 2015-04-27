@@ -537,15 +537,13 @@ objACDC <-
   function (points, candi, covars, strata.type = "area", 
             weights = list(CORR = 0.5, DIST = 0.5), use.coords = FALSE, 
             utopia = list(user = NULL, abs = NULL),
-            #nadir = list(sim = NULL, save.sim = NULL, user = NULL, abs = NULL)) {
             nadir = list(sim = NULL, seeds = NULL, user = NULL, abs = NULL)) {
         
     if (!is.data.frame(covars)) covars <- as.data.frame(covars)
     
     # Check arguments
-    check <- .optimACDCcheck(candi = candi, covars = covars, nadir = nadir,
-                             weights = weights, use.coords = use.coords, 
-                             strata.type = strata.type, utopia = utopia)
+    check <- .optimACDCcheck(candi = candi, covars = covars, 
+                             use.coords = use.coords, strata.type = strata.type)
     if (!is.null(check)) stop (check, call. = FALSE)
     
     # Prepare sample points
