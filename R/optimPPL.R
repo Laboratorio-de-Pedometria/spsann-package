@@ -299,11 +299,13 @@ optimPPL <-
 
       # Plotting
       if (plotit && pedometrics::is.numint(k / 10)) {
+      #if (plotit) {
         .spSANNplot(energy0 = energy0, energies = energies, k = k, 
                     acceptance = acceptance, accept_probs = accept_probs,
                     boundary = boundary, new_conf = new_conf[, 2:3], 
                     conf0 = conf0[, 2:3], y_max0 = y_max0, y.max = y.max,
                     x_max0 = x_max0, x.max = x.max, best.energy = best_energy,
+                    #wp = wp,
                     best.k = best_k, MOOP = MOOP)
       }
 

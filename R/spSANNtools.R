@@ -143,7 +143,7 @@
 # INTERNAL FUNCTION - PLOTTING #################################################
 .spSANNplot <-
   function (energy0, energies, k, acceptance, accept_probs, boundary, new_conf,
-            conf0, y_max0, y.max, x_max0, x.max, best.energy, best.k, MOOP) {
+            conf0, y_max0, y.max, x_max0, x.max, best.energy, best.k, MOOP, wp) {
     par(mfrow = c(1, 2))
     
     # PLOT THE ENERGY STATES
@@ -184,6 +184,10 @@
     points(conf0[, 1], conf0[, 2], pch = 1, cex = 0.5, 
            col = "lightgray")
     points(new_conf[, 1], new_conf[, 2], pch = 20, cex = 0.5)
+    if (!missing(wp)) {
+      points(new_conf[wp, 1], new_conf[wp, 2], pch = 20, cex = 1, 
+             col = "red")
+    }
     
     # plot maximum shift in the x and y coordinates
     x <- c(bb[1, 1], bb[1, 2])
