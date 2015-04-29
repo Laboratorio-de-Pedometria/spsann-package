@@ -45,6 +45,15 @@
 #' plot(meuse.grid[, 2:3], asp = 1, pch = 15, col = "gray")
 #' points(pts2[, 2:3], col = "red", cex = 0.5)
 #' points(pts3[, 2:3], pch = 19, col = "blue", cex = 0.5)
+#' 
+#' # Cluster of points
+#' pts1 <- c(1:55)
+#' pts2 <- meuse.grid[pts1, ]
+#' pts3 <- spJitterFinite(points = pts2, candi = meuse.grid, x.min = 40,
+#'                       x.max = 80, y.min = 40, y.max = 80, which.point = 1)
+#' plot(meuse.grid[, 2:3], asp = 1, pch = 15, col = "gray")
+#' points(pts2[, 2:3], col = "red", cex = 0.5)
+#' points(pts3[, 2:3], pch = 19, col = "blue", cex = 0.5)
 # FUNCTION #####################################################################
 spJitterFinite <-
   function (points, candi, x.max, x.min, y.max, y.min, which.point) {
@@ -52,24 +61,33 @@ spJitterFinite <-
     # Get candidate locations using Cpp
     pt1 <- .spJitterCpp(points[, 2:3], candi[, 2:3], x.max, x.min, y.max, 
                         y.min, which.point)
-    
-    # ASR: Pass all the following to C++
+      
+    # Get candidate locations
     pt1 <- pt1[pt1 != 0]
+    # Select one candidate location
     pt2 <- candi[sample(pt1, 1), ]
+    # Check if it already is in the sample (duplicated)
     dup <- duplicated(rbind(pt2, points))
+    # If it already exists, return the original point
     if (any(dup)) {
-      if (all(dup)) {
-        # We return the old point as the new point.
-        # This is to avoid an infinite loop in the end of the optimization
-        # when the objective function results in clusters of points such as PPL
-        pt2 <- candi[which.point, ]
-      } else {
-        while (any(dup)) {
-          pt2 <- candi[sample(pt1, 1), ]
-          dup <- duplicated(rbind(pt2, points))
-        }
-      }
+      pt2 <- candi[which.point, ]
     }
+    
+    #     if (any(dup)) {
+    #       pt11 <- candi[pt1, ]
+    #       dup11 <- duplicated(rbind(pt11, points))
+    #       if (nrow(pt11) == length(which(dup11 == TRUE))) {
+    #         # We return the old point as the new point.
+    #         # This is to avoid an infinite loop in the end of the optimization
+    #         # when the objective function results in clusters of points such as PPL
+    #         pt2 <- candi[which.point, ]
+    #       } else {
+    #         while (any(dup)) {
+    #           pt2 <- candi[sample(pt1, 1), ]
+    #           dup2 <- duplicated(rbind(pt2, points))
+    #         }
+    #       }
+    #     }
     res <- points
     res[which.point, ] <- pt2
     return (res)

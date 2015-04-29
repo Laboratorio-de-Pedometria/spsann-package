@@ -164,10 +164,6 @@ source('R/spJitter.R')
 source('R/optimPPL.R')
 Rcpp::sourceCpp('src/spJitterCpp.cpp')
 Rcpp::sourceCpp('src/updatePPLCpp.cpp')
-require(pedometrics)
-require(sp)
-require(rgeos)
-require(SpatialTools)
 data(meuse.grid)
 candi <- meuse.grid[, 1:2]
 coordinates(candi) <- ~ x + y
@@ -190,3 +186,35 @@ countPPL(points = res, lags = 7, lags.type = "exponential", pairs = FALSE,
 tail(attr(res, "energy.state"), 1) # 53
 objPPL(points = res, lags = 7, lags.type = "exponential", pairs = FALSE,
        lags.base = 2, cutoff = cutoff, criterion = "distribution")
+
+# Infinite loop
+rm(list = ls())
+gc()
+source('R/spSANNtools.R')
+source('R/spJitter.R')
+source('R/optimPPL.R')
+Rcpp::sourceCpp('src/spJitterCpp.cpp')
+Rcpp::sourceCpp('src/updatePPLCpp.cpp')
+nx <- ny <- 100
+s1 <- 1:nx
+s1 <- s1 - 0.5
+s2 <- s1
+candi <- expand.grid(s1 = s1, s2 = s2)
+coordinates(candi) <- ~ s1 + s2
+gridded(candi) <- TRUE
+boundary <- as(candi, "SpatialPolygons")
+boundary <- gUnionCascaded(boundary)
+candi <- coordinates(candi)
+candi <- matrix(cbind(1:nrow(candi), candi), ncol = 3)
+x.max <- diff(bbox(boundary)[1, ])
+y.max <- diff(bbox(boundary)[2, ])
+cutoff <- sqrt((x.max * x.max) + (y.max * y.max))# / 2
+lags <- 7
+points <- 49
+set.seed(2001)
+sample_b <- optimPPL(points = points, candi = candi, cutoff = cutoff, 
+                     lags = lags, x.max = x.max, x.min = 2, y.max = y.max, 
+                     y.min = 2, boundary = boundary, iterations = 7000, 
+                     plotit = TRUE, pairs = TRUE, verbose = FALSE, greedy = TRUE)
+countPPL(sample_b, lags = lags, cutoff = cutoff, pairs = TRUE)
+objPPL(sample_b, lags = lags, cutoff = cutoff, pairs = TRUE)
