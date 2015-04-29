@@ -5,15 +5,15 @@
 \title{Optimization of sample configurations for variogram and spatial trend
 estimation, and spatial interpolation}
 \usage{
-optimPAN(points, candi, x.max, x.min, y.max, y.min, iterations = 10000,
+optimPAN(points, candi, lags = 7, lags.type = "exponential",
+  lags.base = 2, cutoff = NULL, criterion = "distribution",
+  distri = NULL, pairs = FALSE, covars, strata.type = "equal.area",
+  use.coords = FALSE, x.max, x.min, y.max, y.min, iterations,
   acceptance = list(initial = 0.99, cooling = iterations/10),
-  stopping = list(max.count = iterations/10), PPL = list(lags = 7, lags.type
-  = "exponential", lags.base = 2, cutoff = NULL, criterion = "distribution",
-  pre.distri = NULL), ACDC = list(covars, covars.type = "numeric", strata.type
-  = "equal.area", use.coords = FALSE, weights = list(strata = 0.5, correl =
-  0.5)), PAN = list(weights = list(PPL = 1/3, ACDC = 1/3, MSSD = 1/3), nadir =
-  list(sim = 1000, save.sim = TRUE, user = NULL, abs = NULL)), plotit = TRUE,
-  boundary, progress = TRUE, verbose = TRUE)
+  stopping = list(max.count = iterations/10), weights = list(CORR = 1/3/2,
+  DIST = 1/3/2, PPL = 1/3, MSSD = 1/3), nadir = list(sim = NULL, seeds = NULL,
+  user = NULL, abs = NULL), plotit = TRUE, boundary, progress = TRUE,
+  verbose = TRUE, greedy = FALSE)
 }
 \arguments{
   \item{points}{Integer value, integer vector, data frame
@@ -32,6 +32,21 @@ optimPAN(points, candi, x.max, x.min, y.max, y.min, iterations = 10000,
   \item{candi}{Data frame or matrix with the candidate
   locations for the sample points. The coordinates must be
   projected.}
+
+  \item{covars}{Data frame or matrix with the covariates in
+  the columns.}
+
+  \item{strata.type}{Character value setting the type of
+  stratification that should be used to create sampling
+  strata (or factor levels) for the numeric covariates.
+  Available options are \code{"area"} for equal-area, and
+  \code{"range"} for equal-range. Defaults to
+  \code{strata.type = "area"}. See \sQuote{Details} for
+  more information.}
+
+  \item{use.coords}{Logical value. Should the geographic
+  coordinates be used as covariates? Defaults to
+  \code{use.coords = FALSE}.}
 
   \item{x.max,x.min,y.max,y.min}{Numeric value. The minimum
   and maximum quantity of random noise to be added to the x
@@ -58,33 +73,22 @@ optimPAN(points, candi, x.max, x.min, y.max, y.min, iterations = 10000,
   list(max.count = iterations / 10)}. More options may be
   included in the future.}
 
-  \item{PPL}{List with six named sub-arguments. The
-  parameters used to optimize the sample configuration to
-  the number of points or point-pairs per lag. See
-  \code{optimPPL} for more info.}
+  \item{weights}{List with named sub-arguments. The weights
+  assigned to each of the objective functions combined to
+  form the multi-objective optimization problem (MOOP).
+  They must be named after the objective function to which
+  they apply. The weights must be larger than 0 and sum to
+  1. The default option gives equal weights to all
+  objective functions.}
 
-  \item{ACDC}{List with five named sub-arguments. The
-  paramters used to optimize the sample configuration
-  regardig the association/correlation and marginal
-  distribution of the covariates. See \code{optimACDC} for
-  more info.}
-
-  \item{PAN}{List with two named sub-arguments:
-  \code{weights} and \code{nadir}. \code{weights} is a list
-  with two named sub-arguments. It contains the weights
-  assigned to each objective function (PPL, ACDC, and
-  MSSD). They must be named and sum to unity. Defaults to
-  \code{weights = list(PPL = 1/3, ACDC = 1/3, MSSD = 1/3)}.
-  \code{nadir} is a with four named sub-arguments:
-  \code{sim} -- the number of random realizations to
-  estimate the nadir point; \code{save.sim} -- logical for
-  saving the simulated values and returning them as an
-  attribute of the optimized sample configuration;
-  \code{user} -- a user-defined value; \code{abs} --
-  logical for calculating the nadir point internally. Only
-  simulations are implemented in the current version.
-  Defaults to \code{nadir = list(sim = 1000, save.sim =
-  TRUE, user = NULL, abs = NULL)}.}
+  \item{nadir}{List with named sub-arguments. Three options
+  are available: 1) \code{sim} -- the number of random
+  realizations to estimate the nadir point, and
+  \code{seeds} -- vector defining the random seeds for each
+  of the realizations; 2) \code{user} -- a list of
+  user-defined values named after the objective function to
+  which they apply; 3) \code{abs} -- logical for
+  calculating the nadir point internally.}
 
   \item{plotit}{Logical for plotting the optimization
   results. This includes a) the progress of the objective
@@ -107,6 +111,13 @@ optimPAN(points, candi, x.max, x.min, y.max, y.min, iterations = 10000,
   done using a greedy algorithm, that is, accepting only
   better system configurations? Defaults to \code{greedy =
   FALSE}.}
+
+  \item{utopia}{List with two named sub-arguments:
+  \code{user} -- a list of user-defined values named after
+  the objective function to which they apply, and
+  \code{abs} -- logical for calculating the utopia point
+  internally. Defaults to \code{user = NULL} and \code{abs
+  = NULL}.}
 }
 \value{
 \code{optimPAN} returns a matrix: the optimized sample
@@ -115,16 +126,68 @@ the optimization as an attribute.
 }
 \description{
 Optimize a sample configuration for variogram and spatial
-trend estimation, and spatial interpolation. The criteria
-used are the number of points (or point-pairs) per
-lag-distance class (PPL), matching the
-association/correlation and marginal distribution of the
-covariates (ACDC), and the mean squared shortest distance
-(MSSD).
+trend estimation, and spatial interpolation. An utility
+function is defined aggregating four objective functions:
+\bold{CORR}, \bold{DIST}, \bold{PPL}, and \bold{MSSD}.
+}
+\note{
+This function was derive with modifications from the method
+known as the \emph{conditioned Latin Hypercube sampling}
+originally proposed by Minasny and McBratney (2006).
 }
 \author{
 Alessandro Samuel-Rosa
 \email{alessandrosamuelrosa@gmail.com}
+}
+\references{
+Arora, J. \emph{Introduction to optimum design}. Waltham:
+Academic Press, p. 896, 2011.
+
+Marler, R. T.; Arora, J. S. Survey of multi-objective
+optimization methods for engineering. \emph{Structural and
+Multidisciplinary Optimization}, v. 26, p. 369-395, 2004.
+
+Marler, R. T.; Arora, J. S. Function-transformation methods
+for multi-objective optimization. \emph{Engineering
+Optimization}, v. 37, p. 551-570, 2005.
+
+Marler, R. T.; Arora, J. S. The weighted sum method for
+multi-objective optimization: new insights.
+\emph{Structural and Multidisciplinary Optimization}, v.
+41, p. 853-862, 2009.
+
+Cramér, H. \emph{Mathematical methods of statistics}.
+Princeton: Princeton University Press, p. 575, 1946.
+
+Everitt, B. S. \emph{The Cambridge dictionary of
+statistics}. Cambridge: Cambridge University Press, p. 432,
+2006.
+
+Hyndman, R. J.; Fan, Y. Sample quantiles in statistical
+packages. \emph{The American Statistician}, v. 50, p.
+361-365, 1996.
+
+Minasny, B.; McBratney, A. B. A conditioned Latin hypercube
+method for sampling in the presence of ancillary
+information. \emph{Computers & Geosciences}, v. 32, p.
+1378-1388, 2006.
+
+Minasny, B.; McBratney, A. B. Conditioned Latin Hypercube
+Sampling for calibrating soil sensor data to soil
+properties. Chapter 9. Viscarra Rossel, R. A.; McBratney,
+A. B.; Minasny, B. (Eds.) \emph{Proximal Soil Sensing}.
+Amsterdam: Springer, p. 111-119, 2010.
+
+Mulder, V. L.; de Bruin, S.; Schaepman, M. E. Representing
+major soil variability at regional scale by constrained
+Latin hypercube sampling of remote sensing data.
+\emph{International Journal of Applied Earth Observation
+and Geoinformation}, v. 21, p. 301-310, 2013.
+
+Roudier, P.; Beaudette, D.; Hewitt, A. A conditioned Latin
+hypercube sampling algorithm incorporating operational
+constraints. \emph{5th Global Workshop on Digital Soil
+Mapping}. Sydney, p. 227-231, 2012.
 }
 \concept{
 simulated annealing

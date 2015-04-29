@@ -18,6 +18,6 @@ setwd("~/PROJECTS/r-packages") # Laptop
 setwd("~/alessandro") # ISRIC desktop
 
 system("R CMD build spsann")
-system("R CMD check --as-cran spsann_0.0.0.9004.tar.gz")
+system("R CMD check --as-cran spsann_0.0.0.9005.tar.gz")
 
 setwd("~/alessandro/spsann") # ISRIC desktop

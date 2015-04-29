@@ -1,3 +1,9 @@
+# Version 0.0.0.9005 (2015-04-29)
+
+* `spJitterFinite()` now returns the old point if the new point already is in
+the sample. This is to avoid an infinite loop at the end of the optimization
+when the objective function creates a cluster of points.
+
 # Version 0.0.0.9004 (2015-04-24)
 
 * New version of `optimACDC()`, including new argument definitions;

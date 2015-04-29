@@ -103,7 +103,7 @@ the sample configuration - the objective function value.
 }
 \description{
 Optimize a sample configuration for trend estimation. A
-criterion is defined so #' that the sample reproduces the
+criterion is defined so that the sample reproduces the
 marginal distribution of the covariates (\bold{DIST}).
 }
 \details{

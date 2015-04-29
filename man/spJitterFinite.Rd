@@ -68,6 +68,15 @@ pts3 <- spJitterFinite(points = pts2, candi = meuse.grid, x.min = 40,
 plot(meuse.grid[, 2:3], asp = 1, pch = 15, col = "gray")
 points(pts2[, 2:3], col = "red", cex = 0.5)
 points(pts3[, 2:3], pch = 19, col = "blue", cex = 0.5)
+
+# Cluster of points
+pts1 <- c(1:55)
+pts2 <- meuse.grid[pts1, ]
+pts3 <- spJitterFinite(points = pts2, candi = meuse.grid, x.min = 40,
+                      x.max = 80, y.min = 40, y.max = 80, which.point = 1)
+plot(meuse.grid[, 2:3], asp = 1, pch = 15, col = "gray")
+points(pts2[, 2:3], col = "red", cex = 0.5)
+points(pts3[, 2:3], pch = 19, col = "blue", cex = 0.5)
 }
 \author{
 Alessandro Samuel-Rosa
