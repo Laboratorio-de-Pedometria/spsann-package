@@ -22,84 +22,63 @@ objDIST(points, candi, covars, strata.type = "area", use.coords = FALSE)
   to the points. If \code{points} is a data frame or
   matrix, it must have three columns: \code{[, 1]} the
   identification of each sample point (1, 2, ..., n),
-  \code{[, 2]} the x-coordinates, and \code{[, 3]} the
-  y-coordinates. The coordinates must be projected. If a
-  data frame or matrix is used, \code{points} must be a
-  subset of \code{candi}.}
-
-  \item{candi}{Data frame or matrix with the candidate
-  locations for the sample points. The coordinates must be
-  projected.}
-
-  \item{covars}{Data frame or matrix with the covariates in
-  the columns.}
-
-  \item{strata.type}{Character value setting the type of
-  stratification that should be used to create sampling
-  strata (or factor levels) for the numeric covariates.
-  Available options are \code{"area"} for equal-area, and
-  \code{"range"} for equal-range. Defaults to
-  \code{strata.type = "area"}. See \sQuote{Details} for
-  more information.}
-
-  \item{use.coords}{Logical value. Should the geographic
-  coordinates be used as covariates? Defaults to
-  \code{use.coords = FALSE}.}
-
-  \item{x.max,x.min,y.max,y.min}{Numeric value. The minimum
-  and maximum quantity of random noise to be added to the x
-  and y coordinates. The minimum quantity must be equal to,
-  at least, the minimum distance between two neighbouring
-  candidate locations. The units are the same as of the
-  coordinates.}
-
-  \item{iterations}{Integer. The maximum number of
-  iterations that should be used for the optimization.}
-
-  \item{acceptance}{List with two named sub-arguments:
-  \code{initial} -- numeric value between 0 and 1 defining
-  the initial acceptance probability, and \code{cooling} --
-  a numeric value defining the exponential factor by witch
-  the acceptance probability decreases at each iteration.
-  Defaults to \code{acceptance = list(initial = 0.99,
-  cooling = iterations / 10)}.}
-
+  \code{[, 2]} the x-coordinates, and \code{[, 3]} the y-
+  coordinates. The coordinates must be projected. If a data
+  frame or matrix is used, \code{points} must be a subset of
+  \code{candi}.} \item{candi}{Data frame or matrix with the
+  candidate locations for the sample points. The coordinates
+  must be projected.} \item{covars}{Data frame or matrix
+  with the covariates in the columns.} 
+  \item{strata.type}{Character value setting the type of stratification
+  that should be used to create sampling strata (or factor
+  levels) for the numeric covariates. Available options
+  are \code{"area"} for equal-area, and \code{"range"} for
+  equal-range. Defaults to \code{strata.type = "area"}. See
+  \sQuote{Details} for more information.} 
+  \item{use.coords}{Logical value. Should the geographic coordinates be
+  used as covariates? Defaults to \code{use.coords =
+  FALSE}.} \item{x.max,x.min,y.max,y.min}{Numeric value.
+  The minimum and maximum quantity of random noise to be
+  added to the x and y coordinates. The minimum quantity
+  must be equal to, at least, the minimum distance between
+  two neighbouring candidate locations. The units are the
+  same as of the coordinates.} \item{iterations}{Integer.
+  The maximum number of iterations that should be used for
+  the optimization.} \item{acceptance}{List with two named
+  sub-arguments: \code{initial} -- numeric value between
+  0 and 1 defining the initial acceptance probability,
+  and \code{cooling} -- a numeric value defining the
+  exponential factor by witch the acceptance probability
+  decreases at each iteration. Defaults to \code{acceptance
+  = list(initial = 0.99, cooling = iterations / 10)}.}
   \item{stopping}{List with one named sub-argument:
   \code{max.count} -- integer value defining the maximum
-  allowable number of iterations without improvement of the
-  objective function value. Defaults to \code{stopping =
-  list(max.count = iterations / 10)}. More options may be
-  included in the future.}
-
-  \item{plotit}{Logical for plotting the optimization
-  results. This includes a) the progress of the objective
-  function values and acceptance probabilities, and b) the
-  original points, the perturbed points and the progress of
-  the maximum perturbation in the x- and y-coordinates. The
-  plots are updated at each 10 iterations. Defaults to
-  \code{plotit = TRUE}.}
-
+  allowable number of iterations without improvement of
+  the objective function value. Defaults to \code{stopping
+  = list(max.count = iterations / 10)}. More options may
+  be included in the future.} \item{plotit}{Logical for
+  plotting the optimization results. This includes a) the
+  progress of the objective function values and acceptance
+  probabilities, and b) the original points, the perturbed
+  points and the progress of the maximum perturbation
+  in the x- and y-coordinates. The plots are updated at
+  each 10 iterations. Defaults to \code{plotit = TRUE}.}
   \item{boundary}{SpatialPolygon. The boundary of the
   spatial domain. Mandatory if \code{plotit = TRUE}.}
-
   \item{progress}{Logical for printing a progress bar.
-  Defaults to \code{progress = TRUE}.}
-
-  \item{verbose}{Logical for printing messages about the
-  progress of the optimization.}
-
-  \item{greedy}{Logical value. Should the optimization be
-  done using a greedy algorithm, that is, accepting only
-  better system configurations? Defaults to \code{greedy =
-  FALSE}.}
+  Defaults to \code{progress = TRUE}.} 
+  \item{verbose}{Logical for printing messages about the progress of the
+  optimization.} \item{greedy}{Logical value. Should the
+  optimization be done using a greedy algorithm, that is,
+  accepting only better system configurations? Defaults to
+  \code{greedy = FALSE}.}
 }
 \value{
 \code{optimDIST} returns a matrix: the optimized sample
 configuration with the evolution of the energy state during
-the optimization as an attribute.
-
-\code{objDIST} returns a numeric value: the energy state of
-the sample configuration - the objective function value.
+the optimization as an attribute. \code{objDIST} returns a
+numeric value: the energy state of the sample configuration
+- the objective function value.
 }
 \description{
 Optimize a sample configuration for trend estimation. A
@@ -108,47 +87,41 @@ marginal distribution of the covariates (\bold{DIST}).
 }
 \details{
 Reproducing the marginal distribution of the numeric
-covariates depends upon the definition of sampling strata.
-These sampling strata are also used to categorize any
-numeric covariate when they are passed together with
-categorical covariates (see more details at
-\code{optimDist}). Two types of sampling strata can be
-used. \emph{Equal-area} sampling strata are defined using
-the sample quantiles estimated with \code{quantile()} using
-a discontinuous function (\code{type = 3}). This is to
-avoid creating breakpoints that do not occur in the
-population of existing covariate values.
-
-The function \code{quantile()} commonly produces repeated
-break points. A break point will always be repeated if that
-value has a relatively high frequency in the population of
-covariate values. The number of repeated break points
-increases with the number of sampling strata. Only unique
-break points are used to create sampling strata.
-
-\emph{Equal-range} sampling strata are defined breaking the
-range of covariate values into pieces of equal size. This
-method usually creates breakpoints that do not occur in the
-population of existing covariate values. Such breakpoints
-are replaced by the nearest existing covariate value
-identified using Euclidean distances.
-
-Both stratification methods can produce sampling strata
-that cover a range of values that do not exist in the
-population of covariate value. Any empty sampling strata is
-merged with the closest non-empty sampling strata. These
-are identified using Euclidean distances.
-
-The approaches used to define the sampling strata result in
-each numeric covariate having a different number of
-sampling strata, some of them with different area/size.
-Because the goal is to have a sample that reproduces the
-marginal distribution of the covariate, each sampling
-strata will have a different number of sample points. The
-wanted distribution of the number of sample points per
-strata is estimated empirically computing the proportion of
-points of the population of existing covariate values that
-fall in each sampling strata.
+covariates depends upon the definition of sampling
+strata. These sampling strata are also used to categorize
+any numeric covariate when they are passed together
+with categorical covariates (see more details at
+\code{optimDist}). Two types of sampling strata can be used.
+\emph{Equal-area} sampling strata are defined using the
+sample quantiles estimated with \code{quantile()} using a
+discontinuous function (\code{type = 3}). This is to avoid
+creating breakpoints that do not occur in the population of
+existing covariate values. The function \code{quantile()}
+commonly produces repeated break points. A break point
+will always be repeated if that value has a relatively
+high frequency in the population of covariate values. The
+number of repeated break points increases with the number of
+sampling strata. Only unique break points are used to create
+sampling strata. \emph{Equal-range} sampling strata are
+defined breaking the range of covariate values into pieces
+of equal size. This method usually creates breakpoints that
+do not occur in the population of existing covariate values.
+Such breakpoints are replaced by the nearest existing
+covariate value identified using Euclidean distances. Both
+stratification methods can produce sampling strata that
+cover a range of values that do not exist in the population
+of covariate value. Any empty sampling strata is merged with
+the closest non-empty sampling strata. These are identified
+using Euclidean distances. The approaches used to define
+the sampling strata result in each numeric covariate having
+a different number of sampling strata, some of them with
+different area/size. Because the goal is to have a sample
+that reproduces the marginal distribution of the covariate,
+each sampling strata will have a different number of sample
+points. The wanted distribution of the number of sample
+points per strata is estimated empirically computing the
+proportion of points of the population of existing covariate
+values that fall in each sampling strata.
 }
 \note{
 This function was derive with modifications from the method
@@ -184,36 +157,27 @@ Alessandro Samuel-Rosa
 \references{
 Cramér, H. \emph{Mathematical methods of statistics}.
 Princeton: Princeton University Press, p. 575, 1946.
-
 Everitt, B. S. \emph{The Cambridge dictionary of
-statistics}. Cambridge: Cambridge University Press, p. 432,
-2006.
-
-Hyndman, R. J.; Fan, Y. Sample quantiles in statistical
-packages. \emph{The American Statistician}, v. 50, p.
-361-365, 1996.
-
-Minasny, B.; McBratney, A. B. A conditioned Latin hypercube
-method for sampling in the presence of ancillary
-information. \emph{Computers & Geosciences}, v. 32, p.
-1378-1388, 2006.
-
-Minasny, B.; McBratney, A. B. Conditioned Latin Hypercube
-Sampling for calibrating soil sensor data to soil
-properties. Chapter 9. Viscarra Rossel, R. A.; McBratney,
-A. B.; Minasny, B. (Eds.) \emph{Proximal Soil Sensing}.
-Amsterdam: Springer, p. 111-119, 2010.
-
-Mulder, V. L.; de Bruin, S.; Schaepman, M. E. Representing
-major soil variability at regional scale by constrained
-Latin hypercube sampling of remote sensing data.
+statistics}. Cambridge: Cambridge University Press, p.
+432, 2006. Hyndman, R. J.; Fan, Y. Sample quantiles in
+statistical packages. \emph{The American Statistician},
+v. 50, p. 361-365, 1996. Minasny, B.; McBratney, A. B.
+A conditioned Latin hypercube method for sampling in
+the presence of ancillary information. \emph{Computers
+& Geosciences}, v. 32, p. 1378-1388, 2006. Minasny, B.;
+McBratney, A. B. Conditioned Latin Hypercube Sampling for
+calibrating soil sensor data to soil properties. Chapter
+9. Viscarra Rossel, R. A.; McBratney, A. B.; Minasny, B.
+(Eds.) \emph{Proximal Soil Sensing}. Amsterdam: Springer,
+p. 111-119, 2010. Mulder, V. L.; de Bruin, S.; Schaepman, M.
+E. Representing major soil variability at regional scale by
+constrained Latin hypercube sampling of remote sensing data.
 \emph{International Journal of Applied Earth Observation
-and Geoinformation}, v. 21, p. 301-310, 2013.
-
-Roudier, P.; Beaudette, D.; Hewitt, A. A conditioned Latin
-hypercube sampling algorithm incorporating operational
-constraints. \emph{5th Global Workshop on Digital Soil
-Mapping}. Sydney, p. 227-231, 2012.
+and Geoinformation}, v. 21, p. 301-310, 2013. Roudier, P.;
+Beaudette, D.; Hewitt, A. A conditioned Latin hypercube
+sampling algorithm incorporating operational constraints.
+\emph{5th Global Workshop on Digital Soil Mapping}. Sydney,
+p. 227-231, 2012.
 }
 \seealso{
 \code{\link[clhs]{clhs}}

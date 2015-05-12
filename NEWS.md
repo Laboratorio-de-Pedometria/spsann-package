@@ -1,3 +1,10 @@
+# Version 0.0.0.9006 (2015-05-12)
+
+* `spJitterFinite()` now tries to find an alternative point if the new point
+  already is included in the sample. The number of tries is equal to the total
+  number of points included in the sample. Because the more points we have, the
+  more likely it is that the candidate point already is included in the sample.
+
 # Version 0.0.0.9005 (2015-04-29)
 
 * `spJitterFinite()` now returns the old point if the new point already is in

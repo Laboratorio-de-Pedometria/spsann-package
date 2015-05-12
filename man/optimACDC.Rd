@@ -26,108 +26,81 @@ objACDC(points, candi, covars, strata.type = "area", weights = list(CORR =
   to the points. If \code{points} is a data frame or
   matrix, it must have three columns: \code{[, 1]} the
   identification of each sample point (1, 2, ..., n),
-  \code{[, 2]} the x-coordinates, and \code{[, 3]} the
-  y-coordinates. The coordinates must be projected. If a
-  data frame or matrix is used, \code{points} must be a
-  subset of \code{candi}.}
-
-  \item{candi}{Data frame or matrix with the candidate
-  locations for the sample points. The coordinates must be
-  projected.}
-
-  \item{covars}{Data frame or matrix with the covariates in
-  the columns.}
-
-  \item{strata.type}{Character value setting the type of
-  stratification that should be used to create sampling
-  strata (or factor levels) for the numeric covariates.
-  Available options are \code{"area"} for equal-area, and
-  \code{"range"} for equal-range. Defaults to
-  \code{strata.type = "area"}. See \sQuote{Details} for
-  more information.}
-
-  \item{iterations}{Integer. The maximum number of
-  iterations that should be used for the optimization.}
-
-  \item{weights}{List with named sub-arguments. The weights
-  assigned to each of the objective functions combined to
-  form the multi-objective optimization problem (MOOP).
-  They must be named after the objective function to which
-  they apply. The weights must be larger than 0 and sum to
-  1. The default option gives equal weights to all
-  objective functions.}
-
-  \item{use.coords}{Logical value. Should the geographic
-  coordinates be used as covariates? Defaults to
-  \code{use.coords = FALSE}.}
-
-  \item{nadir}{List with named sub-arguments. Three options
-  are available: 1) \code{sim} -- the number of random
-  realizations to estimate the nadir point, and
-  \code{seeds} -- vector defining the random seeds for each
-  of the realizations; 2) \code{user} -- a list of
-  user-defined values named after the objective function to
-  which they apply; 3) \code{abs} -- logical for
-  calculating the nadir point internally.}
-
-  \item{utopia}{List with two named sub-arguments:
-  \code{user} -- a list of user-defined values named after
-  the objective function to which they apply, and
-  \code{abs} -- logical for calculating the utopia point
+  \code{[, 2]} the x-coordinates, and \code{[, 3]} the y-
+  coordinates. The coordinates must be projected. If a data
+  frame or matrix is used, \code{points} must be a subset of
+  \code{candi}.} \item{candi}{Data frame or matrix with the
+  candidate locations for the sample points. The coordinates
+  must be projected.} \item{covars}{Data frame or matrix
+  with the covariates in the columns.} 
+  \item{strata.type}{Character value setting the type of stratification
+  that should be used to create sampling strata (or factor
+  levels) for the numeric covariates. Available options
+  are \code{"area"} for equal-area, and \code{"range"} for
+  equal-range. Defaults to \code{strata.type = "area"}. See
+  \sQuote{Details} for more information.}
+  \item{iterations}{Integer. The maximum number of iterations that should
+  be used for the optimization.} \item{weights}{List with
+  named sub-arguments. The weights assigned to each of
+  the objective functions combined to form the multi-
+  objective optimization problem (MOOP). They must be
+  named after the objective function to which they apply.
+  The weights must be larger than 0 and sum to 1. The
+  default option gives equal weights to all objective
+  functions.} \item{use.coords}{Logical value. Should the
+  geographic coordinates be used as covariates? Defaults
+  to \code{use.coords = FALSE}.} \item{nadir}{List with
+  named sub-arguments. Three options are available: 1)
+  \code{sim} -- the number of random realizations to
+  estimate the nadir point, and \code{seeds} -- vector
+  defining the random seeds for each of the realizations;
+  2) \code{user} -- a list of user-defined values named
+  after the objective function to which they apply; 3)
+  \code{abs} -- logical for calculating the nadir point
+  internally.} \item{utopia}{List with two named sub-
+  arguments: \code{user} -- a list of user-defined values
+  named after the objective function to which they apply,
+  and \code{abs} -- logical for calculating the utopia point
   internally. Defaults to \code{user = NULL} and \code{abs
-  = NULL}.}
-
-  \item{x.max,x.min,y.max,y.min}{Numeric value. The minimum
-  and maximum quantity of random noise to be added to the x
-  and y coordinates. The minimum quantity must be equal to,
-  at least, the minimum distance between two neighbouring
-  candidate locations. The units are the same as of the
-  coordinates.}
-
-  \item{acceptance}{List with two named sub-arguments:
-  \code{initial} -- numeric value between 0 and 1 defining
-  the initial acceptance probability, and \code{cooling} --
-  a numeric value defining the exponential factor by witch
-  the acceptance probability decreases at each iteration.
-  Defaults to \code{acceptance = list(initial = 0.99,
-  cooling = iterations / 10)}.}
-
-  \item{stopping}{List with one named sub-argument:
-  \code{max.count} -- integer value defining the maximum
-  allowable number of iterations without improvement of the
-  objective function value. Defaults to \code{stopping =
-  list(max.count = iterations / 10)}. More options may be
-  included in the future.}
-
-  \item{plotit}{Logical for plotting the optimization
-  results. This includes a) the progress of the objective
-  function values and acceptance probabilities, and b) the
-  original points, the perturbed points and the progress of
-  the maximum perturbation in the x- and y-coordinates. The
-  plots are updated at each 10 iterations. Defaults to
-  \code{plotit = TRUE}.}
-
-  \item{boundary}{SpatialPolygon. The boundary of the
-  spatial domain. Mandatory if \code{plotit = TRUE}.}
-
-  \item{progress}{Logical for printing a progress bar.
-  Defaults to \code{progress = TRUE}.}
-
-  \item{verbose}{Logical for printing messages about the
-  progress of the optimization.}
-
-  \item{greedy}{Logical value. Should the optimization be
-  done using a greedy algorithm, that is, accepting only
-  better system configurations? Defaults to \code{greedy =
-  FALSE}.}
+  = NULL}.} \item{x.max,x.min,y.max,y.min}{Numeric value.
+  The minimum and maximum quantity of random noise to be
+  added to the x and y coordinates. The minimum quantity
+  must be equal to, at least, the minimum distance between
+  two neighbouring candidate locations. The units are
+  the same as of the coordinates.} \item{acceptance}{List
+  with two named sub-arguments: \code{initial} -- numeric
+  value between 0 and 1 defining the initial acceptance
+  probability, and \code{cooling} -- a numeric value
+  defining the exponential factor by witch the acceptance
+  probability decreases at each iteration. Defaults
+  to \code{acceptance = list(initial = 0.99, cooling =
+  iterations / 10)}.} \item{stopping}{List with one named
+  sub-argument: \code{max.count} -- integer value defining
+  the maximum allowable number of iterations without
+  improvement of the objective function value. Defaults to
+  \code{stopping = list(max.count = iterations / 10)}. More
+  options may be included in the future.} 
+  \item{plotit}{Logical for plotting the optimization results. This
+  includes a) the progress of the objective function values
+  and acceptance probabilities, and b) the original points,
+  the perturbed points and the progress of the maximum
+  perturbation in the x- and y-coordinates. The plots are
+  updated at each 10 iterations. Defaults to \code{plotit
+  = TRUE}.} \item{boundary}{SpatialPolygon. The boundary
+  of the spatial domain. Mandatory if \code{plotit =
+  TRUE}.} \item{progress}{Logical for printing a progress
+  bar. Defaults to \code{progress = TRUE}.} 
+  \item{verbose}{Logical for printing messages about the progress of the
+  optimization.} \item{greedy}{Logical value. Should the
+  optimization be done using a greedy algorithm, that is,
+  accepting only better system configurations? Defaults to
+  \code{greedy = FALSE}.}
 }
 \value{
 \code{optimACDC} returns a matrix: the optimized sample
 configuration with the evolution of the energy state during
-the optimization as an attribute.
-
-\code{objACDC} returns a numeric value: the energy state of
-the point configuration.
+the optimization as an attribute. \code{objACDC} returns a
+numeric value: the energy state of the point configuration.
 }
 \description{
 Optimize a sample configuration for spatial trend
@@ -177,52 +150,37 @@ Alessandro Samuel-Rosa
 \references{
 Cramér, H. \emph{Mathematical methods of statistics}.
 Princeton: Princeton University Press, p. 575, 1946.
-
 Everitt, B. S. \emph{The Cambridge dictionary of
-statistics}. Cambridge: Cambridge University Press, p. 432,
-2006.
-
-Hyndman, R. J.; Fan, Y. Sample quantiles in statistical
-packages. \emph{The American Statistician}, v. 50, p.
-361-365, 1996.
-
-Minasny, B.; McBratney, A. B. A conditioned Latin hypercube
-method for sampling in the presence of ancillary
-information. \emph{Computers & Geosciences}, v. 32, p.
-1378-1388, 2006.
-
-Minasny, B.; McBratney, A. B. Conditioned Latin Hypercube
-Sampling for calibrating soil sensor data to soil
-properties. Chapter 9. Viscarra Rossel, R. A.; McBratney,
-A. B.; Minasny, B. (Eds.) \emph{Proximal Soil Sensing}.
-Amsterdam: Springer, p. 111-119, 2010.
-
-Mulder, V. L.; de Bruin, S.; Schaepman, M. E. Representing
-major soil variability at regional scale by constrained
-Latin hypercube sampling of remote sensing data.
+statistics}. Cambridge: Cambridge University Press, p.
+432, 2006. Hyndman, R. J.; Fan, Y. Sample quantiles in
+statistical packages. \emph{The American Statistician},
+v. 50, p. 361-365, 1996. Minasny, B.; McBratney, A. B.
+A conditioned Latin hypercube method for sampling in
+the presence of ancillary information. \emph{Computers
+& Geosciences}, v. 32, p. 1378-1388, 2006. Minasny, B.;
+McBratney, A. B. Conditioned Latin Hypercube Sampling for
+calibrating soil sensor data to soil properties. Chapter
+9. Viscarra Rossel, R. A.; McBratney, A. B.; Minasny, B.
+(Eds.) \emph{Proximal Soil Sensing}. Amsterdam: Springer,
+p. 111-119, 2010. Mulder, V. L.; de Bruin, S.; Schaepman, M.
+E. Representing major soil variability at regional scale by
+constrained Latin hypercube sampling of remote sensing data.
 \emph{International Journal of Applied Earth Observation
-and Geoinformation}, v. 21, p. 301-310, 2013.
-
-Roudier, P.; Beaudette, D.; Hewitt, A. A conditioned Latin
-hypercube sampling algorithm incorporating operational
-constraints. \emph{5th Global Workshop on Digital Soil
-Mapping}. Sydney, p. 227-231, 2012.
-
-Arora, J. \emph{Introduction to optimum design}. Waltham:
-Academic Press, p. 896, 2011.
-
+and Geoinformation}, v. 21, p. 301-310, 2013. Roudier, P.;
+Beaudette, D.; Hewitt, A. A conditioned Latin hypercube
+sampling algorithm incorporating operational constraints.
+\emph{5th Global Workshop on Digital Soil Mapping}.
+Sydney, p. 227-231, 2012. Arora, J. \emph{Introduction to
+optimum design}. Waltham: Academic Press, p. 896, 2011.
 Marler, R. T.; Arora, J. S. Survey of multi-objective
-optimization methods for engineering. \emph{Structural and
-Multidisciplinary Optimization}, v. 26, p. 369-395, 2004.
-
-Marler, R. T.; Arora, J. S. Function-transformation methods
-for multi-objective optimization. \emph{Engineering
-Optimization}, v. 37, p. 551-570, 2005.
-
-Marler, R. T.; Arora, J. S. The weighted sum method for
-multi-objective optimization: new insights.
-\emph{Structural and Multidisciplinary Optimization}, v.
-41, p. 853-862, 2009.
+optimization methods for engineering. \emph{Structural
+and Multidisciplinary Optimization}, v. 26, p. 369-395,
+2004. Marler, R. T.; Arora, J. S. Function-transformation
+methods for multi-objective optimization. \emph{Engineering
+Optimization}, v. 37, p. 551-570, 2005. Marler, R.
+T.; Arora, J. S. The weighted sum method for multi-
+objective optimization: new insights. \emph{Structural and
+Multidisciplinary Optimization}, v. 41, p. 853-862, 2009.
 }
 \seealso{
 \code{\link[clhs]{clhs}}, \code{\link[pedometrics]{cramer}}

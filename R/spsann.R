@@ -1,4 +1,5 @@
-#' spsann: Optimization of Sample Configurations using Spatial Simulated Annealing
+#' spsann: Optimization of Sample Configurations using Spatial Simulated
+#' Annealing
 #' 
 #' Methods to optimize sample configurations using spatial simulated annealing. 
 #' Multiple objective functions are implemented for various purposes, such as 
@@ -29,8 +30,8 @@
 #' \tabular{ll}{
 #' Package: \tab spsann    \cr
 #' Type:    \tab Package   \cr
-#' Version: \tab 0.0.1.9005\cr
-#' Date:    \tab 2015-04-29\cr
+#' Version: \tab 0.0.0.9006\cr
+#' Date:    \tab 2015-05-12\cr
 #' License: \tab GPL (>= 2)\cr
 #' }
 #' 

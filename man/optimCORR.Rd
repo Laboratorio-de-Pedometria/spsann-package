@@ -22,112 +22,88 @@ objCORR(points, candi, covars, use.coords = FALSE, strata.type = "area")
   to the points. If \code{points} is a data frame or
   matrix, it must have three columns: \code{[, 1]} the
   identification of each sample point (1, 2, ..., n),
-  \code{[, 2]} the x-coordinates, and \code{[, 3]} the
-  y-coordinates. The coordinates must be projected. If a
-  data frame or matrix is used, \code{points} must be a
-  subset of \code{candi}.}
-
-  \item{candi}{Data frame or matrix with the candidate
-  locations for the sample points. The coordinates must be
-  projected.}
-
-  \item{covars}{Data frame or matrix with the covariates in
-  the columns.}
-
-  \item{use.coords}{Logical value. Should the geographic
-  coordinates be used as covariates? Defaults to
-  \code{use.coords = FALSE}.}
-
-  \item{strata.type}{Character value setting the type of
-  stratification that should be used to create sampling
-  strata (or factor levels) for the numeric covariates.
-  Available options are \code{"area"} for equal-area, and
-  \code{"range"} for equal-range. Defaults to
+  \code{[, 2]} the x-coordinates, and \code{[, 3]} the y-
+  coordinates. The coordinates must be projected. If a data
+  frame or matrix is used, \code{points} must be a subset of
+  \code{candi}.} \item{candi}{Data frame or matrix with the
+  candidate locations for the sample points. The coordinates
+  must be projected.} \item{covars}{Data frame or matrix
+  with the covariates in the columns.} 
+  \item{use.coords}{Logical value. Should the geographic coordinates be
+  used as covariates? Defaults to \code{use.coords =
+  FALSE}.} \item{strata.type}{Character value setting the
+  type of stratification that should be used to create
+  sampling strata (or factor levels) for the numeric
+  covariates. Available options are \code{"area"} for equal-
+  area, and \code{"range"} for equal-range. Defaults to
   \code{strata.type = "area"}. See \sQuote{Details} for
-  more information.}
-
-  \item{x.max,x.min,y.max,y.min}{Numeric value. The minimum
-  and maximum quantity of random noise to be added to the x
-  and y coordinates. The minimum quantity must be equal to,
-  at least, the minimum distance between two neighbouring
-  candidate locations. The units are the same as of the
-  coordinates.}
-
-  \item{iterations}{Integer. The maximum number of
-  iterations that should be used for the optimization.}
-
-  \item{acceptance}{List with two named sub-arguments:
-  \code{initial} -- numeric value between 0 and 1 defining
-  the initial acceptance probability, and \code{cooling} --
-  a numeric value defining the exponential factor by witch
-  the acceptance probability decreases at each iteration.
-  Defaults to \code{acceptance = list(initial = 0.99,
-  cooling = iterations / 10)}.}
-
-  \item{stopping}{List with one named sub-argument:
-  \code{max.count} -- integer value defining the maximum
-  allowable number of iterations without improvement of the
-  objective function value. Defaults to \code{stopping =
-  list(max.count = iterations / 10)}. More options may be
-  included in the future.}
-
-  \item{plotit}{Logical for plotting the optimization
-  results. This includes a) the progress of the objective
-  function values and acceptance probabilities, and b) the
-  original points, the perturbed points and the progress of
-  the maximum perturbation in the x- and y-coordinates. The
-  plots are updated at each 10 iterations. Defaults to
-  \code{plotit = TRUE}.}
-
-  \item{boundary}{SpatialPolygon. The boundary of the
-  spatial domain. Mandatory if \code{plotit = TRUE}.}
-
-  \item{progress}{Logical for printing a progress bar.
-  Defaults to \code{progress = TRUE}.}
-
-  \item{verbose}{Logical for printing messages about the
-  progress of the optimization.}
-
-  \item{greedy}{Logical value. Should the optimization be
-  done using a greedy algorithm, that is, accepting only
-  better system configurations? Defaults to \code{greedy =
-  FALSE}.}
+  more information.} \item{x.max,x.min,y.max,y.min}{Numeric
+  value. The minimum and maximum quantity of random noise
+  to be added to the x and y coordinates. The minimum
+  quantity must be equal to, at least, the minimum distance
+  between two neighbouring candidate locations. The units
+  are the same as of the coordinates.} 
+  \item{iterations}{Integer. The maximum number of iterations that should
+  be used for the optimization.} \item{acceptance}{List
+  with two named sub-arguments: \code{initial} -- numeric
+  value between 0 and 1 defining the initial acceptance
+  probability, and \code{cooling} -- a numeric value
+  defining the exponential factor by witch the acceptance
+  probability decreases at each iteration. Defaults
+  to \code{acceptance = list(initial = 0.99, cooling =
+  iterations / 10)}.} \item{stopping}{List with one named
+  sub-argument: \code{max.count} -- integer value defining
+  the maximum allowable number of iterations without
+  improvement of the objective function value. Defaults to
+  \code{stopping = list(max.count = iterations / 10)}. More
+  options may be included in the future.} 
+  \item{plotit}{Logical for plotting the optimization results. This
+  includes a) the progress of the objective function values
+  and acceptance probabilities, and b) the original points,
+  the perturbed points and the progress of the maximum
+  perturbation in the x- and y-coordinates. The plots are
+  updated at each 10 iterations. Defaults to \code{plotit
+  = TRUE}.} \item{boundary}{SpatialPolygon. The boundary
+  of the spatial domain. Mandatory if \code{plotit =
+  TRUE}.} \item{progress}{Logical for printing a progress
+  bar. Defaults to \code{progress = TRUE}.} 
+  \item{verbose}{Logical for printing messages about the progress of the
+  optimization.} \item{greedy}{Logical value. Should the
+  optimization be done using a greedy algorithm, that is,
+  accepting only better system configurations? Defaults to
+  \code{greedy = FALSE}.}
 }
 \value{
 \code{optimCORR} returns a matrix: the optimized sample
 configuration with the evolution of the energy state during
-the optimization as an attribute.
-
-\code{objCORR} returns a numeric value: the energy state of
-the sample configuration - the objective function value.
+the optimization as an attribute. \code{objCORR} returns a
+numeric value: the energy state of the sample configuration
+- the objective function value.
 }
 \description{
-Optimize a sample configuration for trend estimation. A
-criterion is defined so that the sample reproduces the
-association/correlation between the covariates
+Optimize a sample configuration for trend estimation.
+A criterion is defined so that the sample reproduces
+the association/correlation between the covariates
 (\bold{CORR}).
 }
 \details{
 The correlation between two numeric covariates is measured
 using the Pearson's r, a descriptive statistic that ranges
 from -1 to +1. This statistic is also known as the linear
-correlation coefficient.
-
-When the set of covariates includes factor covariates, any
-numeric covariate is transformed into a factor covariate.
-The numeric covariates are categorized using the sampling
-strata defined using one of the two methods available
-(equal-area or equal-range strata) (see more details at
-\code{optimDist}).
-
-The association between two factor covariates is measured
-using the Cramér's v, a descriptive statistic that ranges
-from 0 to 1. The closer to 1 the Cramér's v is, the
-stronger the association between two factor covariates. The
-main weakness of using the Cramér's v is that, while the
-Pearson's r shows the degree and direction of the
-association between two covariates (negative or positive),
-the Cramér's v only measures the degree (weak or strong).
+correlation coefficient. When the set of covariates includes
+factor covariates, any numeric covariate is transformed into
+a factor covariate. The numeric covariates are categorized
+using the sampling strata defined using one of the two
+methods available (equal-area or equal-range strata) (see
+more details at \code{optimDist}). The association between
+two factor covariates is measured using the Cramér's v, a
+descriptive statistic that ranges from 0 to 1. The closer
+to 1 the Cramér's v is, the stronger the association between
+two factor covariates. The main weakness of using the
+Cramér's v is that, while the Pearson's r shows the degree
+and direction of the association between two covariates
+(negative or positive), the Cramér's v only measures the
+degree (weak or strong).
 }
 \note{
 This function was derive with modifications from the method
@@ -163,36 +139,27 @@ Alessandro Samuel-Rosa
 \references{
 Cramér, H. \emph{Mathematical methods of statistics}.
 Princeton: Princeton University Press, p. 575, 1946.
-
 Everitt, B. S. \emph{The Cambridge dictionary of
-statistics}. Cambridge: Cambridge University Press, p. 432,
-2006.
-
-Hyndman, R. J.; Fan, Y. Sample quantiles in statistical
-packages. \emph{The American Statistician}, v. 50, p.
-361-365, 1996.
-
-Minasny, B.; McBratney, A. B. A conditioned Latin hypercube
-method for sampling in the presence of ancillary
-information. \emph{Computers & Geosciences}, v. 32, p.
-1378-1388, 2006.
-
-Minasny, B.; McBratney, A. B. Conditioned Latin Hypercube
-Sampling for calibrating soil sensor data to soil
-properties. Chapter 9. Viscarra Rossel, R. A.; McBratney,
-A. B.; Minasny, B. (Eds.) \emph{Proximal Soil Sensing}.
-Amsterdam: Springer, p. 111-119, 2010.
-
-Mulder, V. L.; de Bruin, S.; Schaepman, M. E. Representing
-major soil variability at regional scale by constrained
-Latin hypercube sampling of remote sensing data.
+statistics}. Cambridge: Cambridge University Press, p.
+432, 2006. Hyndman, R. J.; Fan, Y. Sample quantiles in
+statistical packages. \emph{The American Statistician},
+v. 50, p. 361-365, 1996. Minasny, B.; McBratney, A. B.
+A conditioned Latin hypercube method for sampling in
+the presence of ancillary information. \emph{Computers
+& Geosciences}, v. 32, p. 1378-1388, 2006. Minasny, B.;
+McBratney, A. B. Conditioned Latin Hypercube Sampling for
+calibrating soil sensor data to soil properties. Chapter
+9. Viscarra Rossel, R. A.; McBratney, A. B.; Minasny, B.
+(Eds.) \emph{Proximal Soil Sensing}. Amsterdam: Springer,
+p. 111-119, 2010. Mulder, V. L.; de Bruin, S.; Schaepman, M.
+E. Representing major soil variability at regional scale by
+constrained Latin hypercube sampling of remote sensing data.
 \emph{International Journal of Applied Earth Observation
-and Geoinformation}, v. 21, p. 301-310, 2013.
-
-Roudier, P.; Beaudette, D.; Hewitt, A. A conditioned Latin
-hypercube sampling algorithm incorporating operational
-constraints. \emph{5th Global Workshop on Digital Soil
-Mapping}. Sydney, p. 227-231, 2012.
+and Geoinformation}, v. 21, p. 301-310, 2013. Roudier, P.;
+Beaudette, D.; Hewitt, A. A conditioned Latin hypercube
+sampling algorithm incorporating operational constraints.
+\emph{5th Global Workshop on Digital Soil Mapping}. Sydney,
+p. 227-231, 2012.
 }
 \seealso{
 \code{\link[clhs]{clhs}}, \code{\link[pedometrics]{cramer}}
