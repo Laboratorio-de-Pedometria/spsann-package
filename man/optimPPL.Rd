@@ -34,8 +34,8 @@ countPPL(points, candi, lags = 7, lags.type = "exponential",
   If a data frame or matrix is used, \code{points} must
   be a subset of \code{candi}.} \item{candi}{Data frame
   or matrix with the candidate locations for the sample
-  points. The coordinates must be projected.} 
-  \item{lags}{Integer value. The number of lag-distance classes.
+  points. The coordinates must be projected.} \item{lags}
+  {Integer value. The number of lag-distance classes.
   Alternatively, a vector of numeric values with the lower
   and upper limits of each lag-distance class. The lowest
   value must be larger than zero. Defaults to \code{lags
@@ -60,14 +60,13 @@ countPPL(points, candi, lags = 7, lags.type = "exponential",
   distribution.} \item{pairs}{Logical value. Should the
   sample configuration be optimized regarding the number
   of point-pairs per lag-distance class? Defaults to
-  \code{pairs = FALSE}.}
-  \item{x.max,x.min,y.max,y.min}{Numeric value.
-  The minimum and maximum quantity of random
+  \code{pairs = FALSE}.} \item{x.max,x.min,y.max,y.min}
+  {Numeric value. The minimum and maximum quantity of random
   noise to be added to the x and y coordinates. The minimum
   quantity must be equal to, at least, the minimum distance
   between two neighbouring candidate locations. The units
-  are the same as of the coordinates.} 
-  \item{iterations}{Integer. The maximum number of iterations that should
+  are the same as of the coordinates.} \item{iterations}
+  {Integer. The maximum number of iterations that should
   be used for the optimization.} \item{acceptance}{List
   with two named sub-arguments: \code{initial} -- numeric
   value between 0 and 1 defining the initial acceptance
@@ -80,8 +79,8 @@ countPPL(points, candi, lags = 7, lags.type = "exponential",
   the maximum allowable number of iterations without
   improvement of the objective function value. Defaults to
   \code{stopping = list(max.count = iterations / 10)}. More
-  options may be included in the future.} 
-  \item{plotit}{Logical for plotting the optimization results. This
+  options may be included in the future.} \item{plotit}
+  {Logical for plotting the optimization results. This
   includes a) the progress of the objective function values
   and acceptance probabilities, and b) the original points,
   the perturbed points and the progress of the maximum
@@ -90,8 +89,8 @@ countPPL(points, candi, lags = 7, lags.type = "exponential",
   = TRUE}.} \item{boundary}{SpatialPolygon. The boundary
   of the spatial domain. Mandatory if \code{plotit =
   TRUE}.} \item{progress}{Logical for printing a progress
-  bar. Defaults to \code{progress = TRUE}.} 
-  \item{verbose}{Logical for printing messages about the progress of the
+  bar. Defaults to \code{progress = TRUE}.} \item{verbose}
+  {Logical for printing messages about the progress of the
   optimization.} \item{greedy}{Logical value. Should the
   optimization be done using a greedy algorithm, that is,
   accepting only better system configurations? Defaults to

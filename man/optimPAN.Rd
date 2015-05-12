@@ -30,14 +30,14 @@ optimPAN(points, candi, lags = 7, lags.type = "exponential",
   \code{candi}.} \item{candi}{Data frame or matrix with the
   candidate locations for the sample points. The coordinates
   must be projected.} \item{covars}{Data frame or matrix
-  with the covariates in the columns.} 
-  \item{strata.type}{Character value setting the type of stratification
+  with the covariates in the columns.} \item{strata.type}
+  {Character value setting the type of stratification
   that should be used to create sampling strata (or factor
   levels) for the numeric covariates. Available options
   are \code{"area"} for equal-area, and \code{"range"} for
   equal-range. Defaults to \code{strata.type = "area"}. See
-  \sQuote{Details} for more information.} 
-  \item{use.coords}{Logical value. Should the geographic coordinates be
+  \sQuote{Details} for more information.} \item{use.coords}
+  {Logical value. Should the geographic coordinates be
   used as covariates? Defaults to \code{use.coords =
   FALSE}.} \item{x.max,x.min,y.max,y.min}{Numeric value.
   The minimum and maximum quantity of random noise to be
@@ -78,10 +78,10 @@ optimPAN(points, candi, lags = 7, lags.type = "exponential",
   and b) the original points, the perturbed points and the
   progress of the maximum perturbation in the x- and y-
   coordinates. The plots are updated at each 10 iterations.
-  Defaults to \code{plotit = TRUE}.} 
-  \item{boundary}{SpatialPolygon. The boundary of the spatial domain.
-  Mandatory if \code{plotit = TRUE}.} 
-  \item{progress}{Logical for printing a progress bar. Defaults to
+  Defaults to \code{plotit = TRUE}.} \item{boundary}
+  {SpatialPolygon. The boundary of the spatial domain.
+  Mandatory if \code{plotit = TRUE}.} \item{progress}
+  {Logical for printing a progress bar. Defaults to
   \code{progress = TRUE}.} \item{verbose}{Logical for
   printing messages about the progress of the optimization.}
   \item{greedy}{Logical value. Should the optimization be

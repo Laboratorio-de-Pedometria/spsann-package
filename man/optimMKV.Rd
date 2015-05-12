@@ -32,8 +32,8 @@ objMKV(points, candi, covars, equation, model, krige.stat = "mean")
   \item{equation}{Formula string that defines the dependent
   variable \code{z} as a linear model of independent
   variables. Defaults to \code{equation = z ~ 1}. See the
-  argument \code{formula} in the function 
-  \code{\link[gstat]{krige}} for more information.} \item{model}{Object of
+  argument \code{formula} in the function \code{\link[gstat]
+  {krige}} for more information.} \item{model}{Object of
   class "variogramModel". See the argument \code{model}
   in the function \code{\link[gstat]{krige}} for more
   information.} \item{krige.stat}{Character value defining
@@ -70,8 +70,8 @@ objMKV(points, candi, covars, equation, model, krige.stat = "mean")
   \item{boundary}{SpatialPolygon. The boundary of the
   spatial domain. Mandatory if \code{plotit = TRUE}.}
   \item{progress}{Logical for printing a progress bar.
-  Defaults to \code{progress = TRUE}.} 
-  \item{verbose}{Logical for printing messages about the progress of the
+  Defaults to \code{progress = TRUE}.} \item{verbose}
+  {Logical for printing messages about the progress of the
   optimization.} \item{greedy}{Logical value. Should the
   optimization be done using a greedy algorithm, that is,
   accepting only better system configurations? Defaults to

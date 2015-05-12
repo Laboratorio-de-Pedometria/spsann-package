@@ -28,8 +28,8 @@ objCORR(points, candi, covars, use.coords = FALSE, strata.type = "area")
   \code{candi}.} \item{candi}{Data frame or matrix with the
   candidate locations for the sample points. The coordinates
   must be projected.} \item{covars}{Data frame or matrix
-  with the covariates in the columns.} 
-  \item{use.coords}{Logical value. Should the geographic coordinates be
+  with the covariates in the columns.} \item{use.coords}
+  {Logical value. Should the geographic coordinates be
   used as covariates? Defaults to \code{use.coords =
   FALSE}.} \item{strata.type}{Character value setting the
   type of stratification that should be used to create
@@ -42,8 +42,8 @@ objCORR(points, candi, covars, use.coords = FALSE, strata.type = "area")
   to be added to the x and y coordinates. The minimum
   quantity must be equal to, at least, the minimum distance
   between two neighbouring candidate locations. The units
-  are the same as of the coordinates.} 
-  \item{iterations}{Integer. The maximum number of iterations that should
+  are the same as of the coordinates.} \item{iterations}
+  {Integer. The maximum number of iterations that should
   be used for the optimization.} \item{acceptance}{List
   with two named sub-arguments: \code{initial} -- numeric
   value between 0 and 1 defining the initial acceptance
@@ -56,8 +56,8 @@ objCORR(points, candi, covars, use.coords = FALSE, strata.type = "area")
   the maximum allowable number of iterations without
   improvement of the objective function value. Defaults to
   \code{stopping = list(max.count = iterations / 10)}. More
-  options may be included in the future.} 
-  \item{plotit}{Logical for plotting the optimization results. This
+  options may be included in the future.} \item{plotit}
+  {Logical for plotting the optimization results. This
   includes a) the progress of the objective function values
   and acceptance probabilities, and b) the original points,
   the perturbed points and the progress of the maximum
@@ -66,8 +66,8 @@ objCORR(points, candi, covars, use.coords = FALSE, strata.type = "area")
   = TRUE}.} \item{boundary}{SpatialPolygon. The boundary
   of the spatial domain. Mandatory if \code{plotit =
   TRUE}.} \item{progress}{Logical for printing a progress
-  bar. Defaults to \code{progress = TRUE}.} 
-  \item{verbose}{Logical for printing messages about the progress of the
+  bar. Defaults to \code{progress = TRUE}.} \item{verbose}
+  {Logical for printing messages about the progress of the
   optimization.} \item{greedy}{Logical value. Should the
   optimization be done using a greedy algorithm, that is,
   accepting only better system configurations? Defaults to
