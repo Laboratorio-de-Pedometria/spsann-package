@@ -14,99 +14,104 @@ optimMKV(points, candi, covars, equation = z ~ 1, model,
 objMKV(points, candi, covars, equation, model, krige.stat = "mean")
 }
 \arguments{
-  \item{points}{Integer value, integer vector, data frame
-  or matrix. If \code{points} is an integer value, it
-  defines the number of points that should be sampled from
-  \code{candi}. If \code{points} is an integer vector, it
-  contains the row indexes of \code{candi} that correspond
-  to the points. If \code{points} is a data frame or
-  matrix, it must have three columns: \code{[, 1]} the
-  identification of each sample point (1, 2, ..., n),
-  \code{[, 2]} the x-coordinates, and \code{[, 3]} the y-
-  coordinates. The coordinates must be projected. If a data
-  frame or matrix is used, \code{points} must be a subset
-  of \code{candi}.} \item{candi}{Data frame or matrix
-  with the candidate locations for the sample points.
-  The coordinates must be projected.} \item{covars}{Data
-  frame or matrix with the covariates in the columns.}
-  \item{equation}{Formula string that defines the dependent
-  variable \code{z} as a linear model of independent
-  variables. Defaults to \code{equation = z ~ 1}. See the
-  argument \code{formula} in the function \code{\link[gstat]
-  {krige}} for more information.} \item{model}{Object of
-  class "variogramModel". See the argument \code{model}
-  in the function \code{\link[gstat]{krige}} for more
-  information.} \item{krige.stat}{Character value defining
-  the statistic that should be used to summarize the
-  kriging variance. Available options are \code{"mean"}
-  and \code{"max"} for the mean and maximum kriging
-  variance, respectively. Defaults to \code{krige.stat =
-  "mean"}.} \item{x.max,x.min,y.max,y.min}{Numeric value.
-  The minimum and maximum quantity of random noise to be
-  added to the x and y coordinates. The minimum quantity
-  must be equal to, at least, the minimum distance between
-  two neighbouring candidate locations. The units are the
-  same as of the coordinates.} \item{iterations}{Integer.
-  The maximum number of iterations that should be used for
-  the optimization.} \item{acceptance}{List with two named
-  sub-arguments: \code{initial} -- numeric value between
-  0 and 1 defining the initial acceptance probability,
-  and \code{cooling} -- a numeric value defining the
-  exponential factor by witch the acceptance probability
-  decreases at each iteration. Defaults to \code{acceptance
-  = list(initial = 0.99, cooling = iterations / 10)}.}
-  \item{stopping}{List with one named sub-argument:
-  \code{max.count} -- integer value defining the maximum
-  allowable number of iterations without improvement of
-  the objective function value. Defaults to \code{stopping
-  = list(max.count = iterations / 10)}. More options may
-  be included in the future.} \item{plotit}{Logical for
-  plotting the optimization results. This includes a) the
-  progress of the objective function values and acceptance
-  probabilities, and b) the original points, the perturbed
-  points and the progress of the maximum perturbation
-  in the x- and y-coordinates. The plots are updated at
-  each 10 iterations. Defaults to \code{plotit = TRUE}.}
-  \item{boundary}{SpatialPolygon. The boundary of the
-  spatial domain. Mandatory if \code{plotit = TRUE}.}
-  \item{progress}{Logical for printing a progress bar.
-  Defaults to \code{progress = TRUE}.} \item{verbose}
-  {Logical for printing messages about the progress of the
-  optimization.} \item{greedy}{Logical value. Should the
-  optimization be done using a greedy algorithm, that is,
-  accepting only better system configurations? Defaults to
-  \code{greedy = FALSE}.}
+\item{points}{Integer value, integer vector, data frame or matrix. If
+\code{points} is an integer value, it defines the number of points that
+should be sampled from \code{candi}. If \code{points} is an integer vector,
+it contains the row indexes of \code{candi} that correspond to the points.
+If \code{points} is a data frame or matrix, it must have three
+columns: \code{[, 1]} the identification of each sample point (1, 2, ..., n),
+\code{[, 2]} the x-coordinates, and \code{[, 3]} the y-coordinates. The
+coordinates must be projected. If a data frame or matrix is used,
+\code{points} must be a subset of \code{candi}.}
+
+\item{candi}{Data frame or matrix with the candidate locations for the
+sample points. The coordinates must be projected.}
+
+\item{covars}{Data frame or matrix with the covariates in the columns.}
+
+\item{equation}{Formula string that defines the dependent variable \code{z}
+as a linear model of independent variables. Defaults to
+\code{equation = z ~ 1}. See the argument \code{formula} in the function
+\code{\link[gstat]{krige}} for more information.}
+
+\item{model}{Object of class "variogramModel". See the argument
+\code{model} in the function \code{\link[gstat]{krige}} for more information.}
+
+\item{krige.stat}{Character value defining the statistic that should be used
+to summarize the kriging variance. Available options are \code{"mean"} and
+\code{"max"} for the mean and maximum kriging variance, respectively.
+Defaults to \code{krige.stat = "mean"}.}
+
+\item{x.max,x.min,y.max,y.min}{Numeric value. The minimum and maximum
+quantity of random noise to be added to the x and y coordinates. The minimum
+quantity must be equal to, at least, the minimum distance between two
+neighbouring candidate locations. The units are the same as of the
+coordinates.}
+
+\item{iterations}{Integer. The maximum number of iterations that should be
+used for the optimization.}
+
+\item{acceptance}{List with two named sub-arguments: \code{initial} --
+numeric value between 0 and 1 defining the initial acceptance probability,
+and \code{cooling} -- a numeric value defining the exponential factor by
+witch the acceptance probability decreases at each iteration. Defaults to
+\code{acceptance = list(initial = 0.99, cooling = iterations / 10)}.}
+
+\item{stopping}{List with one named sub-argument: \code{max.count} --
+integer value defining the maximum allowable number of iterations without
+improvement of the objective function value. Defaults to
+\code{stopping = list(max.count = iterations / 10)}. More options may be
+included in the future.}
+
+\item{plotit}{Logical for plotting the optimization results. This includes
+a) the progress of the objective function values and acceptance
+probabilities, and b) the original points, the perturbed points and the
+progress of the maximum perturbation in the x- and y-coordinates. The plots
+are updated at each 10 iterations. Defaults to \code{plotit = TRUE}.}
+
+\item{boundary}{SpatialPolygon. The boundary of the spatial domain.
+Mandatory if \code{plotit = TRUE}.}
+
+\item{progress}{Logical for printing a progress bar. Defaults to
+\code{progress = TRUE}.}
+
+\item{verbose}{Logical for printing messages about the progress of the
+optimization.}
+
+\item{greedy}{Logical value. Should the optimization be done using a greedy
+algorithm, that is, accepting only better system configurations? Defaults
+to \code{greedy = FALSE}.}
 }
 \value{
-\code{optimMKV} returns a matrix: the optimized sample
-configuration with the evolution of the energy state during
-the optimization as an attribute. \code{objMKV} returns a
-numeric value depending on the choice of \code{krige.stat}.
-If \code{krige.stat = "mean"}, the mean kriging variance. If
-\code{krige.stat = "max"}, the maximum kriging variance.
+\code{optimMKV} returns a matrix: the optimized sample configuration with
+the evolution of the energy state during the optimization as an attribute.
+
+\code{objMKV} returns a numeric value depending on the choice of
+\code{krige.stat}. If \code{krige.stat = "mean"}, the mean kriging variance.
+If \code{krige.stat = "max"}, the maximum kriging variance.
 }
 \description{
-Optimize a sample configuration for spatial interpolation
-with a known linear model. A criterion is defined so that
-the sample configuration minimizes the mean kriging variance
+Optimize a sample configuration for spatial interpolation with a known linear
+model. A criterion is defined so that the sample configuration minimizes the
+mean kriging variance
 }
 \author{
-Alessandro Samuel-Rosa
-\email{alessandrosamuelrosa@gmail.com}
+Alessandro Samuel-Rosa \email{alessandrosamuelrosa@gmail.com}
 }
 \references{
-Brus, D. J. & Heuvelink, G. B. M. Optimization of sample
-patterns for universal kriging of environmental variables.
-\emph{Geoderma}. v. 138, p. 86-95, 2007. Heuvelink, G. B.
-M.; Brus, D. J. & de Gruijter, J. J. Optimization of sample
-configurations for digital mapping of soil properties
-with universal kriging. In: Lagacherie, P.; McBratney,
-A. & Voltz, M. (Eds.) \emph{Digital soil mapping - an
-introductory perspective}. Elsevier, v. 31, p. 137-151,
-2006.
+Brus, D. J. & Heuvelink, G. B. M. Optimization of sample patterns for
+universal kriging of environmental variables. \emph{Geoderma}. v. 138,
+p. 86-95, 2007.
+
+Heuvelink, G. B. M.; Brus, D. J. & de Gruijter, J. J. Optimization of sample
+configurations for digital mapping of soil properties with universal kriging.
+In: Lagacherie, P.; McBratney, A. & Voltz, M. (Eds.) \emph{Digital soil
+mapping - an introductory perspective}. Elsevier, v. 31, p. 137-151, 2006.
 }
 \concept{
-simulated annealing simulated annealing
+simulated annealing
+
+simulated annealing
 }
 \keyword{optimize}
 \keyword{spatial}

@@ -10,79 +10,81 @@ optimUSER(points, fun, ..., candi, x.max, x.min, y.max, y.min,
   boundary, progress = TRUE, verbose = TRUE, greedy = FALSE)
 }
 \arguments{
-  \item{points}{Integer value, integer vector, data frame
-  or matrix. If \code{points} is an integer value, it
-  defines the number of points that should be sampled from
-  \code{candi}. If \code{points} is an integer vector, it
-  contains the row indexes of \code{candi} that correspond
-  to the points. If \code{points} is a data frame or
-  matrix, it must have three columns: \code{[, 1]} the
-  identification of each sample point (1, 2, ..., n),
-  \code{[, 2]} the x-coordinates, and \code{[, 3]} the y-
-  coordinates. The coordinates must be projected. If a
-  data frame or matrix is used, \code{points} must be a
-  subset of \code{candi}.} \item{fun}{A function defining
-  the objective function that should be used to evaluate
-  the energy state of the system configuration at each
-  iteration. See \sQuote{Details} for more information.}
-  \item{...}{Other arguments passed to the objective
-  function. See \sQuote{Details} for more information.}
-  \item{candi}{Data frame or matrix with the candidate
-  locations for the sample points. The coordinates must
-  be projected.} \item{x.max,x.min,y.max,y.min}{Numeric
-  value. The minimum and maximum quantity of random noise
-  to be added to the x and y coordinates. The minimum
-  quantity must be equal to, at least, the minimum distance
-  between two neighbouring candidate locations. The units
-  are the same as of the coordinates.} \item{iterations}
-  {Integer. The maximum number of iterations that should
-  be used for the optimization.} \item{acceptance}{List
-  with two named sub-arguments: \code{initial} -- numeric
-  value between 0 and 1 defining the initial acceptance
-  probability, and \code{cooling} -- a numeric value
-  defining the exponential factor by witch the acceptance
-  probability decreases at each iteration. Defaults
-  to \code{acceptance = list(initial = 0.99, cooling =
-  iterations / 10)}.} \item{stopping}{List with one named
-  sub-argument: \code{max.count} -- integer value defining
-  the maximum allowable number of iterations without
-  improvement of the objective function value. Defaults to
-  \code{stopping = list(max.count = iterations / 10)}. More
-  options may be included in the future.} \item{plotit}
-  {Logical for plotting the optimization results. This
-  includes a) the progress of the objective function values
-  and acceptance probabilities, and b) the original points,
-  the perturbed points and the progress of the maximum
-  perturbation in the x- and y-coordinates. The plots are
-  updated at each 10 iterations. Defaults to \code{plotit
-  = TRUE}.} \item{boundary}{SpatialPolygon. The boundary
-  of the spatial domain. Mandatory if \code{plotit =
-  TRUE}.} \item{progress}{Logical for printing a progress
-  bar. Defaults to \code{progress = TRUE}.} \item{verbose}
-  {Logical for printing messages about the progress of the
-  optimization.} \item{greedy}{Logical value. Should the
-  optimization be done using a greedy algorithm, that is,
-  accepting only better system configurations? Defaults to
-  \code{greedy = FALSE}.}
+\item{points}{Integer value, integer vector, data frame or matrix. If
+\code{points} is an integer value, it defines the number of points that
+should be sampled from \code{candi}. If \code{points} is an integer vector,
+it contains the row indexes of \code{candi} that correspond to the points.
+If \code{points} is a data frame or matrix, it must have three
+columns: \code{[, 1]} the identification of each sample point (1, 2, ..., n),
+\code{[, 2]} the x-coordinates, and \code{[, 3]} the y-coordinates. The
+coordinates must be projected. If a data frame or matrix is used,
+\code{points} must be a subset of \code{candi}.}
+
+\item{fun}{A function defining the objective function that should be
+used to evaluate the energy state of the system configuration at each
+iteration. See \sQuote{Details} for more information.}
+
+\item{...}{Other arguments passed to the objective function. See
+\sQuote{Details} for more information.}
+
+\item{candi}{Data frame or matrix with the candidate locations for the
+sample points. The coordinates must be projected.}
+
+\item{x.max,x.min,y.max,y.min}{Numeric value. The minimum and maximum
+quantity of random noise to be added to the x and y coordinates. The minimum
+quantity must be equal to, at least, the minimum distance between two
+neighbouring candidate locations. The units are the same as of the
+coordinates.}
+
+\item{iterations}{Integer. The maximum number of iterations that should be
+used for the optimization.}
+
+\item{acceptance}{List with two named sub-arguments: \code{initial} --
+numeric value between 0 and 1 defining the initial acceptance probability,
+and \code{cooling} -- a numeric value defining the exponential factor by
+witch the acceptance probability decreases at each iteration. Defaults to
+\code{acceptance = list(initial = 0.99, cooling = iterations / 10)}.}
+
+\item{stopping}{List with one named sub-argument: \code{max.count} --
+integer value defining the maximum allowable number of iterations without
+improvement of the objective function value. Defaults to
+\code{stopping = list(max.count = iterations / 10)}. More options may be
+included in the future.}
+
+\item{plotit}{Logical for plotting the optimization results. This includes
+a) the progress of the objective function values and acceptance
+probabilities, and b) the original points, the perturbed points and the
+progress of the maximum perturbation in the x- and y-coordinates. The plots
+are updated at each 10 iterations. Defaults to \code{plotit = TRUE}.}
+
+\item{boundary}{SpatialPolygon. The boundary of the spatial domain.
+Mandatory if \code{plotit = TRUE}.}
+
+\item{progress}{Logical for printing a progress bar. Defaults to
+\code{progress = TRUE}.}
+
+\item{verbose}{Logical for printing messages about the progress of the
+optimization.}
+
+\item{greedy}{Logical value. Should the optimization be done using a greedy
+algorithm, that is, accepting only better system configurations? Defaults
+to \code{greedy = FALSE}.}
 }
 \value{
-\code{optimUSER} returns a matrix: the optimized sample
-configuration with the evolution of the energy state during
-the optimization as an attribute.
+\code{optimUSER} returns a matrix: the optimized sample configuration with
+the evolution of the energy state during the optimization as an attribute.
 }
 \description{
-Optimize a sample configuration using a user-defined
-objective function.
+Optimize a sample configuration using a user-defined objective function.
 }
 \details{
-The user-defined objective function has to be an object of
-class \link[base]{function}. It has to include the argument
-\code{points}, which is defined internally as a matrix
-with three columns: \code{[, 1]} the identification of each
-sample point (1, 2, ..., n), \code{[, 2]} the x-coordinates,
-and \code{[, 3]} the y-coordinates. The identification is
-useful to retrieve information from any data matrix used by
-the objective function defined by the user.
+The user-defined objective function has to be an object of class
+\link[base]{function}. It has to include the argument \code{points}, which is
+defined internally as a matrix with three columns: \code{[, 1]} the
+identification of each sample point (1, 2, ..., n), \code{[, 2]} the
+x-coordinates, and \code{[, 3]} the y-coordinates. The identification is
+useful to retrieve information from any data matrix used by the objective
+function defined by the user.
 }
 \examples{
 require(pedometrics)
@@ -143,11 +145,12 @@ plot(x, y, asp = 1)
 abline(0, 1, col = "red")
 }
 \author{
-Alessandro Samuel-Rosa
-\email{alessandrosamuelrosa@gmail.com}
+Alessandro Samuel-Rosa \email{alessandrosamuelrosa@gmail.com}
 }
 \concept{
-simulated annealing simulated annealing
+simulated annealing
+
+simulated annealing
 }
 \keyword{optimize}
 \keyword{spatial}

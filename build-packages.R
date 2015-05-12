@@ -5,7 +5,7 @@
 # Load packages
 library(devtools)
 library(Rcpp)
-require(Rd2roxygen)
+require(roxygen2)
 
 # Build Rcpp files
 Rcpp::compileAttributes()

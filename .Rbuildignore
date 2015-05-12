@@ -16,7 +16,5 @@ src/*.so
 # R files
 R/optimPAN.R
 
-
 # Rd files
 man/optimPAN.Rd
-

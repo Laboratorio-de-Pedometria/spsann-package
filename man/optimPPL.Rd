@@ -21,131 +21,135 @@ countPPL(points, candi, lags = 7, lags.type = "exponential",
   lags.base = 2, cutoff = NULL, pairs = FALSE)
 }
 \arguments{
-  \item{points}{Integer value, integer vector, data frame
-  or matrix. If \code{points} is an integer value, it
-  defines the number of points that should be sampled
-  from \code{candi}. If \code{points} is an integer
-  vector, it contains the row indexes of \code{candi} that
-  correspond to the points. If \code{points} is a data
-  frame or matrix, it must have three columns: \code{[,
-  1]} the identification of each sample point (1, 2, ...,
-  n), \code{[, 2]} the x-coordinates, and \code{[, 3]}
-  the y-coordinates. The coordinates must be projected.
-  If a data frame or matrix is used, \code{points} must
-  be a subset of \code{candi}.} \item{candi}{Data frame
-  or matrix with the candidate locations for the sample
-  points. The coordinates must be projected.} \item{lags}
-  {Integer value. The number of lag-distance classes.
-  Alternatively, a vector of numeric values with the lower
-  and upper limits of each lag-distance class. The lowest
-  value must be larger than zero. Defaults to \code{lags
-  = 7}.} \item{lags.type}{Character value. The type of
-  lag-distance classes, with options \code{"equidistant"}
-  and \code{"exponential"}. Defaults to \code{lags.type
-  = "exponential"}.} \item{lags.base}{Numeric value.
-  Base of the exponential expression used to create
-  exponentially spaced lag-distance classes. Used only
-  when \code{lags.type = "exponential"}. Defaults to
-  \code{lags.base = 2}.} \item{cutoff}{Numeric value. The
-  maximum distance up to which lag-distance classes are
-  created. Used only when \code{lags} is an integer value.}
-  \item{criterion}{Character value. The feature used to
-  describe the energy state of the system configuration,
-  with options \code{"minimum"} and \code{"distribution"}.
-  Defaults to \code{objective = "distribution"}.}
-  \item{distri}{Numeric vector. The distribution of points
-  or point-pairs per lag-distance class that should be
-  attained at the end of the optimization. Used only when
-  \code{criterion = "distribution"}. Defaults to a uniform
-  distribution.} \item{pairs}{Logical value. Should the
-  sample configuration be optimized regarding the number
-  of point-pairs per lag-distance class? Defaults to
-  \code{pairs = FALSE}.} \item{x.max,x.min,y.max,y.min}
-  {Numeric value. The minimum and maximum quantity of random
-  noise to be added to the x and y coordinates. The minimum
-  quantity must be equal to, at least, the minimum distance
-  between two neighbouring candidate locations. The units
-  are the same as of the coordinates.} \item{iterations}
-  {Integer. The maximum number of iterations that should
-  be used for the optimization.} \item{acceptance}{List
-  with two named sub-arguments: \code{initial} -- numeric
-  value between 0 and 1 defining the initial acceptance
-  probability, and \code{cooling} -- a numeric value
-  defining the exponential factor by witch the acceptance
-  probability decreases at each iteration. Defaults
-  to \code{acceptance = list(initial = 0.99, cooling =
-  iterations / 10)}.} \item{stopping}{List with one named
-  sub-argument: \code{max.count} -- integer value defining
-  the maximum allowable number of iterations without
-  improvement of the objective function value. Defaults to
-  \code{stopping = list(max.count = iterations / 10)}. More
-  options may be included in the future.} \item{plotit}
-  {Logical for plotting the optimization results. This
-  includes a) the progress of the objective function values
-  and acceptance probabilities, and b) the original points,
-  the perturbed points and the progress of the maximum
-  perturbation in the x- and y-coordinates. The plots are
-  updated at each 10 iterations. Defaults to \code{plotit
-  = TRUE}.} \item{boundary}{SpatialPolygon. The boundary
-  of the spatial domain. Mandatory if \code{plotit =
-  TRUE}.} \item{progress}{Logical for printing a progress
-  bar. Defaults to \code{progress = TRUE}.} \item{verbose}
-  {Logical for printing messages about the progress of the
-  optimization.} \item{greedy}{Logical value. Should the
-  optimization be done using a greedy algorithm, that is,
-  accepting only better system configurations? Defaults to
-  \code{greedy = FALSE}.}
+\item{points}{Integer value, integer vector, data frame or matrix. If
+\code{points} is an integer value, it defines the number of points that
+should be sampled from \code{candi}. If \code{points} is an integer vector,
+it contains the row indexes of \code{candi} that correspond to the points.
+If \code{points} is a data frame or matrix, it must have three
+columns: \code{[, 1]} the identification of each sample point (1, 2, ..., n),
+\code{[, 2]} the x-coordinates, and \code{[, 3]} the y-coordinates. The
+coordinates must be projected. If a data frame or matrix is used,
+\code{points} must be a subset of \code{candi}.}
+
+\item{candi}{Data frame or matrix with the candidate locations for the
+sample points. The coordinates must be projected.}
+
+\item{lags}{Integer value. The number of lag-distance classes. Alternatively,
+a vector of numeric values with the lower and upper limits of each
+lag-distance class. The lowest value must be larger than zero. Defaults to
+\code{lags = 7}.}
+
+\item{lags.type}{Character value. The type of lag-distance classes, with
+options \code{"equidistant"} and \code{"exponential"}. Defaults to
+\code{lags.type = "exponential"}.}
+
+\item{lags.base}{Numeric value. Base of the exponential expression used to
+create exponentially spaced lag-distance classes. Used only when
+\code{lags.type = "exponential"}. Defaults to \code{lags.base = 2}.}
+
+\item{cutoff}{Numeric value. The maximum distance up to which lag-distance
+classes are created. Used only when \code{lags} is an integer value.}
+
+\item{criterion}{Character value. The feature used to describe the
+energy state of the system configuration, with options \code{"minimum"} and
+\code{"distribution"}. Defaults to \code{objective = "distribution"}.}
+
+\item{distri}{Numeric vector. The distribution of points or point-pairs per
+lag-distance class that should be attained at the end of the optimization.
+Used only when \code{criterion = "distribution"}. Defaults to a uniform
+distribution.}
+
+\item{pairs}{Logical value. Should the sample configuration be optimized
+regarding the number of point-pairs per lag-distance class? Defaults to
+\code{pairs = FALSE}.}
+
+\item{x.max,x.min,y.max,y.min}{Numeric value. The minimum and maximum
+quantity of random noise to be added to the x and y coordinates. The minimum
+quantity must be equal to, at least, the minimum distance between two
+neighbouring candidate locations. The units are the same as of the
+coordinates.}
+
+\item{iterations}{Integer. The maximum number of iterations that should be
+used for the optimization.}
+
+\item{acceptance}{List with two named sub-arguments: \code{initial} --
+numeric value between 0 and 1 defining the initial acceptance probability,
+and \code{cooling} -- a numeric value defining the exponential factor by
+witch the acceptance probability decreases at each iteration. Defaults to
+\code{acceptance = list(initial = 0.99, cooling = iterations / 10)}.}
+
+\item{stopping}{List with one named sub-argument: \code{max.count} --
+integer value defining the maximum allowable number of iterations without
+improvement of the objective function value. Defaults to
+\code{stopping = list(max.count = iterations / 10)}. More options may be
+included in the future.}
+
+\item{plotit}{Logical for plotting the optimization results. This includes
+a) the progress of the objective function values and acceptance
+probabilities, and b) the original points, the perturbed points and the
+progress of the maximum perturbation in the x- and y-coordinates. The plots
+are updated at each 10 iterations. Defaults to \code{plotit = TRUE}.}
+
+\item{boundary}{SpatialPolygon. The boundary of the spatial domain.
+Mandatory if \code{plotit = TRUE}.}
+
+\item{progress}{Logical for printing a progress bar. Defaults to
+\code{progress = TRUE}.}
+
+\item{verbose}{Logical for printing messages about the progress of the
+optimization.}
+
+\item{greedy}{Logical value. Should the optimization be done using a greedy
+algorithm, that is, accepting only better system configurations? Defaults
+to \code{greedy = FALSE}.}
 }
 \value{
-\code{optimPPL} returns a matrix: the optimized sample
-configuration with the evolution of the energy state during
-the optimization as an attribute. \code{countPPL} returns
-a data.frame with three columns: a) the lower and b) upper
-limits of each lag-distance class, and c) the number of
-points or point-pairs per lag-distance class. \code{objPPL}
-returns a numeric value: the energy state of the sample
-configuration - the objective function value.
+\code{optimPPL} returns a matrix: the optimized sample configuration with
+the evolution of the energy state during the optimization as an attribute.
+
+\code{countPPL} returns a data.frame with three columns: a) the lower and b)
+upper limits of each lag-distance class, and c) the number of points or
+point-pairs per lag-distance class.
+
+\code{objPPL} returns a numeric value: the energy state of the sample configuration
+- the objective function value.
 }
 \description{
-Optimize a sample configuration for variogram estimation.
-A criterion is defined so that the optimized sample
-configuration has a given number of points or point-pairs
-contributing to each lag-distance class.
+Optimize a sample configuration for variogram estimation. A criterion is
+defined so that the optimized sample configuration has a given number of
+points or point-pairs contributing to each lag-distance class.
 }
 \details{
-\strong{Distance}: Euclidean distances between points are
-used. This requires the coordinates to be projected. The
-user is responsible for making sure that this requirement
-is met. \strong{Distribution}: Using the default uniform
-distribution means that the number of point-pairs per lag-
-distance class (\code{pairs = TRUE}) is equal to \eqn{n
-\times (n - 1) / (2 \times lag)}, where \eqn{n} is the
-total number of points and \eqn{lag} is the number of lags.
-If \code{pairs = FALSE}, then it means that the number of
-points per lag is equal to the total number of points. This
-is the same as expecting that each point contributes to
-every lag. Distributions other than the available options
-can be easily implemented changing the arguments \code{lags}
-and \code{distri}. \strong{Type of lags}: Two types of lag-
-distance classes can be created by default. The first are
-evenly spaced lags (\code{lags.type = "equidistant"}). They
-are created by simply dividing the distance interval from
-0.0001 to \code{cutoff} by the required number of lags. The
-minimum value of 0.0001 guarantees that a point does not
-form a pair with itself. The second type of lags is defined
-by exponential spacings (\code{lags.type = "exponential"}).
-The spacings are defined by the base \eqn{b} of the
-exponential expression \eqn{b^n}, where \eqn{n} is the
-required number of lags. The base is defined using the
-argument \code{lags.base}. \strong{Criteria}: There are two
-optimizing criteria implemented. The first is called using
-\code{criterion = "distribution"} and is used to minimize
-the sum of the absolute differences between a pre-specified
-distribution and the observed distribution of points or
-point-pairs per lag-distance class. The second criterion is
-called using \code{criterion = "minimum"}. It corresponds
-to maximizing the minimum number of points or point-pairs
-observed over all lag-distance classes.
+\strong{Distance}: Euclidean distances between points are used. This
+requires the coordinates to be projected. The user is responsible for making
+sure that this requirement is met.
+
+\strong{Distribution}: Using the default uniform distribution means that the
+number of point-pairs per lag-distance class (\code{pairs = TRUE}) is equal
+to \eqn{n \times (n - 1) / (2 \times lag)}, where \eqn{n} is the total number
+of points and \eqn{lag} is the number of lags. If \code{pairs = FALSE}, then
+it means that the number of points per lag is equal to the total number of
+points. This is the same as expecting that each point contributes to every
+lag. Distributions other than the available options can be easily
+implemented changing the arguments \code{lags} and \code{distri}.
+
+\strong{Type of lags}: Two types of lag-distance classes can be created by
+default. The first are evenly spaced lags (\code{lags.type = "equidistant"}).
+They are created by simply dividing the distance interval from 0.0001 to
+\code{cutoff} by the required number of lags. The minimum value of 0.0001
+guarantees that a point does not form a pair with itself. The second type of
+lags is defined by exponential spacings (\code{lags.type = "exponential"}).
+The spacings are defined by the base \eqn{b} of the exponential expression
+\eqn{b^n}, where \eqn{n} is the required number of lags. The base is defined
+using the argument \code{lags.base}.
+
+\strong{Criteria}: There are two optimizing criteria implemented. The first
+is called using \code{criterion = "distribution"} and is used to minimize the
+sum of the absolute differences between a pre-specified distribution and the
+observed distribution of points or point-pairs per lag-distance class. The
+second criterion is called using \code{criterion = "minimum"}. It corresponds
+to maximizing the minimum number of points or point-pairs observed over all
+lag-distance classes.
 }
 \examples{
 require(pedometrics)
@@ -176,30 +180,34 @@ objPPL(points = res, lags = 7, lags.type = "exponential", pairs = FALSE,
        lags.base = 2, cutoff = cutoff, criterion = "distribution")
 }
 \author{
-Alessandro Samuel-Rosa
-\email{alessandrosamuelrosa@gmail.com}
+Alessandro Samuel-Rosa \email{alessandrosamuelrosa@gmail.com}
 }
 \references{
-Bresler, E.; Green, R. E. \emph{Soil parameters and sampling
-scheme for characterizing soil hydraulic properties of a
-watershed}. Honolulu: University of Hawaii at Manoa, p. 42,
-1982. Marler, R. T.; Arora, J. S. Function-transformation
-methods for multi-objective optimization. \emph{Engineering
-Optimization}. v. 37, p. 551-570, 2005. Pettitt, A. N. &
-McBratney, A. B. Sampling designs for estimating spatial
-variance components. \emph{Applied Statistics}. v. 42, p.
-185, 1993. Russo, D. Design of an optimal sampling network
-for estimating the variogram. \emph{Soil Science Society
-of America Journal}. v. 48, p. 708-716, 1984. Truong, P.
-N.; Heuvelink, G. B. M.; Gosling, J. P. Web-based tool
-for expert elicitation of the variogram. \emph{Computers
-and Geosciences}. v. 51, p. 390-399, 2013. Warrick, A.
-W.; Myers, D. E. Optimization of sampling locations for
-variogram calculations. \emph{Water Resources Research}. v.
-23, p. 496-500, 1987.
+Bresler, E.; Green, R. E. \emph{Soil parameters and sampling scheme for
+characterizing soil hydraulic properties of a watershed}. Honolulu:
+University of Hawaii at Manoa, p. 42, 1982.
+
+Marler, R. T.; Arora, J. S. Function-transformation methods for
+multi-objective optimization. \emph{Engineering Optimization}. v. 37, p.
+551-570, 2005.
+
+Pettitt, A. N. & McBratney, A. B. Sampling designs for estimating spatial
+variance components. \emph{Applied Statistics}. v. 42, p. 185, 1993.
+
+Russo, D. Design of an optimal sampling network for estimating the variogram.
+\emph{Soil Science Society of America Journal}. v. 48, p. 708-716, 1984.
+
+Truong, P. N.; Heuvelink, G. B. M.; Gosling, J. P. Web-based tool for expert
+elicitation of the variogram. \emph{Computers and Geosciences}. v. 51, p.
+390-399, 2013.
+
+Warrick, A. W.; Myers, D. E. Optimization of sampling locations for variogram
+calculations. \emph{Water Resources Research}. v. 23, p. 496-500, 1987.
 }
 \concept{
-simulated annealing simulated annealing
+simulated annealing
+
+simulated annealing
 }
 \keyword{optimize}
 \keyword{spatial}

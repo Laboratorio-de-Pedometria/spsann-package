@@ -22,4 +22,3 @@ Imports:
     SpatialTools
 LinkingTo: Rcpp
 Encoding: UTF-8
-Roxygen: list(wrap = TRUE)
