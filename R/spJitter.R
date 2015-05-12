@@ -64,13 +64,35 @@ spJitterFinite <-
       
     # Get candidate locations
     pt1 <- pt1[pt1 != 0]
+    
     # Select one candidate location
-    pt2 <- candi[sample(pt1, 1), ]
+    #pt2 <- candi[sample(pt1, 1), ]
+    pt2 <- sample(pt1, 1)
+    
     # Check if it already is in the sample (duplicated)
-    dup <- duplicated(rbind(pt2, points))
+    #dup <- duplicated(rbind(pt2, points))
+    dup <- duplicated(c(pt2, points[, 1]))
+    
     # If it already exists, return the original point
+    #     if (any(dup)) {
+    #       pt2 <- candi[which.point, ]
+    #     }
+    
+    # If it already exists, we try to find another point as many times as
+    # there are point in the sample. The reason for this choice is that the 
+    # more points we have, the more likely it is that the candidate point
+    # already is included in the sample.
     if (any(dup)) {
-      pt2 <- candi[which.point, ]
+      ntry <- 0
+      while (any(dup)) {
+        pt2 <- sample(pt1, 1)
+        dup <- duplicated(c(pt2, points[, 1]))
+        ntry <- ntry + 1
+        if (ntry == length(nrow(points))) {
+          pt2 <- which.point
+          break
+        }
+      }
     }
     
     #     if (any(dup)) {
@@ -79,7 +101,8 @@ spJitterFinite <-
     #       if (nrow(pt11) == length(which(dup11 == TRUE))) {
     #         # We return the old point as the new point.
     #         # This is to avoid an infinite loop in the end of the optimization
-    #         # when the objective function results in clusters of points such as PPL
+    #         # when the objective function results in clusters of points such
+    #         # as PPL
     #         pt2 <- candi[which.point, ]
     #       } else {
     #         while (any(dup)) {
@@ -88,8 +111,10 @@ spJitterFinite <-
     #         }
     #       }
     #     }
+    
     res <- points
-    res[which.point, ] <- pt2
+    #res[which.point, ] <- pt2
+    res[which.point, ] <- candi[pt2, ]
     return (res)
   }
 # OLD spJitterFinite FUNCTION ##################################################
