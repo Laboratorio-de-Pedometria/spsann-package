@@ -1,19 +1,35 @@
 #' Random perturbation of spatial points
 #' 
-#' Perturbate the coordinates of spatial points (\sQuote{jittering}).
+#' Perturb the coordinates of spatial points (\sQuote{jittering}).
 #' 
 #' @template spJitter_doc
+#' 
 #' @param which.point Integer values defining which point should be perturbed. 
-#' The current version accepts only one point to be perturbed at a time. See 
-#' \sQuote{Details} for more information.
 #'
 #' @details
-#' There are two ways of jittering the coordinates. They differ on how the the
-#' set of candidate locations is defined. The first method uses a finite set of 
-#' candidate locations for the perturbed points. The current version does not 
-#' accept using an infinite set of candidate locations.
+#' There are two ways of jittering the coordinates. They differ on how the
+#' set of candidate locations is defined. The first method is implemented in
+#' \code{spJitterFinite} and uses a finite set of candidate locations for the
+#' perturbed points. In other words, the set of candidate locations must be 
+#' discretized.
+#' 
+#' The second method uses an infinite set of candidate locations, that is, the
+#' candidate locations do not have to be discretized. All that is needed is a
+#' polygon indicating the boundary of the spatial domain. This method is not
+#' implemented (yet) because it is more computationally demanding. When a point
+#' is jittered, it is necessary to check if it lays inside the spatial domain.
+#' 
+#' Using a finite set of candidate location has one important inconvenience.
+#' When a point is jittered, it may be that the new location already was 
+#' occupied by another point. If this happens, \code{spJitterFinite} tries to
+#' find another new location for that point as many times as there are points 
+#' in \code{points}. The reason for this is that the more points there are in
+#' \code{points}, the more likely it is that the new location already is 
+#' occupied by another point.
+#' 
 #' @return
-#' A matrix with the jittered coordinates of the points.
+#' A matrix with the jittered projected coordinates of the points.
+#' 
 #' @references
 #' Edzer Pebesma, Jon Skoien with contributions from Olivier Baume, A. Chorti, 
 #' D.T. Hristopulos, S.J. Melles and G. Spiliopoulos (2013). 
@@ -23,11 +39,14 @@
 #' 
 #' van Groenigen, J.-W. \emph{Constrained optimization of spatial sampling: 
 #' a geostatistical approach.} Wageningen: Wageningen University, p. 148, 1999.
+#' 
 #' @author 
 #' Alessandro Samuel-Rosa \email{alessandrosamuelrosa@@gmail.com}
+#' 
 #' @note
-#' The current version does not accept using an infinite set of candidate
-#' locations or to perturb more than one point at a time.
+#' A future version will accept to use an infinite set of candidate locations 
+#' and to perturb more than one point at a time.
+#' 
 #' @seealso \code{ssaOptim}, \code{\link[sp]{zerodist}}, 
 #' \code{\link[base]{jitter}}, \code{\link[geoR]{jitter2d}}.
 #' @keywords iteration spatial

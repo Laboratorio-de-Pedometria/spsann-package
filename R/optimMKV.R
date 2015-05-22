@@ -2,7 +2,7 @@
 #'
 #' Optimize a sample configuration for spatial interpolation with a known linear 
 #' model. A criterion is defined so that the sample configuration minimizes the
-#' mean kriging variance 
+#' mean/maximum kriging variance.
 #'
 #' @template spJitter_doc
 #' @template spSANN_doc
