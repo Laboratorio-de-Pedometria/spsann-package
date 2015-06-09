@@ -43,15 +43,9 @@
 #' @examples
 #' require(pedometrics)
 #' require(sp)
-#' require(rgeos)
 #' require(SpatialTools)
 #' data(meuse.grid)
 #' candi <- meuse.grid[, 1:2]
-#' coordinates(candi) <- ~ x + y
-#' gridded(candi) <- TRUE
-#' boundary <- as(candi, "SpatialPolygons")
-#' boundary <- gUnionCascaded(boundary)
-#' candi <- coordinates(candi)
 #' x.max <- diff(bbox(boundary)[1, ])
 #' y.max <- diff(bbox(boundary)[2, ])
 #' set.seed(2001)
@@ -74,10 +68,11 @@ optimMSSD <-
     eval(check_spsann_arguments())
     ############################################################################
     
-    if (plotit) {
-      par0 <- par()
-      on.exit(suppressWarnings(par(par0)))
-    }
+    # Set plotting options ####################################################
+    plotting_options <- 
+      function (...) {parse(text = readLines("tools/plotting-options.R"))}
+    eval(plotting_options())
+    ############################################################################
     
     # Prepare sample points
     #n_candi <- nrow(candi)

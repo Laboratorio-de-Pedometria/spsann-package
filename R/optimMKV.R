@@ -50,16 +50,10 @@
 #' @examples
 #' require(pedometrics)
 #' require(sp)
-#' require(rgeos)
 #' require(gstat)
 #' require(plyr)
 #' data(meuse.grid)
 #' candi <- meuse.grid[, 1:2]
-#' coordinates(candi) <- ~ x + y
-#' gridded(candi) <- TRUE
-#' boundary <- as(candi, "SpatialPolygons")
-#' boundary <- gUnionCascaded(boundary)
-#' candi <- coordinates(candi)
 #' covars <- as.data.frame(meuse.grid)
 #' x.max <- diff(bbox(boundary)[1, ])
 #' y.max <- diff(bbox(boundary)[2, ])
@@ -94,10 +88,11 @@ optimMKV <-
                             krige.stat = krige.stat, candi = candi)
     if (!is.null(check)) stop (check, call. = FALSE)
     
-    if (plotit) {
-      par0 <- par()
-      on.exit(suppressWarnings(par(par0)))
-    }
+    # Set plotting options ####################################################
+    plotting_options <- 
+      function (...) {parse(text = readLines("tools/plotting-options.R"))}
+    eval(plotting_options())
+    ############################################################################
     
     # Prepare points
     #n_candi <- nrow(candi)

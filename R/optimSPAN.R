@@ -66,11 +66,11 @@ optimSPAN <-
     check <- .MOOPcheck(weights = weights, nadir = nadir, utopia = utopia)
     if (!is.null(check)) stop (check, call. = FALSE)
 
-    # PLOTTING
-    if (plotit) {
-      par0 <- par()
-      on.exit(suppressWarnings(par(par0)))
-    }
+    # Set plotting options ####################################################
+    plotting_options <- 
+      function (...) {parse(text = readLines("tools/plotting-options.R"))}
+    eval(plotting_options())
+    ############################################################################
 
     # PREPARE SAMPLE POINTS
     #n_candi <- nrow(candi)
