@@ -1,10 +1,12 @@
 # Optimization of sample configurations for variogram and spatial trend 
-# identification and estimation, and spatial interpolation
+# identification and estimation, and for spatial interpolation
 # 
-# Optimize a sample configuration for variogram and spatial trend identification
-# and estimation, 
-# and spatial interpolation. An utility function is defined aggregating four 
-# objective functions: \bold{CORR}, \bold{DIST}, \bold{PPL}, and \bold{MSSD}.
+# Optimize a sample configuration for variogram and spatial trend 
+# identification and estimation, and for spatial interpolation. An utility
+# function \emph{U} is defined so that the sample points cover, extend over,
+# spread over, \bold{SPAN} the feature, variogram and geographic spaces. The
+# utility function is obtained aggregating four single objective functions:
+# \bold{CORR}, \bold{DIST}, \bold{PPL}, and \bold{MSSD}.
 # 
 # @template spJitter_doc
 # @template spSANN_doc
@@ -12,7 +14,7 @@
 # @template ACDC_doc
 # 
 # @return
-# \code{optimPAN} returns a matrix: the optimized sample configuration with
+# \code{optimSPAN()} returns a matrix: the optimized sample configuration with
 # the evolution of the energy state during the optimization as an attribute.
 # 
 # @author Alessandro Samuel-Rosa \email{alessandrosamuelrosa@@gmail.com}
@@ -24,19 +26,25 @@
 # @importFrom pedometrics cont2cat
 # @importFrom SpatialTools dist2
 # @export
+# @examples
 # MAIN FUNCTION ################################################################
-optimPAN <-
-  function (points, candi, lags = 7, lags.type = "exponential", lags.base = 2,
-            cutoff = NULL, criterion = "distribution", distri = NULL, 
-            pairs = FALSE, covars, strata.type = "equal.area", 
-            use.coords = FALSE, x.max, x.min, y.max, y.min, iterations,
-            acceptance = list(initial = 0.99, cooling = iterations / 10),
-            stopping = list(max.count = iterations / 10),
-            weights = list(CORR = 1/3/2, DIST = 1/3/2, PPL = 1/3, MSSD = 1/3),
-            nadir = list(sim = NULL, seeds = NULL, user = NULL, abs = NULL),
-            plotit = TRUE, boundary, progress = TRUE, verbose = TRUE, 
-            greedy = FALSE) {
-
+optimSPAN <-
+  function (
+    # OPTIM
+    points, candi, x.max, x.min, y.max, y.min, iterations,
+    acceptance = list(initial = 0.99, cooling = iterations / 10),
+    stopping = list(max.count = iterations / 10), plotit = TRUE,
+    boundary, progress = TRUE, verbose = TRUE, greedy = FALSE,
+    # PPL
+    lags = 7, lags.type = "exponential", lags.base = 2, cutoff = NULL, 
+    criterion = "distribution", distri = NULL, pairs = FALSE, 
+    # CORR and DIST
+    covars, strata.type = "equal.area", use.coords = FALSE, 
+    # MOOP
+    weights = list(CORR = 1/4, DIST = 1/4, PPL = 1/4, MSSD = 1/4),
+    nadir = list(sim = NULL, seeds = NULL, user = NULL, abs = NULL),
+    utopia = list(user = NULL, abs = NULL)) {
+    
     # Check arguments
     if (!is.data.frame(covars)) covars <- as.data.frame(covars) 
     
@@ -135,7 +143,7 @@ optimPAN <-
     energy0_ppl  <- energy0_ppl * PAN$weights$PPL
     energy0_acdc <- energy0_acdc * PAN$weights$ACDC
     energy0_mssd <- energy0_mssd * PAN$weights$MSSD
-    energy0      <- energy0_ppl + energy0_acdc + energy0_mssd
+    energy0 <- energy0_ppl + energy0_acdc + energy0_mssd
 
     # OTHER SETTINGS FOR THE SIMULATED ANNEALING ALGORITHM
     MOOP <- TRUE # this is a multi-objective optimization problem

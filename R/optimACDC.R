@@ -56,9 +56,12 @@
 # MAIN FUNCTION ################################################################
 optimACDC <-
   function (points, candi, covars, strata.type = "area", iterations,
-            weights = list(CORR = 0.5, DIST = 0.5), use.coords = FALSE,
+            use.coords = FALSE, x.max, x.min, y.max, y.min,
+            
+            weights = list(CORR = 0.5, DIST = 0.5), 
             nadir = list(sim = NULL, seeds = NULL, user = NULL, abs = NULL),
-            utopia = list(user = NULL, abs = NULL), x.max, x.min, y.max, y.min,
+            utopia = list(user = NULL, abs = NULL), 
+            
             acceptance = list(initial = 0.99, cooling = iterations / 10),
             stopping = list(max.count = iterations / 10), plotit = TRUE,
             boundary, progress = TRUE, verbose = TRUE, greedy = FALSE) {
