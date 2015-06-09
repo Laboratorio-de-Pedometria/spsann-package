@@ -129,11 +129,6 @@ require(sp)
 require(rgeos)
 data(meuse.grid)
 candi <- meuse.grid[, 1:2]
-coordinates(candi) <- ~ x + y
-gridded(candi) <- TRUE
-boundary <- as(candi, "SpatialPolygons")
-boundary <- gUnionCascaded(boundary)
-candi <- coordinates(candi)
 x.max <- diff(bbox(boundary)[1, ])
 y.max <- diff(bbox(boundary)[2, ])
 nadir <- list(sim = 10, seeds = 1:10)
