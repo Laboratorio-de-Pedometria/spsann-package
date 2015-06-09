@@ -8,7 +8,7 @@
 optimMSSD(points, candi, x.max, x.min, y.max, y.min, iterations = 10000,
   acceptance = list(initial = 0.99, cooling = iterations/10),
   stopping = list(max.count = iterations/10), plotit = TRUE, boundary,
-  progress = TRUE, verbose = TRUE, greedy = FALSE)
+  progress = TRUE, verbose = TRUE, greedy = FALSE, weights, nadir, utopia)
 
 objMSSD(candi, points)
 }
@@ -93,11 +93,6 @@ require(rgeos)
 require(SpatialTools)
 data(meuse.grid)
 candi <- meuse.grid[, 1:2]
-coordinates(candi) <- ~ x + y
-gridded(candi) <- TRUE
-boundary <- as(candi, "SpatialPolygons")
-boundary <- gUnionCascaded(boundary)
-candi <- coordinates(candi)
 x.max <- diff(bbox(boundary)[1, ])
 y.max <- diff(bbox(boundary)[2, ])
 set.seed(2001)

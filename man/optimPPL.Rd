@@ -11,7 +11,8 @@ optimPPL(points, candi, lags = 7, lags.type = "exponential",
   distri = NULL, pairs = FALSE, x.max, x.min, y.max, y.min,
   iterations = 10000, acceptance = list(initial = 0.99, cooling =
   iterations/10), stopping = list(max.count = iterations/10), plotit = TRUE,
-  boundary, progress = TRUE, verbose = TRUE, greedy = FALSE)
+  boundary, progress = TRUE, verbose = TRUE, greedy = FALSE, weights,
+  nadir, utopia)
 
 objPPL(points, candi, lags = 7, lags.type = "exponential", lags.base = 2,
   cutoff = NULL, criterion = "distribution", distri = NULL,
@@ -161,11 +162,6 @@ require(rgeos)
 require(SpatialTools)
 data(meuse.grid)
 candi <- meuse.grid[, 1:2]
-coordinates(candi) <- ~ x + y
-gridded(candi) <- TRUE
-boundary <- as(candi, "SpatialPolygons")
-boundary <- gUnionCascaded(boundary)
-candi <- coordinates(candi)
 x.max <- diff(bbox(boundary)[1, ])
 y.max <- diff(bbox(boundary)[2, ])
 cutoff <- sqrt((x.max * x.max) + (y.max * y.max)) / 2
