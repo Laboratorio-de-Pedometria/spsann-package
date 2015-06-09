@@ -1,27 +1,27 @@
-#' Optimization of sample configurations for variogram and spatial trend 
-#' estimation, and spatial interpolation
-#'
-#' Optimize a sample configuration for variogram and spatial trend estimation, 
-#' and spatial interpolation. An utility function is defined aggregating four 
-#' objective functions: \bold{CORR}, \bold{DIST}, \bold{PPL}, and \bold{MSSD}.
-#'
-#' @template spJitter_doc
-#' @template spSANN_doc
-#' @template MOOP_doc
-#' @template ACDC_doc
-#' 
-#' @return
-#' \code{optimPAN} returns a matrix: the optimized sample configuration with
-#' the evolution of the energy state during the optimization as an attribute.
-#' 
-#' @author Alessandro Samuel-Rosa \email{alessandrosamuelrosa@@gmail.com}
-#' @keywords spatial optimize
-#' @concept simulated annealing
-#' @importFrom fields rdist
-#' @importFrom pedometrics cramer
-#' @importFrom pedometrics is.numint
-#' @importFrom pedometrics cont2cat
-#' @importFrom SpatialTools dist2
+# Optimization of sample configurations for variogram and spatial trend 
+# estimation, and spatial interpolation
+# 
+# Optimize a sample configuration for variogram and spatial trend estimation, 
+# and spatial interpolation. An utility function is defined aggregating four 
+# objective functions: \bold{CORR}, \bold{DIST}, \bold{PPL}, and \bold{MSSD}.
+# 
+# @template spJitter_doc
+# @template spSANN_doc
+# @template MOOP_doc
+# @template ACDC_doc
+# 
+# @return
+# \code{optimPAN} returns a matrix: the optimized sample configuration with
+# the evolution of the energy state during the optimization as an attribute.
+# 
+# @author Alessandro Samuel-Rosa \email{alessandrosamuelrosa@@gmail.com}
+# @keywords spatial optimize
+# @concept simulated annealing
+# @importFrom fields rdist
+# @importFrom pedometrics cramer
+# @importFrom pedometrics is.numint
+# @importFrom pedometrics cont2cat
+# @importFrom SpatialTools dist2
 # @export
 # MAIN FUNCTION ################################################################
 optimPAN <-

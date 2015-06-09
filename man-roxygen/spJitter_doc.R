@@ -16,7 +16,7 @@
 #' n), \code{[, 2]} the projected x-coordinates, and \code{[, 3]} the projected
 #' y-coordinates.
 #'
-#' @param x.max, x.min, y.max, y.min Numeric value. The minimum and maximum 
+#' @param x.max,x.min,y.max,y.min Numeric value. The minimum and maximum 
 #' quantity of random noise to be added to the projected x- and y-coordinates.
 #' The minimum quantity should be equal to, at least, the minimum distance
 #' between two neighbouring candidate locations. The units are the same as of 
