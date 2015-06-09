@@ -111,7 +111,6 @@ if (aa) {
     }
   }
 }
-
 # Output
 if (!is.null(res)) stop (res, call. = FALSE)
 #
