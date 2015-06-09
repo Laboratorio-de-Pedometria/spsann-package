@@ -143,11 +143,11 @@ covars <- meuse.grid[, 5]
 set.seed(2001)
 res <- optimACDC(points = 100, candi = candi, covars = covars, y.max = y.max,
                  use.coords = TRUE, x.max = x.max, x.min = 40, y.min = 40,
-                 boundary = boundary, iterations = 1000, nadir = nadir,
+                 boundary = boundary, iterations = 100, nadir = nadir,
                  utopia = utopia)
-tail(attr(res, "energy")$obj, 1) # 0.4438131
+tail(attr(res, "energy")$obj, 1) # 0.5251647
 objACDC(points = res, candi = candi, covars = covars, use.coords = TRUE,
-        nadir = nadir, utopia = utopia) # 0.4615769
+        nadir = nadir, utopia = utopia)
 }
 \author{
 Alessandro Samuel-Rosa \email{alessandrosamuelrosa@gmail.com}
