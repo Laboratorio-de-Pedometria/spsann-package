@@ -48,12 +48,11 @@ optimSPAN <-
     # Check arguments
     if (!is.data.frame(covars)) covars <- as.data.frame(covars) 
     
-    check <- .spSANNcheck(points = points, candi = candi, x.max = x.max, 
-                          x.min = x.min, y.max = y.max, verbose = verbose,
-                          iterations = iterations, acceptance = acceptance,
-                          stopping = stopping, plotit = plotit, y.min = y.min, 
-                          boundary = boundary, progress = progress)
-    if (!is.null(check)) stop (check, call. = FALSE)
+    # Check spsann arguments ###################################################
+    check_spsann_arguments <- 
+      function (...) {parse(text = readLines("tools/check-spsann-arguments.R"))}
+    eval(check_spsann_arguments())
+    ############################################################################
     
     check <- .optimPPLcheck(lags = lags, lags.type = lags.type, pairs = pairs,
                             lags.base = lags.base, cutoff = cutoff, 

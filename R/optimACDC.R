@@ -67,14 +67,11 @@ optimACDC <-
     
     if (!is.data.frame(covars)) covars <- as.data.frame(covars)
     
-    # Check arguments
-    check <- .spSANNcheck(points = points, candi = candi, x.max = x.max, 
-                          x.min = x.min, y.max = y.max, y.min = y.min, 
-                          iterations = iterations, acceptance = acceptance,
-                          stopping = stopping, plotit = plotit, 
-                          boundary = boundary, progress = progress,
-                          verbose = verbose)
-    if (!is.null(check)) stop (check, call. = FALSE)
+    # Check spsann arguments ###################################################
+    check_spsann_arguments <- 
+      function (...) {parse(text = readLines("tools/check-spsann-arguments.R"))}
+    eval(check_spsann_arguments())
+    ############################################################################
     
     check <- .optimACDCcheck(candi = candi, covars = covars, 
                              use.coords = use.coords, strata.type = strata.type)

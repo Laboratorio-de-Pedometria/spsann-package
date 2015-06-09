@@ -65,15 +65,14 @@ optimMSSD <-
   function (points, candi, x.max, x.min, y.max, y.min, iterations = 10000,
             acceptance = list(initial = 0.99, cooling = iterations / 10),
             stopping = list(max.count = iterations / 10), plotit = TRUE,
-            boundary, progress = TRUE, verbose = TRUE, greedy = FALSE) {
+            boundary, progress = TRUE, verbose = TRUE, greedy = FALSE,
+            weights, nadir, utopia) {
     
-    check <- .spSANNcheck(points = points, candi = candi, 
-                          x.max = x.max, x.min = x.min, y.max = y.max, 
-                          y.min = y.min, iterations = iterations, 
-                          acceptance = acceptance, stopping = stopping, 
-                          plotit = plotit, boundary = boundary, 
-                          progress = progress, verbose = verbose)
-    if (!is.null(check)) stop (check, call. = FALSE)
+    # Check spsann arguments ###################################################
+    check_spsann_arguments <- 
+      function (...) {parse(text = readLines("tools/check-spsann-arguments.R"))}
+    eval(check_spsann_arguments())
+    ############################################################################
     
     if (plotit) {
       par0 <- par()
