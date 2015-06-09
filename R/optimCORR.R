@@ -60,8 +60,8 @@
 #' set.seed(2001)
 #' res <- optimCORR(points = 100, candi = candi, covars = covars, 
 #'                  use.coords = TRUE, x.max = x.max, x.min = 40, y.max = y.max, 
-#'                  y.min = 40, boundary = boundary, iterations = 500)
-#' tail(attr(res, "energy"), 1) # 0.001747814
+#'                  y.min = 40, boundary = boundary, iterations = 100)
+#' tail(attr(res, "energy"), 1) # 0.07374756
 #' objCORR(points = res, candi = candi, covars = covars, use.coords = TRUE)
 # MAIN FUNCTION ################################################################
 optimCORR <-

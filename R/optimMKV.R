@@ -47,7 +47,32 @@
 #' @concept simulated annealing
 #' @importFrom plyr is.formula
 #' @export
-#' 
+#' @examples
+#' require(pedometrics)
+#' require(sp)
+#' require(rgeos)
+#' require(gstat)
+#' require(plyr)
+#' data(meuse.grid)
+#' candi <- meuse.grid[, 1:2]
+#' coordinates(candi) <- ~ x + y
+#' gridded(candi) <- TRUE
+#' boundary <- as(candi, "SpatialPolygons")
+#' boundary <- gUnionCascaded(boundary)
+#' candi <- coordinates(candi)
+#' candi <- matrix(cbind(1:dim(candi)[1], candi), ncol = 3)
+#' covars <- as.data.frame(meuse.grid)
+#' x.max <- diff(bbox(boundary)[1, ])
+#' y.max <- diff(bbox(boundary)[2, ])
+#' model <- vgm(psill = 10, model = "Exp", range = 500, nugget = 8)
+#' set.seed(2001)
+#' res <- optimMKV(points = 100, candi = candi, covars = covars, 
+#'                 equation = z ~ dist, model = model, krige.stat = "mean", 
+#'                 x.max = x.max, x.min = 40, y.max = y.max, y.min = 40,
+#'                 boundary = boundary, iterations = 100, plotit = TRUE)
+#' tail(attr(res, "energy"), 1) # 11.63081
+#' objMKV(points = res, candi = candi, covars = covars, equation = z ~ dist, 
+#'        model = model, krige.stat = "mean")
 # FUNCTION - MAIN ##############################################################
 optimMKV <-
   function (points, candi, covars, equation = z ~ 1, model, krige.stat = "mean",

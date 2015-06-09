@@ -29,8 +29,8 @@ y.max <- diff(bbox(boundary)[2, ])
 set.seed(2001)
 res <- optimCORR(points = 100, candi = candi, covars = covars, 
                  use.coords = TRUE, x.max = x.max, x.min = 40, y.max = y.max, 
-                 y.min = 40, boundary = boundary, iterations = 500)
-tail(attr(res, "energy"), 1) # 0.001747814
+                 y.min = 40, boundary = boundary, iterations = 100)
+tail(attr(res, "energy"), 1) # 0.07374756
 objCORR(points = res, candi = candi, covars = covars, use.coords = TRUE)
 
 # 1) FACTOR COVARIATES WITH THE COORDINATES ####################################
@@ -56,12 +56,14 @@ set.seed(2001)
 res <- optimCORR(points = 100, candi = candi, covars = covars, 
                  strata.type = "area", use.coords = TRUE, x.max = x.max, 
                  x.min = 40, y.max = y.max, y.min = 40, 
-                 boundary = boundary, iterations = 1000)
-tail(attr(res, "energy"), 1) # 1.249576
+                 boundary = boundary, iterations = 100)
+tail(attr(res, "energy"), 1) # 3.307339
 objCORR(points = res, candi = candi, covars = covars, use.coords = TRUE,
         strata.type = "area")
 
 # 2) FACTOR COVARIATES #########################################################
+# Tue 9 Jun: objCORR() does not return the same criterion value if 
+#            'iterations = 100'
 rm(list = ls())
 gc()
 source('R/optimCORR.R')
@@ -77,7 +79,6 @@ boundary <- as(candi, "SpatialPolygons")
 boundary <- gUnionCascaded(boundary)
 candi <- coordinates(candi)
 candi <- matrix(cbind(1:dim(candi)[1], candi), ncol = 3)
-str(meuse.grid)
 covars <- meuse.grid[, rep(6:7, 3)]
 x.max <- diff(bbox(boundary)[1, ])
 y.max <- diff(bbox(boundary)[2, ])
@@ -86,5 +87,5 @@ res <- optimCORR(points = 100, candi = candi, covars = covars,
                  use.coords = FALSE, x.max = x.max, x.min = 40, 
                  y.max = y.max, y.min = 40, 
                  boundary = boundary, iterations = 1000)
-tail(attr(res, "energy"), 1) # 0.01085086
+tail(attr(res, "energy"), 1) # 0.0023524
 objCORR(points = res, candi = candi, covars = covars, use.coords = FALSE)

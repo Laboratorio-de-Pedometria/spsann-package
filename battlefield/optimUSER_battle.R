@@ -43,7 +43,7 @@ timeUSER <- Sys.time()
 resUSER <- optimUSER(points = 100, fun = objUSER, lags = lags, 
                      n_lags = 9, n_pts = 100,
                      candi = candi, x.max = x.max, x.min = 40, y.max = y.max,
-                     y.min = 40, boundary = boundary, iterations = 1000)
+                     y.min = 40, boundary = boundary, iterations = 100)
 timeUSER <- Sys.time() - timeUSER
 
 # Run the optimization using the respective function implemented in spsann
@@ -52,15 +52,15 @@ timePPL <- Sys.time()
 resPPL <- optimPPL(points = 100, candi = candi, lags = lags,  
                    criterion = "distribution", x.max = x.max, x.min = 40, 
                    y.max = y.max, y.min = 40, boundary = boundary,
-                   iterations = 1000)
+                   iterations = 100)
 timePPL <- Sys.time() - timePPL
 
 # Compare results
 timeUSER
 timePPL
 lapply(list(resUSER, resPPL), countPPL, lags = lags, pairs = FALSE)
-x <- attr(resUSER, "energy.state")
-y <- attr(resPPL, "energy.state")
+x <- attr(resUSER, "energy.state") # 50
+y <- attr(resPPL, "energy.state") # 50
 sapply(list(x, y), tail, 1)
 plot(x, y, asp = 1)
 abline(0, 1, col = "red")

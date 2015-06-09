@@ -78,8 +78,8 @@
 #' set.seed(2001)
 #' res <- optimDIST(points = 100, candi = candi, covars = covars, 
 #'                  use.coords = TRUE, x.max = x.max, x.min = 40, y.max = y.max, 
-#'                  y.min = 40, boundary = boundary, iterations = 1000)
-#' tail(attr(res, "energy"), 1) # 0.9897776
+#'                  y.min = 40, boundary = boundary, iterations = 100)
+#' tail(attr(res, "energy"), 1) # 1.656926
 #' objDIST(points = res, candi = candi, covars = covars, use.coords = TRUE)
 # MAIN FUNCTION ################################################################
 optimDIST <-

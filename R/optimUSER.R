@@ -67,7 +67,7 @@
 #' resUSER <- optimUSER(points = 100, fun = objUSER, lags = lags, 
 #'                      n_lags = 9, n_pts = 100,
 #'                      candi = candi, x.max = x.max, x.min = 40, y.max = y.max,
-#'                      y.min = 40, boundary = boundary, iterations = 1000)
+#'                      y.min = 40, boundary = boundary, iterations = 100)
 #' timeUSER <- Sys.time() - timeUSER
 #' 
 #' # Run the optimization using the respective function implemented in spsann
@@ -76,7 +76,7 @@
 #' resPPL <- optimPPL(points = 100, candi = candi, lags = lags,  
 #'                    criterion = "distribution", x.max = x.max, x.min = 40, 
 #'                    y.max = y.max, y.min = 40, boundary = boundary,
-#'                    iterations = 1000)
+#'                    iterations = 100)
 #' timePPL <- Sys.time() - timePPL
 #' 
 #' # Compare results

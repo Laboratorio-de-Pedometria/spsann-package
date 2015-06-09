@@ -57,9 +57,9 @@
 #' y.max <- diff(bbox(boundary)[2, ])
 #' set.seed(2001)
 #' res <- optimMSSD(points = 100, candi = candi, x.max = x.max, x.min = 40,
-#'                  y.max = y.max, y.min = 40, iterations = 1000,
+#'                  y.max = y.max, y.min = 40, iterations = 100,
 #'                  boundary = boundary)
-#' tail(attr(res, "energy.state"), 1) # 9896.487
+#' tail(attr(res, "energy.state"), 1) # 11855.37
 #' objMSSD(candi = candi, points = res)
 # FUNCTION - MAIN ##############################################################
 optimMSSD <-

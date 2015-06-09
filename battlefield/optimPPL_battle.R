@@ -27,10 +27,10 @@ res <- optimPPL(points = 100, candi = candi, lags = 7, pairs = FALSE,
                 lags.base = 2, criterion = "distribution", cutoff = cutoff,
                 lags.type = "exponential", x.max = x.max, x.min = 40, 
                 y.max = y.max, y.min = 40, boundary = boundary,
-                iterations = 1000, plotit = TRUE, verbose = TRUE)
+                iterations = 100, plotit = TRUE, verbose = TRUE)
 countPPL(points = res, lags = 7, lags.type = "exponential", pairs = FALSE,
          lags.base = 2, cutoff = cutoff)
-tail(attr(res, "energy.state"), 1) # 65
+tail(attr(res, "energy.state"), 1) # 168
 objPPL(points = res, lags = 7, lags.type = "exponential", pairs = FALSE,
        lags.base = 2, cutoff = cutoff, criterion = "distribution")
 
@@ -180,14 +180,14 @@ res <- optimPPL(points = 100, candi = candi, lags = 7, pairs = FALSE,
                 lags.base = 2, criterion = "distribution", cutoff = cutoff,
                 lags.type = "exponential", x.max = x.max, x.min = 40, 
                 y.max = y.max, y.min = 40, boundary = boundary,
-                iterations = 1000, plotit = TRUE, verbose = TRUE, greedy = TRUE)
+                iterations = 100, plotit = TRUE, verbose = TRUE, greedy = TRUE)
 countPPL(points = res, lags = 7, lags.type = "exponential", pairs = FALSE,
          lags.base = 2, cutoff = cutoff)
-tail(attr(res, "energy.state"), 1) # 59
+tail(attr(res, "energy.state"), 1) # 162
 objPPL(points = res, lags = 7, lags.type = "exponential", pairs = FALSE,
        lags.base = 2, cutoff = cutoff, criterion = "distribution")
 
-# 5) INFINITE LOOP #############################################################
+# 5) OLD INFINITE LOOP #########################################################
 rm(list = ls())
 gc()
 source('R/spSANNtools.R')
@@ -215,8 +215,8 @@ set.seed(2001)
 sample_b <- optimPPL(points = points, candi = candi, cutoff = cutoff, 
                      lags = lags, x.max = x.max, x.min = 2, y.max = y.max, 
                      y.min = 2, boundary = boundary, iterations = 7000, 
-                     plotit = TRUE, pairs = TRUE, verbose = FALSE, 
+                     plotit = FALSE, pairs = TRUE, verbose = FALSE, 
                      greedy = TRUE)
 countPPL(sample_b, lags = lags, cutoff = cutoff, pairs = TRUE)
 objPPL(sample_b, lags = lags, cutoff = cutoff, pairs = TRUE)
-tail(attr(sample_b, "energy.state"), 1)
+tail(attr(sample_b, "energy.state"), 1) # 1176
