@@ -71,7 +71,6 @@
 #' boundary <- as(candi, "SpatialPolygons")
 #' boundary <- gUnionCascaded(boundary)
 #' candi <- coordinates(candi)
-#' candi <- matrix(cbind(1:dim(candi)[1], candi), ncol = 3)
 #' covars <- meuse.grid[, 5]
 #' x.max <- diff(bbox(boundary)[1, ])
 #' y.max <- diff(bbox(boundary)[2, ])
@@ -106,11 +105,16 @@ optimDIST <-
     }
     
     # Prepare sample points
-    n_candi <- nrow(candi)
-    points <- .spsannPoints(points = points, candi = candi, n.candi = n_candi)
-    n_pts <- nrow(points)
-    conf0 <- points
-    old_conf <- conf0
+    #n_candi <- nrow(candi)
+    #points <- .spsannPoints(points = points, candi = candi, n.candi = n_candi)
+    #n_pts <- nrow(points)
+    #conf0 <- points
+    #old_conf <- conf0
+    # Prepare points and candi #################################################
+    prepare_points <- 
+      function (...) {parse(text = readLines("tools/prepare-points.R"))}
+    eval(prepare_points())
+    ############################################################################
     
     # Prepare covariates (covars) and create the starting sample matrix (sm)
     covars.type <- ifelse(pedometrics::is.any.factor(covars), "factor",
@@ -329,9 +333,14 @@ objDIST <-
     if (!is.null(check)) stop (check, call. = FALSE)
     
     # Prepare sample points
-    n_candi <- nrow(candi)
-    points <- .spsannPoints(points = points, candi = candi, n.candi = n_candi)
-    n_pts <- nrow(points)
+    #n_candi <- nrow(candi)
+    #points <- .spsannPoints(points = points, candi = candi, n.candi = n_candi)
+    #n_pts <- nrow(points)
+    # Prepare points and candi #################################################
+    prepare_points <- 
+      function (...) {parse(text = readLines("tools/prepare-points.R"))}
+    eval(prepare_points())
+    ############################################################################
     
     # Prepare covariates (covars) and create the starting sample matrix (sm)
     covars.type <- ifelse(is.any.factor(covars), "factor", "numeric")

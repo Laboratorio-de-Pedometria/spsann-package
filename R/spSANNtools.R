@@ -60,14 +60,11 @@
 # INTERNAL FUNCTION - PREPARE POINTS ###########################################
 .spsannPoints <-
   function (points, candi, n.candi) {
-    
     if (is.integer(points) || is.numint(points)) {
-      
       # Integer vector
       if (length(points) > 1) {
         points <- candi[points, ]
       }
-      
       # Integer value
       if (length(points) == 1) {
         points <- sample(1:n.candi, points)
@@ -95,8 +92,8 @@
     }
     
     # candi
-    if (ncol(candi) != 3) {
-      res <- paste("'candi' must have three columns")
+    if (ncol(candi) != 2) {
+      res <- paste("'candi' must have two columns")
       return (res)
     }
     

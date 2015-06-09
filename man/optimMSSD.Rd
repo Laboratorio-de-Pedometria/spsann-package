@@ -98,7 +98,6 @@ gridded(candi) <- TRUE
 boundary <- as(candi, "SpatialPolygons")
 boundary <- gUnionCascaded(boundary)
 candi <- coordinates(candi)
-candi <- matrix(cbind(c(1:dim(candi)[1]), candi), ncol = 3)
 x.max <- diff(bbox(boundary)[1, ])
 y.max <- diff(bbox(boundary)[2, ])
 set.seed(2001)

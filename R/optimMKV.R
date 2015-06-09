@@ -60,7 +60,6 @@
 #' boundary <- as(candi, "SpatialPolygons")
 #' boundary <- gUnionCascaded(boundary)
 #' candi <- coordinates(candi)
-#' candi <- matrix(cbind(1:dim(candi)[1], candi), ncol = 3)
 #' covars <- as.data.frame(meuse.grid)
 #' x.max <- diff(bbox(boundary)[1, ])
 #' y.max <- diff(bbox(boundary)[2, ])
@@ -103,11 +102,16 @@ optimMKV <-
     }
     
     # Prepare points
-    n_candi <- nrow(candi)
-    points <- .spsannPoints(points = points, candi = candi, n.candi = n_candi)
-    n_pts <- nrow(points)
-    conf0 <- points
-    old_conf <- conf0
+    #n_candi <- nrow(candi)
+    #points <- .spsannPoints(points = points, candi = candi, n.candi = n_candi)
+    #n_pts <- nrow(points)
+    #conf0 <- points
+    #old_conf <- conf0
+    # Prepare points and candi #################################################
+    prepare_points <- 
+      function (...) {parse(text = readLines("tools/prepare-points.R"))}
+    eval(prepare_points())
+    ############################################################################
     
     # Prepare prediction grid (pg) with covars
     if (terms(equation)[[3]] == 1) {
@@ -317,9 +321,14 @@ objMKV <-
     #if (!is.null(check)) stop (check, call. = FALSE)
     
     # Prepare points
-    n_candi <- nrow(candi)
-    points <- .spsannPoints(points = points, candi = candi, n.candi = n_candi)
-    n_pts <- nrow(points)
+    #n_candi <- nrow(candi)
+    #points <- .spsannPoints(points = points, candi = candi, n.candi = n_candi)
+    #n_pts <- nrow(points)
+    # Prepare points and candi #################################################
+    prepare_points <- 
+      function (...) {parse(text = readLines("tools/prepare-points.R"))}
+    eval(prepare_points())
+    ############################################################################
     
     # Prepare prediction grid (pg) with covars
     if (terms(equation)[[3]] == 1) {

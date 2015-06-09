@@ -74,11 +74,16 @@ optimSPAN <-
     }
 
     # PREPARE SAMPLE POINTS
-    n_candi <- nrow(candi)
-    points <- .spsannPoints(points = points, candi = candi, n.candi = n_candi)
-    n_pts <- nrow(points)
-    conf0 <- points
-    old_conf <- conf0
+    #n_candi <- nrow(candi)
+    #points <- .spsannPoints(points = points, candi = candi, n.candi = n_candi)
+    #n_pts <- nrow(points)
+    #conf0 <- points
+    #old_conf <- conf0
+    # Prepare points  and candi ################################################
+    prepare_points <- 
+      function (...) {parse(text = readLines("tools/prepare-points.R"))}
+    eval(prepare_points())
+    ############################################################################
 
     # BASE VARIABLES AND DATASETS, NADIR POINT AND INITIAL ENERGY STATE
     

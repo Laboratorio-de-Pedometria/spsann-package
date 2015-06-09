@@ -52,7 +52,6 @@
 #' boundary <- as(candi, "SpatialPolygons")
 #' boundary <- gUnionCascaded(boundary)
 #' candi <- coordinates(candi)
-#' candi <- matrix(cbind(c(1:dim(candi)[1]), candi), ncol = 3)
 #' x.max <- diff(bbox(boundary)[1, ])
 #' y.max <- diff(bbox(boundary)[2, ])
 #' set.seed(2001)
@@ -82,11 +81,16 @@ optimMSSD <-
     }
     
     # Prepare sample points
-    n_candi <- nrow(candi)
-    points <- .spsannPoints(points = points, candi = candi, n.candi = n_candi)
-    n_pts <- nrow(points)
-    conf0 <- points
-    old_conf <- conf0
+    #n_candi <- nrow(candi)
+    #points <- .spsannPoints(points = points, candi = candi, n.candi = n_candi)
+    #n_pts <- nrow(points)
+    #conf0 <- points
+    #old_conf <- conf0
+    # Prepare points and candi #################################################
+    prepare_points <- 
+      function (...) {parse(text = readLines("tools/prepare-points.R"))}
+    eval(prepare_points())
+    ############################################################################
     
     # Calculate the initial energy state. The distance matrix is calculated
     # using the SpatialTools::dist2(). The function .calcMSSDCpp() does the
@@ -230,6 +234,13 @@ optimMSSD <-
 #' @export
 objMSSD <-
   function (candi, points) {
+    
+    # Prepare points and candi #################################################
+    prepare_points <- 
+      function (...) {parse(text = readLines("tools/prepare-points.R"))}
+    eval(prepare_points())
+    ############################################################################
+    
     coords1 <- candi[, 2:3]
     coords2 <- points[, 2:3]
     dm <- SpatialTools::dist2(coords1 = coords1, coords2 = coords2)

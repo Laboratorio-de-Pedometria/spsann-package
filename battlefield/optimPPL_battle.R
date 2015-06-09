@@ -18,7 +18,7 @@ gridded(candi) <- TRUE
 boundary <- as(candi, "SpatialPolygons")
 boundary <- gUnionCascaded(boundary)
 candi <- coordinates(candi)
-candi <- matrix(cbind(1:nrow(candi), candi), ncol = 3)
+#candi <- matrix(cbind(1:nrow(candi), candi), ncol = 3)
 x.max <- diff(bbox(boundary)[1, ])
 y.max <- diff(bbox(boundary)[2, ])
 cutoff <- sqrt((x.max * x.max) + (y.max * y.max)) / 2

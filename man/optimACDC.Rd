@@ -6,12 +6,12 @@
 \title{Optimization of sample configurations for spatial trend estimation}
 \usage{
 optimACDC(points, candi, covars, strata.type = "area", iterations,
-  weights = list(CORR = 0.5, DIST = 0.5), use.coords = FALSE,
-  nadir = list(sim = NULL, seeds = NULL, user = NULL, abs = NULL),
-  utopia = list(user = NULL, abs = NULL), x.max, x.min, y.max, y.min,
-  acceptance = list(initial = 0.99, cooling = iterations/10),
-  stopping = list(max.count = iterations/10), plotit = TRUE, boundary,
-  progress = TRUE, verbose = TRUE, greedy = FALSE)
+  use.coords = FALSE, x.max, x.min, y.max, y.min, weights = list(CORR = 0.5,
+  DIST = 0.5), nadir = list(sim = NULL, seeds = NULL, user = NULL, abs =
+  NULL), utopia = list(user = NULL, abs = NULL), acceptance = list(initial =
+  0.99, cooling = iterations/10), stopping = list(max.count = iterations/10),
+  plotit = TRUE, boundary, progress = TRUE, verbose = TRUE,
+  greedy = FALSE)
 
 objACDC(points, candi, covars, strata.type = "area", weights = list(CORR =
   0.5, DIST = 0.5), use.coords = FALSE, utopia = list(user = NULL, abs =
@@ -45,14 +45,20 @@ covariates. Available options are \code{"area"} for equal-area, and
 \item{iterations}{Integer. The maximum number of iterations that should be
 used for the optimization.}
 
+\item{use.coords}{Logical value. Should the geographic coordinates be used as
+covariates? Defaults to \code{use.coords = FALSE}.}
+
+\item{x.max,x.min,y.max,y.min}{Numeric value. The minimum and maximum
+quantity of random noise to be added to the projected x- and y-coordinates.
+The minimum quantity should be equal to, at least, the minimum distance
+between two neighbouring candidate locations. The units are the same as of
+the projected x- and y-coordinates.}
+
 \item{weights}{List with named sub-arguments. The weights assigned to each of
 the objective functions combined to form the multi-objective optimization
 problem (MOOP). They must be named after the objective function to which
 they apply. The weights must be larger than 0 and sum to 1. The default
 option gives equal weights to all objective functions.}
-
-\item{use.coords}{Logical value. Should the geographic coordinates be used as
-covariates? Defaults to \code{use.coords = FALSE}.}
 
 \item{nadir}{List with named sub-arguments. Three options are available:
 1) \code{sim} -- the number of random realizations to estimate the nadir
@@ -65,12 +71,6 @@ calculating the nadir point internally.}
 user-defined values named after the objective function to which they apply,
 and \code{abs} -- logical for calculating the utopia point internally.
 Defaults to \code{user = NULL} and \code{abs = NULL}.}
-
-\item{x.max,x.min,y.max,y.min}{Numeric value. The minimum and maximum
-quantity of random noise to be added to the projected x- and y-coordinates.
-The minimum quantity should be equal to, at least, the minimum distance
-between two neighbouring candidate locations. The units are the same as of
-the projected x- and y-coordinates.}
 
 \item{acceptance}{List with two named sub-arguments: \code{initial} --
 numeric value between 0 and 1 defining the initial acceptance probability,
@@ -134,7 +134,6 @@ gridded(candi) <- TRUE
 boundary <- as(candi, "SpatialPolygons")
 boundary <- gUnionCascaded(boundary)
 candi <- coordinates(candi)
-candi <- matrix(cbind(1:dim(candi)[1], candi), ncol = 3)
 x.max <- diff(bbox(boundary)[1, ])
 y.max <- diff(bbox(boundary)[2, ])
 nadir <- list(sim = 10, seeds = 1:10)

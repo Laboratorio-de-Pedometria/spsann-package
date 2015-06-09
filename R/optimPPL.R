@@ -119,7 +119,6 @@
 #' boundary <- as(candi, "SpatialPolygons")
 #' boundary <- gUnionCascaded(boundary)
 #' candi <- coordinates(candi)
-#' candi <- matrix(cbind(1:nrow(candi), candi), ncol = 3)
 #' x.max <- diff(bbox(boundary)[1, ])
 #' y.max <- diff(bbox(boundary)[2, ])
 #' cutoff <- sqrt((x.max * x.max) + (y.max * y.max)) / 2
@@ -165,9 +164,16 @@ optimPPL <-
     }
     
     # Prepare points
-    n_candi <- nrow(candi)
-    points <- .spsannPoints(points = points, candi = candi, n.candi = n_candi)
-    n_pts <- nrow(points)
+    #n_candi <- nrow(candi)
+    #points <- .spsannPoints(points = points, candi = candi, n.candi = n_candi)
+    #n_pts <- nrow(points)
+    #conf0 <- points
+    #old_conf <- conf0
+    # Prepare points and candi #################################################
+    prepare_points <- 
+      function (...) {parse(text = readLines("tools/prepare-points.R"))}
+    eval(prepare_points())
+    ############################################################################
     
     # Prepare lags
     if (length(lags) >= 2) {
@@ -177,8 +183,6 @@ optimPPL <-
       lags <- .getLagBreaks(lags = lags, lags.type = lags.type, 
                             cutoff = cutoff, lags.base = lags.base)
     }
-    conf0 <- points
-    old_conf <- conf0
     
     # Initial energy state: points or point-pairs
     # ASR: implement a distance function in Cpp (pedometrics)
@@ -370,9 +374,14 @@ objPPL <-
     if (!is.null(check)) stop (check, call. = FALSE)
     
     # Prepare points
-    if (!missing(candi)) n_candi <- nrow(candi)
-    points <- .spsannPoints(points = points, candi = candi, n.candi = n_candi)
-    n_pts <- nrow(points)
+    #if (!missing(candi)) n_candi <- nrow(candi)
+    #points <- .spsannPoints(points = points, candi = candi, n.candi = n_candi)
+    #n_pts <- nrow(points)
+    # Prepare points and candi #################################################
+    prepare_points <- 
+      function (...) {parse(text = readLines("tools/prepare-points.R"))}
+    eval(prepare_points())
+    ############################################################################
 
     # Prepare lags
     if (length(lags) >= 2) {
@@ -410,9 +419,14 @@ countPPL <-
     if (!is.null(check)) stop (check, call. = FALSE)
     
     # Prepare points
-    if (!missing(candi)) n_candi <- nrow(candi)
-    points <- .spsannPoints(points = points, candi = candi, n.candi = n_candi)
-    n_pts <- nrow(points)
+    #if (!missing(candi)) n_candi <- nrow(candi)
+    #points <- .spsannPoints(points = points, candi = candi, n.candi = n_candi)
+    #n_pts <- nrow(points)
+    # Prepare points and candi #################################################
+    prepare_points <- 
+      function (...) {parse(text = readLines("tools/prepare-points.R"))}
+    eval(prepare_points())
+    ############################################################################
 
     # Prepare lags
     if (length(lags) >= 2) {
