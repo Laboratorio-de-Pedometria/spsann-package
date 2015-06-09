@@ -1,7 +1,8 @@
 # Optimization of sample configurations for variogram and spatial trend 
-# estimation, and spatial interpolation
+# identification and estimation, and spatial interpolation
 # 
-# Optimize a sample configuration for variogram and spatial trend estimation, 
+# Optimize a sample configuration for variogram and spatial trend identification
+# and estimation, 
 # and spatial interpolation. An utility function is defined aggregating four 
 # objective functions: \bold{CORR}, \bold{DIST}, \bold{PPL}, and \bold{MSSD}.
 # 
