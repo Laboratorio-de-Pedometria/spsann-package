@@ -80,9 +80,7 @@ optimSPAN <-
     ############################################################################
     
     # Prepare for jittering ####################################################
-    prepare_jittering <- 
-      function (...) {parse(text = readLines("tools/prepare-jittering.R"))}
-    eval(prepare_jittering())
+    eval(.prepare_jittering())
     ############################################################################
     
     # BASE VARIABLES AND DATASETS, NADIR POINT AND INITIAL ENERGY STATE

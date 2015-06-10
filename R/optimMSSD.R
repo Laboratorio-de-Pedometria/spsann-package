@@ -80,9 +80,7 @@ optimMSSD <-
     ############################################################################
     
     # Prepare for jittering ####################################################
-    prepare_jittering <- 
-      function (...) {parse(text = readLines("tools/prepare-jittering.R"))}
-    eval(prepare_jittering())
+    eval(.prepare_jittering())
     ############################################################################
     
     # Calculate the initial energy state. The distance matrix is calculated

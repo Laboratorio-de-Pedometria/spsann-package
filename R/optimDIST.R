@@ -107,9 +107,7 @@ optimDIST <-
     ############################################################################
     
     # Prepare for jittering ####################################################
-    prepare_jittering <- 
-      function (...) {parse(text = readLines("tools/prepare-jittering.R"))}
-    eval(prepare_jittering())
+    eval(.prepare_jittering())
     ############################################################################
     
     # Prepare covariates (covars) and create the starting sample matrix (sm)
