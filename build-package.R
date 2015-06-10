@@ -22,6 +22,9 @@ devtools::check_doc()
 devtools::check()
 devtools::build_win()
 
+# build package
+devtools::build()
+
 # upload to CRAN
 devtools::release()
 

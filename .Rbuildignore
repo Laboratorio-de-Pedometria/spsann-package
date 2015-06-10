@@ -8,14 +8,12 @@ battlefield
 build-package.R
 Rprof.out
 
-
 # Cpp files
 src/*.o
 src/*.so
-
 # R files
 R/optimPAN.R
 tools/*.R
-
 # Rd files
 man/optimPAN.Rd
+^\.travis\.yml$

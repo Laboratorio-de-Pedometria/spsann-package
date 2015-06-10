@@ -1,6 +1,7 @@
+[![CRAN_Status_Badge](http://www.r-pkg.org/badges/version/spsann)](http://cran.r-project.org/web/packages/spsann)
+[![Travis-CI Build Status](https://travis-ci.org/samuel-rosa/spsann.svg?branch=master)](https://travis-ci.org/samuel-rosa/spsann)
+
 spsann
 ======
 
 Optimization of Sample Configurations using Spatial Simulated Annealing
-
-Download the latest developement version:  [spsann_0.0.0.9005.tar.gz](https://www.dropbox.com/s/0v07u9ofsiksmlf/spsann_0.0.0.9005.tar.gz?dl=0)
