@@ -33,19 +33,38 @@
 #' require(sp)
 #' data(meuse.grid)
 #' candi <- meuse.grid[, 1:2]
-#' x.max <- diff(bbox(boundary)[1, ])
-#' y.max <- diff(bbox(boundary)[2, ])
 #' nadir <- list(sim = 10, seeds = 1:10)
 #' utopia <- list(user = list(DIST = 0, CORR = 0))
 #' covars <- meuse.grid[, 5]
 #' set.seed(2001)
-#' res <- optimACDC(points = 100, candi = candi, covars = covars, y.max = y.max,
-#'                  use.coords = TRUE, x.max = x.max, x.min = 40, y.min = 40, 
-#'                  boundary = boundary, iterations = 100, nadir = nadir, 
-#'                  utopia = utopia)
-#' tail(attr(res, "energy")$obj, 1) # 0.5251647
+#' res <- optimACDC(points = 100, candi = candi, covars = covars, nadir = nadir,
+#'                  use.coords = TRUE, iterations = 100, utopia = utopia)
+#' tail(attr(res, "energy")$obj, 1) # 0.5272031
 #' objACDC(points = res, candi = candi, covars = covars, use.coords = TRUE, 
 #'         nadir = nadir, utopia = utopia)
+#' # MARGINAL DISTRIBUTION
+#' par(mfrow = c(3, 3))
+#' # Covariates
+#' i <- sample(1:nrow(candi), 100)
+#' hist(candi[, 1], breaks = 10)
+#' hist(candi[, 2], breaks = 10)
+#' hist(covars, breaks = 10)
+#' # Optimized sample
+#' hist(candi[res[, 1], 1], breaks = 10)
+#' hist(candi[res[, 1], 2], breaks = 10)
+#' hist(covars[res[, 1]], breaks = 10)
+#' # Random sample
+#' hist(candi[i, 1], breaks = 10)
+#' hist(candi[i, 2], breaks = 10)
+#' hist(covars[i], breaks = 10)
+#' 
+#' # LINEAR CORRELATION
+#' # Covariates
+#' cor(cbind(candi[, 1], candi[, 2], covars))
+#' # Optimized sample
+#' cor(cbind(candi[res[, 1], 1], candi[res[, 1], 2], covars[res[, 1]]))
+#' # Random sample
+#' cor(cbind(candi[i, 1], candi[i, 2], covars[i]))
 # MAIN FUNCTION ################################################################
 optimACDC <-
   function (points, candi, covars, strata.type = "area", iterations,
@@ -90,6 +109,12 @@ optimACDC <-
     prepare_points <- 
       function (...) {parse(text = readLines("tools/prepare-points.R"))}
     eval(prepare_points())
+    ############################################################################
+    
+    # Prepare for jittering ####################################################
+    prepare_jittering <- 
+      function (...) {parse(text = readLines("tools/prepare-jittering.R"))}
+    eval(prepare_jittering())
     ############################################################################
     
     # Prepare covariates (covars) and create the starting sample matrix (sm)
@@ -143,8 +168,6 @@ optimACDC <-
     best_energy <- data.frame(obj = Inf, CORR = Inf, DIST = Inf)
     energies <- data.frame(obj = NA, CORR = NA, DIST = NA)
     accept_probs <- vector()
-    x_max0 <- x.max
-    y_max0 <- y.max
     if (progress) pb <- txtProgressBar(min = 1, max = iterations, style = 3)
     time0 <- proc.time()
 

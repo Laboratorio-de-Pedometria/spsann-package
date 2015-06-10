@@ -1,97 +1,61 @@
 # Initial settings
 rm(list = ls())
 gc()
-require(ASRtools)
 require(pedometrics)
 require(sp)
-require(rgeos)
 source('R/optimMKV.R')
 source('R/spSANNtools.R')
 source('R/spJitter.R')
 Rcpp::sourceCpp('src/spJitterCpp.cpp')
-
 # 0) DEFAULT EXAMPLE ###########################################################
 require(pedometrics)
 require(sp)
-require(rgeos)
 require(gstat)
 require(plyr)
 data(meuse.grid)
 candi <- meuse.grid[, 1:2]
-coordinates(candi) <- ~ x + y
-gridded(candi) <- TRUE
-boundary <- as(candi, "SpatialPolygons")
-boundary <- gUnionCascaded(boundary)
-candi <- coordinates(candi)
-candi <- matrix(cbind(1:dim(candi)[1], candi), ncol = 3)
 covars <- as.data.frame(meuse.grid)
-x.max <- diff(bbox(boundary)[1, ])
-y.max <- diff(bbox(boundary)[2, ])
 model <- vgm(psill = 10, model = "Exp", range = 500, nugget = 8)
 set.seed(2001)
 res <- optimMKV(points = 100, candi = candi, covars = covars, 
-                equation = z ~ dist, model = model, krige.stat = "mean", 
-                x.max = x.max, x.min = 40, y.max = y.max, y.min = 40,
-                boundary = boundary, iterations = 100, plotit = TRUE)
-tail(attr(res, "energy"), 1) # 11.63081
+                equation = z ~ dist, model = model, iterations = 100)
+tail(attr(res, "energy"), 1) # 11.61896
 objMKV(points = res, candi = candi, covars = covars, equation = z ~ dist, 
-       model = model, krige.stat = "mean")
+       model = model)
 
 # 1) GREEDY ALGORITHM ##########################################################
 rm(list = ls())
 gc()
-require(rgeos)
 source('R/optimMKV.R')
 source('R/spSANNtools.R')
 source('R/spJitter.R')
 Rcpp::sourceCpp('src/spJitterCpp.cpp')
 data(meuse.grid)
 candi <- meuse.grid[, 1:2]
-coordinates(candi) <- ~ x + y
-gridded(candi) <- TRUE
-boundary <- as(candi, "SpatialPolygons")
-boundary <- gUnionCascaded(boundary)
-candi <- coordinates(candi)
-candi <- matrix(cbind(1:dim(candi)[1], candi), ncol = 3)
 covars <- as.data.frame(meuse.grid)
-x.max <- diff(bbox(boundary)[1, ])
-y.max <- diff(bbox(boundary)[2, ])
 model <- vgm(psill = 10, model = "Exp", range = 500, nugget = 8)
 set.seed(2001)
-res <- optimMKV(points = 100, candi = candi, covars = covars, 
-                equation = z ~ dist, model = model, krige.stat = "mean", 
-                x.max = x.max, x.min = 40, y.max = y.max, y.min = 40,
-                boundary = boundary, iterations = 100, plotit = TRUE,
-                greedy = TRUE)
-tail(attr(res, "energy"), 1) # 11.72721
+res <- optimMKV(points = 100, candi = candi, covars = covars, model = model, 
+                equation = z ~ dist, iterations = 100, greedy = TRUE)
+tail(attr(res, "energy"), 1) # 11.65344
 objMKV(points = res, candi = candi, covars = covars, equation = z ~ dist, 
-       model = model, krige.stat = "mean")
+       model = model)
 
 # 2) MANY COVARIATES ###########################################################
 rm(list = ls())
 gc()
-require(rgeos)
 source('R/optimMKV.R')
 source('R/spSANNtools.R')
 source('R/spJitter.R')
 Rcpp::sourceCpp('src/spJitterCpp.cpp')
 data(meuse.grid)
 candi <- meuse.grid[, 1:2]
-coordinates(candi) <- ~ x + y
-gridded(candi) <- TRUE
-boundary <- as(candi, "SpatialPolygons")
-boundary <- gUnionCascaded(boundary)
-candi <- coordinates(candi)
-candi <- matrix(cbind(1:dim(candi)[1], candi), ncol = 3)
 covars <- as.data.frame(meuse.grid)
-x.max <- diff(bbox(boundary)[1, ])
-y.max <- diff(bbox(boundary)[2, ])
 model <- vgm(psill = 10, model = "Exp", range = 500, nugget = 8)
 set.seed(2001)
 res <- optimMKV(points = 100, candi = candi, covars = covars, model = model,
                 equation = z ~ dist + soil + ffreq + x + y, plotit = FALSE,
-                krige.stat = "mean", x.max = x.max, x.min = 40, y.max = y.max, 
-                y.min = 40, boundary = boundary, iterations = 100)
-tail(attr(res, "energy"), 1) # 12.12064
-objMKV(points = res, candi = candi, covars = covars, krige.stat = "mean",
+                iterations = 100)
+tail(attr(res, "energy"), 1) # 12.03658
+objMKV(points = res, candi = candi, covars = covars, 
        equation = z ~ dist + soil + ffreq + x + y, model = model)

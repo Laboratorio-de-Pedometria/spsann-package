@@ -1,6 +1,7 @@
 #' Optimization of sample configurations for spatial interpolation
 #'
-#' Optimize a sample configuration for spatial interpolation. The criterion used is
+#' Optimize a sample configuration for spatial interpolation. The criterion 
+#' used is
 #' the mean squared shortest distance (\code{optimMSSD}). \code{objMSSD}
 #' computes the MSSD between a set of points and all grid cells.
 #'
@@ -46,13 +47,9 @@
 #' require(SpatialTools)
 #' data(meuse.grid)
 #' candi <- meuse.grid[, 1:2]
-#' x.max <- diff(bbox(boundary)[1, ])
-#' y.max <- diff(bbox(boundary)[2, ])
 #' set.seed(2001)
-#' res <- optimMSSD(points = 100, candi = candi, x.max = x.max, x.min = 40,
-#'                  y.max = y.max, y.min = 40, iterations = 100,
-#'                  boundary = boundary)
-#' tail(attr(res, "energy.state"), 1) # 11855.37
+#' res <- optimMSSD(points = 100, candi = candi, iterations = 100)
+#' tail(attr(res, "energy.state"), 1) # 11531.03
 #' objMSSD(candi = candi, points = res)
 # FUNCTION - MAIN ##############################################################
 optimMSSD <-
@@ -86,6 +83,12 @@ optimMSSD <-
     eval(prepare_points())
     ############################################################################
     
+    # Prepare for jittering ####################################################
+    prepare_jittering <- 
+      function (...) {parse(text = readLines("tools/prepare-jittering.R"))}
+    eval(prepare_jittering())
+    ############################################################################
+    
     # Calculate the initial energy state. The distance matrix is calculated
     # using the SpatialTools::dist2(). The function .calcMSSDCpp() does the
     # squaring internaly.
@@ -103,8 +106,6 @@ optimMSSD <-
     best_energy   <- Inf
     energy_states <- vector()
     accept_probs  <- vector()
-    x_max0        <- x.max
-    y_max0        <- y.max
     if (progress) pb <- txtProgressBar(min = 1, max = iterations, style = 3)
     time0 <- proc.time()
     

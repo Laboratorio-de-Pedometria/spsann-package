@@ -126,18 +126,15 @@ and McBratney (2006).
 \examples{
 require(pedometrics)
 require(sp)
-require(rgeos)
 data(meuse.grid)
 candi <- meuse.grid[, 1:2]
-x.max <- diff(bbox(boundary)[1, ])
-y.max <- diff(bbox(boundary)[2, ])
 nadir <- list(sim = 10, seeds = 1:10)
 utopia <- list(user = list(DIST = 0, CORR = 0))
 covars <- meuse.grid[, 5]
 set.seed(2001)
-res <- optimACDC(points = 100, candi = candi, covars = covars, y.max = y.max,
-                 use.coords = TRUE, x.max = x.max, x.min = 40, y.min = 40,
-                 boundary = boundary, iterations = 100, nadir = nadir,
+res <- optimACDC(points = 100, candi = candi, covars = covars,
+                 use.coords = TRUE,
+                 iterations = 100, nadir = nadir,
                  utopia = utopia)
 tail(attr(res, "energy")$obj, 1) # 0.5251647
 objACDC(points = res, candi = candi, covars = covars, use.coords = TRUE,

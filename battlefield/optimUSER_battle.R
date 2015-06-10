@@ -10,18 +10,9 @@ Rcpp::sourceCpp('src/updatePPLCpp.cpp')
 # 0) DEFAULT EXAMPLE ###########################################################
 require(pedometrics)
 require(sp)
-require(rgeos)
 require(SpatialTools)
 data(meuse.grid)
 candi <- meuse.grid[, 1:2]
-coordinates(candi) <- ~ x + y
-gridded(candi) <- TRUE
-boundary <- as(candi, "SpatialPolygons")
-boundary <- gUnionCascaded(boundary)
-candi <- coordinates(candi)
-candi <- matrix(cbind(1:nrow(candi), candi), ncol = 3)
-x.max <- diff(bbox(boundary)[1, ])
-y.max <- diff(bbox(boundary)[2, ])
 
 # Define the objective function - number of points per lag distance class
 objUSER <-
@@ -40,27 +31,22 @@ lags <- seq(1, 1000, length.out = 10)
 # Run the optimization using the user-defined objective function
 set.seed(2001)
 timeUSER <- Sys.time()
-resUSER <- optimUSER(points = 100, fun = objUSER, lags = lags, 
-                     n_lags = 9, n_pts = 100,
-                     candi = candi, x.max = x.max, x.min = 40, y.max = y.max,
-                     y.min = 40, boundary = boundary, iterations = 100)
+resUSER <- optimUSER(points = 100, fun = objUSER, lags = lags, n_lags = 9,
+                     n_pts = 100, candi = candi, iterations = 100)
 timeUSER <- Sys.time() - timeUSER
 
 # Run the optimization using the respective function implemented in spsann
 set.seed(2001)
 timePPL <- Sys.time()
-resPPL <- optimPPL(points = 100, candi = candi, lags = lags,  
-                   criterion = "distribution", x.max = x.max, x.min = 40, 
-                   y.max = y.max, y.min = 40, boundary = boundary,
-                   iterations = 100)
+resPPL <- optimPPL(points = 100, candi = candi, lags = lags, iterations = 100)
 timePPL <- Sys.time() - timePPL
 
 # Compare results
 timeUSER
 timePPL
 lapply(list(resUSER, resPPL), countPPL, lags = lags, pairs = FALSE)
-x <- attr(resUSER, "energy.state") # 50
-y <- attr(resPPL, "energy.state") # 50
+x <- attr(resUSER, "energy.state") # 58
+y <- attr(resPPL, "energy.state") # 58
 sapply(list(x, y), tail, 1)
 plot(x, y, asp = 1)
 abline(0, 1, col = "red")

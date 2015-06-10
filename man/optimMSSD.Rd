@@ -89,16 +89,11 @@ this requirement is attained.
 \examples{
 require(pedometrics)
 require(sp)
-require(rgeos)
 require(SpatialTools)
 data(meuse.grid)
 candi <- meuse.grid[, 1:2]
-x.max <- diff(bbox(boundary)[1, ])
-y.max <- diff(bbox(boundary)[2, ])
 set.seed(2001)
-res <- optimMSSD(points = 100, candi = candi, x.max = x.max, x.min = 40,
-                 y.max = y.max, y.min = 40, iterations = 100,
-                 boundary = boundary)
+res <- optimMSSD(points = 100, candi = candi, iterations = 100)
 tail(attr(res, "energy.state"), 1) # 11855.37
 objMSSD(candi = candi, points = res)
 }

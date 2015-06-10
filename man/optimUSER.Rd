@@ -93,12 +93,9 @@ function defined by the user.
 \examples{
 require(pedometrics)
 require(sp)
-require(rgeos)
 require(SpatialTools)
 data(meuse.grid)
 candi <- meuse.grid[, 1:2]
-x.max <- diff(bbox(boundary)[1, ])
-y.max <- diff(bbox(boundary)[2, ])
 
 # Define the objective function - number of points per lag distance class
 objUSER <-
@@ -119,16 +116,16 @@ set.seed(2001)
 timeUSER <- Sys.time()
 resUSER <- optimUSER(points = 100, fun = objUSER, lags = lags,
                      n_lags = 9, n_pts = 100,
-                     candi = candi, x.max = x.max, x.min = 40, y.max = y.max,
-                     y.min = 40, boundary = boundary, iterations = 100)
+                     candi = candi,
+                     iterations = 100)
 timeUSER <- Sys.time() - timeUSER
 
 # Run the optimization using the respective function implemented in spsann
 set.seed(2001)
 timePPL <- Sys.time()
 resPPL <- optimPPL(points = 100, candi = candi, lags = lags,
-                   criterion = "distribution", x.max = x.max, x.min = 40,
-                   y.max = y.max, y.min = 40, boundary = boundary,
+                   criterion = "distribution",
+
                    iterations = 100)
 timePPL <- Sys.time() - timePPL
 

@@ -47,13 +47,10 @@
 #' data(meuse.grid)
 #' candi <- meuse.grid[, 1:2]
 #' covars <- meuse.grid[, 5]
-#' x.max <- diff(bbox(boundary)[1, ])
-#' y.max <- diff(bbox(boundary)[2, ])
 #' set.seed(2001)
 #' res <- optimCORR(points = 100, candi = candi, covars = covars, 
-#'                  use.coords = TRUE, x.max = x.max, x.min = 40, y.max = y.max, 
-#'                  y.min = 40, boundary = boundary, iterations = 100)
-#' tail(attr(res, "energy"), 1) # 0.07374756
+#'                  use.coords = TRUE, iterations = 100)
+#' tail(attr(res, "energy"), 1) # 0.06386069
 #' objCORR(points = res, candi = candi, covars = covars, use.coords = TRUE)
 # MAIN FUNCTION ################################################################
 optimCORR <-
@@ -93,6 +90,12 @@ optimCORR <-
     eval(prepare_points())
     ############################################################################
     
+    # Prepare for jittering ####################################################
+    prepare_jittering <- 
+      function (...) {parse(text = readLines("tools/prepare-jittering.R"))}
+    eval(prepare_jittering())
+    ############################################################################
+    
     # Prepare covariates (covars) and create the starting sample matrix (sm)
     covars.type <- ifelse(pedometrics::is.any.factor(covars), "factor",
                           "numeric")
@@ -128,8 +131,6 @@ optimCORR <-
     best_energy  <- Inf
     energies     <- vector()
     accept_probs <- vector()
-    x_max0       <- x.max
-    y_max0       <- y.max
     if (progress) pb <- txtProgressBar(min = 1, max = iterations, style = 3)
     time0 <- proc.time()
 

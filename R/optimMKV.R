@@ -55,17 +55,13 @@
 #' data(meuse.grid)
 #' candi <- meuse.grid[, 1:2]
 #' covars <- as.data.frame(meuse.grid)
-#' x.max <- diff(bbox(boundary)[1, ])
-#' y.max <- diff(bbox(boundary)[2, ])
 #' model <- vgm(psill = 10, model = "Exp", range = 500, nugget = 8)
 #' set.seed(2001)
 #' res <- optimMKV(points = 100, candi = candi, covars = covars, 
-#'                 equation = z ~ dist, model = model, krige.stat = "mean", 
-#'                 x.max = x.max, x.min = 40, y.max = y.max, y.min = 40,
-#'                 boundary = boundary, iterations = 100, plotit = TRUE)
-#' tail(attr(res, "energy"), 1) # 11.63081
+#'                 equation = z ~ dist, model = model, iterations = 100)
+#' tail(attr(res, "energy"), 1) # 11.61896
 #' objMKV(points = res, candi = candi, covars = covars, equation = z ~ dist, 
-#'        model = model, krige.stat = "mean")
+#'        model = model)
 # FUNCTION - MAIN ##############################################################
 optimMKV <-
   function (points, candi, covars, equation = z ~ 1, model, krige.stat = "mean",
@@ -104,6 +100,12 @@ optimMKV <-
     prepare_points <- 
       function (...) {parse(text = readLines("tools/prepare-points.R"))}
     eval(prepare_points())
+    ############################################################################
+    
+    # Prepare for jittering ####################################################
+    prepare_jittering <- 
+      function (...) {parse(text = readLines("tools/prepare-jittering.R"))}
+    eval(prepare_jittering())
     ############################################################################
     
     # Prepare prediction grid (pg) with covars
@@ -147,8 +149,6 @@ optimMKV <-
     best_energy <- Inf
     energies <- vector()
     accept_probs <- vector()
-    x_max0 <- x.max
-    y_max0 <- y.max
     if (progress) pb <- txtProgressBar(min = 1, max = iterations, style = 3)
     time0 <- proc.time()
     
