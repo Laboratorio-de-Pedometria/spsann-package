@@ -1,5 +1,16 @@
 # Build package
 
+# Automatically build functions
+fun.name <- c(".check_spsann_arguments", ".plotting_options", 
+              ".prepare_jittering", ".prepare_points")
+read.file <- c("tools/check-spsann-arguments.R", "tools/plotting-options.R",
+               "tools/prepare-jittering.R", "tools/prepare-points.R")
+write.file <- c("R/check-spsann-arguments.R", "R/plotting-options.R",
+                "R/prepare-jittering.R", "R/prepare-points.R")
+lapply(1:length(fun.name), function (i) 
+  ASRtools::autoFunction(fun.name = fun.name[i], read.file = read.file[i], 
+                         write.file = write.file[i]))
+
 # turn on/off development mode
 devtools::dev_mode()
 
@@ -8,8 +19,12 @@ devtools::run_examples()
 devtools::check_doc()
 
 # check the package for Linux and Windows
-devtools::check(document = FALSE)
+devtools::check()
 devtools::build_win()
 
 # upload to CRAN
 devtools::release()
+
+
+
+
