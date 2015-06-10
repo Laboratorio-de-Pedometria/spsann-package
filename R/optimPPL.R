@@ -144,16 +144,8 @@ optimPPL <-
     eval(.plotting_options())
     ############################################################################
     
-    # Prepare points
-    #n_candi <- nrow(candi)
-    #points <- .spsannPoints(points = points, candi = candi, n.candi = n_candi)
-    #n_pts <- nrow(points)
-    #conf0 <- points
-    #old_conf <- conf0
     # Prepare points and candi #################################################
-    prepare_points <- 
-      function (...) {parse(text = readLines("tools/prepare-points.R"))}
-    eval(prepare_points())
+    eval(.prepare_points())
     ############################################################################
     
     # Prepare for jittering ####################################################
@@ -356,14 +348,8 @@ objPPL <-
                             fun = "objPPL")
     if (!is.null(check)) stop (check, call. = FALSE)
     
-    # Prepare points
-    #if (!missing(candi)) n_candi <- nrow(candi)
-    #points <- .spsannPoints(points = points, candi = candi, n.candi = n_candi)
-    #n_pts <- nrow(points)
     # Prepare points and candi #################################################
-    prepare_points <- 
-      function (...) {parse(text = readLines("tools/prepare-points.R"))}
-    eval(prepare_points())
+    eval(.prepare_points())
     ############################################################################
 
     # Prepare lags
@@ -401,14 +387,8 @@ countPPL <-
                             fun = "countPPL")
     if (!is.null(check)) stop (check, call. = FALSE)
     
-    # Prepare points
-    #if (!missing(candi)) n_candi <- nrow(candi)
-    #points <- .spsannPoints(points = points, candi = candi, n.candi = n_candi)
-    #n_pts <- nrow(points)
     # Prepare points and candi #################################################
-    prepare_points <- 
-      function (...) {parse(text = readLines("tools/prepare-points.R"))}
-    eval(prepare_points())
+    eval(.prepare_points())
     ############################################################################
 
     # Prepare lags

@@ -147,3 +147,25 @@
       x_max0 <- x.max, y_max0 <- y.max
     )
   }
+# Prepare points and candi #####################################################
+.prepare_points <-
+  function (...) {
+    expression(
+      if (!missing(candi)) {
+        n_candi <- nrow(candi)
+        candi <- as.matrix(cbind(id = 1:n_candi, candi))
+      },
+      if (is.integer(points) || is.numint(points)) {
+        if (length(points) > 1) { # Integer vector
+          points <- candi[points, ]
+        }
+        if (length(points) == 1) { # Integer value
+          points <- sample(1:n_candi, points)
+          points <- candi[points, ] 
+        }
+      } else { # Data frame of matrix
+        points <- points
+      },
+      n_pts <- nrow(points), conf0 <- points, old_conf <- conf0
+    )
+  }

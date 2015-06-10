@@ -94,16 +94,8 @@ optimACDC <-
     eval(.plotting_options())
     ############################################################################
     
-    # Prepare sample points
-    #n_candi <- nrow(candi)
-    #points <- .spsannPoints(points = points, candi = candi, n.candi = n_candi)
-    #n_pts <- nrow(points)
-    #conf0 <- points
-    #old_conf <- conf0
     # Prepare points and candi #################################################
-    prepare_points <- 
-      function (...) {parse(text = readLines("tools/prepare-points.R"))}
-    eval(prepare_points())
+    eval(.prepare_points())
     ############################################################################
     
     # Prepare for jittering ####################################################
@@ -561,14 +553,8 @@ objACDC <-
                              use.coords = use.coords, strata.type = strata.type)
     if (!is.null(check)) stop (check, call. = FALSE)
     
-    # Prepare sample points
-    #n_candi <- nrow(candi)
-    #points <- .spsannPoints(points = points, candi = candi, n.candi = n_candi)
-    #n_pts <- nrow(points)
     # Prepare points and candi #################################################
-    prepare_points <- 
-      function (...) {parse(text = readLines("tools/prepare-points.R"))}
-    eval(prepare_points())
+    eval(.prepare_points())
     ############################################################################
     
     # Prepare covariates (covars) and create the starting sample matrix (sm)
