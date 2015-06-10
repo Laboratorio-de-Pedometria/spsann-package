@@ -7,7 +7,6 @@
 #' @template spJitter_doc
 #' @template spSANN_doc
 #' @template ACDC_doc
-#' @template MOOP_doc
 #' 
 #' @details
 #' See \code{optimDIST} and \code{optimCORR}.

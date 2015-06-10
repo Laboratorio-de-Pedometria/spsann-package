@@ -104,6 +104,24 @@ optimization.}
 \item{greedy}{Logical value. Should the optimization be done using a greedy
 algorithm, that is, accepting only better system configurations? Defaults
 to \code{greedy = FALSE}.}
+
+\item{weights}{List with named sub-arguments. The weights assigned to each of
+the objective functions combined to form the multi-objective optimization
+problem (MOOP). They must be named after the objective function to which
+they apply. The weights must be larger than 0 and sum to 1. The default
+option gives equal weights to all objective functions.}
+
+\item{nadir}{List with named sub-arguments. Three options are available:
+1) \code{sim} -- the number of random realizations to estimate the nadir
+point, and \code{seeds} -- vector defining the random seeds for each of the
+realizations; 2) \code{user} -- a list of user-defined values named after
+the objective function to which they apply; 3) \code{abs} -- logical for
+calculating the nadir point internally.}
+
+\item{utopia}{List with two named sub-arguments: \code{user} -- a list of
+user-defined values named after the objective function to which they apply,
+and \code{abs} -- logical for calculating the utopia point internally.
+Defaults to \code{user = NULL} and \code{abs = NULL}.}
 }
 \value{
 \code{optimPPL} returns a matrix: the optimized sample configuration with
@@ -162,15 +180,30 @@ candi <- meuse.grid[, 1:2]
 set.seed(2001)
 res <- optimPPL(points = 100, candi = candi, iterations = 100)
 #countPPL(points = res, lags = 7, lags.type = "exponential", pairs = FALSE,
-#         lags.base = 2, cutoff = cutoff)
+#'         lags.base = 2, cutoff = cutoff)
 tail(attr(res, "energy.state"), 1) # 160
 #objPPL(points = res, lags = 7, lags.type = "exponential", pairs = FALSE,
-#       lags.base = 2, cutoff = cutoff, criterion = "distribution")
+#'       lags.base = 2, cutoff = cutoff, criterion = "distribution")
 }
 \author{
 Alessandro Samuel-Rosa \email{alessandrosamuelrosa@gmail.com}
 }
 \references{
+Arora, J. \emph{Introduction to optimum design}. Waltham: Academic Press, p.
+896, 2011.
+
+Marler, R. T.; Arora, J. S. Survey of multi-objective optimization methods
+for engineering. \emph{Structural and Multidisciplinary Optimization}, v. 26,
+p. 369-395, 2004.
+
+Marler, R. T.; Arora, J. S. Function-transformation methods for
+multi-objective optimization. \emph{Engineering Optimization}, v. 37, p.
+551-570, 2005.
+
+Marler, R. T.; Arora, J. S. The weighted sum method for multi-objective
+optimization: new insights. \emph{Structural and Multidisciplinary
+Optimization}, v. 41, p. 853-862, 2009.
+
 Bresler, E.; Green, R. E. \emph{Soil parameters and sampling scheme for
 characterizing soil hydraulic properties of a watershed}. Honolulu:
 University of Hawaii at Manoa, p. 42, 1982.

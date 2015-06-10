@@ -10,7 +10,6 @@
 # 
 # @template spJitter_doc
 # @template spSANN_doc
-# @template MOOP_doc
 # @template ACDC_doc
 # 
 # @return

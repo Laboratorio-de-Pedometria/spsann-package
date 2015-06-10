@@ -132,18 +132,54 @@ nadir <- list(sim = 10, seeds = 1:10)
 utopia <- list(user = list(DIST = 0, CORR = 0))
 covars <- meuse.grid[, 5]
 set.seed(2001)
-res <- optimACDC(points = 100, candi = candi, covars = covars,
-                 use.coords = TRUE,
-                 iterations = 100, nadir = nadir,
-                 utopia = utopia)
-tail(attr(res, "energy")$obj, 1) # 0.5251647
+res <- optimACDC(points = 100, candi = candi, covars = covars, nadir = nadir,
+                 use.coords = TRUE, iterations = 100, utopia = utopia)
+tail(attr(res, "energy")$obj, 1) # 0.5272031
 objACDC(points = res, candi = candi, covars = covars, use.coords = TRUE,
         nadir = nadir, utopia = utopia)
+# MARGINAL DISTRIBUTION
+par(mfrow = c(3, 3))
+# Covariates
+i <- sample(1:nrow(candi), 100)
+hist(candi[, 1], breaks = 10)
+hist(candi[, 2], breaks = 10)
+hist(covars, breaks = 10)
+# Optimized sample
+hist(candi[res[, 1], 1], breaks = 10)
+hist(candi[res[, 1], 2], breaks = 10)
+hist(covars[res[, 1]], breaks = 10)
+# Random sample
+hist(candi[i, 1], breaks = 10)
+hist(candi[i, 2], breaks = 10)
+hist(covars[i], breaks = 10)
+
+# LINEAR CORRELATION
+# Covariates
+cor(cbind(candi[, 1], candi[, 2], covars))
+# Optimized sample
+cor(cbind(candi[res[, 1], 1], candi[res[, 1], 2], covars[res[, 1]]))
+# Random sample
+cor(cbind(candi[i, 1], candi[i, 2], covars[i]))
 }
 \author{
 Alessandro Samuel-Rosa \email{alessandrosamuelrosa@gmail.com}
 }
 \references{
+Arora, J. \emph{Introduction to optimum design}. Waltham: Academic Press, p.
+896, 2011.
+
+Marler, R. T.; Arora, J. S. Survey of multi-objective optimization methods
+for engineering. \emph{Structural and Multidisciplinary Optimization}, v. 26,
+p. 369-395, 2004.
+
+Marler, R. T.; Arora, J. S. Function-transformation methods for
+multi-objective optimization. \emph{Engineering Optimization}, v. 37, p.
+551-570, 2005.
+
+Marler, R. T.; Arora, J. S. The weighted sum method for multi-objective
+optimization: new insights. \emph{Structural and Multidisciplinary
+Optimization}, v. 41, p. 853-862, 2009.
+
 Cramér, H. \emph{Mathematical methods of statistics}. Princeton: Princeton
 University Press, p. 575, 1946.
 
@@ -170,21 +206,6 @@ and Geoinformation}, v. 21, p. 301-310, 2013.
 Roudier, P.; Beaudette, D.; Hewitt, A. A conditioned Latin hypercube sampling
 algorithm incorporating operational constraints. \emph{5th Global Workshop on
 Digital Soil Mapping}. Sydney, p. 227-231, 2012.
-
-Arora, J. \emph{Introduction to optimum design}. Waltham: Academic Press, p.
-896, 2011.
-
-Marler, R. T.; Arora, J. S. Survey of multi-objective optimization methods
-for engineering. \emph{Structural and Multidisciplinary Optimization}, v. 26,
-p. 369-395, 2004.
-
-Marler, R. T.; Arora, J. S. Function-transformation methods for
-multi-objective optimization. \emph{Engineering Optimization}, v. 37, p.
-551-570, 2005.
-
-Marler, R. T.; Arora, J. S. The weighted sum method for multi-objective
-optimization: new insights. \emph{Structural and Multidisciplinary
-Optimization}, v. 41, p. 853-862, 2009.
 }
 \seealso{
 \code{\link[clhs]{clhs}}, \code{\link[pedometrics]{cramer}}
