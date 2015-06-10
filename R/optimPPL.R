@@ -113,25 +113,17 @@
 #' require(SpatialTools)
 #' data(meuse.grid)
 #' candi <- meuse.grid[, 1:2]
-#' x.max <- diff(bbox(boundary)[1, ])
-#' y.max <- diff(bbox(boundary)[2, ])
-#' cutoff <- sqrt((x.max * x.max) + (y.max * y.max)) / 2
 #' set.seed(2001)
-#' res <- optimPPL(points = 100, candi = candi, lags = 7, pairs = FALSE,
-#'                 lags.base = 2, criterion = "distribution", cutoff = cutoff,
-#'                 lags.type = "exponential", x.max = x.max, x.min = 40, 
-#'                 y.max = y.max, y.min = 40, boundary = boundary,
-#'                 iterations = 100, plotit = TRUE, verbose = TRUE)
-#' countPPL(points = res, lags = 7, lags.type = "exponential", pairs = FALSE,
-#'          lags.base = 2, cutoff = cutoff)
-#' tail(attr(res, "energy.state"), 1) # 168
-#' objPPL(points = res, lags = 7, lags.type = "exponential", pairs = FALSE,
-#'        lags.base = 2, cutoff = cutoff, criterion = "distribution")
+#' res <- optimPPL(points = 100, candi = candi, iterations = 100)
+#' #countPPL(points = res, lags = 7, lags.type = "exponential", pairs = FALSE,
+#' #'         lags.base = 2, cutoff = cutoff)
+#' tail(attr(res, "energy.state"), 1) # 160
+#' #objPPL(points = res, lags = 7, lags.type = "exponential", pairs = FALSE,
+#' #'       lags.base = 2, cutoff = cutoff, criterion = "distribution")
 # FUNCTION - MAIN ##############################################################
 optimPPL <-
-  function (points, candi, lags = 7, lags.type = "exponential",
-            lags.base = 2, cutoff = NULL, criterion = "distribution",
-            distri = NULL, pairs = FALSE,
+  function (points, candi, lags = 7, lags.type = "exponential", lags.base = 2,
+            cutoff, criterion = "distribution", distri, pairs = FALSE,
             x.max, x.min, y.max, y.min, iterations = 10000,
             acceptance = list(initial = 0.99, cooling = iterations / 10),
             stopping = list(max.count = iterations / 10), plotit = TRUE,
@@ -143,6 +135,7 @@ optimPPL <-
       function (...) {parse(text = readLines("tools/check-spsann-arguments.R"))}
     eval(check_spsann_arguments())
     ############################################################################
+    
     check <- .optimPPLcheck(lags = lags, lags.type = lags.type, pairs = pairs,
                             lags.base = lags.base, cutoff = cutoff, 
                             criterion = criterion, distri = distri, 
@@ -167,7 +160,14 @@ optimPPL <-
     eval(prepare_points())
     ############################################################################
     
-    # Prepare lags
+    # Prepare for jittering ####################################################
+    prepare_jittering <- 
+      function (...) {parse(text = readLines("tools/prepare-jittering.R"))}
+    eval(prepare_jittering())
+    ############################################################################
+    
+    # Prepare cutoff and lags
+    cutoff <- .cutoffPPL(cutoff = cutoff, x.max = x.max, y.max = y.max)
     if (length(lags) >= 2) {
       n_lags <- length(lags) - 1
     } else {
@@ -198,8 +198,6 @@ optimPPL <-
     best_energy <- Inf
     energies <- vector()
     accept_probs <- vector()
-    x_max0 <- x.max
-    y_max0 <- y.max
     if (progress) pb <- txtProgressBar(min = 1, max = iterations, style = 3)
     time0 <- proc.time()
     
@@ -354,9 +352,8 @@ optimPPL <-
 #' @rdname optimPPL
 #' @export
 objPPL <-
-  function (points, candi, lags = 7, lags.type = "exponential",
-            lags.base = 2, cutoff = NULL, criterion = "distribution",
-            distri = NULL, pairs = FALSE) {
+  function (points, candi, lags = 7, lags.type = "exponential", lags.base = 2,
+            cutoff, criterion = "distribution", distri, pairs = FALSE) {
     
     # Check arguments
     check <- .optimPPLcheck(lags = lags, lags.type = lags.type, pairs = pairs, 
@@ -401,8 +398,8 @@ objPPL <-
 #' @rdname optimPPL
 #' @export
 countPPL <-
-  function (points, candi, lags = 7, lags.type = "exponential",
-            lags.base = 2, cutoff = NULL, pairs = FALSE) {
+  function (points, candi, lags = 7, lags.type = "exponential", lags.base = 2,
+            cutoff, pairs = FALSE) {
     
     # Check arguments
     check <- .optimPPLcheck(lags = lags, lags.type = lags.type, pairs = pairs,
@@ -446,55 +443,58 @@ countPPL <-
 .optimPPLcheck <-
   function (lags, lags.type, lags.base, cutoff, criterion, distri, pairs, fun) {
     
-    # pairs
+    # Argument 'pairs'
     if (!is.logical(pairs)) {
-      res <- paste("'pairs' must be a logical value")
+      res <- c("'pairs' must be a logical value")
       return (res)
     }
     
-    # lags and cutoff
+    # Arguments 'lags' and 'cutoff'
     if (length(lags) == 1) {
-      if (is.null(cutoff)) {
-        res <- paste("'cutoff' is mandatory when the lag intervals are not set")
-        return (res)
+      if (fun != "optimPPL") {
+        if (missing(cutoff)) {
+          res <- c("'cutoff' is mandatory if the lag intervals are not set")
+          return (res)
+        }
       }
     } else {
-      if (!is.null(cutoff)) {
-        res <- paste("'cutoff' cannot be used when the lag intervals are set")
+      if (!missing(cutoff)) {
+        res <- c("'cutoff' cannot be used when the lag intervals are set")
         return (res)
       }
       if (lags[1] == 0) {
-        res <- paste("lowest lag value must be larger than zero")
+        res <- c("lowest lag value must be larger than zero")
         return (res)
       }
     }
     
-    # lags.type
+    # Argument 'lags.type'
     lt <- c("equidistant", "exponential")
     lt <- is.na(any(match(lt, lags.type)))
     if (lt) {
       res <- paste("'lags.type = ", lags.type, "' is not supported", sep = "")
       return (res)
     }
-
-    # lags.base
+    
+    # Argument 'lags.base'
     if (!is.numeric(lags.base) || length(lags.base) > 1) {
-      res <- paste("'lags.base' must be a numeric value")
+      res <- c("'lags.base' must be a numeric value")
       return (res)
     }
     
     if (fun != "countPPL") {
-      # criterion
+      
+      # Argument 'criterion'
       cr <- is.na(any(match(criterion, c("distribution", "minimum"))))
       if (cr) {
         res <- paste("'criterion = ", criterion, "' is not supported", sep = "")
         return (res)
       }
       
-      # distri
-      if (!is.null(distri)) {
+      # Argument 'distri'
+      if (!missing(distri)) {
         if (!is.numeric(distri)) {
-          res <- paste("'distri' must be a numeric vector")
+          res <- c("'distri' must be a numeric vector")
           return (res)
         }
         if (length(lags) == 1) {
@@ -515,17 +515,15 @@ countPPL <-
   }
 # INTERNAL FUNCTION - CALCULATE THE POINT CRITERION VALUE ######################
 .objPointsPerLag <-
-  function (ppl, n.lags, n.pts, criterion, distri = NULL) {
+  function (ppl, n.lags, n.pts, criterion, distri) {
     if (criterion == "distribution") {
-      if (is.null(distri)) {
+      if (missing(distri)) {
         distri <- rep(n.pts, n.lags)
       }
       res <- sum(distri - ppl)
-      } else {
-        if (criterion == "minimum") {
-          res <- n.pts / (min(ppl) + 1)
-        }
-      }
+    } else {
+      res <- n.pts / (min(ppl) + 1)
+    }
     return (res)
   }
 # INTERNAL FUNCTION - NUMBER OF POINTS PER LAG-DISTANCE CLASS ##################
@@ -567,9 +565,9 @@ countPPL <-
   }
 # INTERNAL FUNCTION - CALCULATE THE POINT-PAIR CRITERION VALUE #################
 .objPairsPerLag <-
-  function (ppl, n.lags, n.pts, criterion, distri = NULL) {
+  function (ppl, n.lags, n.pts, criterion, distri) {
     if (criterion == "distribution") {
-      if (is.null(distri)) {
+      if (missing(distri)) {
         distri <- rep(n.pts * (n.pts - 1) / (2 * n.lags), n.lags)
       }
       res <- sum(abs(distri - ppl))
@@ -580,4 +578,14 @@ countPPL <-
       }
     }
     return (res)
+  }
+# INTERNAL FUNCTION - DETERMINE THE CUTOFF #####################################
+.cutoffPPL <- 
+  function (cutoff, x.max, y.max) {
+    if (missing(cutoff)) {
+      cutoff <- sqrt(x.max ^ 2 + y.max ^ 2) / 2
+    } else {
+      cutoff <- cutoff
+    }
+    return (cutoff)
   }

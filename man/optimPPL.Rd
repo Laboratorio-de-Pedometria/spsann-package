@@ -7,19 +7,17 @@
 \title{Optimization of sample configurations for variogram estimation}
 \usage{
 optimPPL(points, candi, lags = 7, lags.type = "exponential",
-  lags.base = 2, cutoff = NULL, criterion = "distribution",
-  distri = NULL, pairs = FALSE, x.max, x.min, y.max, y.min,
-  iterations = 10000, acceptance = list(initial = 0.99, cooling =
-  iterations/10), stopping = list(max.count = iterations/10), plotit = TRUE,
-  boundary, progress = TRUE, verbose = TRUE, greedy = FALSE, weights,
-  nadir, utopia)
+  lags.base = 2, cutoff, criterion = "distribution", distri,
+  pairs = FALSE, x.max, x.min, y.max, y.min, iterations = 10000,
+  acceptance = list(initial = 0.99, cooling = iterations/10),
+  stopping = list(max.count = iterations/10), plotit = TRUE, boundary,
+  progress = TRUE, verbose = TRUE, greedy = FALSE, weights, nadir, utopia)
 
 objPPL(points, candi, lags = 7, lags.type = "exponential", lags.base = 2,
-  cutoff = NULL, criterion = "distribution", distri = NULL,
-  pairs = FALSE)
+  cutoff, criterion = "distribution", distri, pairs = FALSE)
 
 countPPL(points, candi, lags = 7, lags.type = "exponential",
-  lags.base = 2, cutoff = NULL, pairs = FALSE)
+  lags.base = 2, cutoff, pairs = FALSE)
 }
 \arguments{
 \item{points}{Integer value, integer vector, data frame or matrix. If
@@ -158,24 +156,16 @@ lag-distance classes.
 \examples{
 require(pedometrics)
 require(sp)
-require(rgeos)
 require(SpatialTools)
 data(meuse.grid)
 candi <- meuse.grid[, 1:2]
-x.max <- diff(bbox(boundary)[1, ])
-y.max <- diff(bbox(boundary)[2, ])
-cutoff <- sqrt((x.max * x.max) + (y.max * y.max)) / 2
 set.seed(2001)
-res <- optimPPL(points = 100, candi = candi, lags = 7, pairs = FALSE,
-                lags.base = 2, criterion = "distribution", cutoff = cutoff,
-                lags.type = "exponential", x.max = x.max, x.min = 40,
-                y.max = y.max, y.min = 40, boundary = boundary,
-                iterations = 100, plotit = TRUE, verbose = TRUE)
-countPPL(points = res, lags = 7, lags.type = "exponential", pairs = FALSE,
-         lags.base = 2, cutoff = cutoff)
-tail(attr(res, "energy.state"), 1) # 168
-objPPL(points = res, lags = 7, lags.type = "exponential", pairs = FALSE,
-       lags.base = 2, cutoff = cutoff, criterion = "distribution")
+res <- optimPPL(points = 100, candi = candi, iterations = 100)
+#countPPL(points = res, lags = 7, lags.type = "exponential", pairs = FALSE,
+#         lags.base = 2, cutoff = cutoff)
+tail(attr(res, "energy.state"), 1) # 160
+#objPPL(points = res, lags = 7, lags.type = "exponential", pairs = FALSE,
+#       lags.base = 2, cutoff = cutoff, criterion = "distribution")
 }
 \author{
 Alessandro Samuel-Rosa \email{alessandrosamuelrosa@gmail.com}
