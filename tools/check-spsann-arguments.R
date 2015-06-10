@@ -114,7 +114,7 @@ if (aa) {
 # Output
 if (!is.null(res)) stop (res, call. = FALSE)
 #
-# COMMAND:
+# COMMAND
 # # Check spsann arguments ###################################################
 # check_spsann_arguments <- 
 #   function (...) {parse(text = readLines("tools/check-spsann-arguments.R"))}

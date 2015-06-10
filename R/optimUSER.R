@@ -84,9 +84,7 @@ optimUSER <-
             weights, nadir, utopia) {
     
     # Check spsann arguments ###################################################
-    check_spsann_arguments <- 
-      function (...) {parse(text = readLines("tools/check-spsann-arguments.R"))}
-    eval(check_spsann_arguments())
+    eval(.check_spsann_arguments())
     ############################################################################
     
     # Set plotting options ####################################################

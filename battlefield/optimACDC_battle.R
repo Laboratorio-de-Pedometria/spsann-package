@@ -7,6 +7,7 @@ require(sp)
 source('R/optimACDC.R')
 source('R/spSANNtools.R')
 source('R/spJitter.R')
+source('R/tools.R')
 Rcpp::sourceCpp('src/spJitterCpp.cpp')
 # 0) DEFAULT EXAMPLE ###########################################################
 require(pedometrics)

@@ -83,10 +83,9 @@ optimDIST <-
     if (!is.data.frame(covars)) covars <- as.data.frame(covars)
     
     # Check spsann arguments ###################################################
-    check_spsann_arguments <- 
-      function (...) {parse(text = readLines("tools/check-spsann-arguments.R"))}
-    eval(check_spsann_arguments())
+    eval(.check_spsann_arguments())
     ############################################################################
+    
     check <- .optimDISTcheck(candi = candi, covars = covars, 
                              use.coords = use.coords, strata.type = strata.type)
     if (!is.null(check)) stop (check, call. = FALSE)

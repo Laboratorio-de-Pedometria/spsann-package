@@ -76,10 +76,9 @@ optimMKV <-
     }    
     
     # Check spsann arguments ###################################################
-    check_spsann_arguments <- 
-      function (...) {parse(text = readLines("tools/check-spsann-arguments.R"))}
-    eval(check_spsann_arguments())
+    eval(.check_spsann_arguments())
     ############################################################################
+    
     check <- .optimMKVcheck(covars = covars, equation = equation, model = model,
                             krige.stat = krige.stat, candi = candi)
     if (!is.null(check)) stop (check, call. = FALSE)
