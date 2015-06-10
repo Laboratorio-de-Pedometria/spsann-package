@@ -5,7 +5,7 @@ man-roxygen
 NEWS\.md
 .RData
 battlefield
-build-packages.R
+build-package.R
 Rprof.out
 
 
@@ -15,6 +15,7 @@ src/*.so
 
 # R files
 R/optimPAN.R
+tools/*.R
 
 # Rd files
 man/optimPAN.Rd
