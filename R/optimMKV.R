@@ -84,9 +84,7 @@ optimMKV <-
     if (!is.null(check)) stop (check, call. = FALSE)
     
     # Set plotting options ####################################################
-    plotting_options <- 
-      function (...) {parse(text = readLines("tools/plotting-options.R"))}
-    eval(plotting_options())
+    eval(.plotting_options())
     ############################################################################
     
     # Prepare points

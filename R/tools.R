@@ -96,4 +96,36 @@
       },
       if (!is.null(res)) stop (res, call. = FALSE))
   }
-################################################################################
+# Set plotting options #########################################################
+.plotting_options <-
+  function (...) {
+    expression(
+      if (plotit) {
+        par0 <- par()
+        on.exit(suppressWarnings(par(par0)))
+        if (missing(boundary)) {
+          x <- by(candi[, 1], as.factor(candi[, 2]), 
+                  FUN = range, simplify = FALSE)
+          x <- do.call(rbind, x)
+          d <- dist(x)
+          d <- min(d[d > 0]) / 2
+          x[, 1] <- x[, 1] - d
+          x[, 2] <- x[, 2] + d
+          y <- as.numeric(rownames(x))
+          xy <- cbind(c(x[, 1], x[, 2]), rep(y, 2))
+          
+          y <- by(candi[, 2], as.factor(candi[, 1]), 
+                  FUN = range, simplify = FALSE)
+          y <- do.call(rbind, y)
+          d <- dist(y)
+          d <- min(d[d > 0]) / 2
+          y[, 1] <- y[, 1] - d
+          y[, 2] <- y[, 2] + d
+          x <- as.numeric(rownames(y))
+          yx <- cbind(rep(x, 2), c(y[, 1], y[, 2]))
+          
+          boundary <- SpatialPoints(unique(rbind(xy, yx)))
+        }
+      }
+    )
+  }
