@@ -83,7 +83,13 @@ optimSPAN <-
       function (...) {parse(text = readLines("tools/prepare-points.R"))}
     eval(prepare_points())
     ############################################################################
-
+    
+    # Prepare for jittering ####################################################
+    prepare_jittering <- 
+      function (...) {parse(text = readLines("tools/prepare-jittering.R"))}
+    eval(prepare_jittering())
+    ############################################################################
+    
     # BASE VARIABLES AND DATASETS, NADIR POINT AND INITIAL ENERGY STATE
     
     # PPL
@@ -171,8 +177,6 @@ optimSPAN <-
     old_energy   <- energy0
     best_energy  <- Inf
     energies     <- accept_probs <- vector()
-    x_max0       <- x.max
-    y_max0       <- y.max
     if (progress) pb <- txtProgressBar(min = 1, max = iterations, style = 3)
     time0 <- proc.time()
 
