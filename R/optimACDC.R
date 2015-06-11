@@ -7,6 +7,7 @@
 #' @template spJitter_doc
 #' @template spSANN_doc
 #' @template ACDC_doc
+#' @template MOOP_doc
 #' 
 #' @details
 #' See \code{optimDIST} and \code{optimCORR}.
@@ -87,8 +88,8 @@ optimACDC <-
                              use.coords = use.coords, strata.type = strata.type)
     if (!is.null(check)) stop (check, call. = FALSE)
     
-    check <- .MOOPcheck(weights = weights, nadir = nadir, utopia = utopia)
-    if (!is.null(check)) stop (check, call. = FALSE)
+#     check <- .MOOPcheck(weights = weights, nadir = nadir, utopia = utopia)
+#     if (!is.null(check)) stop (check, call. = FALSE)
     
     # Set plotting options ####################################################
     eval(.plotting_options())

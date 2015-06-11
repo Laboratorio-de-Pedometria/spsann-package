@@ -7,6 +7,7 @@
 #'
 #' @template spJitter_doc
 #' @template spSANN_doc
+#' @template MOOP_doc
 #'
 #' @details
 #' Euclidean distances between points are calculated. This computation requires

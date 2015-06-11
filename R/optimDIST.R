@@ -7,6 +7,7 @@
 #' @template spJitter_doc
 #' @template spSANN_doc
 #' @template ACDC_doc
+#' @template MOOP_doc
 #' 
 #' @details
 #' Reproducing the marginal distribution of the numeric covariates depends upon

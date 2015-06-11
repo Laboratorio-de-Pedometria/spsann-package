@@ -11,6 +11,7 @@
 # @template spJitter_doc
 # @template spSANN_doc
 # @template ACDC_doc
+# @template MOOP_doc
 # 
 # @return
 # \code{optimSPAN()} returns a matrix: the optimized sample configuration with
@@ -60,8 +61,8 @@ optimSPAN <-
                              use.coords = use.coords, strata.type = strata.type)
     if (!is.null(check)) stop (check, call. = FALSE)
     
-    check <- .MOOPcheck(weights = weights, nadir = nadir, utopia = utopia)
-    if (!is.null(check)) stop (check, call. = FALSE)
+#     check <- .MOOPcheck(weights = weights, nadir = nadir, utopia = utopia)
+#     if (!is.null(check)) stop (check, call. = FALSE)
 
     # Set plotting options ####################################################
     eval(.plotting_options())

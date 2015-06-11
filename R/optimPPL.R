@@ -6,6 +6,7 @@
 #' 
 #' @template spJitter_doc
 #' @template spSANN_doc
+#' @template MOOP_doc
 #' 
 #' @param lags Integer value. The number of lag-distance classes. Alternatively,
 #' a vector of numeric values with the lower and upper limits of each 

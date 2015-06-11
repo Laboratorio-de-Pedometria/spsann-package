@@ -7,6 +7,7 @@
 #' @template spJitter_doc
 #' @template spSANN_doc
 #' @template ACDC_doc
+#' @template MOOP_doc
 #' 
 #' @details
 #' The correlation between two numeric covariates is measured using the 

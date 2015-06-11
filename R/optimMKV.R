@@ -6,6 +6,7 @@
 #'
 #' @template spJitter_doc
 #' @template spSANN_doc
+#' @template MOOP_doc
 #' 
 #' @param covars Data frame or matrix with the covariates in the columns.
 #' 

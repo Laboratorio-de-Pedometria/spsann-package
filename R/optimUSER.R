@@ -4,6 +4,7 @@
 #' 
 #' @template spJitter_doc
 #' @template spSANN_doc
+#' @template MOOP_doc
 #' 
 #' @param fun A function defining the objective function that should be
 #' used to evaluate the energy state of the system configuration at each 
