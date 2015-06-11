@@ -1,10 +1,16 @@
 # Build package
 
+#use_travis()
+#use_cran_comments()
+#use_cran_badge()
+
 # Automatically build functions
 fun.name <- c(".check_spsann_arguments", ".plotting_options", 
               ".prepare_jittering", ".prepare_points")
-read.file <- c("tools/check-spsann-arguments.R", "tools/plotting-options.R",
-               "tools/prepare-jittering.R", "tools/prepare-points.R")
+read.file <- c("R-autoFunction/check-spsann-arguments.R", 
+               "R-autoFunction/plotting-options.R",
+               "R-autoFunction/prepare-jittering.R",
+               "R-autoFunction/prepare-points.R")
 write.file <- c("R/check-spsann-arguments.R", "R/plotting-options.R",
                 "R/prepare-jittering.R", "R/prepare-points.R")
 lapply(1:length(fun.name), function (i) 

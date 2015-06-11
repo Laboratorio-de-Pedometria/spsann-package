@@ -13,7 +13,8 @@ src/*.o
 src/*.so
 # R files
 R/optimPAN.R
-tools/*.R
+R-autoFunction/
 # Rd files
 man/optimPAN.Rd
 ^\.travis\.yml$
+^cran-comments\.md$
