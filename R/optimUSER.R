@@ -33,7 +33,6 @@
 #' @concept simulated annealing
 #' @export
 #' @examples
-#' require(pedometrics)
 #' require(sp)
 #' require(SpatialTools)
 #' data(meuse.grid)
@@ -57,13 +56,16 @@
 #' set.seed(2001)
 #' timeUSER <- Sys.time()
 #' resUSER <- optimUSER(points = 100, fun = objUSER, lags = lags, n_lags = 9,
-#'                      n_pts = 100, candi = candi, iterations = 100)
+#'                      n_pts = 100, candi = candi, iterations = 100,
+#'                      plotit = FALSE, track = FALSE, verbose = FALSE)
 #' timeUSER <- Sys.time() - timeUSER
 #' 
 #' # Run the optimization using the respective function implemented in spsann
 #' set.seed(2001)
 #' timePPL <- Sys.time()
-#' resPPL <- optimPPL(points = 100, candi = candi, lags = lags, iterations = 100)
+#' resPPL <- optimPPL(points = 100, candi = candi, lags = lags, 
+#'                    iterations = 100, plotit = FALSE, track = FALSE, 
+#'                    verbose = FALSE)
 #' timePPL <- Sys.time() - timePPL
 #' 
 #' # Compare results
@@ -81,8 +83,8 @@ optimUSER <-
             candi, x.max, x.min, y.max, y.min, iterations = 10000,
             acceptance = list(initial = 0.99, cooling = iterations / 10),
             stopping = list(max.count = iterations / 10), plotit = TRUE,
-            boundary, progress = TRUE, verbose = TRUE, greedy = FALSE,
-            weights, nadir, utopia) {
+            boundary, progress = TRUE, verbose = TRUE, track = TRUE, 
+            greedy = FALSE, weights = NULL, nadir = NULL, utopia = NULL) {
     
     # Check spsann arguments ###################################################
     eval(.check_spsann_arguments())
@@ -108,8 +110,8 @@ optimUSER <-
     count <- 0
     old_energy <- energy0
     best_energy <- Inf
-    energies <- vector()
-    accept_probs <- vector()
+    #energies <- vector()
+    #accept_probs <- vector()
     if (progress) pb <- txtProgressBar(min = 1, max = iterations, style = 3)
     time0 <- proc.time()
     
@@ -134,7 +136,7 @@ optimUSER <-
         random_prob <- runif(1)
       }
       actual_prob <- acceptance$initial * exp(-k / acceptance$cooling)
-      accept_probs[k] <- actual_prob
+      if (track) accept_probs[k] <- actual_prob
       if (new_energy <= old_energy) {
         # Always accepts a better energy
         old_conf <- new_conf
@@ -162,7 +164,7 @@ optimUSER <-
       }
       
       # Best energy state
-      energies[k] <- new_energy
+      if (track) energies[k] <- new_energy
       if (new_energy < best_energy / 1.0000001) {
         best_k <- k
         best_conf <- new_conf
@@ -189,7 +191,7 @@ optimUSER <-
           old_energy <- best_old_energy
           new_energy <- best_energy
           count <- 0
-          energies[k] <- new_energy
+          #energies[k] <- new_energy
           cat("\n", "reached maximum count with suboptimal configuration\n")
           cat("\n", "restarting with previously best configuration\n")
           cat("\n", count, "iteration(s) with no improvement... stops at",
@@ -201,8 +203,9 @@ optimUSER <-
       if (progress) setTxtProgressBar(pb, k)
     }
     if (progress) close(pb)
-    res <- .spSANNout(new_conf = new_conf, energy0 = energy0, MOOP = MOOP,
-                      energies = energies, time0 = time0)
+    if (!track) energies <- new_energy
+    res <- .spSANNout(new_conf = new_conf, energy0 = energy0, 
+                      energies = energies, time0 = time0, MOOP = MOOP)
     return (res)
   }
 # INTERNAL FUNCTION - CALCULATE DE ENERGY STATE ################################

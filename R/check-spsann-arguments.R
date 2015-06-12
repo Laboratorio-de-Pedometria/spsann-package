@@ -10,43 +10,37 @@ expression(res <- NULL, aa <- c("points", "candi"), bb <- c(missing(points), mis
       aa <- any(apply(candi, 2, is.numeric) == FALSE)
       bb <- ncol(candi) != 2
       cc <- any(c(c("x", "y") != colnames(candi)) == TRUE)
-      #if (ncol(candi) != 2) {
       if (aa || bb || cc) {
         res <- c("'candi' must have two named numeric columns: 'x' and 'y'")
       } else {
-        #aa <- c("x", "y")
-        #bb <- colnames(candi)
-        #bb <- any(c(aa != bb) == TRUE)
-        #if (bb) {
-        #  res <- c("'candi' must have two named columns: 'x' and 'y'")
-        #} else {
-          # Argument 'iterations'
-          if (!is.numint(iterations) || length(iterations) > 1) {
-            res <- c("'iterations' must be an integer value")
+        # Argument 'iterations'
+        if (!is.numint(iterations) || length(iterations) > 1) {
+          res <- c("'iterations' must be an integer value")
+        } else {
+          # Argument 'acceptance'
+          aa <- !is.list(acceptance)
+          bb <- length(acceptance) != 2
+          cc <- is.null(names(acceptance))
+          dd <- !all(c(names(acceptance) == c("initial", "cooling")) == TRUE)
+          if (aa || bb || cc || dd) {
+            res <- paste("'acceptance' must be a list with two named ",
+                         "sub-arguments: 'initial' and 'cooling'", sep = "")
           } else {
-            # Argument 'acceptance'
-            aa <- !is.list(acceptance)
-            bb <- length(acceptance) != 2
-            cc <- is.null(names(acceptance))
-            dd <- !all(c(names(acceptance) == c("initial", "cooling")) == TRUE)
+            # Argument 'stopping'
+            aa <- !is.list(stopping)
+            bb <- length(stopping) != 1
+            cc <- is.null(names(stopping))
+            dd <- !all(c(names(stopping) == "max.count") == TRUE)
             if (aa || bb || cc || dd) {
-              res <- paste("'acceptance' must be a list with two named ",
-                           "sub-arguments: 'initial' and 'cooling'", sep = "")
-            } else {
-              # Argument 'stopping'
-              aa <- !is.list(stopping)
-              bb <- length(stopping) != 1
-              cc <- is.null(names(stopping))
-              dd <- !all(c(names(stopping) == "max.count") == TRUE)
-              if (aa || bb || cc || dd) {
-                res <- paste("'stopping' must be a list with one named ",
-                             "sub-argument: 'max.count'", sep = "")
-              }
+              res <- paste("'stopping' must be a list with one named ",
+                           "sub-argument: 'max.count'", sep = "")
             }
           }
         }
-      }, aa <- all(c(!missing(weights), !missing(utopia), !missing(nadir))), 
-    if (aa) {
+      }
+    }, aa <- all(c(!is.null(weights), !is.null(utopia), !is.null(nadir))), 
+    MOOP <- ifelse(aa, TRUE, FALSE), if (MOOP) {
+      # Argument 'weights'
       aa <- !is.list(weights)
       bb <- is.null(names(weights))
       cc <- length(weights) < 2
@@ -56,41 +50,42 @@ expression(res <- NULL, aa <- c("points", "candi"), bb <- c(missing(points), mis
         aa <- sum(unlist(weights)) != 1
         if (aa) {
           res <- c("'weights' must sum to 1")
-        } else {
-          MOOP <- length(which(weights != 0))
-          MOOP <- ifelse(MOOP > 1, TRUE, FALSE)
-          #COST <- ifelse(weights$COST == 0, FALSE, TRUE)
-          
-          # Argument 'utopia'
-          if (MOOP) {
-            aa <- !is.list(utopia)
-            bb <- !length(utopia) == 1
-            cc <- is.null(names(utopia))
-            if (aa || bb || cc) {
-              res <- c("'utopia' must be a list with one named component")
-            } else {
-              
-              # Argument 'nadir'
-              aa <- !is.list(nadir)
-              if (aa) {
-                res <- c("'nadir' must be a list with named components")
-              }
-              aa <- names(nadir)
-              if (length(aa) >= 2) {
-                if (length(aa) > 2) {
-                  res <- c("you must choose a single 'nadir' option")
-                }
-              } else {
-                if (aa == "sim" || aa == "seeds") { 
-                  res <- c("the number of simulations and their seeds must be set")
-                }
-                if (aa == "abs") {
-                  res <- c("sorry but 'nadir' cannot be calculated")
-                }
-              }  
-            }
-          }
         }
+      }
+    }, if (MOOP) {
+      aa <- !is.list(utopia)
+      bb <- !length(utopia) == 1
+      cc <- is.null(names(utopia))
+      if (aa || bb || cc) {
+        res <- c("'utopia' must be a list with one named component")
+      } else {
+        
+        # Argument 'nadir'
+        aa <- !is.list(nadir)
+        if (aa) {
+          res <- c("'nadir' must be a list with named components")
+        }
+        aa <- names(nadir)
+        if (length(aa) >= 2) {
+          if (length(aa) > 2) {
+            res <- c("you must choose a single 'nadir' option")
+          }
+        } else {
+          if (aa == "sim" || aa == "seeds") { 
+            res <- c("the number of simulations and their seeds must be set")
+          }
+          if (aa == "abs") {
+            res <- c("sorry but 'nadir' cannot be calculated")
+          }
+        }  
+      }
+    }, if (track || plotit) {
+      accept_probs <- vector()
+      if (MOOP) {
+        energies <- as.data.frame(matrix(NA, nrow = 1, ncol = length(weights) + 1))
+        colnames(energies) <- c("obj", names(weights))
+      } else {
+        energies <- vector()
       }
     }, if (!is.null(res)) stop (res, call. = FALSE), rm(aa, bb, cc, dd, res))
 }

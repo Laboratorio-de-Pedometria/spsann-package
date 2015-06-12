@@ -37,7 +37,8 @@
 #' covars <- meuse.grid[, 5]
 #' set.seed(2001)
 #' res <- optimACDC(points = 100, candi = candi, covars = covars, nadir = nadir,
-#'                  use.coords = TRUE, iterations = 100, utopia = utopia)
+#'                  use.coords = TRUE, iterations = 100, utopia = utopia, 
+#'                  plotit = FALSE, track = FALSE, verbose = FALSE)
 #' tail(attr(res, "energy")$obj, 1) # 0.5272031
 #' objACDC(points = res, candi = candi, covars = covars, use.coords = TRUE, 
 #'         nadir = nadir, utopia = utopia)
@@ -69,13 +70,14 @@ optimACDC <-
   function (points, candi, covars, strata.type = "area", iterations,
             use.coords = FALSE, x.max, x.min, y.max, y.min,
             
-            weights = list(CORR = 0.5, DIST = 0.5), 
+            weights = list(CORR = 0.5, DIST = 0.5),
             nadir = list(sim = NULL, seeds = NULL, user = NULL, abs = NULL),
-            utopia = list(user = NULL, abs = NULL), 
+            utopia = list(user = NULL, abs = NULL),
             
             acceptance = list(initial = 0.99, cooling = iterations / 10),
             stopping = list(max.count = iterations / 10), plotit = TRUE,
-            boundary, progress = TRUE, verbose = TRUE, greedy = FALSE) {
+            track = TRUE, boundary, progress = TRUE, verbose = TRUE, 
+            greedy = FALSE) {
     
     if (!is.data.frame(covars)) covars <- as.data.frame(covars)
     
@@ -86,9 +88,6 @@ optimACDC <-
     check <- .optimACDCcheck(candi = candi, covars = covars, 
                              use.coords = use.coords, strata.type = strata.type)
     if (!is.null(check)) stop (check, call. = FALSE)
-    
-#     check <- .MOOPcheck(weights = weights, nadir = nadir, utopia = utopia)
-#     if (!is.null(check)) stop (check, call. = FALSE)
     
     # Set plotting options ####################################################
     eval(.plotting_options())
@@ -141,7 +140,6 @@ optimACDC <-
     }
 
     # Other settings for the simulated annealing algorithm
-    MOOP <- TRUE # this is a multi-objective optimization problem
     old_scm <- scm
     new_scm <- scm
     best_scm <- scm
@@ -151,8 +149,8 @@ optimACDC <-
     count <- 0
     old_energy <- energy0
     best_energy <- data.frame(obj = Inf, CORR = Inf, DIST = Inf)
-    energies <- data.frame(obj = NA, CORR = NA, DIST = NA)
-    accept_probs <- vector()
+    #energies <- data.frame(obj = NA, CORR = NA, DIST = NA)
+    #accept_probs <- vector()
     if (progress) pb <- txtProgressBar(min = 1, max = iterations, style = 3)
     time0 <- proc.time()
 
@@ -194,7 +192,7 @@ optimACDC <-
         random_prob <- runif(1)
       }
       actual_prob <- acceptance[[1]] * exp(-k / acceptance[[2]])
-      accept_probs[k] <- actual_prob
+      if (track) accept_probs[k] <- actual_prob
       
       if (new_energy[1] <= old_energy[1]) {
         old_conf <- new_conf
@@ -227,7 +225,7 @@ optimACDC <-
       }
       
       # Best energy state
-      energies[k, ] <- new_energy
+      if (track) energies[k, ] <- new_energy
       if (new_energy[1] < best_energy[1] / 1.0000001) {
         best_k <- k
         best_conf <- new_conf
@@ -273,6 +271,7 @@ optimACDC <-
       if (progress) setTxtProgressBar(pb, k)
     }
     if (progress) close(pb)
+    if (!track) energies <- new_energy
     res <- .spSANNout(new_conf = new_conf, energy0 = energy0, 
                       energies = energies, time0 = time0, MOOP = MOOP)
     return (res)

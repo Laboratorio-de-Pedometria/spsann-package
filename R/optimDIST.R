@@ -71,7 +71,8 @@
 #' covars <- meuse.grid[, 5]
 #' set.seed(2001)
 #' res <- optimDIST(points = 100, candi = candi, covars = covars, 
-#'                  use.coords = TRUE, iterations = 100)
+#'                  use.coords = TRUE, iterations = 100, plotit = FALSE, 
+#'                  track = FALSE, verbose = FALSE)
 #' tail(attr(res, "energy"), 1) # 1.6505
 #' objDIST(points = res, candi = candi, covars = covars, use.coords = TRUE)
 # MAIN FUNCTION ################################################################
@@ -81,7 +82,7 @@ optimDIST <-
             acceptance = list(initial = 0.99, cooling = iterations / 10),
             stopping = list(max.count = iterations / 10), plotit = TRUE,
             boundary, progress = TRUE, verbose = TRUE, greedy = FALSE,
-            weights, nadir, utopia) {
+            track = TRUE, weights = NULL, nadir = NULL, utopia = NULL) {
     
     if (!is.data.frame(covars)) covars <- as.data.frame(covars)
     
@@ -137,8 +138,8 @@ optimDIST <-
     count        <- 0
     old_energy   <- energy0
     best_energy  <- Inf
-    energies     <- vector()
-    accept_probs <- vector()
+    #energies     <- vector()
+    #accept_probs <- vector()
     if (progress) pb <- txtProgressBar(min = 1, max = iterations, style = 3)
     time0 <- proc.time()
 
@@ -174,7 +175,7 @@ optimDIST <-
         random_prob <- runif(1)
       }
       actual_prob <- acceptance[[1]] * exp(-k / acceptance[[2]])
-      accept_probs[k] <- actual_prob
+      if (track) accept_probs[k] <- actual_prob
       if (new_energy <= old_energy) {
         old_conf   <- new_conf
         old_energy <- new_energy
@@ -202,7 +203,7 @@ optimDIST <-
         }
       }
       # Best energy state
-      energies[k] <- new_energy
+      if (track) energies[k] <- new_energy
       if (new_energy < best_energy / 1.0000001) {
         best_k          <- k
         best_conf       <- new_conf
@@ -243,7 +244,9 @@ optimDIST <-
       if (progress) setTxtProgressBar(pb, k)
     }
     if (progress) close(pb)
-    res <- .spSANNout(new_conf, energy0, energies, time0, MOOP = MOOP)
+    if (!track) energies <- new_energy
+    res <- .spSANNout(new_conf = new_conf, energy0 = energy0, 
+                      energies = energies, time0 = time0, MOOP = MOOP)
     return (res)
   }
 # INTERNAL FUNCTION - CHECK ARGUMENTS ##########################################

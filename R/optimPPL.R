@@ -109,18 +109,13 @@
 #' @concept simulated annealing
 #' @export
 #' @examples
-#' require(pedometrics)
 #' require(sp)
-#' require(SpatialTools)
 #' data(meuse.grid)
 #' candi <- meuse.grid[, 1:2]
 #' set.seed(2001)
-#' res <- optimPPL(points = 100, candi = candi, iterations = 100)
-#' #countPPL(points = res, lags = 7, lags.type = "exponential", pairs = FALSE,
-#' #'         lags.base = 2, cutoff = cutoff)
+#' res <- optimPPL(points = 100, candi = candi, iterations = 100,
+#'                 plotit = FALSE, track = FALSE, verbose = FALSE)
 #' tail(attr(res, "energy.state"), 1) # 160
-#' #objPPL(points = res, lags = 7, lags.type = "exponential", pairs = FALSE,
-#' #'       lags.base = 2, cutoff = cutoff, criterion = "distribution")
 # FUNCTION - MAIN ##############################################################
 optimPPL <-
   function (points, candi, lags = 7, lags.type = "exponential", lags.base = 2,
@@ -128,8 +123,8 @@ optimPPL <-
             x.max, x.min, y.max, y.min, iterations = 10000,
             acceptance = list(initial = 0.99, cooling = iterations / 10),
             stopping = list(max.count = iterations / 10), plotit = TRUE,
-            boundary, progress = TRUE, verbose = TRUE, greedy = FALSE,
-            weights, nadir, utopia) {
+            boundary, progress = TRUE, verbose = TRUE, track = TRUE, 
+            greedy = FALSE, weights = NULL, nadir = NULL, utopia = NULL) {
     
     # Check spsann arguments ###################################################
     eval(.check_spsann_arguments())
@@ -183,8 +178,8 @@ optimPPL <-
     count <- 0
     old_energy <- energy0
     best_energy <- Inf
-    energies <- vector()
-    accept_probs <- vector()
+    #energies <- vector()
+    #accept_probs <- vector()
     if (progress) pb <- txtProgressBar(min = 1, max = iterations, style = 3)
     time0 <- proc.time()
     
@@ -254,7 +249,7 @@ optimPPL <-
         random_prob <- runif(1)
       }
       actual_prob <- acceptance$initial * exp(-k / acceptance$cooling)
-      accept_probs[k] <- actual_prob
+      if (track) accept_probs[k] <- actual_prob
       if (new_energy <= old_energy) {
         # Always accepts a better energy
         old_conf   <- new_conf
@@ -284,7 +279,7 @@ optimPPL <-
       }
       
       # Best energy state
-      energies[k] <- new_energy
+      if (track) energies[k] <- new_energy
       if (new_energy < best_energy / 1.0000001) {
         best_k          <- k
         best_conf       <- new_conf
@@ -295,19 +290,6 @@ optimPPL <-
         best_old_dm     <- old_dm
       }
 
-      #       # Plotting: which is the new point?
-      #       #if (plotit && pedometrics::is.numint(k / 10)) {
-      #       if (plotit && k > 6575) {
-      #       #if (plotit) {
-      #         .spSANNplot(energy0 = energy0, energies = energies, k = k, 
-      #                     acceptance = acceptance, accept_probs = accept_probs,
-      #                     boundary = boundary, new_conf = new_conf[, 2:3], 
-      #                     conf0 = conf0[, 2:3], y_max0 = y_max0, y.max = y.max,
-      #                     x_max0 = x_max0, x.max = x.max, best.energy = best_energy,
-      #                     wp = wp,
-      #                     best.k = best_k, MOOP = MOOP)
-      #       }
-
       # Freezing parameters
       if (count == stopping$max.count) {
         if (new_energy > best_energy * 1.000001) {
@@ -316,7 +298,7 @@ optimPPL <-
           old_energy  <- best_old_energy
           new_energy  <- best_energy
           count       <- 0
-          energies[k] <- new_energy
+          #energies[k] <- new_energy
           new_dm      <- best_dm
           old_dm      <- best_old_dm
           cat("\n", "reached maximum count with suboptimal configuration\n")
@@ -331,8 +313,9 @@ optimPPL <-
       
     }
     if (progress) close(pb)
-    res <- .spSANNout(new_conf = new_conf, energy0 = energy0, MOOP = MOOP,
-                      energies = energies, time0 = time0)
+    if (!track) energies <- new_energy
+    res <- .spSANNout(new_conf = new_conf, energy0 = energy0, 
+                      energies = energies, time0 = time0, MOOP = MOOP)
     return (res)
   }
 # FUNCTION - CALCULATE THE CRITERION VALUE #####################################

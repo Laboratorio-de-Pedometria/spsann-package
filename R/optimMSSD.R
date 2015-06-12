@@ -46,7 +46,8 @@
 #' data(meuse.grid)
 #' candi <- meuse.grid[, 1:2]
 #' set.seed(2001)
-#' res <- optimMSSD(points = 100, candi = candi, iterations = 100)
+#' res <- optimMSSD(points = 100, candi = candi, iterations = 100,
+#'                  plotit = FALSE, track = FALSE, verbose = FALSE)
 #' tail(attr(res, "energy.state"), 1) # 11531.03
 #' objMSSD(candi = candi, points = res)
 # FUNCTION - MAIN ##############################################################
@@ -55,7 +56,7 @@ optimMSSD <-
             acceptance = list(initial = 0.99, cooling = iterations / 10),
             stopping = list(max.count = iterations / 10), plotit = TRUE,
             boundary, progress = TRUE, verbose = TRUE, greedy = FALSE,
-            weights, nadir, utopia) {
+            track = TRUE, weights = NULL, nadir = NULL, utopia = NULL) {
     
     # Check spsann arguments ###################################################
     eval(.check_spsann_arguments())
@@ -82,14 +83,13 @@ optimMSSD <-
     #energy0 <- mean(apply(dm, 1, min) ^ 2)
     
     # other settings for the simulated annealing algorithm
-    MOOP = FALSE
     old_dm        <- dm
     best_dm       <- dm
     count         <- 0
     old_energy    <- energy0
     best_energy   <- Inf
-    energy_states <- vector()
-    accept_probs  <- vector()
+    #energies <- vector()
+    #accept_probs  <- vector()
     if (progress) pb <- txtProgressBar(min = 1, max = iterations, style = 3)
     time0 <- proc.time()
     
@@ -134,7 +134,7 @@ optimMSSD <-
         random_prob <- runif(1)
       }
       actual_prob <- acceptance[[1]] * exp(-k / acceptance[[2]])
-      accept_probs[k] <- actual_prob
+      if (track) accept_probs[k] <- actual_prob
       if (new_energy <= old_energy) {
         old_conf <- new_conf
         old_energy <- new_energy
@@ -162,7 +162,7 @@ optimMSSD <-
       }
 
       # Best energy state
-      energy_states[k] <- new_energy
+      if (track) energies[k] <- new_energy
       if (new_energy < best_energy / 1.0000001) {
         best_k          <- k
         best_conf     <- new_conf
@@ -177,7 +177,7 @@ optimMSSD <-
       #if (any(round(seq(1, iterations, 10)) == k)) {
       if (plotit && pedometrics::is.numint(k / 10)) {
         if (plotit){
-          .spSANNplot(energy0, energy_states, k, acceptance,
+          .spSANNplot(energy0 = energy0, energies, k, acceptance,
                       accept_probs, boundary, new_conf[, 2:3],
                       conf0[, 2:3], y_max0, y.max, x_max0, x.max,
                       best.energy = best_energy, best.k = best_k, 
@@ -206,7 +206,9 @@ optimMSSD <-
       if (progress) setTxtProgressBar(pb, k)
     }
     if (progress) close(pb)
-    res <- .spSANNout(new_conf, energy0, energy_states, time0, MOOP = MOOP)
+    if (!track) energies <- new_energy
+    res <- .spSANNout(new_conf = new_conf, energy0 = energy0, 
+                      energies = energies, time0 = time0, MOOP = MOOP)
     return (res)
   }
 # FUNCTION - CALCULATE THE CRITERION VALUE #####################################

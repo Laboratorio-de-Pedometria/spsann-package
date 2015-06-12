@@ -33,6 +33,10 @@
 #' algorithm, that is, accepting only better system configurations? Defaults
 #' to \code{greedy = FALSE}. (experimental)
 #' 
+#' @param track Logical value. Should the evolution of the energy state and 
+#' acceptance probability be recorded and returned with the result? Defaults
+#' to \code{track = TRUE}.
+#' 
 #' @keywords spatial optimize
 #' 
 #' @concept simulated annealing

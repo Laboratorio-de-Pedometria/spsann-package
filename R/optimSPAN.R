@@ -34,7 +34,7 @@ optimSPAN <-
     points, candi, x.max, x.min, y.max, y.min, iterations,
     acceptance = list(initial = 0.99, cooling = iterations / 10),
     stopping = list(max.count = iterations / 10), plotit = TRUE,
-    boundary, progress = TRUE, verbose = TRUE, greedy = FALSE,
+    boundary, progress = TRUE, verbose = TRUE, track = TRUE, greedy = FALSE, 
     # PPL
     lags = 7, lags.type = "exponential", lags.base = 2, cutoff = NULL, 
     criterion = "distribution", distri = NULL, pairs = FALSE, 
@@ -60,9 +60,6 @@ optimSPAN <-
     check <- .optimACDCcheck(candi = candi, covars = covars,
                              use.coords = use.coords, strata.type = strata.type)
     if (!is.null(check)) stop (check, call. = FALSE)
-    
-#     check <- .MOOPcheck(weights = weights, nadir = nadir, utopia = utopia)
-#     if (!is.null(check)) stop (check, call. = FALSE)
 
     # Set plotting options ####################################################
     eval(.plotting_options())
@@ -162,7 +159,7 @@ optimSPAN <-
     count <- 0
     old_energy   <- energy0
     best_energy  <- Inf
-    energies     <- accept_probs <- vector()
+    #energies     <- accept_probs <- vector()
     if (progress) pb <- txtProgressBar(min = 1, max = iterations, style = 3)
     time0 <- proc.time()
 
@@ -224,7 +221,7 @@ optimSPAN <-
       # Evaluate the new system configuration
       random_prob <- runif(1)
       actual_prob <- acceptance[[1]] * exp(-k / acceptance[[2]])
-      accept_probs[k] <- actual_prob
+      if (track) accept_probs[k] <- actual_prob
       if (new_energy <= old_energy) {
         old_conf    <- new_conf
         old_energy  <- new_energy
@@ -271,7 +268,7 @@ optimSPAN <-
       }
 
       # Best energy state
-      energies[k] <- new_energy
+      if (track) energies[k] <- new_energy
       if (new_energy < best_energy / 1.0000001) {
         best_k           <- k
         best_conf        <- new_conf
@@ -330,7 +327,9 @@ optimSPAN <-
       if (progress) setTxtProgressBar(pb, k)
     }
     if (progress) close(pb)
-    res <- .spSANNout(new_conf, energy0, energies, time0)
+    if (!track) energies <- new_energy
+    res <- .spSANNout(new_conf = new_conf, energy0 = energy0, 
+                      energies = energies, time0 = time0, MOOP = MOOP)
     return (res)
   }
 # INTERNAL FUNCTION - CALCULATE NADIR ##########################################
