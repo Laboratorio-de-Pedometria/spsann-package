@@ -49,7 +49,7 @@
 #' @aliases optimMKV
 #' @keywords spatial optimize
 #' @concept simulated annealing
-#' @importFrom plyr is.formula
+# @importFrom plyr is.formula
 #' @export
 #' @examples
 #' require(sp)
@@ -261,8 +261,8 @@ optimMKV <-
     }
     
     # equation
-    #bb <- inherits(equation, "formula")
-    bb <- !plyr::is.formula(equation)
+    bb <- !inherits(equation, "formula")
+    #bb <- !plyr::is.formula(equation)
     cc <- all.vars(equation)[1] != "z"
     if (bb || cc) {
       res <-
