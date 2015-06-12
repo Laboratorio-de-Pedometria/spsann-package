@@ -313,11 +313,14 @@ optimSPAN <-
       }
       if (progress) setTxtProgressBar(pb, k)
     }
-    if (progress) close(pb)
-    if (!track) energies <- new_energy
-    res <- .spSANNout(new_conf = new_conf, energy0 = energy0, 
-                      energies = energies, time0 = time0, MOOP = MOOP)
-    return (res)
+#     if (progress) close(pb)
+#     if (!track) energies <- new_energy
+#     res <- .spSANNout(new_conf = new_conf, energy0 = energy0, 
+#                       energies = energies, time0 = time0, MOOP = MOOP)
+#     return (res)
+    # Prepare output ###########################################################
+    eval(.prepare_output())
+    ############################################################################
   }
 # INTERNAL FUNCTION - CALCULATE NADIR ##########################################
 .panNadir <-

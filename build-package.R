@@ -6,15 +6,17 @@
 
 # Automatically build functions
 fun.name <- c(".check_spsann_arguments", ".plotting_options", 
-              ".prepare_jittering", ".prepare_points", ".plot_and_jitter")
+              ".prepare_jittering", ".prepare_points", ".plot_and_jitter",
+              ".prepare_output")
 read.file <- c("R-autoFunction/check-spsann-arguments.R", 
                "R-autoFunction/plotting-options.R",
                "R-autoFunction/prepare-jittering.R",
                "R-autoFunction/prepare-points.R",
-               "R-autoFunction/plot-and-jitter.R")
+               "R-autoFunction/plot-and-jitter.R",
+               "R-autoFunction/prepare-output.R")
 write.file <- c("R/check-spsann-arguments.R", "R/plotting-options.R",
                 "R/prepare-jittering.R", "R/prepare-points.R",
-                "R/plot-and-jitter.R")
+                "R/plot-and-jitter.R", "R/prepare-output.R")
 lapply(1:length(fun.name), function (i) 
   ASRtools::autoFunction(fun.name = fun.name[i], read.file = read.file[i], 
                          write.file = write.file[i]))

@@ -85,7 +85,7 @@
   }
 # INTERNAL FUNCTION - PREPARE RESULTS ##########################################
 .spSANNout <-
-  function (new_conf, energy0, energies, time0, nadir, MOOP) {
+  function (new_conf, energy0, energies, time0, nadir, MOOP, k) {
     res <- new_conf
     
     # Multi-objective optimization problem
@@ -93,14 +93,14 @@
       criterion <- rbind(energy0, energies)
       a <- attributes(res)
       a$energy.state <- criterion
-      a$iterations <- nrow(energies)
+      a$iterations <- k
     
       # Single-objective optimization problem
     } else {
       criterion <- c(energy0, energies)
       a <- attributes(res)
       a$energy.state <- criterion
-      a$iterations <- length(energies)
+      a$iterations <- k
             
     }
     
