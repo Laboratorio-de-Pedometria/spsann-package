@@ -2,22 +2,20 @@
 rm(list = ls())
 gc()
 require(pedometrics)
+require(gstat)
 require(sp)
-source('R/optimMKV.R')
-source('R/spSANNtools.R')
-source('R/spJitter.R')
-Rcpp::sourceCpp('src/spJitterCpp.cpp')
+require(plyr)
+sapply(list.files("R", full.names = TRUE, pattern = ".R$"), source)
+sapply(list.files("src", full.names = TRUE, pattern = ".cpp$"), Rcpp::sourceCpp)
 # 0) DEFAULT EXAMPLE ###########################################################
-require(pedometrics)
 require(sp)
 require(gstat)
-require(plyr)
 data(meuse.grid)
 candi <- meuse.grid[, 1:2]
 covars <- as.data.frame(meuse.grid)
 model <- vgm(psill = 10, model = "Exp", range = 500, nugget = 8)
 set.seed(2001)
-res <- optimMKV(points = 100, candi = candi, covars = covars, 
+res <- optimMKV(points = 100, candi = candi, covars = covars,
                 equation = z ~ dist, model = model, iterations = 100)
 tail(attr(res, "energy"), 1) # 11.61896
 objMKV(points = res, candi = candi, covars = covars, equation = z ~ dist, 
