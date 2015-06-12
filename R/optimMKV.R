@@ -145,14 +145,9 @@ optimMKV <-
     # begin the main loop
     for (k in 1:iterations) {
       
-      # jitter one of the points and update x.max and y.max
-      wp <- sample(1:n_pts, 1)
-      new_conf <- spJitterFinite(points = old_conf, candi = candi,
-                                 x.max = x.max, x.min = x.min, y.max = y.max,
-                                 y.min = y.min, which.point = wp)
-      x.max <- x_max0 - (k / iterations) * (x_max0 - x.min)
-      y.max <- y_max0 - (k / iterations) * (y_max0 - y.min)
-      
+      # Plotting and jittering #################################################
+      eval(.plot_and_jitter())
+      ##########################################################################
       # Update sample matrix and energy state
       #new_row <- covars[new_conf[wp, 1], ]
       new_row <- cbind(1, covars[new_conf[wp, 1], ])
@@ -213,16 +208,7 @@ optimMKV <-
         best_sm         <- new_sm
         best_old_sm     <- old_sm
       }
-      # Plotting
-      #if (plotit && any(round(seq(1, iterations, 10)) == k)) {
-      if (plotit && pedometrics::is.numint(k / 10)) {
-        .spSANNplot(energy0 = energy0, energies = energies, k = k,
-                    acceptance = acceptance, accept_probs = accept_probs,
-                    boundary = boundary, new_conf = new_conf[, 2:3], 
-                    conf0 = conf0[, 2:3], y_max0 = y_max0, y.max = y.max, 
-                    x_max0 = x_max0, x.max = x.max, best.k = best_k, 
-                    best.energy = best_energy, MOOP = FALSE, greedy = greedy)
-      }
+      
       # Freezing parameters
       if (count == stopping[[1]]) {
         if (new_energy > best_energy * 1.000001) {

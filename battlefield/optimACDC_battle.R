@@ -15,7 +15,7 @@ covars <- meuse.grid[, 5]
 set.seed(2001)
 res <- optimACDC(points = 100, candi = candi, covars = covars, nadir = nadir,
                  use.coords = TRUE, iterations = 100, utopia = utopia, 
-                 plotit = FALSE, track = FALSE, verbose = FALSE)
+                 verbose = FALSE)
 tail(attr(res, "energy")$obj, 1) # 0.5272031
 objACDC(points = res, candi = candi, covars = covars, use.coords = TRUE, 
         nadir = nadir, utopia = utopia)

@@ -38,7 +38,7 @@
 #' set.seed(2001)
 #' res <- optimACDC(points = 100, candi = candi, covars = covars, nadir = nadir,
 #'                  use.coords = TRUE, iterations = 100, utopia = utopia, 
-#'                  plotit = FALSE, track = FALSE, verbose = FALSE)
+#'                  verbose = FALSE)
 #' tail(attr(res, "energy")$obj, 1) # 0.5272031
 #' objACDC(points = res, candi = candi, covars = covars, use.coords = TRUE, 
 #'         nadir = nadir, utopia = utopia)
@@ -156,15 +156,10 @@ optimACDC <-
 
     # Begin the main loop
     for (k in 1:iterations) {
-
-      # Jitter one of the points and update x.max and y.max; which point (wp)?
-      wp <- sample(c(1:n_pts), 1)
-      new_conf <- spJitterFinite(points = old_conf, candi = candi, 
-                                 x.max = x.max, x.min = x.min, y.max = y.max, 
-                                 y.min = y.min, which.point = wp)
-      x.max <- x_max0 - (k / iterations) * (x_max0 - x.min)
-      y.max <- y_max0 - (k / iterations) * (y_max0 - y.min)
-
+      
+      # Plotting and jittering #################################################
+      eval(.plot_and_jitter())
+      ##########################################################################
       # Update sample and correlation matrices, and energy state
       if (covars.type == "numeric") { # Numeric covariates
         new_row <- covars[new_conf[wp, 1], ]
@@ -236,16 +231,6 @@ optimACDC <-
         best_old_sm <- old_sm
         best_scm <- new_scm
         best_old_scm <- old_scm
-      }
-      
-      # Plotting
-      if (plotit && pedometrics::is.numint(k / 10)) {
-        .spSANNplot(energy0 = energy0, energies = energies, k = k, 
-                    acceptance = acceptance, accept_probs = accept_probs, 
-                    boundary = boundary, new_conf = new_conf[, 2:3],
-                    conf0 = conf0[, 2:3], y_max0 = y_max0, y.max = y.max, 
-                    x_max0 = x_max0, x.max = x.max, best.energy = best_energy,
-                    best.k = best_k, MOOP = MOOP, greedy = greedy)
       }
       
       # Freezing parameters

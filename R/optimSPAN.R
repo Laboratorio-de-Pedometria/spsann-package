@@ -166,14 +166,10 @@ optimSPAN <-
     # BEGIN THE ITERATIONS
     for (k in 1:iterations) {
 
-      # Jitter one of the points and update x.max and y.max
-      # Which point (wp) are we jittering?
-      wp <- sample(c(1:n_pts), 1)
-      new_conf <- spJitterFinite(old_conf, candi, x.max, x.min, y.max,
-                                 y.min, wp)
-      x.max <- x_max0 - (k / iterations) * (x_max0 - x.min)
-      y.max <- y_max0 - (k / iterations) * (y_max0 - y.min)
-
+      # Plotting and jittering #################################################
+      eval(.plot_and_jitter())
+      ##########################################################################
+      
       # UPDATE DATASETS AND COMPUTE NEW ENERGY STATE
       # ppl: distance matrix
       new_dm_ppl <- .updatePPLCpp(new_conf[, 2:3], old_dm_ppl, wp)
@@ -286,15 +282,6 @@ optimSPAN <-
         # mssd
         best_dm_mssd     <- new_dm_mssd
         best_old_dm_mssd <- old_dm_mssd
-      }
-
-      # Plotting
-      #if (plotit && any(round(seq(1, iterations, 10)) == k)) {
-      if (plotit && pedometrics::is.numint(k / 10)) {
-        .spSANNplot(energy0, energies, k, acceptance,
-                    accept_probs, boundary, new_conf[, 2:3],
-                    conf0[, 2:3], y_max0, y.max, x_max0, x.max,
-                    best.energy = best_energy, best.k = best_k, greedy = greedy)
       }
 
       # Freezing parameters

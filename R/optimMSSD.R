@@ -96,13 +96,9 @@ optimMSSD <-
     # Begin the main loop
     for (k in 1:iterations) {
       
-      # Jitter one of the points and update x.max and y.max
-      # ASR: spJitterFinite() can be improved implementing it in C++
-      wp <- sample(c(1:n_pts), 1)
-      new_conf <- spJitterFinite(old_conf, candi, x.max, x.min, y.max,
-                                 y.min, wp)
-      x.max <- x_max0 - (k / iterations) * (x_max0 - x.min)
-      y.max <- y_max0 - (k / iterations) * (y_max0 - y.min)
+      # Plotting and jittering #################################################
+      eval(.plot_and_jitter())
+      ##########################################################################
       
       # Update the distance matrix and calculate the new energy state
       x2 <- matrix(new_conf[wp, 2:3], nrow = 1)
@@ -171,18 +167,6 @@ optimMSSD <-
         old_conf      <- old_conf
         best_dm         <- new_dm
         best_old_dm     <- old_dm
-      }
-
-      # Plotting
-      #if (any(round(seq(1, iterations, 10)) == k)) {
-      if (plotit && pedometrics::is.numint(k / 10)) {
-        if (plotit){
-          .spSANNplot(energy0 = energy0, energies, k, acceptance,
-                      accept_probs, boundary, new_conf[, 2:3],
-                      conf0[, 2:3], y_max0, y.max, x_max0, x.max,
-                      best.energy = best_energy, best.k = best_k, 
-                      MOOP = MOOP, greedy = greedy)
-        }
       }
 
       # Freezing parameters
