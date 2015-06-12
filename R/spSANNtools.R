@@ -12,12 +12,14 @@
       n <- ncol(energy0)
       l <- colnames(energy0)
       a <- rbind(energy0, energies)
-      plot(1, type = 'n', xlim = c(0, k), ylim = c(min(a), max(a)), 
+      plot(1, type = 'n', xlim = c(0, k), 
+           ylim = c(0, max(a)), #ylim = c(min(a), max(a)), 
            xlab = "iteration", ylab = "energy state")
       legend("topright", legend = l, lwd = 1, lty = 1:n)
       
       for(i in 1:ncol(a)) {
-        lines(a[, i] ~ c(0:k), type = "l", lty = i)
+        #lines(a[, i] ~ c(0:k), type = "l", lty = i)
+        lines(a[, i] ~ c(1:k), type = "l", lty = i)
       }
       lines(x = c(-k, 0), y = rep(energy0[1], 2), col = "red")
       lines(x = rep(best.k, 2), y = c(-5, best.energy[1]), col = "green")
