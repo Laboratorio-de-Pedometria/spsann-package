@@ -8,7 +8,7 @@
 # 5. Prepare MOOP attributes (weights, nadir, and utopia);
 # 6. Print optimization info and return output.
 #
-# NOTES:
+# NOTES
 # 1. 
 # 2. 
 # 
@@ -48,6 +48,7 @@ cat("running time = ", a$running.time, " minutes", sep = "")
 
 # Output
 return (res)
+#
 # COMMAND
 # # Prepare output ###########################################################
 # eval(.prepare_output())

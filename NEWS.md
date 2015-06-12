@@ -1,19 +1,19 @@
-# Version 0.0.0.9007 (2015-06-10)
-* BUG: `objACDC()` and `objCORR()` may not return the same criterion value
-  of the optimized sample configuration if the number of iterations used
-  in the optimization is equal to 100. The problem seems to disappear if a
-  larger number of iterations is used.
-* A directory called 'tools' was created, where R code chunks are included in
-  individual files. These R code chunks are used in several functions of both
-  families of `obj...()` and `optim...()` functions. They are used to 
-  automatically build internal functions using `ASRtools::autoFunction()`.
-  Currently, R code chunks are used to check the arguments of the family of 
-  `optim...()` functions, prepare `points` and `candi`, set plotting options,
-  estimate the `boundary`, and prepare for jittering.
-* The `boundary` of the spatial domain can now be estimated intenally. As such,
-  the `rgeos` package is not a dependency anymore. The user should relly on the
-  `rgeos` package if a more precise `boundary` is required.
-  
+# Version 0.0.0.9007 (2015-06-12)
+* The `rgeos` and `plyr` packages are not dependencies anymore.
+* The `boundary` of the spatial domain can now be estimated intenally. The user 
+  should use the `rgeos` package if a more precise `boundary` is needed.
+* Now using a directory called 'R-autoFunction', where R code chunks that are 
+  used in several functions of both families of `obj...()` and `optim...()`
+  functions are included in individual files. These R code chunks are used to
+  automatically build internal functions. Currently, R code chunks are
+  used to check the arguments of the family of `optim...()` functions, prepare
+  `points` and `candi`, set plotting options, estimate the `boundary`,
+  prepare for jittering, plot and jitter, and prepare the output.
+* BUG: the family of `obj...()` functions may not return the same criterion 
+  value of the optimized sample configuration returned by the family of
+  `optim...()` functions if the number of iterations used in the optimization 
+  is equal to 100. The problem seems to disappear if a larger number of
+  iterations is used.
 
 # Version 0.0.0.9006 (2015-05-12)
 * `spJitterFinite()` now tries to find an alternative point if the new point

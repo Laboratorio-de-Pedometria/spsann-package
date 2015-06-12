@@ -31,7 +31,7 @@
 #' Package: \tab spsann    \cr
 #' Type:    \tab Package   \cr
 #' Version: \tab 0.0.0.9007\cr
-#' Date:    \tab 2015-06-10\cr
+#' Date:    \tab 2015-06-12\cr
 #' License: \tab GPL (>= 2)\cr
 #' }
 #' 

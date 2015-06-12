@@ -83,39 +83,6 @@
     y <- bb[2, 1] + (bb[2, 2] - bb[2, 1]) / 2
     text(y = y, x = x, srt = 90, labels = "maximum shift in the Y axis")
   }
-# INTERNAL FUNCTION - PREPARE RESULTS ##########################################
-.spSANNout <-
-  function (new_conf, energy0, energies, time0, nadir, MOOP, k) {
-    res <- new_conf
-    
-    # Multi-objective optimization problem
-    if (MOOP) {
-      criterion <- rbind(energy0, energies)
-      a <- attributes(res)
-      a$energy.state <- criterion
-      a$iterations <- k
-    
-      # Single-objective optimization problem
-    } else {
-      criterion <- c(energy0, energies)
-      a <- attributes(res)
-      a$energy.state <- criterion
-      a$iterations <- k
-            
-    }
-    
-    running_time <- (proc.time() - time0) / 60
-    a$running.time <- running_time
-    if (!missing(nadir)) {
-      a$nadir <- nadir
-    }
-    attributes(res) <- a
-    
-    # Print the number of iterations and running time
-    cat("iterations = ", a$iterations, "\n", sep = "")
-    cat("running time = ", round(running_time[3], 2), " minutes", sep = "")
-    return (res)
-  }
 # THE ORIGINAL spSANN FUNCTION #################################################
 # .energyState <- 
 #   function (fun, points, ...) {

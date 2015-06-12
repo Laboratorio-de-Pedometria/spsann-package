@@ -1,6 +1,6 @@
 # Prepare points and candi
 #
-# SUMMARY:
+# SUMMARY
 # 1. Compute 'n_candi', the number of finite candidate locations;
 # 2. Add the 'id' column to 'candi, and force 'candi' to be of class matrix;
 # 3. Prepare the 'points' for the spatial simulated annealing routine;
@@ -9,7 +9,7 @@
 #    optimization;
 # 6. FUTURE FEATURE: Create 'cm', the starting cost matrix (if needed).
 #
-# NOTES:
+# NOTES
 # 1. This code chunk is used in both 'optim...()' and 'obj...()' functions.
 #    The family of 'obj...()' functions may not use the argument 'candi'. This
 #    is the reason for evaluating if 'candi' is missing.
@@ -33,9 +33,7 @@ conf0 <- points
 old_conf <- conf0
 #if (COST) cm <- cost[points[, 1]]
 #
-# COMMAND:
+# COMMAND
 # # Prepare points and candi #################################################
-# prepare_points <- 
-#   function (...) {parse(text = readLines("tools/prepare-points.R"))}
-# eval(prepare_points())
+# eval(.prepare_points())
 # ############################################################################

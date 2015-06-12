@@ -1,6 +1,6 @@
 # Check spsann arguments
 # 
-# SUMMARY:
+# SUMMARY
 # 1. Check the mandatory OPTIM arguments 'points' and 'candi';
 # 2. If all is fine, check the mandatory OPTIM argument 'iterations';
 # 3. If all is fine, check the mandatory OPTIM argument 'acceptance';
@@ -11,7 +11,7 @@
 #    arguments 'weights', 'nadir' and 'utopia';
 # 7. Check if acceptance probabilities should be tracked.
 #
-# NOTES:
+# NOTES
 # 1. This code chunk is used only with the family of 'optim...()' functions.
 # 2. A good reading on argument checking is the article at
 #    http://www.r-bloggers.com/a-warning-about-warning/
@@ -124,7 +124,5 @@ rm(aa, bb, cc, dd, res)
 #
 # COMMAND
 # # Check spsann arguments ###################################################
-# check_spsann_arguments <- 
-#   function (...) {parse(text = readLines("tools/check-spsann-arguments.R"))}
-# eval(check_spsann_arguments())
+# eval(.check_spsann_arguments())
 # ############################################################################

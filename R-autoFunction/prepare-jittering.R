@@ -36,7 +36,5 @@ y_max0 <- y.max
 #
 # COMMAND (uncomment)
 # # Prepare for jittering ####################################################
-# prepare_jittering <- 
-#   function (...) {parse(text = readLines("tools/prepare-jittering.R"))}
-# eval(prepare_jittering())
+# eval(.prepare_jittering())
 # ############################################################################

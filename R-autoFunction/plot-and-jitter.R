@@ -1,6 +1,6 @@
 # Plotting and jittering
 # 
-# SUMMARY:
+# SUMMARY
 # 1. Select one point to be jittered;
 # 2. Plot the evlolution of the energy state, and the old and new system
 #    configurations possibly indicating the selected point;
@@ -8,7 +8,7 @@
 # 4. Update x.max and y.max
 # 5. ...
 #
-# NOTES:
+# NOTES
 # 1. 
 # 2. 
 # 
