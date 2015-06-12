@@ -7,15 +7,19 @@ expression(res <- NULL, aa <- c("points", "candi"), bb <- c(missing(points), mis
       res <- c("missing argument: '", aa[i], "'\n", sep = "")
     } else {
       # Argument 'candi'
-      if (ncol(candi) != 2) {
-        res <- c("'candi' must have two columns")
+      aa <- any(apply(candi, 2, is.numeric) == FALSE)
+      bb <- ncol(candi) != 2
+      cc <- any(c(c("x", "y") != colnames(candi)) == TRUE)
+      #if (ncol(candi) != 2) {
+      if (aa || bb || cc) {
+        res <- c("'candi' must have two named numeric columns: 'x' and 'y'")
       } else {
-        aa <- c("x", "y")
-        bb <- colnames(candi)
-        bb <- any(c(aa != bb) == TRUE)
-        if (bb) {
-          res <- c("'candi' must have two named columns: 'x' and 'y'")
-        } else {
+        #aa <- c("x", "y")
+        #bb <- colnames(candi)
+        #bb <- any(c(aa != bb) == TRUE)
+        #if (bb) {
+        #  res <- c("'candi' must have two named columns: 'x' and 'y'")
+        #} else {
           # Argument 'iterations'
           if (!is.numint(iterations) || length(iterations) > 1) {
             res <- c("'iterations' must be an integer value")
@@ -41,8 +45,7 @@ expression(res <- NULL, aa <- c("points", "candi"), bb <- c(missing(points), mis
             }
           }
         }
-      }
-    }, aa <- all(c(!missing(weights), !missing(utopia), !missing(nadir))), 
+      }, aa <- all(c(!missing(weights), !missing(utopia), !missing(nadir))), 
     if (aa) {
       aa <- !is.list(weights)
       bb <- is.null(names(weights))
