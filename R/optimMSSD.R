@@ -1,9 +1,7 @@
 #' Optimization of sample configurations for spatial interpolation
 #'
 #' Optimize a sample configuration for spatial interpolation. The criterion 
-#' used is
-#' the mean squared shortest distance (\code{optimMSSD}). \code{objMSSD}
-#' computes the MSSD between a set of points and all grid cells.
+#' used is the mean squared shortest distance (\bold{MSSD}).
 #'
 #' @template spJitter_doc
 #' @template spSANN_doc
@@ -13,13 +11,14 @@
 #' Euclidean distances between points are calculated. This computation requires
 #' the coordinates to be projected. The user is responsible for making sure that
 #' this requirement is attained.
+#' 
 #' @return
-#' \code{objMSSD} returns a numeric value: the MSSD between a set of points and
-#' all grid cells.
-#'
 #' \code{optimMSSD} returns a matrix: the optimized sample configuration with
 #' the evolution of the energy state during the optimization as an attribute.
 #'
+#' \code{objMSSD} returns a numeric value: the energy state of the sample
+#' configuration - the objective function value.
+#' 
 #' @references
 #' Brus, D. J.; de Gruijter, J. J.; van Groenigen, J. W. Designing spatial
 #' coverage samples using the k-means clustering algorithm. In: P. Lagacherie,
@@ -43,9 +42,7 @@
 #' @importFrom fields rdist
 #' @export
 #' @examples
-#' require(pedometrics)
 #' require(sp)
-#' require(SpatialTools)
 #' data(meuse.grid)
 #' candi <- meuse.grid[, 1:2]
 #' set.seed(2001)
@@ -183,7 +180,8 @@ optimMSSD <-
           .spSANNplot(energy0, energy_states, k, acceptance,
                       accept_probs, boundary, new_conf[, 2:3],
                       conf0[, 2:3], y_max0, y.max, x_max0, x.max,
-                      best.energy = best_energy, best.k = best_k, MOOP = MOOP)
+                      best.energy = best_energy, best.k = best_k, 
+                      MOOP = MOOP, greedy = greedy)
         }
       }
 

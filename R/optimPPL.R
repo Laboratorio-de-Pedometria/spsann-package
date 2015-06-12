@@ -2,7 +2,7 @@
 #'
 #' Optimize a sample configuration for variogram estimation. A criterion is
 #' defined so that the optimized sample configuration has a given number of
-#' points or point-pairs contributing to each lag-distance class.
+#' points or point-pairs contributing to each lag-distance class (\bold{PPL}).
 #' 
 #' @template spJitter_doc
 #' @template spSANN_doc
@@ -213,7 +213,7 @@ optimPPL <-
                     conf0 = conf0[, 2:3], y_max0 = y_max0, y.max = y.max,
                     x_max0 = x_max0, x.max = x.max, best.energy = best_energy,
                     #wp = wp,
-                    best.k = best_k, MOOP = MOOP)
+                    best.k = best_k, MOOP = MOOP, greedy = greedy)
       }
       
       new_conf <- spJitterFinite(points = old_conf, candi = candi,

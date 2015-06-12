@@ -1,8 +1,8 @@
 #' Optimization of sample configurations for spatial interpolation
 #'
-#' Optimize a sample configuration for spatial interpolation with a known linear 
+#' Optimize a sample configuration for spatial interpolation with a known linear
 #' model. A criterion is defined so that the sample configuration minimizes the
-#' mean/maximum kriging variance.
+#' mean/maximum kriging variance (\bold{MKV}).
 #'
 #' @template spJitter_doc
 #' @template spSANN_doc
@@ -11,25 +11,28 @@
 #' @param covars Data frame or matrix with the covariates in the columns.
 #' 
 #' @param equation Formula string that defines the dependent variable \code{z}
-#' as a linear model of independent variables. Defaults to 
-#' \code{equation = z ~ 1}. See the argument \code{formula} in the function
-#' \code{\link[gstat]{krige}} for more information.
+#' as a linear model of the independent variables contained in \code{covars}. 
+#' Defaults to \code{equation = z ~ 1}, that is, ordinary kriging. See the 
+#' argument \code{formula} in the function \code{\link[gstat]{krige}} for 
+#' more information.
 #'
 #' @param model Object of class "variogramModel". See the argument 
-#' \code{model} in the function \code{\link[gstat]{krige}} for more information.
+#' \code{model} in the function \code{\link[gstat]{krige}} for more 
+#' information.
 #'
 #' @param krige.stat Character value defining the statistic that should be used
 #' to summarize the kriging variance. Available options are \code{"mean"} and
 #' \code{"max"} for the mean and maximum kriging variance, respectively.
 #' Defaults to \code{krige.stat = "mean"}.
+#' 
+#' @param ... further arguments passed to \code{\link[gstat]{krige}}.
 #'
 #' @return
 #' \code{optimMKV} returns a matrix: the optimized sample configuration with
 #' the evolution of the energy state during the optimization as an attribute.
 #'
-#' \code{objMKV} returns a numeric value depending on the choice of 
-#' \code{krige.stat}. If \code{krige.stat = "mean"}, the mean kriging variance.
-#' If \code{krige.stat = "max"}, the maximum kriging variance.
+#' \code{objMKV} returns a numeric value: the energy state of the sample
+#' configuration - the objective function value.
 #'
 #' @references
 #' Brus, D. J. & Heuvelink, G. B. M. Optimization of sample patterns for
@@ -49,10 +52,8 @@
 #' @importFrom plyr is.formula
 #' @export
 #' @examples
-#' require(pedometrics)
 #' require(sp)
 #' require(gstat)
-#' require(plyr)
 #' data(meuse.grid)
 #' candi <- meuse.grid[, 1:2]
 #' covars <- as.data.frame(meuse.grid)
@@ -65,7 +66,8 @@
 #'        model = model)
 # FUNCTION - MAIN ##############################################################
 optimMKV <-
-  function (points, candi, covars, equation = z ~ 1, model, krige.stat = "mean",
+  function (points, candi, 
+            covars, equation = z ~ 1, model, krige.stat = "mean",
             x.max, x.min, y.max, y.min, iterations = 10000,
             acceptance = list(initial = 0.99, cooling = iterations / 10),
             stopping = list(max.count = iterations / 10), plotit = TRUE,
@@ -219,7 +221,7 @@ optimMKV <-
                     boundary = boundary, new_conf = new_conf[, 2:3], 
                     conf0 = conf0[, 2:3], y_max0 = y_max0, y.max = y.max, 
                     x_max0 = x_max0, x.max = x.max, best.k = best_k, 
-                    best.energy = best_energy, MOOP = FALSE)
+                    best.energy = best_energy, MOOP = FALSE, greedy = greedy)
       }
       # Freezing parameters
       if (count == stopping[[1]]) {
@@ -259,7 +261,8 @@ optimMKV <-
     }
     
     # equation
-    bb <- !is.formula(equation)
+    #bb <- inherits(equation, "formula")
+    bb <- !plyr::is.formula(equation)
     cc <- all.vars(equation)[1] != "z"
     if (bb || cc) {
       res <-

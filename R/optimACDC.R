@@ -16,8 +16,8 @@
 #' \code{optimACDC} returns a matrix: the optimized sample configuration with
 #' the evolution of the energy state during the optimization as an attribute.
 #' 
-#' \code{objACDC} returns a numeric value: the energy state of the point 
-#' configuration.
+#' \code{objACDC} returns a numeric value: the energy state of the sample
+#' configuration - the objective function value.
 #'
 #' @author Alessandro Samuel-Rosa \email{alessandrosamuelrosa@@gmail.com}
 #' @seealso \code{\link[clhs]{clhs}}, \code{\link[pedometrics]{cramer}}
@@ -29,7 +29,6 @@
 #' @importFrom SpatialTools dist2
 #' @export
 #' @examples
-#' require(pedometrics)
 #' require(sp)
 #' data(meuse.grid)
 #' candi <- meuse.grid[, 1:2]
@@ -248,7 +247,7 @@ optimACDC <-
                     boundary = boundary, new_conf = new_conf[, 2:3],
                     conf0 = conf0[, 2:3], y_max0 = y_max0, y.max = y.max, 
                     x_max0 = x_max0, x.max = x.max, best.energy = best_energy,
-                    best.k = best_k, MOOP = MOOP)
+                    best.k = best_k, MOOP = MOOP, greedy = greedy)
       }
       
       # Freezing parameters
