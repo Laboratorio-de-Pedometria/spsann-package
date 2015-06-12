@@ -12,8 +12,7 @@
 #' @param stopping List with one named sub-argument: \code{max.count} -- 
 #' integer value defining the maximum allowable number of iterations without 
 #' improvement of the objective function value. Defaults to 
-#' \code{stopping = list(max.count = iterations / 10)}. More options may be
-#' included in the future.
+#' \code{stopping = list(max.count = iterations / 10)}.
 #' 
 #' @param plotit Logical for plotting the optimization results. This includes 
 #' a) the progress of the objective function values and acceptance 
@@ -22,17 +21,17 @@
 #' are updated at each 10 iterations. Defaults to \code{plotit = TRUE}.
 #' 
 #' @param boundary SpatialPolygon. The boundary of the spatial domain. 
-#' Mandatory if \code{plotit = TRUE}.
+#' If missing, it is estimated from \code{candi}.
 #' 
 #' @param progress Logical for printing a progress bar. Defaults to 
 #' \code{progress = TRUE}.
 #' 
 #' @param verbose Logical for printing messages about the progress of the
-#' optimization.
+#' optimization. Defaults to \code{verbose = TRUE}.
 #' 
 #' @param greedy Logical value. Should the optimization be done using a greedy
 #' algorithm, that is, accepting only better system configurations? Defaults
-#' to \code{greedy = FALSE}.
+#' to \code{greedy = FALSE}. (experimental)
 #' 
 #' @keywords spatial optimize
 #' 

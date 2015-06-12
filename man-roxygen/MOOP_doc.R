@@ -1,22 +1,22 @@
 #  Template documentation for multi-objective optimization problems (MOOP)
 ################################################################################
 #' @param nadir List with named sub-arguments. Three options are available: 
-#' 1) \code{sim} -- the number of random realizations that should be used to
-#' estimate the nadir point, and \code{seeds} -- vector defining the random 
-#' seeds for each of the realizations; 2) \code{user} -- a list of user-defined
-#' nadir values named after the respective objective function to which they 
-#' apply; 3) \code{abs} -- logical for calculating the nadir point internally.
+#' 1) \code{sim} -- the number of simulations that should be used to estimate 
+#' the nadir point, and \code{seeds} -- vector defining the random seeds for
+#' each simulation; 2) \code{user} -- a list of user-defined nadir values named 
+#' after the respective objective function to which they apply; 3) \code{abs} 
+#' -- logical for calculating the nadir point internally (experimental).
 #'
-#' @param weights List with named sub-arguments. The weights assigned to each of
-#' the objective functions combined to form the multi-objective optimization
+#' @param weights List with named sub-arguments. The weights assigned to each 
+#' of the objective functions that form the multi-objective optimization
 #' problem (MOOP). They must be named after the respective objective function 
 #' to which they apply. The weights must be equal to or larger than 0 and sum 
-#' to 1. The default option gives equal weights to all objective functions, 
-#' except for COST which is set to zero.
+#' to 1. The default option gives equal weights to all objective functions.
 #'
-#' @param utopia List with two named sub-arguments: \code{user} -- a list of
-#' user-defined values named after the objective function to which they apply, 
-#' and \code{abs} -- logical for calculating the utopia point internally.
+#' @param utopia List with named sub-arguments. Two options are available: 1) 
+#' \code{user} -- a list of user-defined values named after the respective 
+#' objective function to which they apply; 2) \code{abs} -- logical for 
+#' calculating the utopia point internally (experimental).
 #'
 #' @references
 #' Arora, J. \emph{Introduction to optimum design}. Waltham: Academic Press, p. 

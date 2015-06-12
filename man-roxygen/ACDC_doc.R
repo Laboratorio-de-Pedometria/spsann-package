@@ -1,15 +1,14 @@
 #  Template documentation for the family of ACDC objective functions
 ################################################################################
 #' @param strata.type Character value setting the type of stratification that 
-#' should be used to create sampling strata (or factor levels) for the numeric 
-#' covariates. Available options are \code{"area"} for equal-area, and
-#' \code{"range"} for equal-range. Defaults to \code{strata.type = "area"}. See
-#' \sQuote{Details} for more information.
+#' should be used to create the marginal sampling strata (or factor levels) for 
+#' the numeric covariates. Available options are \code{"area"} for equal-area, 
+#' and \code{"range"} for equal-range. Defaults to \code{strata.type = "area"}.
 #' 
 #' @param covars Data frame or matrix with the covariates in the columns.
 #'
-#' @param use.coords Logical value. Should the geographic coordinates be used as
-#' covariates? Defaults to \code{use.coords = FALSE}.
+#' @param use.coords Logical value. Should the geographic coordinates be used 
+#' as covariates? Defaults to \code{use.coords = FALSE}.
 #'
 #' @references
 #' Cramér, H. \emph{Mathematical methods of statistics}. Princeton: Princeton 
@@ -42,6 +41,7 @@
 #' @note
 #' This function was derive with modifications from the method known as the 
 #' \emph{conditioned Latin Hypercube sampling} originally proposed by Minasny 
-#' and McBratney (2006).
+#' and McBratney (2006), and implemented in the R-package 
+#' \pkg{\link[clhs]{clhs}}.
 
 
