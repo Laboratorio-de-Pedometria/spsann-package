@@ -32,6 +32,7 @@ y_max0 <- y.max
 # if (missing(cellsize)) {
 #   cellsize <- c(x.min, y.min)
 # }
+rm(x, id, y)
 #
 # COMMAND (uncomment)
 # # Prepare for jittering ####################################################

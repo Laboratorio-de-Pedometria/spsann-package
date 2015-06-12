@@ -77,7 +77,7 @@ if (aa) {
     } else {
       MOOP <- length(which(weights != 0))
       MOOP <- ifelse(MOOP > 1, TRUE, FALSE)
-      COST <- ifelse(weights$COST == 0, FALSE, TRUE)
+      #COST <- ifelse(weights$COST == 0, FALSE, TRUE)
       
       # Argument 'utopia'
       if (MOOP) {
@@ -111,8 +111,9 @@ if (aa) {
     }
   }
 }
-# Output
+# Output and cleanup
 if (!is.null(res)) stop (res, call. = FALSE)
+rm(aa, bb, cc, dd, res)
 #
 # COMMAND
 # # Check spsann arguments ###################################################
