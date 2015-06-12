@@ -10,8 +10,8 @@ optimACDC(points, candi, covars, strata.type = "area", iterations,
   DIST = 0.5), nadir = list(sim = NULL, seeds = NULL, user = NULL, abs =
   NULL), utopia = list(user = NULL, abs = NULL), acceptance = list(initial =
   0.99, cooling = iterations/10), stopping = list(max.count = iterations/10),
-  plotit = TRUE, boundary, progress = TRUE, verbose = TRUE,
-  greedy = FALSE)
+  plotit = TRUE, track = TRUE, boundary, progress = TRUE,
+  verbose = TRUE, greedy = FALSE)
 
 objACDC(points, candi, covars, strata.type = "area", weights = list(CORR =
   0.5, DIST = 0.5), use.coords = FALSE, utopia = list(user = NULL, abs =
@@ -20,57 +20,57 @@ objACDC(points, candi, covars, strata.type = "area", weights = list(CORR =
 \arguments{
 \item{points}{Integer value, integer vector, data frame or matrix. If
 \code{points} is an integer value, it defines the number of points that
-should be sampled from \code{candi}. If \code{points} is a vector of integer
-values, it contains the row indexes of \code{candi} that correspond to the
-points. If \code{points} is a data frame or matrix, it must have three
-columns in the following order: \code{[, 1]} the identification of each point
-(1, 2, ..., n), \code{[, 2]} the projected x-coordinates, and \code{[, 3]}
-the projected y-coordinates. In the later case, \code{points} must be a
-subset of \code{candi}.}
+should be randomly sampled from \code{candi} to form the starting system
+configuration. If \code{points} is a vector of integer values, it contains
+the row indexes of \code{candi} that correspond to the points that form the
+starting system configuration. If \code{points} is a data frame or matrix,
+it must have three columns in the following order: \code{[, "id"]} the
+row indexes of \code{candi} that correspond to each point, \code{[, "x"]}
+the projected x-coordinates, and \code{[, "y"]} the projected y-coordinates.
+Note that in the later case, \code{points} must be a subset of \code{candi}.}
 
 \item{candi}{Data frame or matrix with the candidate locations for the
-perturbed points. \code{candi} must have three columns in the following
-order: \code{[, 1]} the identification of each candidate location (1, 2, ...,
-n), \code{[, 2]} the projected x-coordinates, and \code{[, 3]} the projected
-y-coordinates.}
+perturbed points. \code{candi} must have two columns in the following
+order: \code{[, "x"]} the projected x-coordinates, and \code{[, "y"]} the
+projected y-coordinates.}
 
 \item{covars}{Data frame or matrix with the covariates in the columns.}
 
 \item{strata.type}{Character value setting the type of stratification that
-should be used to create sampling strata (or factor levels) for the numeric
-covariates. Available options are \code{"area"} for equal-area, and
-\code{"range"} for equal-range. Defaults to \code{strata.type = "area"}. See
-\sQuote{Details} for more information.}
+should be used to create the marginal sampling strata (or factor levels) for
+the numeric covariates. Available options are \code{"area"} for equal-area,
+and \code{"range"} for equal-range. Defaults to \code{strata.type = "area"}.}
 
 \item{iterations}{Integer. The maximum number of iterations that should be
 used for the optimization.}
 
-\item{use.coords}{Logical value. Should the geographic coordinates be used as
-covariates? Defaults to \code{use.coords = FALSE}.}
+\item{use.coords}{Logical value. Should the geographic coordinates be used
+as covariates? Defaults to \code{use.coords = FALSE}.}
 
 \item{x.max,x.min,y.max,y.min}{Numeric value. The minimum and maximum
 quantity of random noise to be added to the projected x- and y-coordinates.
 The minimum quantity should be equal to, at least, the minimum distance
 between two neighbouring candidate locations. The units are the same as of
-the projected x- and y-coordinates.}
+the projected x- and y-coordinates. If missing, they will be estimated from
+\code{candi}.}
 
-\item{weights}{List with named sub-arguments. The weights assigned to each of
-the objective functions combined to form the multi-objective optimization
-problem (MOOP). They must be named after the objective function to which
-they apply. The weights must be larger than 0 and sum to 1. The default
-option gives equal weights to all objective functions.}
+\item{weights}{List with named sub-arguments. The weights assigned to each
+of the objective functions that form the multi-objective optimization
+problem (MOOP). They must be named after the respective objective function
+to which they apply. The weights must be equal to or larger than 0 and sum
+to 1. The default option gives equal weights to all objective functions.}
 
 \item{nadir}{List with named sub-arguments. Three options are available:
-1) \code{sim} -- the number of random realizations to estimate the nadir
-point, and \code{seeds} -- vector defining the random seeds for each of the
-realizations; 2) \code{user} -- a list of user-defined values named after
-the objective function to which they apply; 3) \code{abs} -- logical for
-calculating the nadir point internally.}
+1) \code{sim} -- the number of simulations that should be used to estimate
+the nadir point, and \code{seeds} -- vector defining the random seeds for
+each simulation; 2) \code{user} -- a list of user-defined nadir values named
+after the respective objective function to which they apply; 3) \code{abs}
+-- logical for calculating the nadir point internally (experimental).}
 
-\item{utopia}{List with two named sub-arguments: \code{user} -- a list of
-user-defined values named after the objective function to which they apply,
-and \code{abs} -- logical for calculating the utopia point internally.
-Defaults to \code{user = NULL} and \code{abs = NULL}.}
+\item{utopia}{List with named sub-arguments. Two options are available: 1)
+\code{user} -- a list of user-defined values named after the respective
+objective function to which they apply; 2) \code{abs} -- logical for
+calculating the utopia point internally (experimental).}
 
 \item{acceptance}{List with two named sub-arguments: \code{initial} --
 numeric value between 0 and 1 defining the initial acceptance probability,
@@ -81,8 +81,7 @@ witch the acceptance probability decreases at each iteration. Defaults to
 \item{stopping}{List with one named sub-argument: \code{max.count} --
 integer value defining the maximum allowable number of iterations without
 improvement of the objective function value. Defaults to
-\code{stopping = list(max.count = iterations / 10)}. More options may be
-included in the future.}
+\code{stopping = list(max.count = iterations / 10)}.}
 
 \item{plotit}{Logical for plotting the optimization results. This includes
 a) the progress of the objective function values and acceptance
@@ -90,25 +89,29 @@ probabilities, and b) the original points, the perturbed points and the
 progress of the maximum perturbation in the x- and y-coordinates. The plots
 are updated at each 10 iterations. Defaults to \code{plotit = TRUE}.}
 
+\item{track}{Logical value. Should the evolution of the energy state and
+acceptance probability be recorded and returned with the result? Defaults
+to \code{track = TRUE}.}
+
 \item{boundary}{SpatialPolygon. The boundary of the spatial domain.
-Mandatory if \code{plotit = TRUE}.}
+If missing, it is estimated from \code{candi}.}
 
 \item{progress}{Logical for printing a progress bar. Defaults to
 \code{progress = TRUE}.}
 
 \item{verbose}{Logical for printing messages about the progress of the
-optimization.}
+optimization. Defaults to \code{verbose = TRUE}.}
 
 \item{greedy}{Logical value. Should the optimization be done using a greedy
 algorithm, that is, accepting only better system configurations? Defaults
-to \code{greedy = FALSE}.}
+to \code{greedy = FALSE}. (experimental)}
 }
 \value{
 \code{optimACDC} returns a matrix: the optimized sample configuration with
 the evolution of the energy state during the optimization as an attribute.
 
-\code{objACDC} returns a numeric value: the energy state of the point
-configuration.
+\code{objACDC} returns a numeric value: the energy state of the sample
+configuration - the objective function value.
 }
 \description{
 Optimize a sample configuration for spatial trend estimation. A criterion is
@@ -121,10 +124,10 @@ See \code{optimDIST} and \code{optimCORR}.
 \note{
 This function was derive with modifications from the method known as the
 \emph{conditioned Latin Hypercube sampling} originally proposed by Minasny
-and McBratney (2006).
+and McBratney (2006), and implemented in the R-package
+\pkg{\link[clhs]{clhs}}.
 }
 \examples{
-require(pedometrics)
 require(sp)
 data(meuse.grid)
 candi <- meuse.grid[, 1:2]
@@ -133,7 +136,8 @@ utopia <- list(user = list(DIST = 0, CORR = 0))
 covars <- meuse.grid[, 5]
 set.seed(2001)
 res <- optimACDC(points = 100, candi = candi, covars = covars, nadir = nadir,
-                 use.coords = TRUE, iterations = 100, utopia = utopia)
+                 use.coords = TRUE, iterations = 100, utopia = utopia,
+                 plotit = FALSE, track = FALSE, verbose = FALSE)
 tail(attr(res, "energy")$obj, 1) # 0.5272031
 objACDC(points = res, candi = candi, covars = covars, use.coords = TRUE,
         nadir = nadir, utopia = utopia)
@@ -165,21 +169,6 @@ cor(cbind(candi[i, 1], candi[i, 2], covars[i]))
 Alessandro Samuel-Rosa \email{alessandrosamuelrosa@gmail.com}
 }
 \references{
-Arora, J. \emph{Introduction to optimum design}. Waltham: Academic Press, p.
-896, 2011.
-
-Marler, R. T.; Arora, J. S. Survey of multi-objective optimization methods
-for engineering. \emph{Structural and Multidisciplinary Optimization}, v. 26,
-p. 369-395, 2004.
-
-Marler, R. T.; Arora, J. S. Function-transformation methods for
-multi-objective optimization. \emph{Engineering Optimization}, v. 37, p.
-551-570, 2005.
-
-Marler, R. T.; Arora, J. S. The weighted sum method for multi-objective
-optimization: new insights. \emph{Structural and Multidisciplinary
-Optimization}, v. 41, p. 853-862, 2009.
-
 Cramér, H. \emph{Mathematical methods of statistics}. Princeton: Princeton
 University Press, p. 575, 1946.
 
@@ -206,6 +195,21 @@ and Geoinformation}, v. 21, p. 301-310, 2013.
 Roudier, P.; Beaudette, D.; Hewitt, A. A conditioned Latin hypercube sampling
 algorithm incorporating operational constraints. \emph{5th Global Workshop on
 Digital Soil Mapping}. Sydney, p. 227-231, 2012.
+
+Arora, J. \emph{Introduction to optimum design}. Waltham: Academic Press, p.
+896, 2011.
+
+Marler, R. T.; Arora, J. S. Survey of multi-objective optimization methods
+for engineering. \emph{Structural and Multidisciplinary Optimization}, v. 26,
+p. 369-395, 2004.
+
+Marler, R. T.; Arora, J. S. Function-transformation methods for
+multi-objective optimization. \emph{Engineering Optimization}, v. 37, p.
+551-570, 2005.
+
+Marler, R. T.; Arora, J. S. The weighted sum method for multi-objective
+optimization: new insights. \emph{Structural and Multidisciplinary
+Optimization}, v. 41, p. 853-862, 2009.
 }
 \seealso{
 \code{\link[clhs]{clhs}}, \code{\link[pedometrics]{cramer}}

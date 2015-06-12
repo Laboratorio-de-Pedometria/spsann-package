@@ -9,25 +9,26 @@ spJitterFinite(points, candi, x.max, x.min, y.max, y.min, which.point)
 \arguments{
 \item{points}{Integer value, integer vector, data frame or matrix. If
 \code{points} is an integer value, it defines the number of points that
-should be sampled from \code{candi}. If \code{points} is a vector of integer
-values, it contains the row indexes of \code{candi} that correspond to the
-points. If \code{points} is a data frame or matrix, it must have three
-columns in the following order: \code{[, 1]} the identification of each point
-(1, 2, ..., n), \code{[, 2]} the projected x-coordinates, and \code{[, 3]}
-the projected y-coordinates. In the later case, \code{points} must be a
-subset of \code{candi}.}
+should be randomly sampled from \code{candi} to form the starting system
+configuration. If \code{points} is a vector of integer values, it contains
+the row indexes of \code{candi} that correspond to the points that form the
+starting system configuration. If \code{points} is a data frame or matrix,
+it must have three columns in the following order: \code{[, "id"]} the
+row indexes of \code{candi} that correspond to each point, \code{[, "x"]}
+the projected x-coordinates, and \code{[, "y"]} the projected y-coordinates.
+Note that in the later case, \code{points} must be a subset of \code{candi}.}
 
 \item{candi}{Data frame or matrix with the candidate locations for the
-perturbed points. \code{candi} must have three columns in the following
-order: \code{[, 1]} the identification of each candidate location (1, 2, ...,
-n), \code{[, 2]} the projected x-coordinates, and \code{[, 3]} the projected
-y-coordinates.}
+perturbed points. \code{candi} must have two columns in the following
+order: \code{[, "x"]} the projected x-coordinates, and \code{[, "y"]} the
+projected y-coordinates.}
 
 \item{x.max,x.min,y.max,y.min}{Numeric value. The minimum and maximum
 quantity of random noise to be added to the projected x- and y-coordinates.
 The minimum quantity should be equal to, at least, the minimum distance
 between two neighbouring candidate locations. The units are the same as of
-the projected x- and y-coordinates.}
+the projected x- and y-coordinates. If missing, they will be estimated from
+\code{candi}.}
 
 \item{which.point}{Integer values defining which point should be perturbed.}
 }

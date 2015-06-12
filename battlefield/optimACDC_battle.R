@@ -1,11 +1,10 @@
 # Initial settings
 rm(list = ls())
 gc()
-require(ASRtools)
 require(pedometrics)
 require(sp)
-sapply(list.files("R", full.names = TRUE, pattern = ".R$"), source)
 sapply(list.files("src", full.names = TRUE, pattern = ".cpp$"), Rcpp::sourceCpp)
+sapply(list.files("R", full.names = TRUE, pattern = ".R$"), source)
 # 0) DEFAULT EXAMPLE ###########################################################
 require(sp)
 data(meuse.grid)
@@ -15,7 +14,8 @@ utopia <- list(user = list(DIST = 0, CORR = 0))
 covars <- meuse.grid[, 5]
 set.seed(2001)
 res <- optimACDC(points = 100, candi = candi, covars = covars, nadir = nadir,
-                 use.coords = TRUE, iterations = 100, utopia = utopia)
+                 use.coords = TRUE, iterations = 100, utopia = utopia, 
+                 plotit = FALSE, track = FALSE, verbose = FALSE)
 tail(attr(res, "energy")$obj, 1) # 0.5272031
 objACDC(points = res, candi = candi, covars = covars, use.coords = TRUE, 
         nadir = nadir, utopia = utopia)
@@ -46,10 +46,8 @@ cor(cbind(candi[i, 1], candi[i, 2], covars[i]))
 # 1) FACTOR COVARIATES USING THE COORDINATES, WITH USER-DEFINED NADIR ##########
 rm(list = ls())
 gc()
-source('R/optimACDC.R')
-source('R/spSANNtools.R')
-source('R/spJitter.R')
-Rcpp::sourceCpp('src/spJitterCpp.cpp')
+sapply(list.files("src", full.names = TRUE, pattern = ".cpp$"), Rcpp::sourceCpp)
+sapply(list.files("R", full.names = TRUE, pattern = ".R$"), source)
 data(meuse.grid)
 candi <- meuse.grid[, 1:2]
 nadir <- list(user = list(DIST = 10, CORR = 1))
@@ -67,10 +65,8 @@ objACDC(points = tmp, candi = candi, covars = covars, use.coords = TRUE,
 #            'iterations = 100'
 rm(list = ls())
 gc()
-source('R/optimACDC.R')
-source('R/spSANNtools.R')
-source('R/spJitter.R')
-Rcpp::sourceCpp('src/spJitterCpp.cpp')
+sapply(list.files("src", full.names = TRUE, pattern = ".cpp$"), Rcpp::sourceCpp)
+sapply(list.files("R", full.names = TRUE, pattern = ".R$"), source)
 data(meuse.grid)
 candi <- meuse.grid[, 1:2]
 covars <- meuse.grid[, 6:7]
@@ -86,18 +82,28 @@ objACDC(points = tmp, candi = candi, covars = covars, use.coords = TRUE,
 # 4) CATEGORICAL COVARIATES WITH MANY COVARIATES AND MANY POINTS ###############
 rm(list = ls())
 gc()
-source('R/optimACDC.R')
-source('R/spSANNtools.R')
-source('R/spJitter.R')
-Rcpp::sourceCpp('src/spJitterCpp.cpp')
+sapply(list.files("src", full.names = TRUE, pattern = ".cpp$"), Rcpp::sourceCpp)
+sapply(list.files("R", full.names = TRUE, pattern = ".R$"), source)
 data(meuse.grid)
 candi <- meuse.grid[, 1:2]
 covars <- meuse.grid[, rep(c(6, 7), 10)]
 nadir <- list(sim = 10, seeds = 1:10)
 utopia <- list(user = list(CORR = 0, DIST = 0))
+
+# Plot and track
 set.seed(2001)
 tmp <- optimACDC(points = 500, candi = candi, covars = covars, nadir = nadir, 
-                 use.coords = TRUE, iterations = 100, utopia = utopia)
+                 use.coords = TRUE, iterations = 100, utopia = utopia,
+                 verbose = FALSE)
+tail(attr(tmp, "energy")$obj, 1) # 0.620825
+objACDC(points = tmp, candi = candi, covars = covars, use.coords = TRUE, 
+        nadir = nadir, utopia = utopia)
+
+# No plotting and no tracking
+set.seed(2001)
+tmp <- optimACDC(points = 500, candi = candi, covars = covars, nadir = nadir, 
+                 use.coords = TRUE, iterations = 100, utopia = utopia,
+                 plotit = FALSE, track = FALSE, verbose = FALSE)
 tail(attr(tmp, "energy")$obj, 1) # 0.620825
 objACDC(points = tmp, candi = candi, covars = covars, use.coords = TRUE, 
         nadir = nadir, utopia = utopia)
@@ -105,10 +111,8 @@ objACDC(points = tmp, candi = candi, covars = covars, use.coords = TRUE,
 # 5) NUMERIC COVARIATES USING THE COORDINATES, WITH USER-DEFINED NADIR #########
 rm(list = ls())
 gc()
-source('R/optimACDC.R')
-source('R/spSANNtools.R')
-source('R/spJitter.R')
-Rcpp::sourceCpp('src/spJitterCpp.cpp')
+sapply(list.files("src", full.names = TRUE, pattern = ".cpp$"), Rcpp::sourceCpp)
+sapply(list.files("R", full.names = TRUE, pattern = ".R$"), source)
 data(meuse.grid)
 candi <- meuse.grid[, 1:2]
 nadir <- list(user = list(DIST = 10, CORR = 1))

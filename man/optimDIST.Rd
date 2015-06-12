@@ -9,43 +9,44 @@ optimDIST(points, candi, covars, strata.type = "area", use.coords = FALSE,
   x.max, x.min, y.max, y.min, iterations, acceptance = list(initial = 0.99,
   cooling = iterations/10), stopping = list(max.count = iterations/10),
   plotit = TRUE, boundary, progress = TRUE, verbose = TRUE,
-  greedy = FALSE, weights, nadir, utopia)
+  greedy = FALSE, track = TRUE, weights = NULL, nadir = NULL,
+  utopia = NULL)
 
 objDIST(points, candi, covars, strata.type = "area", use.coords = FALSE)
 }
 \arguments{
 \item{points}{Integer value, integer vector, data frame or matrix. If
 \code{points} is an integer value, it defines the number of points that
-should be sampled from \code{candi}. If \code{points} is a vector of integer
-values, it contains the row indexes of \code{candi} that correspond to the
-points. If \code{points} is a data frame or matrix, it must have three
-columns in the following order: \code{[, 1]} the identification of each point
-(1, 2, ..., n), \code{[, 2]} the projected x-coordinates, and \code{[, 3]}
-the projected y-coordinates. In the later case, \code{points} must be a
-subset of \code{candi}.}
+should be randomly sampled from \code{candi} to form the starting system
+configuration. If \code{points} is a vector of integer values, it contains
+the row indexes of \code{candi} that correspond to the points that form the
+starting system configuration. If \code{points} is a data frame or matrix,
+it must have three columns in the following order: \code{[, "id"]} the
+row indexes of \code{candi} that correspond to each point, \code{[, "x"]}
+the projected x-coordinates, and \code{[, "y"]} the projected y-coordinates.
+Note that in the later case, \code{points} must be a subset of \code{candi}.}
 
 \item{candi}{Data frame or matrix with the candidate locations for the
-perturbed points. \code{candi} must have three columns in the following
-order: \code{[, 1]} the identification of each candidate location (1, 2, ...,
-n), \code{[, 2]} the projected x-coordinates, and \code{[, 3]} the projected
-y-coordinates.}
+perturbed points. \code{candi} must have two columns in the following
+order: \code{[, "x"]} the projected x-coordinates, and \code{[, "y"]} the
+projected y-coordinates.}
 
 \item{covars}{Data frame or matrix with the covariates in the columns.}
 
 \item{strata.type}{Character value setting the type of stratification that
-should be used to create sampling strata (or factor levels) for the numeric
-covariates. Available options are \code{"area"} for equal-area, and
-\code{"range"} for equal-range. Defaults to \code{strata.type = "area"}. See
-\sQuote{Details} for more information.}
+should be used to create the marginal sampling strata (or factor levels) for
+the numeric covariates. Available options are \code{"area"} for equal-area,
+and \code{"range"} for equal-range. Defaults to \code{strata.type = "area"}.}
 
-\item{use.coords}{Logical value. Should the geographic coordinates be used as
-covariates? Defaults to \code{use.coords = FALSE}.}
+\item{use.coords}{Logical value. Should the geographic coordinates be used
+as covariates? Defaults to \code{use.coords = FALSE}.}
 
 \item{x.max,x.min,y.max,y.min}{Numeric value. The minimum and maximum
 quantity of random noise to be added to the projected x- and y-coordinates.
 The minimum quantity should be equal to, at least, the minimum distance
 between two neighbouring candidate locations. The units are the same as of
-the projected x- and y-coordinates.}
+the projected x- and y-coordinates. If missing, they will be estimated from
+\code{candi}.}
 
 \item{iterations}{Integer. The maximum number of iterations that should be
 used for the optimization.}
@@ -59,8 +60,7 @@ witch the acceptance probability decreases at each iteration. Defaults to
 \item{stopping}{List with one named sub-argument: \code{max.count} --
 integer value defining the maximum allowable number of iterations without
 improvement of the objective function value. Defaults to
-\code{stopping = list(max.count = iterations / 10)}. More options may be
-included in the future.}
+\code{stopping = list(max.count = iterations / 10)}.}
 
 \item{plotit}{Logical for plotting the optimization results. This includes
 a) the progress of the objective function values and acceptance
@@ -69,35 +69,39 @@ progress of the maximum perturbation in the x- and y-coordinates. The plots
 are updated at each 10 iterations. Defaults to \code{plotit = TRUE}.}
 
 \item{boundary}{SpatialPolygon. The boundary of the spatial domain.
-Mandatory if \code{plotit = TRUE}.}
+If missing, it is estimated from \code{candi}.}
 
 \item{progress}{Logical for printing a progress bar. Defaults to
 \code{progress = TRUE}.}
 
 \item{verbose}{Logical for printing messages about the progress of the
-optimization.}
+optimization. Defaults to \code{verbose = TRUE}.}
 
 \item{greedy}{Logical value. Should the optimization be done using a greedy
 algorithm, that is, accepting only better system configurations? Defaults
-to \code{greedy = FALSE}.}
+to \code{greedy = FALSE}. (experimental)}
 
-\item{weights}{List with named sub-arguments. The weights assigned to each of
-the objective functions combined to form the multi-objective optimization
-problem (MOOP). They must be named after the objective function to which
-they apply. The weights must be larger than 0 and sum to 1. The default
-option gives equal weights to all objective functions.}
+\item{track}{Logical value. Should the evolution of the energy state and
+acceptance probability be recorded and returned with the result? Defaults
+to \code{track = TRUE}.}
+
+\item{weights}{List with named sub-arguments. The weights assigned to each
+of the objective functions that form the multi-objective optimization
+problem (MOOP). They must be named after the respective objective function
+to which they apply. The weights must be equal to or larger than 0 and sum
+to 1. The default option gives equal weights to all objective functions.}
 
 \item{nadir}{List with named sub-arguments. Three options are available:
-1) \code{sim} -- the number of random realizations to estimate the nadir
-point, and \code{seeds} -- vector defining the random seeds for each of the
-realizations; 2) \code{user} -- a list of user-defined values named after
-the objective function to which they apply; 3) \code{abs} -- logical for
-calculating the nadir point internally.}
+1) \code{sim} -- the number of simulations that should be used to estimate
+the nadir point, and \code{seeds} -- vector defining the random seeds for
+each simulation; 2) \code{user} -- a list of user-defined nadir values named
+after the respective objective function to which they apply; 3) \code{abs}
+-- logical for calculating the nadir point internally (experimental).}
 
-\item{utopia}{List with two named sub-arguments: \code{user} -- a list of
-user-defined values named after the objective function to which they apply,
-and \code{abs} -- logical for calculating the utopia point internally.
-Defaults to \code{user = NULL} and \code{abs = NULL}.}
+\item{utopia}{List with named sub-arguments. Two options are available: 1)
+\code{user} -- a list of user-defined values named after the respective
+objective function to which they apply; 2) \code{abs} -- logical for
+calculating the utopia point internally (experimental).}
 }
 \value{
 \code{optimDIST} returns a matrix: the optimized sample configuration with
@@ -113,54 +117,58 @@ so that the sample reproduces the marginal distribution of the covariates
 }
 \details{
 Reproducing the marginal distribution of the numeric covariates depends upon
-the definition of sampling strata. These sampling strata are also used to
-categorize any numeric covariate when they are passed together with
-categorical covariates (see more details at \code{optimDist}).
-Two types of sampling strata can be used. \emph{Equal-area} sampling strata
-are defined using the sample quantiles estimated with \code{quantile()} using
-a discontinuous function (\code{type = 3}). This is to avoid creating
-breakpoints that do not occur in the population of existing covariate values.
+the definition of marginal sampling strata. These marginal sampling strata
+are also used to define the factor levels of any numeric covariate when they
+are passed together with factor covariates (see more details at
+\code{optimDist}).
 
-The function \code{quantile()} commonly produces repeated break points. A
-break point will always be repeated if that value has a relatively
-high frequency in the population of covariate values. The number of repeated
-break points increases with the number of sampling strata. Only unique
-break points are used to create sampling strata.
+Two types of marginal sampling strata can be used. \emph{Equal-area}
+sampling strata are defined using the sample quantiles estimated with
+\code{\link[stats]{quantile}} using a discontinuous function
+(\code{type = 3}). This is to avoid creating breakpoints that do not occur
+in the population of existing covariate values.
+
+The function \code{\link[stats]{quantile}} commonly produces repeated
+break points. A break point will always be repeated if that value has a
+relatively high frequency in the population of covariate values. The number
+of repeated break points increases with the number of marginal sampling
+strata. Only unique break points are used to create marginal sampling strata.
 
 \emph{Equal-range} sampling strata are defined breaking the range of
 covariate values into pieces of equal size. This method usually creates
-breakpoints that do not occur in the population of existing covariate values.
-Such breakpoints are replaced by the nearest existing covariate value
-identified using Euclidean distances.
+break points that do not occur in the population of existing covariate
+values. Such break points are replaced by the nearest existing covariate
+value identified using Euclidean distances.
 
-Both stratification methods can produce sampling strata that cover a range of
-values that do not exist in the population of covariate value. Any empty
-sampling strata is merged with the closest non-empty sampling strata. These
-are identified using Euclidean distances.
+Both stratification methods can produce marginal sampling strata that cover
+a range of values that do not exist in the population of covariate values.
+Any empty marginal sampling strata is merged with the closest non-empty
+marginal sampling strata. These are identified using Euclidean distances.
 
-The approaches used to define the sampling strata result in each numeric
-covariate having a different number of sampling strata, some of them with
-different area/size. Because the goal is to have a sample that reproduces the
-marginal distribution of the covariate, each sampling strata will have a
-different number of sample points. The wanted distribution of the number of
-sample points per strata is estimated empirically computing the proportion of
-points of the population of existing covariate values that fall in each
-sampling strata.
+The approaches used to define the marginal sampling strata result in each
+numeric covariate having a different number of marginal sampling strata,
+some of them with different area/size. Because the goal is to have a sample
+that reproduces the marginal distribution of the covariate, each marginal
+sampling strata will have a different number of sample points. The wanted
+distribution of the number of sample points per marginal strata is estimated
+empirically computing the proportion of points of the population of existing
+covariate values that fall in each marginal sampling strata.
 }
 \note{
 This function was derive with modifications from the method known as the
 \emph{conditioned Latin Hypercube sampling} originally proposed by Minasny
-and McBratney (2006).
+and McBratney (2006), and implemented in the R-package
+\pkg{\link[clhs]{clhs}}.
 }
 \examples{
-require(pedometrics)
 require(sp)
 data(meuse.grid)
 candi <- meuse.grid[, 1:2]
 covars <- meuse.grid[, 5]
 set.seed(2001)
 res <- optimDIST(points = 100, candi = candi, covars = covars,
-                 use.coords = TRUE, iterations = 100)
+                 use.coords = TRUE, iterations = 100, plotit = FALSE,
+                 track = FALSE, verbose = FALSE)
 tail(attr(res, "energy"), 1) # 1.6505
 objDIST(points = res, candi = candi, covars = covars, use.coords = TRUE)
 }
@@ -168,21 +176,6 @@ objDIST(points = res, candi = candi, covars = covars, use.coords = TRUE)
 Alessandro Samuel-Rosa \email{alessandrosamuelrosa@gmail.com}
 }
 \references{
-Arora, J. \emph{Introduction to optimum design}. Waltham: Academic Press, p.
-896, 2011.
-
-Marler, R. T.; Arora, J. S. Survey of multi-objective optimization methods
-for engineering. \emph{Structural and Multidisciplinary Optimization}, v. 26,
-p. 369-395, 2004.
-
-Marler, R. T.; Arora, J. S. Function-transformation methods for
-multi-objective optimization. \emph{Engineering Optimization}, v. 37, p.
-551-570, 2005.
-
-Marler, R. T.; Arora, J. S. The weighted sum method for multi-objective
-optimization: new insights. \emph{Structural and Multidisciplinary
-Optimization}, v. 41, p. 853-862, 2009.
-
 Cramér, H. \emph{Mathematical methods of statistics}. Princeton: Princeton
 University Press, p. 575, 1946.
 
@@ -209,6 +202,21 @@ and Geoinformation}, v. 21, p. 301-310, 2013.
 Roudier, P.; Beaudette, D.; Hewitt, A. A conditioned Latin hypercube sampling
 algorithm incorporating operational constraints. \emph{5th Global Workshop on
 Digital Soil Mapping}. Sydney, p. 227-231, 2012.
+
+Arora, J. \emph{Introduction to optimum design}. Waltham: Academic Press, p.
+896, 2011.
+
+Marler, R. T.; Arora, J. S. Survey of multi-objective optimization methods
+for engineering. \emph{Structural and Multidisciplinary Optimization}, v. 26,
+p. 369-395, 2004.
+
+Marler, R. T.; Arora, J. S. Function-transformation methods for
+multi-objective optimization. \emph{Engineering Optimization}, v. 37, p.
+551-570, 2005.
+
+Marler, R. T.; Arora, J. S. The weighted sum method for multi-objective
+optimization: new insights. \emph{Structural and Multidisciplinary
+Optimization}, v. 41, p. 853-862, 2009.
 }
 \seealso{
 \code{\link[clhs]{clhs}}

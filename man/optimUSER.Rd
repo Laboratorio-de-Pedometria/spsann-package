@@ -7,19 +7,20 @@
 optimUSER(points, fun, ..., candi, x.max, x.min, y.max, y.min,
   iterations = 10000, acceptance = list(initial = 0.99, cooling =
   iterations/10), stopping = list(max.count = iterations/10), plotit = TRUE,
-  boundary, progress = TRUE, verbose = TRUE, greedy = FALSE, weights,
-  nadir, utopia)
+  boundary, progress = TRUE, verbose = TRUE, track = TRUE,
+  greedy = FALSE, weights = NULL, nadir = NULL, utopia = NULL)
 }
 \arguments{
 \item{points}{Integer value, integer vector, data frame or matrix. If
 \code{points} is an integer value, it defines the number of points that
-should be sampled from \code{candi}. If \code{points} is a vector of integer
-values, it contains the row indexes of \code{candi} that correspond to the
-points. If \code{points} is a data frame or matrix, it must have three
-columns in the following order: \code{[, 1]} the identification of each point
-(1, 2, ..., n), \code{[, 2]} the projected x-coordinates, and \code{[, 3]}
-the projected y-coordinates. In the later case, \code{points} must be a
-subset of \code{candi}.}
+should be randomly sampled from \code{candi} to form the starting system
+configuration. If \code{points} is a vector of integer values, it contains
+the row indexes of \code{candi} that correspond to the points that form the
+starting system configuration. If \code{points} is a data frame or matrix,
+it must have three columns in the following order: \code{[, "id"]} the
+row indexes of \code{candi} that correspond to each point, \code{[, "x"]}
+the projected x-coordinates, and \code{[, "y"]} the projected y-coordinates.
+Note that in the later case, \code{points} must be a subset of \code{candi}.}
 
 \item{fun}{A function defining the objective function that should be
 used to evaluate the energy state of the system configuration at each
@@ -29,16 +30,16 @@ iteration. See \sQuote{Details} for more information.}
 \sQuote{Details} for more information.}
 
 \item{candi}{Data frame or matrix with the candidate locations for the
-perturbed points. \code{candi} must have three columns in the following
-order: \code{[, 1]} the identification of each candidate location (1, 2, ...,
-n), \code{[, 2]} the projected x-coordinates, and \code{[, 3]} the projected
-y-coordinates.}
+perturbed points. \code{candi} must have two columns in the following
+order: \code{[, "x"]} the projected x-coordinates, and \code{[, "y"]} the
+projected y-coordinates.}
 
 \item{x.max,x.min,y.max,y.min}{Numeric value. The minimum and maximum
 quantity of random noise to be added to the projected x- and y-coordinates.
 The minimum quantity should be equal to, at least, the minimum distance
 between two neighbouring candidate locations. The units are the same as of
-the projected x- and y-coordinates.}
+the projected x- and y-coordinates. If missing, they will be estimated from
+\code{candi}.}
 
 \item{iterations}{Integer. The maximum number of iterations that should be
 used for the optimization.}
@@ -52,8 +53,7 @@ witch the acceptance probability decreases at each iteration. Defaults to
 \item{stopping}{List with one named sub-argument: \code{max.count} --
 integer value defining the maximum allowable number of iterations without
 improvement of the objective function value. Defaults to
-\code{stopping = list(max.count = iterations / 10)}. More options may be
-included in the future.}
+\code{stopping = list(max.count = iterations / 10)}.}
 
 \item{plotit}{Logical for plotting the optimization results. This includes
 a) the progress of the objective function values and acceptance
@@ -62,35 +62,39 @@ progress of the maximum perturbation in the x- and y-coordinates. The plots
 are updated at each 10 iterations. Defaults to \code{plotit = TRUE}.}
 
 \item{boundary}{SpatialPolygon. The boundary of the spatial domain.
-Mandatory if \code{plotit = TRUE}.}
+If missing, it is estimated from \code{candi}.}
 
 \item{progress}{Logical for printing a progress bar. Defaults to
 \code{progress = TRUE}.}
 
 \item{verbose}{Logical for printing messages about the progress of the
-optimization.}
+optimization. Defaults to \code{verbose = TRUE}.}
+
+\item{track}{Logical value. Should the evolution of the energy state and
+acceptance probability be recorded and returned with the result? Defaults
+to \code{track = TRUE}.}
 
 \item{greedy}{Logical value. Should the optimization be done using a greedy
 algorithm, that is, accepting only better system configurations? Defaults
-to \code{greedy = FALSE}.}
+to \code{greedy = FALSE}. (experimental)}
 
-\item{weights}{List with named sub-arguments. The weights assigned to each of
-the objective functions combined to form the multi-objective optimization
-problem (MOOP). They must be named after the objective function to which
-they apply. The weights must be larger than 0 and sum to 1. The default
-option gives equal weights to all objective functions.}
+\item{weights}{List with named sub-arguments. The weights assigned to each
+of the objective functions that form the multi-objective optimization
+problem (MOOP). They must be named after the respective objective function
+to which they apply. The weights must be equal to or larger than 0 and sum
+to 1. The default option gives equal weights to all objective functions.}
 
 \item{nadir}{List with named sub-arguments. Three options are available:
-1) \code{sim} -- the number of random realizations to estimate the nadir
-point, and \code{seeds} -- vector defining the random seeds for each of the
-realizations; 2) \code{user} -- a list of user-defined values named after
-the objective function to which they apply; 3) \code{abs} -- logical for
-calculating the nadir point internally.}
+1) \code{sim} -- the number of simulations that should be used to estimate
+the nadir point, and \code{seeds} -- vector defining the random seeds for
+each simulation; 2) \code{user} -- a list of user-defined nadir values named
+after the respective objective function to which they apply; 3) \code{abs}
+-- logical for calculating the nadir point internally (experimental).}
 
-\item{utopia}{List with two named sub-arguments: \code{user} -- a list of
-user-defined values named after the objective function to which they apply,
-and \code{abs} -- logical for calculating the utopia point internally.
-Defaults to \code{user = NULL} and \code{abs = NULL}.}
+\item{utopia}{List with named sub-arguments. Two options are available: 1)
+\code{user} -- a list of user-defined values named after the respective
+objective function to which they apply; 2) \code{abs} -- logical for
+calculating the utopia point internally (experimental).}
 }
 \value{
 \code{optimUSER} returns a matrix: the optimized sample configuration with
@@ -109,7 +113,6 @@ useful to retrieve information from any data matrix used by the objective
 function defined by the user.
 }
 \examples{
-require(pedometrics)
 require(sp)
 require(SpatialTools)
 data(meuse.grid)
@@ -133,13 +136,16 @@ lags <- seq(1, 1000, length.out = 10)
 set.seed(2001)
 timeUSER <- Sys.time()
 resUSER <- optimUSER(points = 100, fun = objUSER, lags = lags, n_lags = 9,
-                     n_pts = 100, candi = candi, iterations = 100)
+                     n_pts = 100, candi = candi, iterations = 100,
+                     plotit = FALSE, track = FALSE, verbose = FALSE)
 timeUSER <- Sys.time() - timeUSER
 
 # Run the optimization using the respective function implemented in spsann
 set.seed(2001)
 timePPL <- Sys.time()
-resPPL <- optimPPL(points = 100, candi = candi, lags = lags, iterations = 100)
+resPPL <- optimPPL(points = 100, candi = candi, lags = lags,
+                   iterations = 100, plotit = FALSE, track = FALSE,
+                   verbose = FALSE)
 timePPL <- Sys.time() - timePPL
 
 # Compare results

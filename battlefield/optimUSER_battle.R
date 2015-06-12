@@ -1,18 +1,9 @@
 # Initial settings
 rm(list = ls())
 gc()
-source('R/spSANNtools.R')
-source('R/spJitter.R')
-source('R/optimUSER.R')
-source('R/optimPPL.R')
-source('R/prepare-points.R')
-source('R/check-spsann-arguments.R')
-source('R/plotting-options.R')
-source('R/prepare-jittering.R')
-Rcpp::sourceCpp('src/spJitterCpp.cpp')
-Rcpp::sourceCpp('src/updatePPLCpp.cpp')
+sapply(list.files("src", full.names = TRUE, pattern = ".cpp$"), Rcpp::sourceCpp)
+sapply(list.files("R", full.names = TRUE, pattern = ".R$"), source)
 # 0) DEFAULT EXAMPLE ###########################################################
-require(pedometrics)
 require(sp)
 require(SpatialTools)
 data(meuse.grid)
@@ -36,13 +27,16 @@ lags <- seq(1, 1000, length.out = 10)
 set.seed(2001)
 timeUSER <- Sys.time()
 resUSER <- optimUSER(points = 100, fun = objUSER, lags = lags, n_lags = 9,
-                     n_pts = 100, candi = candi, iterations = 100)
+                     n_pts = 100, candi = candi, iterations = 100,
+                     plotit = FALSE, track = FALSE, verbose = FALSE)
 timeUSER <- Sys.time() - timeUSER
 
 # Run the optimization using the respective function implemented in spsann
 set.seed(2001)
 timePPL <- Sys.time()
-resPPL <- optimPPL(points = 100, candi = candi, lags = lags, iterations = 100)
+resPPL <- optimPPL(points = 100, candi = candi, lags = lags, 
+                   iterations = 100, plotit = FALSE, track = FALSE, 
+                   verbose = FALSE)
 timePPL <- Sys.time() - timePPL
 
 # Compare results
