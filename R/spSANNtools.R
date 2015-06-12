@@ -1,146 +1,9 @@
 #' @importFrom sp bbox
-# INTERNAL FUNCTION - CHECK MOOP ARGUMENTS #####################################
-.MOOPcheck <-
-  function (weights, utopia, nadir) {
-    
-    # utopia
-    aa <- !is.list(utopia)
-    bb <- !length(utopia) == 1
-    cc <- is.null(names(utopia))
-    if (aa || bb || cc) {
-      res <- paste("'utopia' must be a list with a named component")
-    }
-    rm(aa, bb, cc)
-    
-    # weights
-    aa <- !is.list(weights)
-    bb <- is.null(names(weights))
-    if (aa || bb) {
-      res <- paste("'weights' must be a list with named components")
-      return (res)
-    }
-    rm(aa, bb)
-    
-    aa <- sum(unlist(weights)) != 1
-    bb <- any(unlist(weights) == 0)
-    if (aa || bb) {
-      res <- paste("the 'weights' must be larger than 0 and sum to 1")
-      return (res)
-    }
-    rm(aa, bb)
-    
-    # nadir
-    aa <- !is.list(nadir)
-    if (aa) {
-      res <- paste("'nadir' must be a list with named components")
-      return (res)
-    }
-    rm(aa)
-    
-    aa <- names(nadir)
-    if (length(aa) >= 2) {
-      if (length(aa) > 2) {
-        res <- paste("you must choose a single nadir option")
-        return (res)
-      }
-    } else {
-      if (aa == "sim" || aa == "seeds") { 
-        res <- paste("you must set the number of random simulations and their ",
-                     "seeds", sep = "")
-        return (res)
-      }
-      if (aa == "abs") {
-        res <- paste("sorry but the nadir point cannot be calculated")
-        return (res)
-      }
-    }
-    rm(aa)
-  }
-  
-# INTERNAL FUNCTION - PREPARE POINTS ###########################################
-.spsannPoints <-
-  function (points, candi, n.candi) {
-    if (is.integer(points) || is.numint(points)) {
-      # Integer vector
-      if (length(points) > 1) {
-        points <- candi[points, ]
-      }
-      # Integer value
-      if (length(points) == 1) {
-        points <- sample(1:n.candi, points)
-        points <- candi[points, ] 
-      }
-    } else {
-      # Data frame of matrix
-      points <- points
-    }
-    return (points)
-  }
-# INTERNAL FUNCTION - CHECK ARGUMENTS ##########################################
-.spSANNcheck <-
-  function (points, candi, x.max, x.min, y.max, y.min, iterations,
-            acceptance, stopping, plotit, boundary, progress, verbose) {
-    
-    # missing arguments
-    arg <- c("points", "candi", "x.max", "x.min", "y.max", "y.min")
-    mis <- c(missing(points), missing(candi), missing(x.max), 
-             missing(x.min), missing(y.max), missing(y.min))
-    if (any(mis)) {
-      i <- which(mis == TRUE)
-      res <- paste("missing argument: ", arg[i], "\n", sep = "")
-      return (res)
-    }
-    
-    # candi
-    if (ncol(candi) != 2) {
-      res <- paste("'candi' must have two columns")
-      return (res)
-    }
-    
-    # iterations
-    if (!is.numint(iterations) || length(iterations) > 1) {
-      res <- paste("'iterations' must be an integer value")
-      return (res)
-    }
-    
-    # acceptance
-    aa <- !is.list(acceptance)
-    bb <- length(acceptance) != 2
-    cc <- is.null(names(acceptance))
-    dd <- !all(c(names(acceptance) == c("initial", "cooling")) == TRUE)
-    if (aa || bb || cc || dd) {
-      res <- paste("'acceptance' must be a list with two named sub-arguments: ",
-                   "'initial' and 'cooling'", sep = "")
-      return (res)
-    }
-    
-    # stopping
-    aa <- !is.list(stopping)
-    bb <- length(stopping) != 1
-    cc <- is.null(names(stopping))
-    dd <- !all(c(names(stopping) == "max.count") == TRUE)
-    if (aa || bb || cc || dd) {
-      res <- paste("'stopping' must be a list with one named sub-argument: ",
-                   "'max.count'", sep = "")
-      return (res)
-    }
-    
-    # boundary
-    if (plotit) {
-      if (missing(boundary)) {
-        res <- paste("'boundary' is mandatory when 'plotit = TRUE'")
-        return (res)
-      }
-      if (inherits(boundary, "SpatialPolygon")) {
-        res <- paste("'boundary' must be a SpatialPolygon")
-        return (res)
-      }
-    }    
-  }
 # INTERNAL FUNCTION - PLOTTING #################################################
 .spSANNplot <-
   function (energy0, energies, k, acceptance, accept_probs, boundary, new_conf,
-            conf0, y_max0, y.max, x_max0, x.max, best.energy, best.k, MOOP, wp) {
+            conf0, y_max0, y.max, x_max0, x.max, best.energy, best.k, MOOP, 
+            wp, greedy = FALSE) {
     par(mfrow = c(1, 2))
     
     # PLOT THE ENERGY STATES
@@ -168,16 +31,22 @@
     }
     
     # plot acceptance probability
-    a <- c(acceptance[[1]], accept_probs[1:k])
-    par(new = TRUE)
-    plot(a ~ c(0:k), type = "l", axes = FALSE, bty = "n", xlab = "", 
-         ylab = "", col = "blue", ylim = c(0, acceptance[[1]]))
-    axis(side = 4, at = pretty(range(a)))
-    mtext("acceptance probability", side = 4, line = 3)
+    if (greedy == FALSE) {
+      a <- c(acceptance[[1]], accept_probs[1:k])
+      par(new = TRUE)
+      plot(a ~ c(0:k), type = "l", axes = FALSE, bty = "n", xlab = "", 
+           ylab = "", col = "blue", ylim = c(0, acceptance[[1]]))
+      axis(side = 4, at = pretty(range(a)))
+      mtext("acceptance probability", side = 4, line = 3) 
+    }
     
     # plot sample points
     bb <- bbox(boundary)
-    plot(boundary)
+    if (class(boundary) == "SpatialPoints") {
+      plot(boundary, pch = 20, cex = 0.1)
+    } else {
+      plot(boundary)
+    }
     points(conf0[, 1], conf0[, 2], pch = 1, cex = 0.5, 
            col = "lightgray")
     points(new_conf[, 1], new_conf[, 2], pch = 20, cex = 0.5)
