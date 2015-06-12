@@ -45,8 +45,8 @@ if (plotit) {
     
     boundary <- SpatialPoints(unique(rbind(xy, yx)))
   }
+  rm(x, d, y, xy, yx)
 }
-rm(x, d, y, xy, yx)
 #
 # COMMAND (uncomment)
 # # Set plotting options ####################################################

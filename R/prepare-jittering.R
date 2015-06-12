@@ -11,6 +11,7 @@ expression(if (missing(x.min) && missing(x.max) && missing(y.min) && missing(y.m
   id <- y > 0
   y.min <- min(y[id])
   y.max <- max(y)
-}, x_max0 <- x.max, y_max0 <- y.max, rm(x, id, y))
+  rm(x, id, y)
+}, x_max0 <- x.max, y_max0 <- y.max)
 }
 

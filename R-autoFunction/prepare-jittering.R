@@ -26,13 +26,13 @@ if (missing(x.min) && missing(x.max) && missing(y.min) && missing(y.max)) {
   id <- y > 0
   y.min <- min(y[id])
   y.max <- max(y)
+  rm(x, id, y)
 }
 x_max0 <- x.max
 y_max0 <- y.max
 # if (missing(cellsize)) {
 #   cellsize <- c(x.min, y.min)
 # }
-rm(x, id, y)
 #
 # COMMAND (uncomment)
 # # Prepare for jittering ####################################################
