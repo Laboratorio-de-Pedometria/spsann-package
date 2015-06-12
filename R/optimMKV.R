@@ -59,20 +59,21 @@
 #' covars <- as.data.frame(meuse.grid)
 #' model <- vgm(psill = 10, model = "Exp", range = 500, nugget = 8)
 #' set.seed(2001)
-#' res <- optimMKV(points = 100, candi = candi, covars = covars, 
-#'                 equation = z ~ dist, model = model, iterations = 100)
-#' tail(attr(res, "energy"), 1) # 11.61896
+#' res <- optimMKV(points = 100, candi = candi, covars = covars, maxdist = 500,
+#'                 equation = z ~ dist, model = model, iterations = 100,
+#'                 plotit = FALSE, track = FALSE, verbose = FALSE)
+#' tail(attr(res, "energy"), 1) # 11.9878
 #' objMKV(points = res, candi = candi, covars = covars, equation = z ~ dist, 
-#'        model = model)
+#'        model = model, maxdist = 500)
 # FUNCTION - MAIN ##############################################################
 optimMKV <-
   function (points, candi, 
-            covars, equation = z ~ 1, model, krige.stat = "mean",
+            covars, equation = z ~ 1, model, krige.stat = "mean", ...,
             x.max, x.min, y.max, y.min, iterations = 10000,
             acceptance = list(initial = 0.99, cooling = iterations / 10),
             stopping = list(max.count = iterations / 10), plotit = TRUE,
             boundary, progress = TRUE, verbose = TRUE, greedy = FALSE,
-            weights, nadir, utopia) {
+            track = TRUE, weights = NULL, nadir = NULL, utopia = NULL) {
     
     if (!missing(covars)) {
       if (!is.data.frame(covars)) covars <- as.data.frame(covars) 
@@ -120,7 +121,7 @@ optimMKV <-
     
     # Initial energy state
     energy0 <- gstat::krige(formula = equation, locations = ~ x + y, data = sm,
-                            newdata = covars, model = model)$var1.var
+                            newdata = covars, model = model, ...)$var1.var
     if (krige.stat == "mean") {
       energy0 <- mean(energy0)
     } else {
@@ -130,15 +131,14 @@ optimMKV <-
     }
     
     # other settings for the simulated annealing algorithm
-    MOOP <- FALSE
     old_sm <- sm
     new_sm <- sm
     best_sm <- sm
     count <- 0
     old_energy <- energy0
     best_energy <- Inf
-    energies <- vector()
-    accept_probs <- vector()
+    #energies <- vector()
+    #accept_probs <- vector()
     if (progress) pb <- txtProgressBar(min = 1, max = iterations, style = 3)
     time0 <- proc.time()
     
@@ -158,7 +158,7 @@ optimMKV <-
       new_row <- cbind(1, covars[new_conf[wp, 1], ])
       new_sm[wp, ] <- new_row
       new_energy <- gstat::krige(formula = equation, locations = ~ x + y, 
-                                 data = new_sm, newdata = covars, 
+                                 data = new_sm, newdata = covars, ..., 
                                  model = model, debug.level = 0)$var1.var
       if (krige.stat == "mean") {
         new_energy <- mean(new_energy)
@@ -175,7 +175,7 @@ optimMKV <-
         random_prob <- runif(1)
       }
       actual_prob <- acceptance[[1]] * exp(-k / acceptance[[2]])
-      accept_probs[k] <- actual_prob
+      if (track) accept_probs[k] <- actual_prob
       if (new_energy <= old_energy) {
         old_conf   <- new_conf
         old_energy <- new_energy
@@ -203,7 +203,7 @@ optimMKV <-
         }
       }
       # Best energy state
-      energies[k] <- new_energy
+      if (track) energies[k] <- new_energy
       if (new_energy < best_energy / 1.0000001) {
         best_k          <- k
         best_conf       <- new_conf
@@ -244,7 +244,9 @@ optimMKV <-
       if (progress) setTxtProgressBar(pb, k)
     }
     if (progress) close(pb)
-    res <- .spSANNout(new_conf, energy0, energies, time0, MOOP = FALSE)
+    if (!track) energies <- new_energy
+    res <- .spSANNout(new_conf = new_conf, energy0 = energy0, 
+                      energies = energies, time0 = time0, MOOP = MOOP)
     return (res)
   }
 # INTERNAL FUNCTION - CHECK ARGUMENTS ##########################################
@@ -291,18 +293,11 @@ optimMKV <-
 #' @export
 #' @rdname optimMKV
 objMKV <-
-  function (points, candi, covars, equation, model, krige.stat = "mean") {
+  function (points, candi, covars, equation, model, krige.stat = "mean", ...) {
     
     if (!missing(covars)) {
       if (!is.data.frame(covars)) covars <- as.data.frame(covars) 
-    }    
-    
-    # Check arguments
-    #check <- .spSANNcheck(points, candi)
-    #if (!is.null(check)) stop (check, call. = FALSE)
-    
-    #check <- .optimMKVcheck()
-    #if (!is.null(check)) stop (check, call. = FALSE)
+    }
     
     # Prepare points and candi #################################################
     eval(.prepare_points())
@@ -330,7 +325,7 @@ objMKV <-
     
     # Initial energy state
     res <- gstat::krige(formula = equation, locations = ~ x + y, data = sm,
-                        newdata = covars, model = model)$var1.var
+                        newdata = covars, model = model, ...)$var1.var
     if (krige.stat == "mean") {
       res <- mean(res)
     } else {
