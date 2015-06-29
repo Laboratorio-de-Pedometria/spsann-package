@@ -112,9 +112,9 @@ optimACDC <-
     if (covars.type == "numeric") { # Numeric covariates
       strata <- .numStrata(n.pts = n_pts, covars = covars, 
                            strata.type = strata.type)
-      nadir <- .numNadir(n.pts = n_pts, n.cov = n_cov, n.candi = n_candi, 
-                         pcm = pcm, nadir = nadir, candi = candi, 
-                         covars = covars, strata = strata)
+      nadir <- .nadirACDC(n.pts = n_pts, n.cov = n_cov, n.candi = n_candi, 
+                          pcm = pcm, nadir = nadir, covars.type = covars.type,
+                          covars = covars, pop.prop = strata, candi = candi)
       utopia <- .utopiaACDC(utopia = utopia)
       energy0 <- .objNum(sm = sm, n.cov = n_cov, strata = strata, pcm = pcm, 
                          scm = scm, nadir = nadir, weights = weights, 
@@ -123,9 +123,10 @@ optimACDC <-
     } else { # Factor covariates
       if (covars.type == "factor") {
         pop_prop <- lapply(covars, function(x) table(x) / nrow(covars))
-        nadir <- .facNadir(nadir = nadir, candi = candi, n.candi = n_candi,
-                           n.pts = n_pts, n.cov = n_cov, covars = covars, 
-                           pop.prop = pop_prop, pcm = pcm)
+        nadir <- .nadirACDC(nadir = nadir, candi = candi, n.candi = n_candi,
+                            n.pts = n_pts, n.cov = n_cov, pop.prop = pop_prop,
+                            pcm = pcm, covars = covars, 
+                            covars.type = covars.type)
         utopia <- .utopiaACDC(utopia = utopia)
         energy0 <- .objFac(sm = sm, pop.prop = pop_prop, nadir = nadir, 
                            weights = weights, pcm = pcm, scm = scm,
@@ -344,9 +345,10 @@ optimACDC <-
     return (strata)
   }
 # INTERNAL FUNCTION - NADIR FOR NUMERIC COVARIATES #############################
-.numNadir <-
-  function (n.pts, n.cov, n.candi, pcm, nadir, candi, covars, strata) {
-
+.nadirACDC <-
+  function (n.pts, n.cov, n.candi, nadir, candi, covars, pcm, pop.prop, 
+            covars.type) {
+    
     # Simulate the nadir point
     if (!is.null(nadir$sim) && !is.null(nadir$seeds)) { 
       m <- paste("simulating ", nadir$sim, " nadir values...", sep = "")
@@ -361,19 +363,35 @@ optimACDC <-
         set.seed(nadir$seeds[i])
         pts <- sample(1:n.candi, n.pts)
         sm <- covars[pts, ]
-        scm <- cor(sm, use = "complete.obs")
-        
-        # Count the proportion of points per sampling strata
-        counts <- lapply(1:n.cov, function (i)
-          hist(sm[, i], strata[[1]][[i]], plot = FALSE)$counts)
-        counts <- lapply(1:n.cov, function(i) counts[[i]] / n.pts)
-        counts <- sapply(1:n.cov, function (i)
-          sum(abs(counts[[i]] - strata[[2]][[i]])))
-        
-        # Compute the nadir point
-        nadirDIST[i] <- sum(counts)
-        nadirCORR[i] <- sum(abs(pcm - scm))
-      }  
+       
+        if (covars.type == "numeric") {
+          # Compute the sample correlation matrix
+          scm <- cor(sm, use = "complete.obs")
+          
+          # Count the proportion of points per sampling strata
+          samp_prop <- lapply(1:n.cov, function (i)
+            hist(sm[, i], pop.prop[[1]][[i]], plot = FALSE)$counts)
+          samp_prop <- lapply(1:n.cov, function(i) samp_prop[[i]] / n.pts)
+          samp_prop <- sapply(1:n.cov, function (i)
+            sum(abs(samp_prop[[i]] - pop.prop[[2]][[i]])))
+          
+        } else {
+          
+          # Compute the sample association matrix
+          scm <- pedometrics::cramer(sm)
+          
+          # Count the proportion of points per factor level
+          samp_prop <- lapply(sm, function(x) table(x) / n.pts)
+          samp_prop <- sapply(1:n.cov, function (i)
+            sum(abs(samp_prop[[i]] - pop.prop[[i]])))
+        }
+
+        # Compute the energy state
+        nadirDIST[i] <- sum(samp_prop)
+        nadirCORR[i] <- .objCORR(scm = scm, pcm = pcm)
+      }
+      
+      # Prepare output
       res <- list(DIST = mean(nadirDIST), CORR = mean(nadirCORR))
             
     } else {
@@ -386,24 +404,6 @@ optimACDC <-
         if (!is.null(nadir$abs)) { 
           message("sorry but the nadir point cannot be calculated")
         }
-        # Maximum absolute value: upper bound is equal to 100
-        # For a single covariate, the lower bound is equal to 0
-        # For the correlation matrix, the lower bound is always equal to 0
-        #     # Absolute nadir point
-        #     if (pre.distri == 1) {
-        #       strata_nadir <- (2 * (n.pts - 1)) * n.cov / 100
-        #     } else {
-        #       if (pre.distri == 0.5) {
-        #         strata_nadir <- 2 * n.pts * n.cov / 100
-        #       } else {
-        #         strata_nadir <- rep(0, n.pts)
-        #         strata_nadir[which.min(pre.distri)] <- n.pts
-        #         strata_nadir <- sum(abs(strata_nadir - pre.distri))
-        #         strata_nadir <- strata_nadir * n.cov / 100
-        #       }
-        #     }
-        #     cor_nadir <- (2 * n.cov) + sum(abs(pcm - diag(n.cov)))
-        #     cor_nadir <- cor_nadir / 100
       }
     }
     return (res)
@@ -429,47 +429,6 @@ optimACDC <-
     res <- obj_cont + obj_cor
     res <- data.frame(obj = res, CORR = obj_cor, DIST = obj_cont)
     
-    return (res)
-  }
-# INTERNAL FUNCTION - NADIR FOR FACTOR COVARIATES ##############################
-.facNadir <-
-  function (nadir, candi, n.candi, n.pts, n.cov, covars, pop.prop, pcm) {
-    
-    # Simulate the nadir point
-    if (!is.null(nadir$sim) && !is.null(nadir$seeds)) {
-      m <- paste("simulating ", nadir$sim, " nadir values...", sep = "")
-      message(m)
-      
-      # Set variables
-      nadirDIST <- vector()
-      nadirCORR <- vector()
-      
-      # Begin the simulation
-      for (i in 1:nadir$sim) { 
-        set.seed(nadir$seeds[i])
-        pts <- sample(1:n.candi, n.pts)
-        sm <- covars[pts, ]
-        scm <- pedometrics::cramer(sm)
-        samp_prop <- lapply(sm, function(x) table(x) / n.pts)
-        samp_prop <- sapply(1:n.cov, function (i)
-          sum(abs(samp_prop[[i]] - pop.prop[[i]])))
-        nadirDIST[i] <- sum(samp_prop)
-        nadirCORR[i] <- sum(abs(pcm - scm))
-      }
-      
-      res <- list(DIST = mean(nadirDIST), CORR = mean(nadirCORR))
-      
-      } else {
-        # User-defined nadir values
-        if (!is.null(nadir$user)) {
-          res <- list(DIST = nadir$user$DIST, CORR = nadir$user$CORR)
-          
-          } else {
-            if (!is.null(nadir$abs)) { 
-              message("sorry but the nadir point cannot be calculated")
-            }
-          }
-      }
     return (res)
   }
 # INTERNAL FUNCTION - CRITERION FOR FACTOR COVARIATES ##########################
@@ -532,9 +491,10 @@ objACDC <-
     if (covars.type == "numeric") { # Numeric covariates
       strata <- .numStrata(n.pts = n_pts, covars = covars, 
                            strata.type = strata.type)
-      nadir <- .numNadir(n.pts = n_pts, n.cov = n_cov, n.candi = n_candi, 
-                         pcm = pcm, nadir = nadir, candi = candi, 
-                         covars = covars, strata = strata)
+      nadir <- .nadirACDC(n.pts = n_pts, n.cov = n_cov, n.candi = n_candi, 
+                          pcm = pcm, nadir = nadir, candi = candi, 
+                          covars = covars, pop.prop = strata, 
+                          covars.type = covars.type)
       utopia <- .utopiaACDC(utopia = utopia)
       energy <- .objNum(sm = sm, n.cov = n_cov, strata = strata, pcm = pcm,
                         scm = scm, nadir = nadir, weights = weights,
@@ -543,9 +503,10 @@ objACDC <-
     } else { # Factor covariates
       if (covars.type == "factor") {
         pop_prop <- lapply(covars, function(x) table(x) / nrow(covars))
-        nadir <- .facNadir(nadir = nadir, candi = candi, n.candi = n_candi,
-                           n.pts = n_pts, n.cov = n_cov, covars = covars, 
-                           pop.prop = pop_prop, pcm = pcm)
+        nadir <- .nadirACDC(nadir = nadir, candi = candi, n.candi = n_candi,
+                            n.pts = n_pts, n.cov = n_cov, covars = covars, 
+                            pop.prop = pop_prop, pcm = pcm, 
+                            covars.type = covars.type)
         utopia <- .utopiaACDC(utopia = utopia)
         energy <- .objFac(sm = sm, pop.prop = pop_prop, nadir = nadir, 
                            weights = weights, pcm = pcm, scm = scm,
