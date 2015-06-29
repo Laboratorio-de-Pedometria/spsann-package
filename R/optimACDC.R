@@ -567,18 +567,3 @@ objACDC <-
     }
     return (energy)
   }
-# INTERNAL FUNCTION - USE THE COORDINATES AS COVARIATES ########################
-.useCoords <-
-  function (covars.type, candi, n.pts, strata.type) {
-    if (covars.type == "factor") {
-      coords <- data.frame(candi[, 2:3])
-      breaks <- .numStrata(n.pts = n.pts, covars = coords, 
-                           strata.type = strata.type)[[1]]
-      coords <- pedometrics::cont2cat(x = coords, breaks = breaks)
-      covars <- data.frame(covars, coords)
-      
-    } else {
-      covars <- data.frame(covars, candi[, 2:3])
-    }
-    return (covars)
-  }
