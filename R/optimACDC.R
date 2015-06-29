@@ -115,7 +115,7 @@ optimACDC <-
       nadir <- .numNadir(n.pts = n_pts, n.cov = n_cov, n.candi = n_candi, 
                          pcm = pcm, nadir = nadir, candi = candi, 
                          covars = covars, strata = strata)
-      utopia <- .numUtopia(utopia = utopia)
+      utopia <- .utopiaACDC(utopia = utopia)
       energy0 <- .objNum(sm = sm, n.cov = n_cov, strata = strata, pcm = pcm, 
                          scm = scm, nadir = nadir, weights = weights, 
                          n.pts = n_pts, utopia = utopia)
@@ -126,7 +126,7 @@ optimACDC <-
         nadir <- .facNadir(nadir = nadir, candi = candi, n.candi = n_candi,
                            n.pts = n_pts, n.cov = n_cov, covars = covars, 
                            pop.prop = pop_prop, pcm = pcm)
-        utopia <- .facUtopia(utopia = utopia)
+        utopia <- .utopiaACDC(utopia = utopia)
         energy0 <- .objFac(sm = sm, pop.prop = pop_prop, nadir = nadir, 
                            weights = weights, pcm = pcm, scm = scm,
                            n.pts = n_pts, n.cov = n_cov, utopia = utopia)
@@ -492,24 +492,11 @@ optimACDC <-
     
     return (res)
   }
-# INTERNAL FUNCTION - UTOPIA POINT FOR FACTOR COVARIATES #######################
-.facUtopia <-
+# INTERNAL FUNCTION - PREPARE THE UTOPIA POINT #################################
+.utopiaACDC <-
   function (utopia) {
-    
     if (!is.null(unlist(utopia$user))) {
-      utopia <- list(CORR = utopia$user$CORR, DIST = utopia$user$DIST)
-      
-    } else {
-      message("sorry but the utopia point cannot be calculated")
-    }
-  }
-# INTERNAL FUNCTION - UTOPIA POINT FOR NUMERIC COVARIATES ######################
-.numUtopia <-
-  function (utopia) {
-    
-    if (!is.null(unlist(utopia$user))) {
-      utopia <- list(CORR = utopia$user$CORR, DIST = utopia$user$DIST)
-      
+      list(CORR = utopia$user$CORR, DIST = utopia$user$DIST)
     } else {
       message("sorry but the utopia point cannot be calculated")
     }
@@ -548,7 +535,7 @@ objACDC <-
       nadir <- .numNadir(n.pts = n_pts, n.cov = n_cov, n.candi = n_candi, 
                          pcm = pcm, nadir = nadir, candi = candi, 
                          covars = covars, strata = strata)
-      utopia <- .numUtopia(utopia = utopia)
+      utopia <- .utopiaACDC(utopia = utopia)
       energy <- .objNum(sm = sm, n.cov = n_cov, strata = strata, pcm = pcm,
                         scm = scm, nadir = nadir, weights = weights,
                         n.pts = n_pts, utopia = utopia)
@@ -559,7 +546,7 @@ objACDC <-
         nadir <- .facNadir(nadir = nadir, candi = candi, n.candi = n_candi,
                            n.pts = n_pts, n.cov = n_cov, covars = covars, 
                            pop.prop = pop_prop, pcm = pcm)
-        utopia <- .facUtopia(utopia = utopia)
+        utopia <- .utopiaACDC(utopia = utopia)
         energy <- .objFac(sm = sm, pop.prop = pop_prop, nadir = nadir, 
                            weights = weights, pcm = pcm, scm = scm,
                            n.pts = n_pts, n.cov = n_cov, utopia = utopia)
