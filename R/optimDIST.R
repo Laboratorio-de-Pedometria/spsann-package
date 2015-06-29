@@ -111,20 +111,11 @@ optimDIST <-
     ############################################################################
     
     # Base data and initial energy state (energy)
-    if (covars.type == "numeric") { # Numeric covariates
-      strata <- .numStrata(n.pts = n_pts, covars = covars, 
-                           strata.type = strata.type)
-      energy0 <- .objDISTnum(sm = sm, n.pts = n_pts, n.cov = n_cov, 
-                             strata = strata)
-    } else { # Factor covariates
-      if (covars.type == "factor") {
-        #pop_prop <- lapply(covars, function(x) table(x) / nrow(covars) * 100)
-        pop_prop <- lapply(covars, function(x) table(x) / nrow(covars))
-        energy0 <- .objDISTfac(sm = sm, pop.prop = pop_prop, n.pts = n_pts,
-                                n.cov = n_cov)
-      }
-    }
-
+    pop_prop <- .strataACDC(n.pts = n_pts, strata.type = strata.type,
+                            covars.type = covars.type, covars = covars)
+    energy0 <- .objDIST(sm = sm, pop.prop = pop_prop, n.pts = n_pts,
+                        n.cov = n_cov, covars.type = covars.type)
+    
     # Other settings for the simulated annealing algorithm
     MOOP <- FALSE
     old_sm       <- sm
@@ -133,8 +124,6 @@ optimDIST <-
     count        <- 0
     old_energy   <- energy0
     best_energy  <- Inf
-    #energies     <- vector()
-    #accept_probs <- vector()
     if (progress) pb <- txtProgressBar(min = 1, max = iterations, style = 3)
     time0 <- proc.time()
 
@@ -144,20 +133,11 @@ optimDIST <-
       # Plotting and jittering #################################################
       eval(.plot_and_jitter())
       ##########################################################################
+      
       # Update sample and correlation matrices, and energy state
-      if (covars.type == "numeric") { # Numeric covariates
-        new_row <- covars[new_conf[wp, 1], ]
-        new_sm[wp, ] <- new_row
-        new_energy <- .objDISTnum(sm = new_sm, n.cov = n_cov, strata = strata, 
-                                  n.pts = n_pts)
-      } else { # Factor covariates
-        if (covars.type == "factor") {
-          new_row <- covars[new_conf[wp, 1], ]
-          new_sm[wp, ] <- new_row
-          new_energy <- .objDISTfac(sm = new_sm, pop.prop = pop_prop, 
-                                    n.pts = n_pts, n.cov = n_cov)
-        }
-      }
+      new_sm[wp, ] <- covars[new_conf[wp, 1], ]
+      new_energy <- .objDIST(sm = new_sm, pop.prop = pop_prop, n.pts = n_pts, 
+                             n.cov = n_cov, covars.type = covars.type)
       
       # Evaluate the new system configuration
       if (greedy) {
@@ -247,19 +227,6 @@ optimDIST <-
       return (res)
     }
     
-    # covars.type
-#     if (missing(covars.type)) {
-#       res <- paste("'covars.type' is missing")
-#       return (res)
-#     } else {
-#       ct <- pmatch(covars.type, c("numeric", "factor"))
-#       if (is.na(ct)) {
-#         res <- paste("'covars.type = ", covars.type, "' is not supported", 
-#                      sep = "")
-#         return (res)
-#       }
-#     }
-    
     # strata.type
     st <- match(strata.type, c("area", "range"))
     if (is.na(st)) {
@@ -268,26 +235,30 @@ optimDIST <-
       return (res)
     }
   }
-# INTERNAL FUNCTION - CRITERION FOR FACTOR COVARIATES ##########################
-.objDISTfac <-
-  function (sm, pop.prop, n.pts, n.cov) {    
-    #samp_prop <- lapply(sm, function(x) table(x) / n.pts * 100)
-    samp_prop <- lapply(sm, function(x) table(x) / n.pts)
-    samp_prop <- sapply(1:n.cov, function (i)
-      sum(abs(samp_prop[[i]] - pop.prop[[i]])))
+# INTERNAL FUNCTION - CALCULATE THE CRITERION VALUE ############################
+# sm: sample matrix
+# n.pts: number of points
+# n.cov: number of covariates
+# pop.prop: the sampling strata and population proportion, for numeric 
+#           covariates, and the population proportion, for factor covariates
+# covars.type: the type of covariate (numeric or factor)
+.objDIST <-
+  function (sm, n.pts, n.cov, pop.prop, covars.type) {
+    
+    if (covars.type == "numeric") {
+      samp_prop <- lapply(1:n.cov, function (i)
+        hist(sm[, i], pop.prop[[1]][[i]], plot = FALSE)$counts)
+      samp_prop <- lapply(1:n.cov, function(i) samp_prop[[i]] / n.pts)
+      samp_prop <- sapply(1:n.cov, function (i) 
+        sum(abs(samp_prop[[i]] - pop.prop[[2]][[i]])))
+    
+      } else {
+      samp_prop <- lapply(sm, function(x) table(x) / n.pts)
+      samp_prop <- sapply(1:n.cov, function (i)
+        sum(abs(samp_prop[[i]] - pop.prop[[i]])))
+      }
+    
     energy <- sum(samp_prop)
-    return (energy)
-  }
-# INTERNAL FUNCTION - CRITERION FOR NUMERIC COVARIATES #########################
-.objDISTnum <-
-  function (sm, n.pts, n.cov, strata) {
-    counts <- lapply(1:n.cov, function (i)
-      hist(sm[, i], strata[[1]][[i]], plot = FALSE)$counts)
-    #counts <- lapply(1:n.cov, function(i) counts[[i]] / n.pts * 100)
-    counts <- lapply(1:n.cov, function(i) counts[[i]] / n.pts)
-    counts <- sapply(1:n.cov, function (i) 
-      sum(abs(counts[[i]] - strata[[2]][[i]])))
-    energy <- sum(counts)
     return (energy)
   }
 # CALCULATE OBJECTIVE FUNCTION VALUE ###########################################
@@ -312,18 +283,9 @@ objDIST <-
     ############################################################################
     
     # Calculate the energy state
-    if (covars.type == "numeric") { # Numeric covariates
-      strata <- .numStrata(n.pts = n_pts, covars = covars, 
-                           strata.type = strata.type)
-      energy <- .objDISTnum(sm = sm, n.pts = n_pts, n.cov = n_cov, 
-                            strata = strata)
-    } else { # Factor covariates
-      if (covars.type == "factor") {
-        #pop_prop <- lapply(covars, function(x) table(x) / nrow(covars) * 100)
-        pop_prop <- lapply(covars, function(x) table(x) / nrow(covars))
-        energy <- .objDISTfac(sm = sm, pop.prop = pop_prop, n.pts = n_pts,
-                              n.cov = n_cov)
-      }
-    }
+    pop_prop <- .strataACDC(n.pts = n_pts, strata.type = strata.type,
+                            covars = covars, covars.type = covars.type)
+    energy <- .objDIST(sm = sm, pop.prop = pop_prop, n.pts = n_pts, 
+                       n.cov = n_cov, covars.type = covars.type)
     return (energy)
   }

@@ -108,26 +108,21 @@ optimACDC <-
     # Base data and initial energy state (energy)
     pcm <- .corCORR(obj = covars, covars.type = covars.type)
     scm <- .corCORR(obj = sm, covars.type = covars.type)
+    pop_prop <- .strataACDC(n.pts = n_pts, strata.type = strata.type, 
+                            covars = covars, covars.type = covars.type)
+    nadir <- .nadirACDC(n.pts = n_pts, n.cov = n_cov, n.candi = n_candi, 
+                        pcm = pcm, nadir = nadir, covars.type = covars.type,
+                        covars = covars, pop.prop = pop_prop, candi = candi)
+    utopia <- .utopiaACDC(utopia = utopia)
+    
     
     if (covars.type == "numeric") { # Numeric covariates
-      strata <- .numStrata(n.pts = n_pts, covars = covars, 
-                           strata.type = strata.type)
-      nadir <- .nadirACDC(n.pts = n_pts, n.cov = n_cov, n.candi = n_candi, 
-                          pcm = pcm, nadir = nadir, covars.type = covars.type,
-                          covars = covars, pop.prop = strata, candi = candi)
-      utopia <- .utopiaACDC(utopia = utopia)
-      energy0 <- .objNum(sm = sm, n.cov = n_cov, strata = strata, pcm = pcm, 
+      energy0 <- .objNum(sm = sm, n.cov = n_cov, strata = pop_prop, pcm = pcm, 
                          scm = scm, nadir = nadir, weights = weights, 
                          n.pts = n_pts, utopia = utopia)
 
     } else { # Factor covariates
       if (covars.type == "factor") {
-        pop_prop <- lapply(covars, function(x) table(x) / nrow(covars))
-        nadir <- .nadirACDC(nadir = nadir, candi = candi, n.candi = n_candi,
-                            n.pts = n_pts, n.cov = n_cov, pop.prop = pop_prop,
-                            pcm = pcm, covars = covars, 
-                            covars.type = covars.type)
-        utopia <- .utopiaACDC(utopia = utopia)
         energy0 <- .objFac(sm = sm, pop.prop = pop_prop, nadir = nadir, 
                            weights = weights, pcm = pcm, scm = scm,
                            n.pts = n_pts, n.cov = n_cov, utopia = utopia)
@@ -155,21 +150,20 @@ optimACDC <-
       # Plotting and jittering #################################################
       eval(.plot_and_jitter())
       ##########################################################################
+      
       # Update sample and correlation matrices, and energy state
+      new_sm[wp, ] <- covars[new_conf[wp, 1], ]
+      
       if (covars.type == "numeric") { # Numeric covariates
-        new_row <- covars[new_conf[wp, 1], ]
-        new_sm[wp, ] <- new_row
         new_scm <- cor(new_sm, use = "complete.obs")
-        new_energy <- .objNum(sm = new_sm, n.cov = n_cov, strata = strata, 
+        new_energy <- .objNum(sm = new_sm, n.cov = n_cov, strata = pop_prop, 
                               pcm = pcm, scm = new_scm, nadir = nadir,
                               weights = weights, n.pts = n_pts, utopia = utopia)
 
       } else { # Factor covariates
         if (covars.type == "factor") {
-          new_row <- covars[new_conf[wp, 1], ]
-          new_sm[wp, ] <- new_row
           new_scm <- pedometrics::cramer(new_sm)
-          new_energy <- .objFac(sm = new_sm, pop.prop = pop_prop, scm = new_scm, 
+          new_energy <- .objFac(sm = new_sm, pop.prop = pop_prop, scm = new_scm,
                                 nadir = nadir, weights = weights, pcm = pcm, 
                                 n.pts = n_pts, n.cov = n_cov, utopia = utopia)
         }
@@ -285,64 +279,52 @@ optimACDC <-
 # Quantiles now honour the fact that the data are discontinuous
 # NOTE: there is a problem when the number of unique values is small (3)
 # TODO: build a function is pedometrics
-.numStrata <-
-  function (n.pts, covars, strata.type) {
+# n.pts <- 5
+# covars <- data.frame(a = round(rnorm(20)), b = round(rlnorm(20)))
+# strata.type <- "area"
+.strataACDC <-
+  function (n.pts, covars, strata.type, covars.type) {
     
-    # equal area strata
-    if (strata.type == "area") {
-      n_cov <- ncol(covars)
-      probs <- seq(0, 1, length.out = n.pts + 1)
-      breaks <- lapply(covars, quantile, probs, na.rm = TRUE, type = 3)
+    n_cov <- ncol(covars)
+    
+    if (covars.type == "factor") {
+      res <- lapply(covars, function(x) table(x) / nrow(covars))
       
-      # ASR: This is an old implementation
-      #count <- lapply(breaks, table)
-      #count <- lapply(count, as.integer)
-      #count <- lapply(count, function(x) {x[2] <- x[2] + x[1] - 1; x[-1L]})
-      
-      # Compute the proportion of points per sampling strata
-      breaks <- lapply(breaks, unique)
-      count <- lapply(1:n_cov, function (i)
-        hist(covars[, i], breaks[[i]], plot = FALSE)$counts)
-      count <- lapply(1:n_cov, function(i) count[[i]] / sum(count[[i]]))
-      strata <- list(breaks, count)
-
     } else {
-      # equal range strata
-      if (strata.type == "range") {
-        n_cov <- ncol(covars)
+      
+      # equal area strata
+      if (strata.type == "area") {
+        
+        # Compute the break points (discrete sample quantiles)
+        probs <- seq(0, 1, length.out = n.pts + 1)
+        breaks <- lapply(covars, quantile, probs, na.rm = TRUE, type = 3)
+        
+      } else { # equal range strata
+        
+        # Compute the break points
         breaks <- lapply(1:n_cov, function(i)
           seq(min(covars[, i]), max(covars[, i]), length.out = n.pts + 1))
+        
+        # Find and replace by the closest population value
         d <- lapply(1:n_cov, function(i)
           SpatialTools::dist2(matrix(breaks[[i]]), matrix(covars[, i])))
         d <- lapply(1:n_cov, function(i) apply(d[[i]], 1, which.min))
         breaks <- lapply(1:n_cov, function(i) breaks[[i]] <- covars[d[[i]], i])
-        breaks <- lapply(breaks, unique)
-        count <- lapply(1:n_cov, function (i)
-          hist(covars[, i], breaks[[i]], plot = FALSE)$counts)
-        
-        # Compute the proportion of points per sampling strata
-        count <- lapply(1:n_cov, function (i) {count[[i]] / sum(count[[i]])})
-                
-        # ASR: This is an old implementation to merge null strata
-        #breaks <- lapply(breaks, unique)
-        #count <- lapply(1:n_cov, function (i)
-        #  hist(covars[, i], breaks[[i]], plot = FALSE)$counts)
-        #zero <- sapply(1:n_cov, function (i) any(count[[i]] == 0))
-        #zero <- which(zero)
-        #for (i in zero) {
-        #  wz <- which(count[[i]] == 0)
-        #  breaks[[i]] <- breaks[[i]][-(wz + 1)]
-        #}
-        #for (i in 1:n_cov) {
-        #  mini <- min(covars[, i])
-        #  maxi <- max(covars[, i])
-        #  count[[i]] <- diff(breaks[[i]]) / ((maxi - mini) / n.pts)
-        #}
-        
-        strata <- list(breaks, count)
       }
+      
+      # Keep only the unique break points
+      breaks <- lapply(breaks, unique)
+      
+      # Compute the proportion of population points per sampling strata
+      count <- lapply(1:n_cov, function (i)
+        hist(covars[, i], breaks[[i]], plot = FALSE)$counts)
+      prop <- lapply(1:n_cov, function (i) {count[[i]] / sum(count[[i]])})
+      
+      # Output
+      res <- list(breaks = breaks, prop = prop)  
     }
-    return (strata)
+    
+    return (res)
   }
 # INTERNAL FUNCTION - NADIR FOR NUMERIC COVARIATES #############################
 .nadirACDC <-
