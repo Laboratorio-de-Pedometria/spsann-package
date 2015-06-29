@@ -84,14 +84,9 @@ optimCORR <-
     eval(.prepare_jittering())
     ############################################################################
     
-    # Prepare covariates (covars) and create the starting sample matrix (sm)
-    covars.type <- ifelse(pedometrics::is.any.factor(covars), "factor",
-                          "numeric")
-    covars <- .covarsACDC(covars = covars, covars.type = covars.type, 
-                          use.coords = use.coords, candi = candi, n.pts = n_pts,
-                          strata.type = strata.type)
-    n_cov <- ncol(covars)
-    sm <- covars[points[, 1], ]
+    # Prepare 'covars' and create the starting sample matrix 'sm' ##############
+    eval(.prepare_acdc_covars())
+    ############################################################################
     
     # Base data and initial energy state (energy)
     if (covars.type == "numeric") { # Numeric covariates
@@ -261,17 +256,9 @@ objCORR <-
     eval(.prepare_points())
     ############################################################################
     
-    # Prepare covariates (covars) and create the starting sample matrix (sm)
-    #     if (use.coords) {
-    #       covars <- .useCoords(covars.type = covars.type, candi = candi, 
-    #                            n.pts = n_pts, strata.type = strata.type)
-    #     }
-    #     sm <- covars[points[, 1], ]
-    covars.type <- ifelse(is.any.factor(covars), "factor", "numeric")
-    covars <- .covarsACDC(covars = covars, covars.type = covars.type, 
-                          use.coords = use.coords, candi = candi, n.pts = n_pts,
-                          strata.type = strata.type)
-    sm <- covars[points[, 1], ]
+    # Prepare 'covars' and create the starting sample matrix 'sm' ##############
+    eval(.prepare_acdc_covars())
+    ############################################################################
     
     # Calculate the energy state
     if (covars.type == "numeric") { # Numeric covariates

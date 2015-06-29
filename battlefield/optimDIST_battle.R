@@ -77,5 +77,6 @@ resC <- optimDIST(points = 100, candi = candi, covars = covars,
 tail(attr(resC, "energy"), 1) # 2.924718
 objDIST(points = resC, candi = candi, covars = covars, use.coords = TRUE)
 
-sapply(list(resA, resB, resC), attr, "run")[3, ]
-
+sapply(list(resA, resB, resC), attr, "run")
+rm(resA, resB, resC)
+gc()
