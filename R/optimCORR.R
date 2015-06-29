@@ -89,17 +89,9 @@ optimCORR <-
     ############################################################################
     
     # Base data and initial energy state (energy)
-    if (covars.type == "numeric") { # Numeric covariates
-      pcm <- cor(covars, use = "complete.obs")
-      scm <- cor(sm, use = "complete.obs")
-      energy0 <- sum(abs(pcm - scm))
-    } else { # Factor covariates
-      if (covars.type == "factor") {
-        pcm <- pedometrics::cramer(covars)
-        scm <- pedometrics::cramer(sm)
-        energy0 <- sum(abs(pcm - scm))
-      }
-    }
+    pcm <- .corCORR(obj = covars, covars.type = covars.type)
+    scm <- .corCORR(obj = sm, covars.type = covars.type)
+    energy0 <- .objCORR(scm = scm, pcm = pcm)
 
     # Other settings for the simulated annealing algorithm
     old_scm      <- scm
@@ -261,16 +253,28 @@ objCORR <-
     ############################################################################
     
     # Calculate the energy state
-    if (covars.type == "numeric") { # Numeric covariates
-      pcm <- cor(covars, use = "complete.obs")
-      scm <- cor(sm, use = "complete.obs")
-      energy <- sum(abs(pcm - scm))
-    } else { # Factor covariates
-      if (covars.type == "factor") {
-        pcm <- pedometrics::cramer(covars)
-        scm <- pedometrics::cramer(sm)
-        energy <- sum(abs(pcm - scm))
-      }
-    }
+    pcm <- .corCORR(obj = covars, covars.type = covars.type)
+    scm <- .corCORR(obj = sm, covars.type = covars.type)
+    energy <- .objCORR(scm = scm, pcm = pcm)
+    
     return (energy)
+  }
+# INTERNAL FUNCTION - CALCULATE ASSOCIATION/CORRELATION MATRIX ################
+# obj: the matrix of covariates, for the population correlation matrix, and the
+#      sample matrix, for the sample correlation matrix
+# covars.type: the type of covariate
+.corCORR <-
+  function (obj, covars.type) {
+    if (covars.type == "numeric") { 
+      cor(x = obj, use = "complete.obs")
+    } else {
+      pedometrics::cramer(x = obj)
+    }
+  }
+# INTERNAL FUNCTION - CALCULATE THE CRITERION VALUE ############################
+# scm: sample correlation matrix
+# pcm: population correlation matrix
+.objCORR <-
+  function (scm, pcm) {
+    sum(abs(pcm - scm))
   }

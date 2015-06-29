@@ -106,28 +106,27 @@ optimACDC <-
     ############################################################################
     
     # Base data and initial energy state (energy)
+    pcm <- .corCORR(obj = covars, covars.type = covars.type)
+    scm <- .corCORR(obj = sm, covars.type = covars.type)
+    
     if (covars.type == "numeric") { # Numeric covariates
-      pcm <- cor(covars, use = "complete.obs")
       strata <- .numStrata(n.pts = n_pts, covars = covars, 
                            strata.type = strata.type)
       nadir <- .numNadir(n.pts = n_pts, n.cov = n_cov, n.candi = n_candi, 
                          pcm = pcm, nadir = nadir, candi = candi, 
                          covars = covars, strata = strata)
       utopia <- .numUtopia(utopia = utopia)
-      scm <- cor(sm, use = "complete.obs")
       energy0 <- .objNum(sm = sm, n.cov = n_cov, strata = strata, pcm = pcm, 
                          scm = scm, nadir = nadir, weights = weights, 
                          n.pts = n_pts, utopia = utopia)
 
     } else { # Factor covariates
       if (covars.type == "factor") {
-        pcm <- pedometrics::cramer(covars)
         pop_prop <- lapply(covars, function(x) table(x) / nrow(covars))
         nadir <- .facNadir(nadir = nadir, candi = candi, n.candi = n_candi,
                            n.pts = n_pts, n.cov = n_cov, covars = covars, 
                            pop.prop = pop_prop, pcm = pcm)
         utopia <- .facUtopia(utopia = utopia)
-        scm <- pedometrics::cramer(sm)
         energy0 <- .objFac(sm = sm, pop.prop = pop_prop, nadir = nadir, 
                            weights = weights, pcm = pcm, scm = scm,
                            n.pts = n_pts, n.cov = n_cov, utopia = utopia)
@@ -539,29 +538,28 @@ objACDC <-
     eval(.prepare_acdc_covars())
     ############################################################################
     
-    # Calculate the energy state
+    # Base data and initial energy state
+    pcm <- .corCORR(obj = covars, covars.type = covars.type)
+    scm <- .corCORR(obj = sm, covars.type = covars.type)
+    
     if (covars.type == "numeric") { # Numeric covariates
-      pcm <- cor(covars, use = "complete.obs")
       strata <- .numStrata(n.pts = n_pts, covars = covars, 
                            strata.type = strata.type)
       nadir <- .numNadir(n.pts = n_pts, n.cov = n_cov, n.candi = n_candi, 
                          pcm = pcm, nadir = nadir, candi = candi, 
                          covars = covars, strata = strata)
       utopia <- .numUtopia(utopia = utopia)
-      scm <- cor(sm, use = "complete.obs")
       energy <- .objNum(sm = sm, n.cov = n_cov, strata = strata, pcm = pcm,
                         scm = scm, nadir = nadir, weights = weights,
                         n.pts = n_pts, utopia = utopia)
       
     } else { # Factor covariates
       if (covars.type == "factor") {
-        pcm <- pedometrics::cramer(covars)
         pop_prop <- lapply(covars, function(x) table(x) / nrow(covars))
         nadir <- .facNadir(nadir = nadir, candi = candi, n.candi = n_candi,
                            n.pts = n_pts, n.cov = n_cov, covars = covars, 
                            pop.prop = pop_prop, pcm = pcm)
         utopia <- .facUtopia(utopia = utopia)
-        scm <- pedometrics::cramer(sm)
         energy <- .objFac(sm = sm, pop.prop = pop_prop, nadir = nadir, 
                            weights = weights, pcm = pcm, scm = scm,
                            n.pts = n_pts, n.cov = n_cov, utopia = utopia)
@@ -572,7 +570,6 @@ objACDC <-
 # INTERNAL FUNCTION - USE THE COORDINATES AS COVARIATES ########################
 .useCoords <-
   function (covars.type, candi, n.pts, strata.type) {
-    
     if (covars.type == "factor") {
       coords <- data.frame(candi[, 2:3])
       breaks <- .numStrata(n.pts = n.pts, covars = coords, 
