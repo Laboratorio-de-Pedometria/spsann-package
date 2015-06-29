@@ -1,3 +1,6 @@
+# Version 0.0.0.9008 (2015-06-29)
+* 
+
 # Version 0.0.0.9007 (2015-06-12)
 * The `rgeos` and `plyr` packages are not dependencies anymore.
 * The `boundary` of the spatial domain can now be estimated intenally. The user 
