@@ -89,17 +89,6 @@ candi <- meuse.grid[, 1:2]
 covars <- meuse.grid[, rep(c(6, 7), 10)]
 nadir <- list(sim = 10, seeds = 1:10)
 utopia <- list(user = list(CORR = 0, DIST = 0))
-
-# Plot and track
-set.seed(2001)
-tmp <- optimACDC(points = 500, candi = candi, covars = covars, nadir = nadir, 
-                 use.coords = TRUE, iterations = 100, utopia = utopia,
-                 verbose = FALSE)
-tail(attr(tmp, "energy")$obj, 1) # 0.620825
-objACDC(points = tmp, candi = candi, covars = covars, use.coords = TRUE, 
-        nadir = nadir, utopia = utopia)
-
-# No plotting and no tracking
 set.seed(2001)
 tmp <- optimACDC(points = 500, candi = candi, covars = covars, nadir = nadir, 
                  use.coords = TRUE, iterations = 100, utopia = utopia,

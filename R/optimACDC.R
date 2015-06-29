@@ -79,32 +79,27 @@ optimACDC <-
             track = TRUE, boundary, progress = TRUE, verbose = TRUE, 
             greedy = FALSE) {
     
-    # Check spsann arguments ###################################################
+    # Check spsann arguments
     eval(.check_spsann_arguments())
-    ############################################################################
     
     # Check other arguments
     check <- .optimACDCcheck(candi = candi, covars = covars, 
                              use.coords = use.coords, strata.type = strata.type)
     if (!is.null(check)) stop (check, call. = FALSE)
     
-    # Set plotting options ####################################################
+    # Set plotting options
     eval(.plotting_options())
-    ############################################################################
     
-    # Prepare points and candi #################################################
+    # Prepare points and candi
     eval(.prepare_points())
-    ############################################################################
     
-    # Prepare for jittering ####################################################
+    # Prepare for jittering
     eval(.prepare_jittering())
-    ############################################################################
     
-    # Prepare 'covars' and create the starting sample matrix 'sm' ##############
+    # Prepare 'covars' and create the starting sample matrix 'sm'
     eval(.prepare_acdc_covars())
-    ############################################################################
     
-    # Base data and initial energy state (energy)
+    # Base data and initial energy state
     pcm <- .corCORR(obj = covars, covars.type = covars.type)
     scm <- .corCORR(obj = sm, covars.type = covars.type)
     pop_prop <- .strataACDC(n.pts = n_pts, strata.type = strata.type, 
@@ -128,17 +123,14 @@ optimACDC <-
     count <- 0
     old_energy <- energy0
     best_energy <- data.frame(obj = Inf, CORR = Inf, DIST = Inf)
-    #energies <- data.frame(obj = NA, CORR = NA, DIST = NA)
-    #accept_probs <- vector()
     if (progress) pb <- txtProgressBar(min = 1, max = iterations, style = 3)
     time0 <- proc.time()
 
     # Begin the main loop
     for (k in 1:iterations) {
       
-      # Plotting and jittering #################################################
+      # Plotting and jittering
       eval(.plot_and_jitter())
-      ##########################################################################
       
       # Update sample and correlation matrices, and energy state
       new_sm[wp, ] <- covars[new_conf[wp, 1], ]
@@ -224,19 +216,18 @@ optimACDC <-
       if (progress) setTxtProgressBar(pb, k)
     }
 
-    # Prepare output ###########################################################
+    # Prepare output
     eval(.prepare_output())
-    ############################################################################
   }
 # INTERNAL FUNCTION - CHECK ARGUMENTS ##########################################
+# candi: candidate locations
+# covars: covariates
+# use.coords: should the coordinates be used
+# strata.type: type of stratification of numeric covariates
 .optimACDCcheck <-
   function (candi, covars, use.coords, strata.type) {
     
     # covars
-    if (is.vector(covars) && use.coords == FALSE) {
-      
-    }
-    
     if (is.vector(covars)) {
       if (use.coords == FALSE) {
         res <- "'covars' must have two or more columns"
@@ -260,26 +251,22 @@ optimACDC <-
                    sep = "")
       return (res)
     }
-    rm(aa)
-    
   }
 # INTERNAL FUNCTION - BREAKS FOR NUMERIC COVARIATES ############################
-# Now we define the breaks and the distribution, and return it as a list
-# Quantiles now honour the fact that the data are discontinuous
-# NOTE: there is a problem when the number of unique values is small (3)
-# TODO: build a function is pedometrics
-# n.pts <- 5
-# covars <- data.frame(a = round(rnorm(20)), b = round(rlnorm(20)))
-# strata.type <- "area"
+# Now we define the breaks and the distribution, and return it as a list.
+# Quantiles now honour the fact that the data are discontinuous.
+# NOTE: there might be a problem when the number of unique values is small (3)
 .strataACDC <-
   function (n.pts, covars, strata.type, covars.type) {
     
     n_cov <- ncol(covars)
     
     if (covars.type == "factor") {
+      
+      # Compute the proportion of population points per marginal factor level
       res <- lapply(covars, function(x) table(x) / nrow(covars))
       
-    } else {
+    } else { # Numeric covariates
       
       # equal area strata
       if (strata.type == "area") {
@@ -304,7 +291,7 @@ optimACDC <-
       # Keep only the unique break points
       breaks <- lapply(breaks, unique)
       
-      # Compute the proportion of population points per sampling strata
+      # Compute the proportion of population points per marginal sampling strata
       count <- lapply(1:n_cov, function (i)
         hist(covars[, i], breaks[[i]], plot = FALSE)$counts)
       prop <- lapply(1:n_cov, function (i) {count[[i]] / sum(count[[i]])})
@@ -359,8 +346,9 @@ optimACDC <-
   }
 # INTERNAL FUNCTION - CALCULATE THE CRITERION VALUE ############################
 # This function is used to calculate the criterion value of ACDC.
-# It calculates, scales and weights, and aggregates the objective function
-# values.
+# It calculates, scales, weights, and aggregates the objective function values.
+# Scaling is done using the upper-lower bound approach.
+# Aggregation is done using the weighted sum method.
 .objACDC <-
   function (sm, n.cov, nadir, weights, n.pts, utopia, pcm, scm, covars.type,
             pop.prop) {
@@ -405,13 +393,11 @@ objACDC <-
                              use.coords = use.coords, strata.type = strata.type)
     if (!is.null(check)) stop (check, call. = FALSE)
     
-    # Prepare points and candi #################################################
+    # Prepare points and candi
     eval(.prepare_points())
-    ############################################################################
     
-    # Prepare 'covars' and create the starting sample matrix 'sm' ##############
+    # Prepare 'covars' and create the starting sample matrix 'sm'
     eval(.prepare_acdc_covars())
-    ############################################################################
     
     # Compute base data
     pcm <- .corCORR(obj = covars, covars.type = covars.type)

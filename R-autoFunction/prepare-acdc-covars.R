@@ -37,6 +37,5 @@ n_cov <- ncol(covars)
 sm <- covars[points[, 1], ]
 
 # COMMAND
-# # Prepare 'covars' and create the starting sample matrix 'sm' ##############
+# # Prepare 'covars' and create the starting sample matrix 'sm'
 # eval(.prepare_acdc_covars())
-# ############################################################################

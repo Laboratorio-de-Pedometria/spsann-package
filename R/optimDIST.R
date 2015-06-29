@@ -84,30 +84,25 @@ optimDIST <-
             boundary, progress = TRUE, verbose = TRUE, greedy = FALSE,
             track = TRUE, weights = NULL, nadir = NULL, utopia = NULL) {
     
-    # Check spsann arguments ###################################################
+    # Check spsann arguments
     eval(.check_spsann_arguments())
-    ############################################################################
     
     # Check other arguments
     check <- .optimACDCcheck(candi = candi, covars = covars, 
                              use.coords = use.coords, strata.type = strata.type)
     if (!is.null(check)) stop (check, call. = FALSE)
     
-    # Set plotting options ####################################################
+    # Set plotting options
     eval(.plotting_options())
-    ############################################################################
     
-    # Prepare points and candi #################################################
+    # Prepare points and candi
     eval(.prepare_points())
-    ############################################################################
     
-    # Prepare for jittering ####################################################
+    # Prepare for jittering
     eval(.prepare_jittering())
-    ############################################################################
     
-    # Prepare 'covars' and create the starting sample matrix 'sm' ##############
+    # Prepare 'covars' and create the starting sample matrix 'sm'
     eval(.prepare_acdc_covars())
-    ############################################################################
     
     # Base data and initial energy state (energy)
     pop_prop <- .strataACDC(n.pts = n_pts, strata.type = strata.type,
@@ -117,21 +112,20 @@ optimDIST <-
     
     # Other settings for the simulated annealing algorithm
     MOOP <- FALSE
-    old_sm       <- sm
-    new_sm       <- sm
-    best_sm      <- sm
-    count        <- 0
-    old_energy   <- energy0
-    best_energy  <- Inf
+    old_sm <- sm
+    new_sm <- sm
+    best_sm <- sm
+    count <- 0
+    old_energy <- energy0
+    best_energy <- Inf
     if (progress) pb <- txtProgressBar(min = 1, max = iterations, style = 3)
     time0 <- proc.time()
 
     # Begin the main loop
     for (k in 1:iterations) {
       
-      # Plotting and jittering #################################################
+      # Plotting and jittering
       eval(.plot_and_jitter())
-      ##########################################################################
       
       # Update sample and correlation matrices, and energy state
       new_sm[wp, ] <- covars[new_conf[wp, 1], ]
@@ -147,25 +141,25 @@ optimDIST <-
       actual_prob <- acceptance[[1]] * exp(-k / acceptance[[2]])
       if (track) accept_probs[k] <- actual_prob
       if (new_energy <= old_energy) {
-        old_conf   <- new_conf
+        old_conf <- new_conf
         old_energy <- new_energy
-        count      <- 0
-        old_sm     <- new_sm
+        count <- 0
+        old_sm <- new_sm
       } else {
         if (new_energy > old_energy & random_prob <= actual_prob) {
-          old_conf   <- new_conf
+          old_conf <- new_conf
           old_energy <- new_energy
-          count      <- count + 1
-          old_sm     <- new_sm
+          count <- count + 1
+          old_sm <- new_sm
           if (verbose) {
             cat("\n", count, "iteration(s) with no improvement... p = ",
                 random_prob, "\n")
           }
         } else {
           new_energy <- old_energy
-          new_conf   <- old_conf
-          count      <- count + 1
-          new_sm     <- old_sm
+          new_conf <- old_conf
+          count <- count + 1
+          new_sm <- old_sm
           if (verbose) {
             cat("\n", count, "iteration(s) with no improvement... stops at",
                 stopping[[1]], "\n")
@@ -175,25 +169,25 @@ optimDIST <-
       # Best energy state
       if (track) energies[k] <- new_energy
       if (new_energy < best_energy / 1.0000001) {
-        best_k          <- k
-        best_conf       <- new_conf
-        best_energy     <- new_energy
+        best_k <- k
+        best_conf <- new_conf
+        best_energy <- new_energy
         best_old_energy <- old_energy
-        old_conf        <- old_conf
-        best_sm         <- new_sm
-        best_old_sm     <- old_sm
+        old_conf <- old_conf
+        best_sm <- new_sm
+        best_old_sm <- old_sm
       }
       
       # Freezing parameters
       if (count == stopping[[1]]) {
         if (new_energy > best_energy * 1.000001) {
-          old_conf   <- old_conf
-          new_conf   <- best_conf
+          old_conf <- old_conf
+          new_conf <- best_conf
           old_energy <- best_old_energy
           new_energy <- best_energy
-          count      <- 0
-          new_sm     <- best_sm
-          old_sm     <- best_old_sm
+          count <- 0
+          new_sm <- best_sm
+          old_sm <- best_old_sm
           cat("\n", "reached maximum count with suboptimal configuration\n")
           cat("\n", "restarting with previously best configuration\n")
           cat("\n", count, "iteration(s) with no improvement... stops at",
@@ -205,11 +199,11 @@ optimDIST <-
       if (progress) setTxtProgressBar(pb, k)
     }
     
-    # Prepare output ###########################################################
+    # Prepare output
     eval(.prepare_output())
-    ############################################################################
   }
 # INTERNAL FUNCTION - CALCULATE THE CRITERION VALUE ############################
+# Arguments:
 # sm: sample matrix
 # n.pts: number of points
 # n.cov: number of covariates
@@ -220,19 +214,30 @@ optimDIST <-
   function (sm, n.pts, n.cov, pop.prop, covars.type) {
     
     if (covars.type == "numeric") {
-      samp_prop <- lapply(1:n.cov, function (i)
+      
+      # Count the number of points per marginal sampling strata
+      count <- lapply(1:n.cov, function (i)
         hist(sm[, i], pop.prop[[1]][[i]], plot = FALSE)$counts)
-      samp_prop <- lapply(1:n.cov, function(i) samp_prop[[i]] / n.pts)
-      samp_prop <- sapply(1:n.cov, function (i) 
-        sum(abs(samp_prop[[i]] - pop.prop[[2]][[i]])))
+      
+      # Compute the sample proportions
+      samp.prop <- lapply(1:n.cov, function(i) count[[i]] / n.pts)
+      
+      # Compare the sample and population proportions
+      samp.prop <- sapply(1:n.cov, function (i) 
+        sum(abs(samp.prop[[i]] - pop.prop[[2]][[i]])))
+      
+    } else { # Factor covariates
+      
+      # Compute the sample proportions
+      samp.prop <- lapply(sm, function(x) table(x) / n.pts)
+      
+      # Compare the sample and population proportions
+      samp.prop <- sapply(1:n.cov, function (i)
+        sum(abs(samp.prop[[i]] - pop.prop[[i]])))
+    }
     
-      } else {
-      samp_prop <- lapply(sm, function(x) table(x) / n.pts)
-      samp_prop <- sapply(1:n.cov, function (i)
-        sum(abs(samp_prop[[i]] - pop.prop[[i]])))
-      }
-    
-    energy <- sum(samp_prop)
+    # Compute the energy value
+    energy <- sum(samp.prop)
     return (energy)
   }
 # CALCULATE OBJECTIVE FUNCTION VALUE ###########################################
@@ -246,13 +251,11 @@ objDIST <-
                              use.coords = use.coords, strata.type = strata.type)
     if (!is.null(check)) stop (check, call. = FALSE)
     
-    # Prepare points and candi #################################################
+    # Prepare points and candi
     eval(.prepare_points())
-    ############################################################################
     
-    # Prepare 'covars' and create the starting sample matrix 'sm' ##############
+    # Prepare 'covars' and create the starting sample matrix 'sm'
     eval(.prepare_acdc_covars())
-    ############################################################################
     
     # Calculate the energy state
     pop_prop <- .strataACDC(n.pts = n_pts, strata.type = strata.type,
