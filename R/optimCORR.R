@@ -114,21 +114,11 @@ optimCORR <-
       # Plotting and jittering #################################################
       eval(.plot_and_jitter())
       ##########################################################################
+      
       # Update sample and correlation matrices, and energy state
-      if (covars.type == "numeric") { # Numeric covariates
-        new_row <- covars[new_conf[wp, 1], ]
-        new_sm[wp, ] <- new_row
-        new_scm <- cor(new_sm, use = "complete.obs")
-        new_energy <- sum(abs(pcm - new_scm))
-
-      } else { # Factor covariates
-        if (covars.type == "factor") {
-          new_row <- covars[new_conf[wp, 1], ]
-          new_sm[wp, ] <- new_row
-          new_scm <- pedometrics::cramer(new_sm)
-          new_energy <- sum(abs(pcm - new_scm))
-        }
-      }
+      new_sm[wp, ] <- covars[new_conf[wp, 1], ]
+      new_scm <- .corCORR(obj = new_sm, covars.type = covars.type)
+      new_energy <- .objCORR(scm = new_scm, pcm = pcm)
       
       # Evaluate the new system configuration
       if (greedy) {

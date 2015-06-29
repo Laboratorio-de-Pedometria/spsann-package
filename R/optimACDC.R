@@ -114,20 +114,10 @@ optimACDC <-
                         pcm = pcm, nadir = nadir, covars.type = covars.type,
                         covars = covars, pop.prop = pop_prop, candi = candi)
     utopia <- .utopiaACDC(utopia = utopia)
-    
-    
-    if (covars.type == "numeric") { # Numeric covariates
-      energy0 <- .objNum(sm = sm, n.cov = n_cov, strata = pop_prop, pcm = pcm, 
-                         scm = scm, nadir = nadir, weights = weights, 
-                         n.pts = n_pts, utopia = utopia)
-
-    } else { # Factor covariates
-      if (covars.type == "factor") {
-        energy0 <- .objFac(sm = sm, pop.prop = pop_prop, nadir = nadir, 
-                           weights = weights, pcm = pcm, scm = scm,
-                           n.pts = n_pts, n.cov = n_cov, utopia = utopia)
-      }
-    }
+    energy0 <- .objACDC(sm = sm, n.cov = n_cov, pop.prop = pop_prop, pcm = pcm, 
+                        scm = scm, nadir = nadir, weights = weights, 
+                        n.pts = n_pts, utopia = utopia, 
+                        covars.type = covars.type)
 
     # Other settings for the simulated annealing algorithm
     old_scm <- scm
@@ -153,21 +143,11 @@ optimACDC <-
       
       # Update sample and correlation matrices, and energy state
       new_sm[wp, ] <- covars[new_conf[wp, 1], ]
-      
-      if (covars.type == "numeric") { # Numeric covariates
-        new_scm <- cor(new_sm, use = "complete.obs")
-        new_energy <- .objNum(sm = new_sm, n.cov = n_cov, strata = pop_prop, 
-                              pcm = pcm, scm = new_scm, nadir = nadir,
-                              weights = weights, n.pts = n_pts, utopia = utopia)
-
-      } else { # Factor covariates
-        if (covars.type == "factor") {
-          new_scm <- pedometrics::cramer(new_sm)
-          new_energy <- .objFac(sm = new_sm, pop.prop = pop_prop, scm = new_scm,
-                                nadir = nadir, weights = weights, pcm = pcm, 
-                                n.pts = n_pts, n.cov = n_cov, utopia = utopia)
-        }
-      }
+      new_scm <- .corCORR(obj = new_sm, covars.type = covars.type)
+      new_energy <- .objACDC(sm = new_sm, pop.prop = pop_prop, scm = new_scm,
+                             nadir = nadir, weights = weights, pcm = pcm, 
+                             n.pts = n_pts, n.cov = n_cov, utopia = utopia,
+                             covars.type = covars.type)
       
       # Evaluate the new system configuration
       if (greedy) {
@@ -345,31 +325,9 @@ optimACDC <-
         set.seed(nadir$seeds[i])
         pts <- sample(1:n.candi, n.pts)
         sm <- covars[pts, ]
-       
-        if (covars.type == "numeric") {
-          # Compute the sample correlation matrix
-          scm <- cor(sm, use = "complete.obs")
-          
-          # Count the proportion of points per sampling strata
-          samp_prop <- lapply(1:n.cov, function (i)
-            hist(sm[, i], pop.prop[[1]][[i]], plot = FALSE)$counts)
-          samp_prop <- lapply(1:n.cov, function(i) samp_prop[[i]] / n.pts)
-          samp_prop <- sapply(1:n.cov, function (i)
-            sum(abs(samp_prop[[i]] - pop.prop[[2]][[i]])))
-          
-        } else {
-          
-          # Compute the sample association matrix
-          scm <- pedometrics::cramer(sm)
-          
-          # Count the proportion of points per factor level
-          samp_prop <- lapply(sm, function(x) table(x) / n.pts)
-          samp_prop <- sapply(1:n.cov, function (i)
-            sum(abs(samp_prop[[i]] - pop.prop[[i]])))
-        }
-
-        # Compute the energy state
-        nadirDIST[i] <- sum(samp_prop)
+        scm <- .corCORR(obj = sm, covars.type = covars.type)
+        nadirDIST[i] <- .objDIST(sm = sm, n.pts = n.pts, n.cov = n.cov, 
+                                 pop.prop = pop.prop, covars.type = covars.type)
         nadirCORR[i] <- .objCORR(scm = scm, pcm = pcm)
       }
       
@@ -390,47 +348,27 @@ optimACDC <-
     }
     return (res)
   }
-# INTERNAL FUNCTION - CRITERION FOR NUMERIC COVARIATES #########################
-.objNum <-
-  function (sm, n.cov, strata, pcm, scm, nadir, weights, n.pts, utopia) {
+# INTERNAL FUNCTION - CALCULATE THE CRITERION VALUE ############################
+# This function is used to calculate the criterion value of ACDC.
+# It calculates, scales and weights, and aggregates the objective function
+# values.
+.objACDC <-
+  function (sm, n.cov, nadir, weights, n.pts, utopia, pcm, scm, covars.type,
+            pop.prop) {
     
-    # Count the proportion of points per sampling strata
-    counts <- lapply(1:n.cov, function (i)
-      hist(sm[, i], strata[[1]][[i]], plot = FALSE)$counts)
-    counts <- lapply(1:n.cov, function(i) counts[[i]] / n.pts)
-    counts <- sapply(1:n.cov, function (i) 
-      sum(abs(counts[[i]] - strata[[2]][[i]])))
-        
-    # Scale the objective function values
-    obj_cont <- (sum(counts) - utopia$DIST) / (nadir$DIST - utopia$DIST)
-    obj_cor <- (sum(abs(pcm - scm)) - utopia$CORR) / (nadir$CORR - utopia$CORR)
-      
-    # Aggregate the objective function values
-    obj_cont <- obj_cont * weights$DIST
+    # Distribution
+    obj_dist <- .objDIST(sm = sm, n.pts = n.pts, n.cov = n.cov, 
+                         pop.prop = pop.prop, covars.type = covars.type)
+    obj_dist <- (obj_dist - utopia$DIST) / (nadir$DIST - utopia$DIST)
+    obj_dist <- obj_dist * weights$DIST
+    
+    # Correlation
+    obj_cor <- .objCORR(scm = scm, pcm = pcm)
+    obj_cor <- (obj_cor - utopia$CORR) / (nadir$CORR - utopia$CORR)
     obj_cor <- obj_cor * weights$CORR
-    res <- obj_cont + obj_cor
-    res <- data.frame(obj = res, CORR = obj_cor, DIST = obj_cont)
     
-    return (res)
-  }
-# INTERNAL FUNCTION - CRITERION FOR FACTOR COVARIATES ##########################
-.objFac <-
-  function (sm, pop.prop, nadir, weights, pcm, scm, n.pts, n.cov, utopia) {
-    
-    samp_prop <- lapply(sm, function(x) table(x) / n.pts)
-    samp_prop <- sapply(1:n.cov, function (i)
-      sum(abs(samp_prop[[i]] - pop.prop[[i]])))
-    
-    # Scale the objective function values
-    obj_cat <- (sum(samp_prop) - utopia$DIST) / (nadir$DIST - utopia$DIST)
-    obj_cor <- (sum(abs(pcm - scm)) - utopia$CORR) / (nadir$CORR - utopia$CORR)
-    
-    # Aggregate the objective function values
-    obj_cat <- obj_cat * weights$DIST
-    obj_cor <- obj_cor * weights$CORR
-    res <- obj_cat + obj_cor
-    res <- data.frame(obj = res, CORR = obj_cor, DIST = obj_cat)
-    
+    # Prepare output
+    res <- data.frame(obj = obj_dist + obj_cor, CORR = obj_cor, DIST = obj_dist)
     return (res)
   }
 # INTERNAL FUNCTION - PREPARE THE UTOPIA POINT #################################
@@ -466,34 +404,20 @@ objACDC <-
     eval(.prepare_acdc_covars())
     ############################################################################
     
-    # Base data and initial energy state
+    # Compute base data
     pcm <- .corCORR(obj = covars, covars.type = covars.type)
     scm <- .corCORR(obj = sm, covars.type = covars.type)
+    pop_prop <- .strataACDC(n.pts = n_pts, strata.type = strata.type,
+                            covars = covars, covars.type = covars.type)
+    nadir <- .nadirACDC(n.pts = n_pts, n.cov = n_cov, n.candi = n_candi, 
+                        pcm = pcm, nadir = nadir, candi = candi, 
+                        covars = covars, pop.prop = pop_prop, 
+                        covars.type = covars.type)
+    utopia <- .utopiaACDC(utopia = utopia)
     
-    if (covars.type == "numeric") { # Numeric covariates
-      strata <- .numStrata(n.pts = n_pts, covars = covars, 
-                           strata.type = strata.type)
-      nadir <- .nadirACDC(n.pts = n_pts, n.cov = n_cov, n.candi = n_candi, 
-                          pcm = pcm, nadir = nadir, candi = candi, 
-                          covars = covars, pop.prop = strata, 
-                          covars.type = covars.type)
-      utopia <- .utopiaACDC(utopia = utopia)
-      energy <- .objNum(sm = sm, n.cov = n_cov, strata = strata, pcm = pcm,
-                        scm = scm, nadir = nadir, weights = weights,
-                        n.pts = n_pts, utopia = utopia)
-      
-    } else { # Factor covariates
-      if (covars.type == "factor") {
-        pop_prop <- lapply(covars, function(x) table(x) / nrow(covars))
-        nadir <- .nadirACDC(nadir = nadir, candi = candi, n.candi = n_candi,
-                            n.pts = n_pts, n.cov = n_cov, covars = covars, 
-                            pop.prop = pop_prop, pcm = pcm, 
-                            covars.type = covars.type)
-        utopia <- .utopiaACDC(utopia = utopia)
-        energy <- .objFac(sm = sm, pop.prop = pop_prop, nadir = nadir, 
-                           weights = weights, pcm = pcm, scm = scm,
-                           n.pts = n_pts, n.cov = n_cov, utopia = utopia)
-      }
-    }
+    # Compute the energy state
+    energy <- .objACDC(sm = sm, pop.prop = pop_prop, covars.type = covars.type, 
+                       weights = weights, pcm = pcm, scm = scm, n.pts = n_pts, 
+                       n.cov = n_cov, utopia = utopia, nadir = nadir)
     return (energy)
   }
