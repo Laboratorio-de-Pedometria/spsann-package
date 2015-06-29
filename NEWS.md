@@ -1,5 +1,12 @@
 # Version 0.0.0.9008 (2015-06-29)
-* 
+* Improvements in the family of ACDC, CORR, and DIST functions.
+* Several pairs of internal function that were originaly designed to deal with
+  different types of covariates (factor and numeric) were merged. Now a single
+  function does the job by using the key argument `covars.type`.
+* New internal functions now enable building multi-objective optimization
+  problems more easily. They have also allowed to cleanup/simplify the source 
+  code.
+* A new `autofun` was created to setup the covariates (`covar`).
 
 # Version 0.0.0.9007 (2015-06-12)
 * The `rgeos` and `plyr` packages are not dependencies anymore.
