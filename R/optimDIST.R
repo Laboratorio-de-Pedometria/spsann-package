@@ -84,13 +84,12 @@ optimDIST <-
             boundary, progress = TRUE, verbose = TRUE, greedy = FALSE,
             track = TRUE, weights = NULL, nadir = NULL, utopia = NULL) {
     
-    if (!is.data.frame(covars)) covars <- as.data.frame(covars)
-    
     # Check spsann arguments ###################################################
     eval(.check_spsann_arguments())
     ############################################################################
     
-    check <- .optimDISTcheck(candi = candi, covars = covars, 
+    # Check other arguments
+    check <- .optimACDCcheck(candi = candi, covars = covars, 
                              use.coords = use.coords, strata.type = strata.type)
     if (!is.null(check)) stop (check, call. = FALSE)
     
@@ -210,31 +209,6 @@ optimDIST <-
     eval(.prepare_output())
     ############################################################################
   }
-# INTERNAL FUNCTION - CHECK ARGUMENTS ##########################################
-.optimDISTcheck <-
-  function (candi, covars, 
-            #covars.type, 
-            use.coords, strata.type) {
-    
-    # covars
-    if (ncol(covars) < 2 && use.coords == FALSE) {
-      res <- paste("'covars' must have two or more columns")
-      return (res)
-    }
-    if (nrow(candi) != nrow(covars)) {
-      res <-
-        paste("'candi' and 'covars' must have the same number of rows")
-      return (res)
-    }
-    
-    # strata.type
-    st <- match(strata.type, c("area", "range"))
-    if (is.na(st)) {
-      res <- paste("'strata.type = ", strata.type, "' is not supported",
-                   sep = "")
-      return (res)
-    }
-  }
 # INTERNAL FUNCTION - CALCULATE THE CRITERION VALUE ############################
 # sm: sample matrix
 # n.pts: number of points
@@ -267,10 +241,8 @@ optimDIST <-
 objDIST <-
   function (points, candi, covars, strata.type = "area", use.coords = FALSE) {
     
-    if (!is.data.frame(covars)) covars <- as.data.frame(covars)
-    
-    # Check arguments
-    check <- .optimDISTcheck(candi = candi, covars = covars,
+    # Check other arguments
+    check <- .optimACDCcheck(candi = candi, covars = covars, 
                              use.coords = use.coords, strata.type = strata.type)
     if (!is.null(check)) stop (check, call. = FALSE)
     

@@ -79,12 +79,11 @@ optimACDC <-
             track = TRUE, boundary, progress = TRUE, verbose = TRUE, 
             greedy = FALSE) {
     
-    if (!is.data.frame(covars)) covars <- as.data.frame(covars)
-    
     # Check spsann arguments ###################################################
     eval(.check_spsann_arguments())
     ############################################################################
     
+    # Check other arguments
     check <- .optimACDCcheck(candi = candi, covars = covars, 
                              use.coords = use.coords, strata.type = strata.type)
     if (!is.null(check)) stop (check, call. = FALSE)
@@ -234,16 +233,26 @@ optimACDC <-
   function (candi, covars, use.coords, strata.type) {
     
     # covars
-    if (ncol(covars) < 2 && use.coords == FALSE) {
-      res <- paste("'covars' must have two or more columns")
-      return (res)
+    if (is.vector(covars) && use.coords == FALSE) {
+      
     }
-    if (nrow(candi) != nrow(covars)) {
-      res <-
-        paste("'candi' and 'covars' must have the same number of rows")
-      return (res)
+    
+    if (is.vector(covars)) {
+      if (use.coords == FALSE) {
+        res <- "'covars' must have two or more columns"
+        return (res)
+      }
+      if (nrow(candi) != length(covars)) {
+        res <- "'candi' and 'covars' must have the same number of rows"
+        return (res)
+      }
+    } else {
+      if (nrow(candi) != nrow(covars)) {
+        res <- "'candi' and 'covars' must have the same number of rows"
+        return (res)
+      }
     }
-        
+    
     # strata.type
     aa <- match(strata.type, c("area", "range"))
     if (is.na(aa)) {
@@ -374,8 +383,10 @@ optimACDC <-
 # INTERNAL FUNCTION - PREPARE THE UTOPIA POINT #################################
 .utopiaACDC <-
   function (utopia) {
+
     if (!is.null(unlist(utopia$user))) {
       list(CORR = utopia$user$CORR, DIST = utopia$user$DIST)
+      
     } else {
       message("sorry but the utopia point cannot be calculated")
     }
@@ -388,8 +399,6 @@ objACDC <-
             weights = list(CORR = 0.5, DIST = 0.5), use.coords = FALSE, 
             utopia = list(user = NULL, abs = NULL),
             nadir = list(sim = NULL, seeds = NULL, user = NULL, abs = NULL)) {
-        
-    if (!is.data.frame(covars)) covars <- as.data.frame(covars)
     
     # Check arguments
     check <- .optimACDCcheck(candi = candi, covars = covars, 
