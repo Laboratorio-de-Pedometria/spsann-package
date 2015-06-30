@@ -126,27 +126,24 @@ optimPPL <-
             boundary, progress = TRUE, verbose = TRUE, track = TRUE, 
             greedy = FALSE, weights = NULL, nadir = NULL, utopia = NULL) {
     
-    # Check spsann arguments ###################################################
+    # Check spsann arguments
     eval(.check_spsann_arguments())
-    ############################################################################
     
+    # Check other arguments
     check <- .optimPPLcheck(lags = lags, lags.type = lags.type, pairs = pairs,
                             lags.base = lags.base, cutoff = cutoff, 
                             criterion = criterion, distri = distri, 
                             fun = "optimPPL")
     if (!is.null(check)) stop (check, call. = FALSE)
     
-    # Set plotting options ####################################################
+    # Set plotting options
     eval(.plotting_options())
-    ############################################################################
     
-    # Prepare points and candi #################################################
+    # Prepare points and candi
     eval(.prepare_points())
-    ############################################################################
     
-    # Prepare for jittering ####################################################
+    # Prepare for jittering
     eval(.prepare_jittering())
-    ############################################################################
     
     # Prepare cutoff and lags
     cutoff <- .cutoffPPL(cutoff = cutoff, x.max = x.max, y.max = y.max)
@@ -159,14 +156,13 @@ optimPPL <-
     }
     
     # Initial energy state: points or point-pairs
-    # ASR: implement a distance function in Cpp (pedometrics)
     dm <- SpatialTools::dist1(conf0[, 2:3])
+    ppl <- .getPPL(lags = lags, n.lags = n_lags, dist.mat = dm, pairs = pairs)
+    
     if (pairs) {
-      ppl <- .getPairsPerLag(lags = lags, n.lags = n_lags, dist.mat = dm)
       energy0 <- .objPairsPerLag(ppl = ppl, n.lags = n_lags, n.pts = n_pts,
                                  criterion = criterion, distri = distri)
     } else {
-      ppl <- .getPointsPerLag(lags = lags, n.lags = n_lags, dist.mat = dm)
       energy0 <- .objPointsPerLag(ppl = ppl, n.lags = n_lags, n.pts = n_pts,
                                   criterion = criterion, distri = distri)
     }
@@ -178,23 +174,14 @@ optimPPL <-
     count <- 0
     old_energy <- energy0
     best_energy <- Inf
-    #energies <- vector()
-    #accept_probs <- vector()
     if (progress) pb <- txtProgressBar(min = 1, max = iterations, style = 3)
     time0 <- proc.time()
     
     # Begin the iterations
-    
-    # Use a while loop
-    #k <- 1
-    #while (k <= iterations) {
-    
-    # Use a for loop
     for (k in 1:iterations) {
       
-      # Plotting and jittering #################################################
+      # Plotting and jittering
       eval(.plot_and_jitter())
-      ##########################################################################
       
       # Update the distance matrix using a Cpp function
       new_dm <- .updatePPLCpp(x = new_conf[, 2:3], dm = old_dm, idx = wp)
@@ -210,12 +197,12 @@ optimPPL <-
       #new_dm[, wp] <- x2
       
       # Update the energy state: points or point-pairs?
+      ppl <- .getPPL(lags = lags, n.lags = n_lags, dist.mat = new_dm, 
+                     pairs = pairs)
       if (pairs) {
-        ppl <- .getPairsPerLag(lags = lags, n.lags = n_lags, dist.mat = new_dm)
         new_energy <- .objPairsPerLag(ppl = ppl, n.lags = n_lags, n.pts = n_pts,
                                       criterion = criterion, distri = distri)
       } else {
-        ppl <- .getPointsPerLag(lags = lags, n.lags = n_lags, dist.mat = new_dm)
         new_energy <- .objPointsPerLag(ppl = ppl, n.lags = n_lags, 
                                        n.pts = n_pts, criterion = criterion, 
                                        distri = distri)
@@ -230,26 +217,24 @@ optimPPL <-
       actual_prob <- acceptance$initial * exp(-k / acceptance$cooling)
       if (track) accept_probs[k] <- actual_prob
       if (new_energy <= old_energy) {
-        # Always accepts a better energy
-        old_conf   <- new_conf
+        old_conf <- new_conf
         old_energy <- new_energy
-        count      <- 0
-        old_dm     <- new_dm
+        count <- 0
+        old_dm <- new_dm
       } else {
         if (new_energy > old_energy && random_prob <= actual_prob) {
-          # Accepts a worse energy depending on the probability
-          old_conf   <- new_conf
+          old_conf <- new_conf
           old_energy <- new_energy
-          count      <- count + 1
-          old_dm     <- new_dm
+          count <- count + 1
+          old_dm <- new_dm
           if (verbose) {
             cat("\n", count, "iteration(s) with no improvement... p = ",
                 random_prob, "\n")
           }
         } else {
           new_energy <- old_energy
-          new_conf   <- old_conf
-          count      <- count + 1
+          new_conf <- old_conf
+          count <- count + 1
           if (verbose) {
             cat("\n", count, "iteration(s) with no improvement... stops at",
                 stopping$max.count, "\n")
@@ -260,26 +245,25 @@ optimPPL <-
       # Best energy state
       if (track) energies[k] <- new_energy
       if (new_energy < best_energy / 1.0000001) {
-        best_k          <- k
-        best_conf       <- new_conf
-        best_energy     <- new_energy
+        best_k <- k
+        best_conf <- new_conf
+        best_energy <- new_energy
         best_old_energy <- old_energy
-        old_conf        <- old_conf
-        best_dm         <- new_dm
-        best_old_dm     <- old_dm
+        old_conf <- old_conf
+        best_dm <- new_dm
+        best_old_dm <- old_dm
       }
 
       # Freezing parameters
       if (count == stopping$max.count) {
         if (new_energy > best_energy * 1.000001) {
-          old_conf    <- old_conf
-          new_conf    <- best_conf
-          old_energy  <- best_old_energy
-          new_energy  <- best_energy
-          count       <- 0
-          #energies[k] <- new_energy
-          new_dm      <- best_dm
-          old_dm      <- best_old_dm
+          old_conf <- old_conf
+          new_conf <- best_conf
+          old_energy <- best_old_energy
+          new_energy <- best_energy
+          count <- 0
+          new_dm <- best_dm
+          old_dm <- best_old_dm
           cat("\n", "reached maximum count with suboptimal configuration\n")
           cat("\n", "restarting with previously best configuration\n")
           cat("\n", count, "iteration(s) with no improvement... stops at",
@@ -292,9 +276,8 @@ optimPPL <-
       
     }
     
-    # Prepare output ###########################################################
+    # Prepare output
     eval(.prepare_output())
-    ############################################################################
   }
 # FUNCTION - CALCULATE THE CRITERION VALUE #####################################
 #' @rdname optimPPL
@@ -310,10 +293,9 @@ objPPL <-
                             fun = "objPPL")
     if (!is.null(check)) stop (check, call. = FALSE)
     
-    # Prepare points and candi #################################################
+    # Prepare points and candi
     eval(.prepare_points())
-    ############################################################################
-
+    
     # Prepare lags
     if (length(lags) >= 2) {
       n_lags <- length(lags) - 1
@@ -325,12 +307,11 @@ objPPL <-
     
     # Distance matrix and energy state
     dm <- SpatialTools::dist1(points[, 2:3])
+    ppl <- .getPPL(lags = lags, n.lags = n_lags, dist.mat = dm, pairs = pairs)
     if (pairs) {
-      ppl <- .getPairsPerLag(lags = lags, n.lags = n_lags, dist.mat = dm)
       res <- .objPairsPerLag(ppl = ppl, n.lags = n_lags, n.pts = n_pts, 
                              criterion = criterion, distri = distri)
     } else {
-      ppl <- .getPointsPerLag(lags = lags, n.lags = n_lags, dist.mat = dm)
       res <- .objPointsPerLag(ppl = ppl, n.lags = n_lags, n.pts = n_pts, 
                               criterion = criterion, distri = distri)
     }
@@ -349,10 +330,9 @@ countPPL <-
                             fun = "countPPL")
     if (!is.null(check)) stop (check, call. = FALSE)
     
-    # Prepare points and candi #################################################
+    # Prepare points and candi
     eval(.prepare_points())
-    ############################################################################
-
+    
     # Prepare lags
     if (length(lags) >= 2) {
       n_lags <- length(lags) - 1
@@ -364,15 +344,9 @@ countPPL <-
     
     # Distance matrix and counts
     dm <- SpatialTools::dist1(points[, 2:3])
-    if (pairs) {
-      res <- .getPairsPerLag(lags = lags, n.lags = n_lags,  dist.mat = dm)
-      res <- data.frame(lag.lower = lags[-length(lags)], lag.upper = lags[-1],
-                        pairs = res)
-    } else {
-      res <- .getPointsPerLag(lags = lags, n.lags = n_lags, dist.mat = dm)
-      res <- data.frame(lag.lower = lags[-length(lags)], lag.upper = lags[-1],
-                        points = res)
-    }
+    res <- .getPPL(lags = lags, n.lags = n_lags, dist.mat = dm, pairs = pairs)
+    res <- data.frame(lag.lower = lags[-length(lags)], lag.upper = lags[-1],
+                      ppl = res)
     return (res)
   }
 # INTERNAL FUNCTION - CHECK ARGUMENTS ##########################################
@@ -462,42 +436,48 @@ countPPL <-
     }
     return (res)
   }
-# INTERNAL FUNCTION - NUMBER OF POINTS PER LAG-DISTANCE CLASS ##################
-# It is 3 times faster to use the for loop with function 'which' than when
-# using 'apply' with functions 'table' and 'cut'.
+# INTERNAL FUNCTION - NUMBER OF POINTS (POINT-PAIRS) PER LAG-DISTANCE CLASS ####
+# Note:
+# It is 3 times faster to use the for loop with function 'which()' than using
+# 'apply()' with functions 'table()' and 'cut()'.
 # apply(X = dist.mat, 1, FUN = function (X) table(cut(X, breaks = lags)))
 # apply(X = ppl, 1, FUN = function (X) sum(X != 0))
-.getPointsPerLag <- function (lags, n.lags, dist.mat) {
-  ppl <- vector()
-  for (i in 1:n.lags) {
-    n <- which(dist.mat > lags[i] & dist.mat <= lags[i + 1], arr.ind = TRUE)
-    ppl[i] <- length(unique(c(n)))
+.getPPL <-
+  function (lags, n.lags, dist.mat, pairs) {
+    
+    ppl <- vector()
+    
+    if (pairs) { # Point-pairs per lag
+      for (i in 1:n.lags) {
+        n <- which(dist.mat > lags[i] & dist.mat <= lags[i + 1])
+        ppl[i] <- length(n)
+      }
+      
+    } else { # Points per lag
+      for (i in 1:n.lags) {
+        n <- which(dist.mat > lags[i] & dist.mat <= lags[i + 1], arr.ind = TRUE)
+        ppl[i] <- length(unique(c(n)))
+      }
+    }
+    
+    return (ppl)
   }
-  return (ppl)
-}
 # INTERNAL FUNCTION - BREAKS OF THE lag-distance CLASSES #######################
 .getLagBreaks <-
   function (lags, lags.type, cutoff, lags.base) {
+    
     if (length(lags) == 1) {
+      
       if (lags.type == "equidistant") {
         lags <- seq(0.0001, cutoff, length.out = lags + 1)
       }
+      
       if (lags.type == "exponential") {
         idx <- lags.base ^ c(1:lags - 1)
         lags <- c(0.0001, rev(cutoff / idx))
       }
     }
     return (lags)
-  }
-# INTERNAL FUNCTION - NUMBER OF POINT-PAIRS PER LAG-DISTANCE CLASS #############
-.getPairsPerLag <-
-  function (lags, n.lags, dist.mat) {
-    pairs <- vector()
-    for (i in 1:n.lags) {
-      n <- which(dist.mat > lags[i] & dist.mat <= lags[i + 1])
-      pairs[i] <- length(n)
-    }
-    return (pairs)
   }
 # INTERNAL FUNCTION - CALCULATE THE POINT-PAIR CRITERION VALUE #################
 .objPairsPerLag <-
@@ -518,8 +498,10 @@ countPPL <-
 # INTERNAL FUNCTION - DETERMINE THE CUTOFF #####################################
 .cutoffPPL <- 
   function (cutoff, x.max, y.max) {
+    
     if (missing(cutoff)) {
       cutoff <- sqrt(x.max ^ 2 + y.max ^ 2) / 2
+      
     } else {
       cutoff <- cutoff
     }
