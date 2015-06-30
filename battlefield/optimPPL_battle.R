@@ -1,6 +1,7 @@
 # Initial settings
 rm(list = ls())
 gc()
+require(pedometrics)
 sapply(list.files("src", full.names = TRUE, pattern = ".cpp$"), Rcpp::sourceCpp)
 sapply(list.files("R", full.names = TRUE, pattern = ".R$"), source)
 # 0) DEFAULT EXAMPLE ###########################################################
@@ -28,11 +29,10 @@ candi <- meuse.grid[, 1:2]
 pairs <- TRUE
 set.seed(2001)
 res <- optimPPL(points = 100, candi = candi, pairs = pairs, iterations = 100)
-
+tail(attr(res, "energy.state"), 1) # 7059.143
 
 
 countPPL(points = res, cutoff = cutoff, pairs = pairs)
-tail(attr(res, "energy.state"), 1) # 7059.143
 objPPL(points = res, pairs = pairs, cutoff = cutoff)
 
 # 2) Points per lag - select sample points from candi ##########################
@@ -83,12 +83,11 @@ data(meuse.grid)
 candi <- meuse.grid[, 1:2]
 set.seed(2001)
 res <- optimPPL(points = 100, candi = candi, iterations = 100, greedy = TRUE)
-
+tail(attr(res, "energy.state"), 1) # 165
 
 
 
 countPPL(points = res, cutoff = cutoff)
-tail(attr(res, "energy.state"), 1) # 165
 objPPL(points = res, cutoff = cutoff)
 
 # 5) OLD INFINITE LOOP #########################################################

@@ -158,14 +158,10 @@ optimPPL <-
     # Initial energy state: points or point-pairs
     dm <- SpatialTools::dist1(conf0[, 2:3])
     ppl <- .getPPL(lags = lags, n.lags = n_lags, dist.mat = dm, pairs = pairs)
-    
-    if (pairs) {
-      energy0 <- .objPairsPerLag(ppl = ppl, n.lags = n_lags, n.pts = n_pts,
-                                 criterion = criterion, distri = distri)
-    } else {
-      energy0 <- .objPointsPerLag(ppl = ppl, n.lags = n_lags, n.pts = n_pts,
-                                  criterion = criterion, distri = distri)
-    }
+    distri <- .distriPPL(n.lags = n_lags, n.pts = n_pts, criterion = criterion,
+                         distri = distri, pairs = pairs)
+    energy0 <- .objPPL(ppl = ppl, n.lags = n_lags, n.pts = n_pts,
+                       criterion = criterion, distri = distri, pairs = pairs)
     
     # Other settings for the simulated annealing algorithm
     MOOP <- FALSE
@@ -199,15 +195,9 @@ optimPPL <-
       # Update the energy state: points or point-pairs?
       ppl <- .getPPL(lags = lags, n.lags = n_lags, dist.mat = new_dm, 
                      pairs = pairs)
-      if (pairs) {
-        new_energy <- .objPairsPerLag(ppl = ppl, n.lags = n_lags, n.pts = n_pts,
-                                      criterion = criterion, distri = distri)
-      } else {
-        new_energy <- .objPointsPerLag(ppl = ppl, n.lags = n_lags, 
-                                       n.pts = n_pts, criterion = criterion, 
-                                       distri = distri)
-      }
-      
+      new_energy <- .objPPL(n.lags = n_lags, n.pts = n_pts, pairs = pairs,
+                            criterion = criterion, distri = distri, ppl = ppl)
+                            
       # Evaluate the new system configuration
       if (greedy) {
         random_prob <- 1
@@ -308,13 +298,12 @@ objPPL <-
     # Distance matrix and energy state
     dm <- SpatialTools::dist1(points[, 2:3])
     ppl <- .getPPL(lags = lags, n.lags = n_lags, dist.mat = dm, pairs = pairs)
-    if (pairs) {
-      res <- .objPairsPerLag(ppl = ppl, n.lags = n_lags, n.pts = n_pts, 
-                             criterion = criterion, distri = distri)
-    } else {
-      res <- .objPointsPerLag(ppl = ppl, n.lags = n_lags, n.pts = n_pts, 
-                              criterion = criterion, distri = distri)
-    }
+    distri <- .distriPPL(n.lags = n_lags, n.pts = n_pts, criterion = criterion,
+                         distri = distri, pairs = pairs)
+    res <- .objPPL(ppl = ppl, n.lags = n_lags, n.pts = n_pts, 
+                   criterion = criterion, distri = distri, pairs = pairs)
+    
+    # Output
     return (res)
   }
 # FUNCTION - POINTS PER LAG-DISTANCE CLASS #####################################
@@ -423,17 +412,51 @@ countPPL <-
       }
     }
   }
-# INTERNAL FUNCTION - CALCULATE THE POINT CRITERION VALUE ######################
-.objPointsPerLag <-
-  function (ppl, n.lags, n.pts, criterion, distri) {
+# INTERNAL FUNCTION - COMPUTE THE DISTRIBUTION #################################
+.distriPPL <-
+  function (n.lags, n.pts, criterion, distri, pairs) {
+    
     if (criterion == "distribution") {
       if (missing(distri)) {
-        distri <- rep(n.pts, n.lags)
+        if (pairs) { # Point-pairs per lag
+          distri <- rep(n.pts * (n.pts - 1) / (2 * n.lags), n.lags)
+          
+        } else { # Point per lag
+          distri <- rep(n.pts, n.lags)
+        }
       }
-      res <- sum(distri - ppl)
-    } else {
-      res <- n.pts / (min(ppl) + 1)
     }
+    return (distri)
+  }
+# INTERNAL FUNCTION - CALCULATE THE CRITERION VALUE ############################
+.objPPL <-
+  function (ppl, n.lags, n.pts, criterion, distri, pairs) {
+    
+    if (pairs) { # Point-pairs per lag
+      if (criterion == "distribution") {
+#         if (missing(distri)) {
+#           distri <- rep(n.pts * (n.pts - 1) / (2 * n.lags), n.lags)
+#         }
+        res <- sum(abs(distri - ppl))
+        
+      } else { # minimum
+        a <- n.pts * (n.pts - 1) / (2 * n.lags)
+        res <- a / (min(ppl) + 1)
+      }
+      
+    } else { # Points per lag
+      if (criterion == "distribution") {
+#         if (missing(distri)) {
+#           distri <- rep(n.pts, n.lags)
+#         }
+        res <- sum(distri - ppl)
+        
+      } else { # minimum
+        res <- n.pts / (min(ppl) + 1)
+      }
+    }
+    
+    # Output
     return (res)
   }
 # INTERNAL FUNCTION - NUMBER OF POINTS (POINT-PAIRS) PER LAG-DISTANCE CLASS ####
@@ -478,22 +501,6 @@ countPPL <-
       }
     }
     return (lags)
-  }
-# INTERNAL FUNCTION - CALCULATE THE POINT-PAIR CRITERION VALUE #################
-.objPairsPerLag <-
-  function (ppl, n.lags, n.pts, criterion, distri) {
-    if (criterion == "distribution") {
-      if (missing(distri)) {
-        distri <- rep(n.pts * (n.pts - 1) / (2 * n.lags), n.lags)
-      }
-      res <- sum(abs(distri - ppl))
-    } else {
-      if (criterion == "minimum") {
-        a <- n.pts * (n.pts - 1) / (2 * n.lags)
-        res <- a / (min(ppl) + 1)
-      }
-    }
-    return (res)
   }
 # INTERNAL FUNCTION - DETERMINE THE CUTOFF #####################################
 .cutoffPPL <- 
