@@ -130,10 +130,9 @@ optimPPL <-
     eval(.check_spsann_arguments())
     
     # Check other arguments
-    check <- .optimPPLcheck(lags = lags, lags.type = lags.type, pairs = pairs,
-                            lags.base = lags.base, cutoff = cutoff, 
-                            criterion = criterion, distri = distri, 
-                            fun = "optimPPL")
+    check <- .checkPPL(lags = lags, lags.type = lags.type, pairs = pairs,
+                       lags.base = lags.base, cutoff = cutoff, 
+                       criterion = criterion, distri = distri, fun = "optimPPL")
     if (!is.null(check)) stop (check, call. = FALSE)
     
     # Set plotting options
@@ -147,13 +146,9 @@ optimPPL <-
     
     # Prepare cutoff and lags
     cutoff <- .cutoffPPL(cutoff = cutoff, x.max = x.max, y.max = y.max)
-    if (length(lags) >= 2) {
-      n_lags <- length(lags) - 1
-    } else {
-      n_lags <- lags
-      lags <- .getLagBreaks(lags = lags, lags.type = lags.type, 
-                            cutoff = cutoff, lags.base = lags.base)
-    }
+    lags <- .lagsPPL(lags = lags, lags.type = lags.type, 
+                          cutoff = cutoff, lags.base = lags.base)
+    n_lags <- length(lags) - 1
     
     # Initial energy state: points or point-pairs
     dm <- SpatialTools::dist1(conf0[, 2:3])
@@ -277,23 +272,18 @@ objPPL <-
             cutoff, criterion = "distribution", distri, pairs = FALSE) {
     
     # Check arguments
-    check <- .optimPPLcheck(lags = lags, lags.type = lags.type, pairs = pairs, 
-                            lags.base = lags.base, cutoff = cutoff,
-                            criterion = criterion, distri = distri,
-                            fun = "objPPL")
+    check <- .checkPPL(lags = lags, lags.type = lags.type, pairs = pairs, 
+                       lags.base = lags.base, cutoff = cutoff,
+                       criterion = criterion, distri = distri, fun = "objPPL")
     if (!is.null(check)) stop (check, call. = FALSE)
     
     # Prepare points and candi
     eval(.prepare_points())
     
     # Prepare lags
-    if (length(lags) >= 2) {
-      n_lags <- length(lags) - 1
-    } else {
-      n_lags <- lags
-      lags <- .getLagBreaks(lags = lags, lags.type = lags.type, 
-                            cutoff = cutoff, lags.base = lags.base)
-    }
+    lags <- .lagsPPL(lags = lags, lags.type = lags.type, 
+                     cutoff = cutoff, lags.base = lags.base)
+    n_lags <- length(lags) - 1
     
     # Distance matrix and energy state
     dm <- SpatialTools::dist1(points[, 2:3])
@@ -314,22 +304,17 @@ countPPL <-
             cutoff, pairs = FALSE) {
     
     # Check arguments
-    check <- .optimPPLcheck(lags = lags, lags.type = lags.type, pairs = pairs,
-                            lags.base = lags.base, cutoff = cutoff,
-                            fun = "countPPL")
+    check <- .checkPPL(lags = lags, lags.type = lags.type, pairs = pairs,
+                       lags.base = lags.base, cutoff = cutoff, fun = "countPPL")
     if (!is.null(check)) stop (check, call. = FALSE)
     
     # Prepare points and candi
     eval(.prepare_points())
     
     # Prepare lags
-    if (length(lags) >= 2) {
-      n_lags <- length(lags) - 1
-    } else {
-      n_lags <- lags
-      lags <- .getLagBreaks(lags = lags, lags.type = lags.type, cutoff = cutoff,
-                            lags.base = lags.base)
-    }
+    lags <- .lagsPPL(lags = lags, lags.type = lags.type, cutoff = cutoff,
+                     lags.base = lags.base)
+    n_lags <- length(lags) - 1
     
     # Distance matrix and counts
     dm <- SpatialTools::dist1(points[, 2:3])
@@ -339,7 +324,7 @@ countPPL <-
     return (res)
   }
 # INTERNAL FUNCTION - CHECK ARGUMENTS ##########################################
-.optimPPLcheck <-
+.checkPPL <-
   function (lags, lags.type, lags.base, cutoff, criterion, distri, pairs, fun) {
     
     # Argument 'pairs'
@@ -413,19 +398,21 @@ countPPL <-
     }
   }
 # INTERNAL FUNCTION - COMPUTE THE DISTRIBUTION #################################
+# If required and missing, the wanted distribution of poins (point-pairs) per
+# lag distance class is computed internally.
 .distriPPL <-
   function (n.lags, n.pts, criterion, distri, pairs) {
     
-    if (criterion == "distribution") {
-      if (missing(distri)) {
-        if (pairs) { # Point-pairs per lag
-          distri <- rep(n.pts * (n.pts - 1) / (2 * n.lags), n.lags)
-          
-        } else { # Point per lag
-          distri <- rep(n.pts, n.lags)
-        }
+    if (criterion == "distribution" && missing(distri)) {
+     
+      if (pairs) { # Point-pairs per lag
+        distri <- rep(n.pts * (n.pts - 1) / (2 * n.lags), n.lags)
+        
+      } else { # Point per lag
+        distri <- rep(n.pts, n.lags)
       }
     }
+    
     return (distri)
   }
 # INTERNAL FUNCTION - CALCULATE THE CRITERION VALUE ############################
@@ -433,10 +420,8 @@ countPPL <-
   function (ppl, n.lags, n.pts, criterion, distri, pairs) {
     
     if (pairs) { # Point-pairs per lag
+      
       if (criterion == "distribution") {
-#         if (missing(distri)) {
-#           distri <- rep(n.pts * (n.pts - 1) / (2 * n.lags), n.lags)
-#         }
         res <- sum(abs(distri - ppl))
         
       } else { # minimum
@@ -445,10 +430,8 @@ countPPL <-
       }
       
     } else { # Points per lag
+      
       if (criterion == "distribution") {
-#         if (missing(distri)) {
-#           distri <- rep(n.pts, n.lags)
-#         }
         res <- sum(distri - ppl)
         
       } else { # minimum
@@ -485,8 +468,8 @@ countPPL <-
     
     return (ppl)
   }
-# INTERNAL FUNCTION - BREAKS OF THE lag-distance CLASSES #######################
-.getLagBreaks <-
+# INTERNAL FUNCTION - BREAKS OF THE LAG-DISTANCE CLASSES #######################
+.lagsPPL <-
   function (lags, lags.type, cutoff, lags.base) {
     
     if (length(lags) == 1) {
@@ -500,6 +483,7 @@ countPPL <-
         lags <- c(0.0001, rev(cutoff / idx))
       }
     }
+    
     return (lags)
   }
 # INTERNAL FUNCTION - DETERMINE THE CUTOFF #####################################
@@ -508,9 +492,7 @@ countPPL <-
     
     if (missing(cutoff)) {
       cutoff <- sqrt(x.max ^ 2 + y.max ^ 2) / 2
-      
-    } else {
-      cutoff <- cutoff
     }
+    
     return (cutoff)
   }
