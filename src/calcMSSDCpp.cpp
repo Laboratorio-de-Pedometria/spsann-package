@@ -4,8 +4,9 @@ x: matrix of distances between candidate locations and sample points
 *******************************************************************************/
 #include <Rcpp.h>
 using namespace Rcpp;
-// [[Rcpp::export(".calcMSSDCpp")]]
-double calcMSSDCpp(NumericMatrix x) {
+// [[Rcpp::export(".objMSSD")]]
+double objMSSDCpp(NumericMatrix x) {
+  
   int nrow = x.nrow(), ncol = x.ncol();
   NumericVector out(nrow), xi(ncol);
   

@@ -5,14 +5,14 @@
 
 using namespace Rcpp;
 
-// calcMSSDCpp
-double calcMSSDCpp(NumericMatrix x);
-RcppExport SEXP spsann_calcMSSDCpp(SEXP xSEXP) {
+// objMSSDCpp
+double objMSSDCpp(NumericMatrix x);
+RcppExport SEXP spsann_objMSSDCpp(SEXP xSEXP) {
 BEGIN_RCPP
     Rcpp::RObject __result;
     Rcpp::RNGScope __rngScope;
     Rcpp::traits::input_parameter< NumericMatrix >::type x(xSEXP);
-    __result = Rcpp::wrap(calcMSSDCpp(x));
+    __result = Rcpp::wrap(objMSSDCpp(x));
     return __result;
 END_RCPP
 }

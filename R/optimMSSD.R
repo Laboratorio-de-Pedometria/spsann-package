@@ -58,71 +58,51 @@ optimMSSD <-
             boundary, progress = TRUE, verbose = TRUE, greedy = FALSE,
             track = TRUE, weights = NULL, nadir = NULL, utopia = NULL) {
     
-    # Check spsann arguments ###################################################
+    # Check spsann arguments
     eval(.check_spsann_arguments())
-    ############################################################################
     
-    # Set plotting options ####################################################
+    # Set plotting options
     eval(.plotting_options())
-    ############################################################################
     
-    # Prepare points and candi #################################################
+    # Prepare points and candi
     eval(.prepare_points())
-    ############################################################################
     
-    # Prepare for jittering ####################################################
+    # Prepare for jittering
     eval(.prepare_jittering())
-    ############################################################################
     
     # Calculate the initial energy state. The distance matrix is calculated
-    # using the SpatialTools::dist2(). The function .calcMSSDCpp() does the
+    # using the SpatialTools::dist2(). The function .objMSSD() does the
     # squaring internaly.
-    # ASR: write own distance function in C++
     dm <- SpatialTools::dist2(candi[, 2:3], conf0[, 2:3])
-    energy0 <- .calcMSSDCpp(x = dm)
-    #energy0 <- mean(apply(dm, 1, min) ^ 2)
+    energy0 <- .objMSSD(x = dm)
     
     # other settings for the simulated annealing algorithm
-    old_dm        <- dm
-    best_dm       <- dm
-    count         <- 0
-    old_energy    <- energy0
-    best_energy   <- Inf
-    #energies <- vector()
-    #accept_probs  <- vector()
+    old_dm <- dm
+    best_dm <- dm
+    count <- 0
+    old_energy <- energy0
+    best_energy <- Inf
     if (progress) pb <- txtProgressBar(min = 1, max = iterations, style = 3)
     time0 <- proc.time()
     
     # Begin the main loop
     for (k in 1:iterations) {
       
-      # Plotting and jittering #################################################
+      # Plotting and jittering
       eval(.plot_and_jitter())
-      ##########################################################################
       
-      # Update the distance matrix and calculate the new energy state
+      # Update the matrix of distances and calculate the new energy state (Cpp)
       x2 <- matrix(new_conf[wp, 2:3], nrow = 1)
-      
-      # Update the matrix of distances in C++
       new_dm <- .updateMSSDCpp(x1 = candi[, 2:3], x2 = x2, dm = old_dm, 
                                idx = wp)
+      new_energy <- .objMSSD(new_dm)
       
-      # Update the matrix of distances in R
-      #x2 <- SpatialTools::dist2(coords = candi[, 2:3], coords2 = x2)
-      #new_dm <- old_dm
-      #new_dm[, wp] <- x2
-      
+      # Update the matrix of distances and calculate the new energy state (R)
+      # x2 <- SpatialTools::dist2(coords = candi[, 2:3], coords2 = x2)
+      # new_dm <- old_dm
+      # new_dm[, wp] <- x2
       # new_energy <- mean(apply(new_dm, 1, min) ^ 2)
-      new_energy <- .calcMSSDCpp(new_dm)
       
-      # ASR: This is to test the 'update' function
-      #a <- objMSSD(candi = candi, points = new_conf)
-      #if (round(new_energy, 2) != round(a, 2)) {
-      # print(new_energy)
-      # print(a)
-      # break
-      #}
-            
       # Evaluate the new system configuration
       if (greedy) {
         random_prob <- 1
@@ -148,8 +128,8 @@ optimMSSD <-
           }
           } else {
             new_energy <- old_energy
-            new_conf   <- old_conf
-            count      <- count + 1
+            new_conf <- old_conf
+            count <- count + 1
             if (verbose) {
               cat("\n", count, "iteration(s) with no improvement... stops at",
                   stopping[[1]], "\n")
@@ -160,13 +140,13 @@ optimMSSD <-
       # Best energy state
       if (track) energies[k] <- new_energy
       if (new_energy < best_energy / 1.0000001) {
-        best_k          <- k
-        best_conf     <- new_conf
-        best_energy     <- new_energy
+        best_k <- k
+        best_conf <- new_conf
+        best_energy <- new_energy
         best_old_energy <- old_energy
-        old_conf      <- old_conf
-        best_dm         <- new_dm
-        best_old_dm     <- old_dm
+        old_conf <- old_conf
+        best_dm <- new_dm
+        best_old_dm <- old_dm
       }
 
       # Freezing parameters
@@ -176,9 +156,9 @@ optimMSSD <-
           new_conf <- best_conf
           old_energy <- best_old_energy
           new_energy <- best_energy
-          count      <- 0
-          new_dm     <- best_dm
-          old_dm     <- best_old_dm
+          count <- 0
+          new_dm <- best_dm
+          old_dm <- best_old_dm
           cat("\n", "reached maximum count with suboptimal configuration\n")
           cat("\n", "restarting with previously best configuration\n")
           cat("\n", count, "iteration(s) with no improvement... stops at",
@@ -190,9 +170,8 @@ optimMSSD <-
       if (progress) setTxtProgressBar(pb, k)
     }
     
-    # Prepare output ###########################################################
+    # Prepare output
     eval(.prepare_output())
-    ############################################################################
   }
 # FUNCTION - CALCULATE THE CRITERION VALUE #####################################
 #' @rdname optimMSSD
@@ -200,15 +179,16 @@ optimMSSD <-
 objMSSD <-
   function (candi, points) {
     
-    # Prepare points and candi #################################################
+    # Prepare points and candi
     eval(.prepare_points())
-    ############################################################################
     
-    coords1 <- candi[, 2:3]
-    coords2 <- points[, 2:3]
-    dm <- SpatialTools::dist2(coords1 = coords1, coords2 = coords2)
-    res <- mean(apply(dm, 1, min) ^ 2)
-    #res <- .calcMSSDCpp(dm)
+    # Compute the matrix of distances
+    dm <- SpatialTools::dist2(coords1 = candi[, 2:3], coords2 = points[, 2:3])
+    
+    # Calculate the energy state
+    res <- .objMSSD(dm)
+    
+    # Output
     return (res)
   }
 # INTERNAL FUNCTION - NEAREST POINT ############################################
