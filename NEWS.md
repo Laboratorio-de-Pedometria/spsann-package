@@ -1,3 +1,6 @@
+# Version 0.0.0.9009 (2015-06-30)
+
+
 # Version 0.0.0.9008 (2015-06-29)
 * Improvements in the family of ACDC, CORR, and DIST functions.
 * Several pairs of internal function that were originaly designed to deal with
