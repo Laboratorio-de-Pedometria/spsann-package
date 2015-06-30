@@ -86,44 +86,37 @@ optimUSER <-
             boundary, progress = TRUE, verbose = TRUE, track = TRUE, 
             greedy = FALSE, weights = NULL, nadir = NULL, utopia = NULL) {
     
-    # Check spsann arguments ###################################################
+    # Check spsann arguments
     eval(.check_spsann_arguments())
-    ############################################################################
     
-    # Set plotting options ####################################################
+    # Set plotting options
     eval(.plotting_options())
-    ############################################################################
-        
-    # Prepare points and candi #################################################
-    eval(.prepare_points())
-    ############################################################################
     
-    # Prepare for jittering ####################################################
+    # Prepare points and candi
+    eval(.prepare_points())
+    
+    # Prepare for jittering 
     eval(.prepare_jittering())
-    ############################################################################
     
     # Initial energy state
-    energy0 <- .energyState(fun = fun, points = old_conf, ...)
+    energy0 <- .energyUSER(fun = fun, points = old_conf, ...)
     
     # Other settings for the simulated annealing algorithm
     MOOP <- FALSE
     count <- 0
     old_energy <- energy0
     best_energy <- Inf
-    #energies <- vector()
-    #accept_probs <- vector()
     if (progress) pb <- txtProgressBar(min = 1, max = iterations, style = 3)
     time0 <- proc.time()
     
     # Begin the iterations    
     for (k in 1:iterations) {
       
-      # Plotting and jittering #################################################
+      # Plotting and jittering
       eval(.plot_and_jitter())
-      ##########################################################################
       
       # New energy state
-      new_energy <- .energyState(fun = fun, points = new_conf, ...)
+      new_energy <- .energyUSER(fun = fun, points = new_conf, ...)
       
       # Evaluate the new system configuration
       if (greedy) {
@@ -134,13 +127,11 @@ optimUSER <-
       actual_prob <- acceptance$initial * exp(-k / acceptance$cooling)
       if (track) accept_probs[k] <- actual_prob
       if (new_energy <= old_energy) {
-        # Always accepts a better energy
         old_conf <- new_conf
         old_energy <- new_energy
         count <- 0
       } else {
         if (new_energy > old_energy && random_prob <= actual_prob) {
-          # Accepts a worse energy depending on the probability
           old_conf <- new_conf
           old_energy <- new_energy
           count <- count + 1
@@ -177,7 +168,6 @@ optimUSER <-
           old_energy <- best_old_energy
           new_energy <- best_energy
           count <- 0
-          #energies[k] <- new_energy
           cat("\n", "reached maximum count with suboptimal configuration\n")
           cat("\n", "restarting with previously best configuration\n")
           cat("\n", count, "iteration(s) with no improvement... stops at",
@@ -189,12 +179,13 @@ optimUSER <-
       if (progress) setTxtProgressBar(pb, k)
     }
     
-    # Prepare output ###########################################################
+    # Prepare output
     eval(.prepare_output())
-    ############################################################################
   }
 # INTERNAL FUNCTION - CALCULATE DE ENERGY STATE ################################
-.energyState <- 
+# fun: objective function definition
+# points: system configuration
+.energyUSER <- 
   function (fun, points, ...) {
     if (missing(fun) || missing(points)) {
       stop ("'fun' and 'points' are mandatory arguments")
