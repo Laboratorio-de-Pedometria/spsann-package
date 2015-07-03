@@ -310,90 +310,60 @@ optimSPAN <-
     eval(.prepare_output())
     ############################################################################
   }
-# INTERNAL FUNCTION - CALCULATE NADIR ##########################################
-.panNadir <-
-  function (n.pts, n.candi, candi, n.lags, lags, criterion, pre.distri,
-            nadir, n.cov, covars, covars.type, pop.prop, pcm, strata) {
-
-    if (!is.null(nadir[[1]]) && !is.null(nadir[[2]])) { # Simulate the nadir
-      m <- paste("simulating ", nadir[[1]], " nadir values...", sep = "")
+# INTERNAL FUNCTION - COMPUTE THE NADIR VALUE ##################################
+.nadirACDC <-
+  function (n.pts, n.cov, n.candi, nadir, candi, covars, pcm, pop.prop, 
+            covars.type, lags, n.lags, pairs, distri, criterion) {
+    
+    # Simulate the nadir point
+    if (!is.null(nadir$sim) && !is.null(nadir$seeds)) { 
+      m <- paste("simulating ", nadir$sim, " nadir values...", sep = "")
       message(m)
-
-      # SET VARIABLES
-      ppl_nadir    <- vector()
-      strata_nadir <- vector()
-      correl_nadir <- vector()
-      mssd_nadir   <- vector()
-
-      # BEGIN THE SIMULATION
-      for (i in 1:nadir[[1]]) {
+      
+      # Set variables
+      nadirDIST <- vector()
+      nadirCORR <- vector()
+      nadirPPL <- vector()
+      nadirMSSD <- vector()
+      
+      # Begin the simulation
+      for (i in 1:nadir$sim) {
+        set.seed(nadir$seeds[i])
         pts <- sample(1:n.candi, n.pts)
         sm <- covars[pts, ]
-        pts <- candi[pts, ]
-
-        # ppl
-        dm_ppl <- as.matrix(dist(pts[, 2:3], method = "euclidean"))
-        ppl <- .getPointsPerLag(lags, dm_ppl)
-        if (criterion == "distribution") {
-          if (is.null(pre.distri)) {
-            pre.distri <- rep(n.pts, n.lags)
-          }
-          ppl_nadir[i] <- sum(pre.distri - ppl)
-        } else {
-          if (criterion == "minimum") {
-            ppl_nadir[i] <- n.pts / (min(ppl) + 1)
-          }
-        }
-
-        # acdc
-        if (covars.type == "numeric") { # numeric covariates
-          scm <- cor(sm, use = "complete.obs",  method = "pearson")
-          counts <- lapply(1:n.cov, function (i)
-            hist(sm[, i], strata[[1]][[i]], plot = FALSE)$counts)
-          counts <- sapply(1:n.cov, function (i)
-            sum(abs(counts[[i]] - strata[[2]][[i]])))
-          strata_nadir[i] <- sum(counts)
-          correl_nadir[i] <- sum(abs(pcm - scm))
-
-        } else { # factor covariates
-          if (covars.type == "factor") {
-            scm <- pedometrics::cramer(sm)
-            samp_prop <- lapply(sm, function(x) table(x) / n.pts)
-            samp_prop <- sapply(1:n.cov, function (i)
-              sum(abs(samp_prop[[i]] - pop.prop[[i]])))
-            strata_nadir[i] <- sum(samp_prop)
-            correl_nadir[i] <- sum(abs(pcm - scm))
-          }
-        }
-
-        # mssd
-        dm_mssd <- fields::rdist(candi[, 2:3], pts[, 2:3])
-        mssd_nadir[i] <- .calcMSSDCpp(dm_mssd)
+        # CORR
+        scm <- .corCORR(obj = sm, covars.type = covars.type)
+        nadirCORR[i] <- .objCORR(scm = scm, pcm = pcm)
+        # DIST
+        nadirDIST[i] <- .objDIST(sm = sm, n.pts = n.pts, n.cov = n.cov, 
+                                 pop.prop = pop.prop, covars.type = covars.type)
+        # PPL
+        dm <- SpatialTools::dist1(pts[, 2:3])
+        ppl <- .getPPL(lags = lags, n.lags = n.lags, dist.mat = dm, 
+                       pairs = pairs)
+        distri <- .distriPPL(n.lags = n.lags, n.pts = n.pts, distri = distri, 
+                             criterion = criterion, pairs = pairs)
+        nadirPPL[i] <- .objPPL(ppl = ppl, n.lags = n.lags, n.pts = n.pts,
+                               criterion = criterion, distri = distri, 
+                               pairs = pairs)
+        # MSSD
+        dm <- SpatialTools::dist2(candi[, 2:3], pts[, 2:3])
+        nadirMSSD[i] <- .objMSSD(x = dm)
       }
-
-      # SHOULD WE SAVE AND RETURN THE SIMULATED VALUES?
-      # ASR: We compute the mean simulated value and return it as an attribute
-      #      because we want to explore the simulated values in the future.
-      if (nadir[[2]]) {
-        res <- list(ppl = ppl_nadir, strata = strata_nadir,
-                    correl = correl_nadir, mssd_nadir = mssd_nadir)
-      } else {
-        res <- list(ppl = "ppl_nadir", strata = "strata_nadir",
-                    correl = "correl_nadir", mssd_nadir = "mssd_nadir")
-      }
-      a <- attributes(res)
-      a$ppl_nadir <- mean(ppl_nadir) / 100
-      a$strata_nadir <- mean(strata_nadir) / 100
-      a$correl_nadir <- mean(correl_nadir) / 100
-      a$mssd_nadir <- mean(mssd_nadir) / 100
-      attributes(res) <- a
-
-      # ASR: Other options are not available yet.
+      
+      # Prepare output
+      res <- list(DIST = mean(nadirDIST), CORR = mean(nadirCORR), 
+                  PPL = mean(nadirPPL), MSSD = mean(nadirMSSD))
+      
     } else {
-      if (!is.null(nadir[[3]])) {
-        message("sorry but you cannot set the nadir point")
+      
+      # User-defined nadir values
+      if (!is.null(nadir$user)) { 
+        res <- list(DIST = nadir$user$DIST, CORR = nadir$user$CORR,
+                    PPL = nadir$user$PPL, MSSD = nadir$user$MSSD)
+        
       } else {
-        if (!is.null(nadir[[4]])) {
+        if (!is.null(nadir$abs)) { 
           message("sorry but the nadir point cannot be calculated")
         }
       }
