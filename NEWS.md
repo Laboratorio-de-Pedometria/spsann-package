@@ -1,19 +1,25 @@
 # Version 0.0.0.9009 (2015-06-30)
-
+* Several internal function were renamed using a pattern that includes the name
+  of the respective objective function. For example, `.optimPPLcheck()` was 
+  renamed as `.checkPPL()`, and `.getLagBreaks()` was renamed as `.lagsPPL()`.
+  Note that the first part of the function name indicates what it does, while 
+  the second indicates the objective function to which it applies. This 
+  standardization is important to ease the construction of multi-objective
+  optimization problems.
 
 # Version 0.0.0.9008 (2015-06-29)
 * Improvements in the family of ACDC, CORR, and DIST functions.
-* Several pairs of internal function that were originaly designed to deal with
+* Several pairs of internal function that were originally designed to deal with
   different types of covariates (factor and numeric) were merged. Now a single
   function does the job by using the key argument `covars.type`.
 * New internal functions now enable building multi-objective optimization
-  problems more easily. They have also allowed to cleanup/simplify the source 
+  problems more easily. They have also allowed to clean-up/simplify the source 
   code.
-* A new `autofun` was created to setup the covariates (`covar`).
+* A new `autofun` was created to set-up the covariates (`covar`).
 
 # Version 0.0.0.9007 (2015-06-12)
-* The `rgeos` and `plyr` packages are not dependencies anymore.
-* The `boundary` of the spatial domain can now be estimated intenally. The user 
+* The `rgeos` and `plyr` packages are not dependencies any more.
+* The `boundary` of the spatial domain can now be estimated internally. The user 
   should use the `rgeos` package if a more precise `boundary` is needed.
 * Now using a directory called 'R-autoFunction', where R code chunks that are 
   used in several functions of both families of `obj...()` and `optim...()`
