@@ -1,6 +1,6 @@
 ## Test environments
-* local x86_64-pc-linux-gnu, 3.2.1
-* ubuntu 12.04 (on travis-ci), R 3.1.2
+* local x86_64-pc-linux-gnu (ubuntu 14.), R 3.2.1
+* ubuntu 12.04 (on travis-ci), R 3.2.1
 * win-builder (devel and release)
 
 ## R CMD check results
