@@ -14,13 +14,11 @@
 # @template MOOP_doc
 # 
 # @return
-# \code{optimSPAN()} returns a matrix: the optimized sample configuration with
-# the evolution of the energy state during the optimization as an attribute.
+# \code{optimSPAN()} returns a matrix: the optimized sample configuration.
 # 
 # @author Alessandro Samuel-Rosa \email{alessandrosamuelrosa@@gmail.com}
 # @keywords spatial optimize
 # @concept simulated annealing
-# @importFrom fields rdist
 # @importFrom pedometrics cramer
 # @importFrom pedometrics is.numint
 # @importFrom pedometrics cont2cat
@@ -45,60 +43,54 @@ optimSPAN <-
     nadir = list(sim = NULL, seeds = NULL, user = NULL, abs = NULL),
     utopia = list(user = NULL, abs = NULL)) {
     
-    # Check arguments
-    if (!is.data.frame(covars)) covars <- as.data.frame(covars) 
-    
-    # Check spsann arguments ###################################################
+    # Check spsann arguments
     eval(.check_spsann_arguments())
-    ############################################################################
     
-    check <- .optimPPLcheck(lags = lags, lags.type = lags.type, pairs = pairs,
-                            lags.base = lags.base, cutoff = cutoff, 
-                            criterion = criterion, distri = distri)
+    # Check other arguments
+    check <- .checkPPL(lags = lags, lags.type = lags.type, pairs = pairs,
+                       lags.base = lags.base, cutoff = cutoff, 
+                       criterion = criterion, distri = distri, fun = "optimPPL")
     if (!is.null(check)) stop (check, call. = FALSE)
-    
-    check <- .optimACDCcheck(candi = candi, covars = covars,
+    check <- .optimACDCcheck(candi = candi, covars = covars, 
                              use.coords = use.coords, strata.type = strata.type)
     if (!is.null(check)) stop (check, call. = FALSE)
-
-    # Set plotting options ####################################################
+    check <- .checkMKV(covars = covars, eqn = eqn, vgm = vgm, 
+                       krige.stat = krige.stat, candi = candi)
+    if (!is.null(check)) stop (check, call. = FALSE)
+    
+    # Set plotting options
     eval(.plotting_options())
-    ############################################################################
-
-    # Prepare points and candi #################################################
+    
+    # Prepare points and candi
     eval(.prepare_points())
-    ############################################################################
     
-    # Prepare for jittering ####################################################
+    # Prepare for jittering
     eval(.prepare_jittering())
-    ############################################################################
     
-    # BASE VARIABLES AND DATASETS, NADIR POINT AND INITIAL ENERGY STATE
+    # Prepare 'covars' and create the starting sample matrix 'sm'
+    eval(.prepare_acdc_covars())
     
+    # Base data
+    # CORR
+    pcm <- .corCORR(obj = covars, covars.type = covars.type)
+    scm <- .corCORR(obj = sm, covars.type = covars.type)
+    # DIST
+    pop_prop <- .strataACDC(n.pts = n_pts, strata.type = strata.type, 
+                            covars = covars, covars.type = covars.type)
     # PPL
-    if (length(lags) >= 3) {
-      n_lags <- length(lags) - 1
-    } else {
-      n_lags <- lags
-      lags <- .getLagBreaks(lags, lags.type, cutoff, lags.base)
-    }
-    dm_ppl <- as.matrix(dist(conf0[, 2:3], method = "euclidean"))
-    ppl <- .getPointsPerLag(lags, dm_ppl)
-    energy0_ppl <- .objPointsPerLag(ppl = ppl, n.lags = n_lags, n.pts = n_pts,
-                                    criterion = criterion, distri = distri)
-
+    cutoff <- .cutoffPPL(cutoff = cutoff, x.max = x.max, y.max = y.max)
+    lags <- .lagsPPL(lags = lags, lags.type = lags.type, cutoff = cutoff, 
+                     lags.base = lags.base)
+    n_lags <- length(lags) - 1
+    dm_ppl <- SpatialTools::dist1(conf0[, 2:3])
+    ppl <- .getPPL(lags = lags, n.lags = n_lags, dist.mat = dm_ppl, 
+                   pairs = pairs)
     # MSSD
-    dm_mssd <- fields::rdist(candi[, 2:3], conf0[, 2:3])
-
-    # ACDC
-    # Prepare covariates (covars) and create the starting sample matrix (sm)
-    covars.type <- ifelse(pedometrics::is.any.factor(covars), "factor",
-                          "numeric")
-    covars <- .covarsACDC(covars = covars, covars.type = covars.type, 
-                          use.coords = use.coords, candi = candi, n.pts = n_pts,
-                          strata.type = strata.type)
-    n_cov <- ncol(covars)
-    sm <- covars[points[, 1], ]
+    dm_mssd <- SpatialTools::dist2(candi[, 2:3], conf0[, 2:3])
+    
+    # Nadir and utopia points
+    
+    
     
     # Base data and initial energy state (energy)
     if (covars.type == "numeric") { # Numeric covariates
