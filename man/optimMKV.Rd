@@ -5,14 +5,14 @@
 \alias{optimMKV}
 \title{Optimization of sample configurations for spatial interpolation}
 \usage{
-optimMKV(points, candi, covars, equation = z ~ 1, model,
-  krige.stat = "mean", ..., x.max, x.min, y.max, y.min, iterations = 10000,
-  acceptance = list(initial = 0.99, cooling = iterations/10),
-  stopping = list(max.count = iterations/10), plotit = TRUE, boundary,
-  progress = TRUE, verbose = TRUE, greedy = FALSE, track = TRUE,
-  weights = NULL, nadir = NULL, utopia = NULL)
+optimMKV(points, candi, covars, eqn = z ~ 1, vgm, krige.stat = "mean", ...,
+  x.max, x.min, y.max, y.min, iterations = 10000, acceptance = list(initial
+  = 0.99, cooling = iterations/10), stopping = list(max.count =
+  iterations/10), plotit = TRUE, boundary, progress = TRUE,
+  verbose = TRUE, greedy = FALSE, track = TRUE, weights = NULL,
+  nadir = NULL, utopia = NULL)
 
-objMKV(points, candi, covars, equation, model, krige.stat = "mean", ...)
+objMKV(points, candi, covars, eqn, vgm, krige.stat = "mean", ...)
 }
 \arguments{
 \item{points}{Integer value, integer vector, data frame or matrix. If
@@ -33,13 +33,13 @@ projected y-coordinates.}
 
 \item{covars}{Data frame or matrix with the covariates in the columns.}
 
-\item{equation}{Formula string that defines the dependent variable \code{z}
+\item{eqn}{Formula string that defines the dependent variable \code{z}
 as a linear model of the independent variables contained in \code{covars}.
-Defaults to \code{equation = z ~ 1}, that is, ordinary kriging. See the
+Defaults to \code{eqn = z ~ 1}, that is, ordinary kriging. See the
 argument \code{formula} in the function \code{\link[gstat]{krige}} for
 more information.}
 
-\item{model}{Object of class "variogramModel". See the argument
+\item{vgm}{Object of class "variogramModel". See the argument
 \code{model} in the function \code{\link[gstat]{krige}} for more
 information.}
 
@@ -130,14 +130,14 @@ require(gstat)
 data(meuse.grid)
 candi <- meuse.grid[, 1:2]
 covars <- as.data.frame(meuse.grid)
-model <- vgm(psill = 10, model = "Exp", range = 500, nugget = 8)
+vgm <- vgm(psill = 10, model = "Exp", range = 500, nugget = 8)
 set.seed(2001)
 res <- optimMKV(points = 100, candi = candi, covars = covars, maxdist = 500,
-                equation = z ~ dist, model = model, iterations = 100,
+                eqn = z ~ dist, vgm = vgm, iterations = 100,
                 plotit = FALSE, track = FALSE, verbose = FALSE)
 tail(attr(res, "energy"), 1) # 11.9878
-objMKV(points = res, candi = candi, covars = covars, equation = z ~ dist,
-       model = model, maxdist = 500)
+objMKV(points = res, candi = candi, covars = covars, eqn = z ~ dist,
+       vgm = vgm, maxdist = 500)
 }
 \author{
 Alessandro Samuel-Rosa \email{alessandrosamuelrosa@gmail.com}
