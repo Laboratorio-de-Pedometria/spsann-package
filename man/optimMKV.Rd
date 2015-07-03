@@ -5,7 +5,7 @@
 \alias{optimMKV}
 \title{Optimization of sample configurations for spatial interpolation}
 \usage{
-optimMKV(points, candi, covars, eqn = z ~ 1, vgm, krige.stat = "mean", ...,
+optimMKV(covars, eqn = z ~ 1, vgm, krige.stat = "mean", ..., points, candi,
   x.max, x.min, y.max, y.min, iterations = 10000, acceptance = list(initial
   = 0.99, cooling = iterations/10), stopping = list(max.count =
   iterations/10), plotit = TRUE, boundary, progress = TRUE,
@@ -15,22 +15,6 @@ optimMKV(points, candi, covars, eqn = z ~ 1, vgm, krige.stat = "mean", ...,
 objMKV(points, candi, covars, eqn, vgm, krige.stat = "mean", ...)
 }
 \arguments{
-\item{points}{Integer value, integer vector, data frame or matrix. If
-\code{points} is an integer value, it defines the number of points that
-should be randomly sampled from \code{candi} to form the starting system
-configuration. If \code{points} is a vector of integer values, it contains
-the row indexes of \code{candi} that correspond to the points that form the
-starting system configuration. If \code{points} is a data frame or matrix,
-it must have three columns in the following order: \code{[, "id"]} the
-row indexes of \code{candi} that correspond to each point, \code{[, "x"]}
-the projected x-coordinates, and \code{[, "y"]} the projected y-coordinates.
-Note that in the later case, \code{points} must be a subset of \code{candi}.}
-
-\item{candi}{Data frame or matrix with the candidate locations for the
-perturbed points. \code{candi} must have two columns in the following
-order: \code{[, "x"]} the projected x-coordinates, and \code{[, "y"]} the
-projected y-coordinates.}
-
 \item{covars}{Data frame or matrix with the covariates in the columns.}
 
 \item{eqn}{Formula string that defines the dependent variable \code{z}
@@ -49,6 +33,22 @@ to summarize the kriging variance. Available options are \code{"mean"} and
 Defaults to \code{krige.stat = "mean"}.}
 
 \item{...}{further arguments passed to \code{\link[gstat]{krige}}.}
+
+\item{points}{Integer value, integer vector, data frame or matrix. If
+\code{points} is an integer value, it defines the number of points that
+should be randomly sampled from \code{candi} to form the starting system
+configuration. If \code{points} is a vector of integer values, it contains
+the row indexes of \code{candi} that correspond to the points that form the
+starting system configuration. If \code{points} is a data frame or matrix,
+it must have three columns in the following order: \code{[, "id"]} the
+row indexes of \code{candi} that correspond to each point, \code{[, "x"]}
+the projected x-coordinates, and \code{[, "y"]} the projected y-coordinates.
+Note that in the later case, \code{points} must be a subset of \code{candi}.}
+
+\item{candi}{Data frame or matrix with the candidate locations for the
+perturbed points. \code{candi} must have two columns in the following
+order: \code{[, "x"]} the projected x-coordinates, and \code{[, "y"]} the
+projected y-coordinates.}
 
 \item{x.max,x.min,y.max,y.min}{Numeric value. The minimum and maximum
 quantity of random noise to be added to the projected x- and y-coordinates.
@@ -113,8 +113,7 @@ objective function to which they apply; 2) \code{abs} -- logical for
 calculating the utopia point internally (experimental).}
 }
 \value{
-\code{optimMKV} returns a matrix: the optimized sample configuration with
-the evolution of the energy state during the optimization as an attribute.
+\code{optimMKV} returns a matrix: the optimized sample configuration.
 
 \code{objMKV} returns a numeric value: the energy state of the sample
 configuration - the objective function value.

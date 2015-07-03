@@ -28,8 +28,7 @@
 #' @param ... further arguments passed to \code{\link[gstat]{krige}}.
 #'
 #' @return
-#' \code{optimMKV} returns a matrix: the optimized sample configuration with
-#' the evolution of the energy state during the optimization as an attribute.
+#' \code{optimMKV} returns a matrix: the optimized sample configuration.
 #'
 #' \code{objMKV} returns a numeric value: the energy state of the sample
 #' configuration - the objective function value.
@@ -67,13 +66,16 @@
 #'        vgm = vgm, maxdist = 500)
 # FUNCTION - MAIN ##############################################################
 optimMKV <-
-  function (points, candi, 
-            covars, eqn = z ~ 1, vgm, krige.stat = "mean", ...,
-            x.max, x.min, y.max, y.min, iterations = 10000,
-            acceptance = list(initial = 0.99, cooling = iterations / 10),
-            stopping = list(max.count = iterations / 10), plotit = TRUE,
-            boundary, progress = TRUE, verbose = TRUE, greedy = FALSE,
-            track = TRUE, weights = NULL, nadir = NULL, utopia = NULL) {
+  function (
+    # MKV
+    covars, eqn = z ~ 1, vgm, krige.stat = "mean", ...,
+    # SPSANN
+    points, candi, x.max, x.min, y.max, y.min, iterations = 10000,
+    acceptance = list(initial = 0.99, cooling = iterations / 10),
+    stopping = list(max.count = iterations / 10), plotit = TRUE,
+    boundary, progress = TRUE, verbose = TRUE, greedy = FALSE, track = TRUE, 
+    # MOOP
+    weights = NULL, nadir = NULL, utopia = NULL) {
     
     # Check spsann arguments
     eval(.check_spsann_arguments())

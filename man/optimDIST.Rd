@@ -3,9 +3,10 @@
 \name{optimDIST}
 \alias{objDIST}
 \alias{optimDIST}
-\title{Optimization of sample configurations for spatial trend estimation}
+\title{Optimization of sample configurations for spatial trend identification and
+estimation}
 \usage{
-optimDIST(points, candi, covars, strata.type = "area", use.coords = FALSE,
+optimDIST(covars, strata.type = "area", use.coords = FALSE, points, candi,
   x.max, x.min, y.max, y.min, iterations, acceptance = list(initial = 0.99,
   cooling = iterations/10), stopping = list(max.count = iterations/10),
   plotit = TRUE, boundary, progress = TRUE, verbose = TRUE,
@@ -15,6 +16,16 @@ optimDIST(points, candi, covars, strata.type = "area", use.coords = FALSE,
 objDIST(points, candi, covars, strata.type = "area", use.coords = FALSE)
 }
 \arguments{
+\item{covars}{Data frame or matrix with the covariates in the columns.}
+
+\item{strata.type}{Character value setting the type of stratification that
+should be used to create the marginal sampling strata (or factor levels) for
+the numeric covariates. Available options are \code{"area"} for equal-area,
+and \code{"range"} for equal-range. Defaults to \code{strata.type = "area"}.}
+
+\item{use.coords}{Logical value. Should the geographic coordinates be used
+as covariates? Defaults to \code{use.coords = FALSE}.}
+
 \item{points}{Integer value, integer vector, data frame or matrix. If
 \code{points} is an integer value, it defines the number of points that
 should be randomly sampled from \code{candi} to form the starting system
@@ -30,16 +41,6 @@ Note that in the later case, \code{points} must be a subset of \code{candi}.}
 perturbed points. \code{candi} must have two columns in the following
 order: \code{[, "x"]} the projected x-coordinates, and \code{[, "y"]} the
 projected y-coordinates.}
-
-\item{covars}{Data frame or matrix with the covariates in the columns.}
-
-\item{strata.type}{Character value setting the type of stratification that
-should be used to create the marginal sampling strata (or factor levels) for
-the numeric covariates. Available options are \code{"area"} for equal-area,
-and \code{"range"} for equal-range. Defaults to \code{strata.type = "area"}.}
-
-\item{use.coords}{Logical value. Should the geographic coordinates be used
-as covariates? Defaults to \code{use.coords = FALSE}.}
 
 \item{x.max,x.min,y.max,y.min}{Numeric value. The minimum and maximum
 quantity of random noise to be added to the projected x- and y-coordinates.
@@ -104,16 +105,15 @@ objective function to which they apply; 2) \code{abs} -- logical for
 calculating the utopia point internally (experimental).}
 }
 \value{
-\code{optimDIST} returns a matrix: the optimized sample configuration with
-the evolution of the energy state during the optimization as an attribute.
+\code{optimDIST} returns a matrix: the optimized sample configuration.
 
 \code{objDIST} returns a numeric value: the energy state of the sample
 configuration - the objective function value.
 }
 \description{
-Optimize a sample configuration for trend estimation. A criterion is defined
-so that the sample reproduces the marginal distribution of the covariates
-(\bold{DIST}).
+Optimize a sample configuration for spatial trend identification and
+estimation. A criterion is defined so that the sample reproduces the
+marginal distribution of the covariates (\bold{DIST}).
 }
 \details{
 Reproducing the marginal distribution of the numeric covariates depends upon

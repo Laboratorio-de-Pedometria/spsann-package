@@ -13,8 +13,7 @@
 #' this requirement is attained.
 #' 
 #' @return
-#' \code{optimMSSD} returns a matrix: the optimized sample configuration with
-#' the evolution of the energy state during the optimization as an attribute.
+#' \code{optimMSSD} returns a matrix: the optimized sample configuration.
 #'
 #' \code{objMSSD} returns a numeric value: the energy state of the sample
 #' configuration - the objective function value.
@@ -52,11 +51,14 @@
 #' objMSSD(candi = candi, points = res)
 # FUNCTION - MAIN ##############################################################
 optimMSSD <-
-  function (points, candi, x.max, x.min, y.max, y.min, iterations = 10000,
-            acceptance = list(initial = 0.99, cooling = iterations / 10),
-            stopping = list(max.count = iterations / 10), plotit = TRUE,
-            boundary, progress = TRUE, verbose = TRUE, greedy = FALSE,
-            track = TRUE, weights = NULL, nadir = NULL, utopia = NULL) {
+  function (
+    # SPSANN
+    points, candi, x.max, x.min, y.max, y.min, iterations = 10000,
+    acceptance = list(initial = 0.99, cooling = iterations / 10),
+    stopping = list(max.count = iterations / 10), plotit = TRUE,
+    boundary, progress = TRUE, verbose = TRUE, greedy = FALSE, track = TRUE, 
+    # MOOP
+    weights = NULL, nadir = NULL, utopia = NULL) {
     
     # Check spsann arguments
     eval(.check_spsann_arguments())

@@ -4,15 +4,16 @@
 \alias{countPPL}
 \alias{objPPL}
 \alias{optimPPL}
-\title{Optimization of sample configurations for variogram estimation}
+\title{Optimization of sample configurations for variogram identification and
+estimation}
 \usage{
-optimPPL(points, candi, lags = 7, lags.type = "exponential",
-  lags.base = 2, cutoff, criterion = "distribution", distri,
-  pairs = FALSE, x.max, x.min, y.max, y.min, iterations = 10000,
-  acceptance = list(initial = 0.99, cooling = iterations/10),
-  stopping = list(max.count = iterations/10), plotit = TRUE, boundary,
-  progress = TRUE, verbose = TRUE, track = TRUE, greedy = FALSE,
-  weights = NULL, nadir = NULL, utopia = NULL)
+optimPPL(lags = 7, lags.type = "exponential", lags.base = 2, cutoff,
+  criterion = "distribution", distri, pairs = FALSE, points, candi, x.max,
+  x.min, y.max, y.min, iterations = 10000, acceptance = list(initial = 0.99,
+  cooling = iterations/10), stopping = list(max.count = iterations/10),
+  plotit = TRUE, boundary, progress = TRUE, verbose = TRUE,
+  track = TRUE, greedy = FALSE, weights = NULL, nadir = NULL,
+  utopia = NULL)
 
 objPPL(points, candi, lags = 7, lags.type = "exponential", lags.base = 2,
   cutoff, criterion = "distribution", distri, pairs = FALSE)
@@ -21,22 +22,6 @@ countPPL(points, candi, lags = 7, lags.type = "exponential",
   lags.base = 2, cutoff, pairs = FALSE)
 }
 \arguments{
-\item{points}{Integer value, integer vector, data frame or matrix. If
-\code{points} is an integer value, it defines the number of points that
-should be randomly sampled from \code{candi} to form the starting system
-configuration. If \code{points} is a vector of integer values, it contains
-the row indexes of \code{candi} that correspond to the points that form the
-starting system configuration. If \code{points} is a data frame or matrix,
-it must have three columns in the following order: \code{[, "id"]} the
-row indexes of \code{candi} that correspond to each point, \code{[, "x"]}
-the projected x-coordinates, and \code{[, "y"]} the projected y-coordinates.
-Note that in the later case, \code{points} must be a subset of \code{candi}.}
-
-\item{candi}{Data frame or matrix with the candidate locations for the
-perturbed points. \code{candi} must have two columns in the following
-order: \code{[, "x"]} the projected x-coordinates, and \code{[, "y"]} the
-projected y-coordinates.}
-
 \item{lags}{Integer value. The number of lag-distance classes. Alternatively,
 a vector of numeric values with the lower and upper limits of each
 lag-distance class. The lowest value must be larger than zero. Defaults to
@@ -65,6 +50,22 @@ distribution.}
 \item{pairs}{Logical value. Should the sample configuration be optimized
 regarding the number of point-pairs per lag-distance class? Defaults to
 \code{pairs = FALSE}.}
+
+\item{points}{Integer value, integer vector, data frame or matrix. If
+\code{points} is an integer value, it defines the number of points that
+should be randomly sampled from \code{candi} to form the starting system
+configuration. If \code{points} is a vector of integer values, it contains
+the row indexes of \code{candi} that correspond to the points that form the
+starting system configuration. If \code{points} is a data frame or matrix,
+it must have three columns in the following order: \code{[, "id"]} the
+row indexes of \code{candi} that correspond to each point, \code{[, "x"]}
+the projected x-coordinates, and \code{[, "y"]} the projected y-coordinates.
+Note that in the later case, \code{points} must be a subset of \code{candi}.}
+
+\item{candi}{Data frame or matrix with the candidate locations for the
+perturbed points. \code{candi} must have two columns in the following
+order: \code{[, "x"]} the projected x-coordinates, and \code{[, "y"]} the
+projected y-coordinates.}
 
 \item{x.max,x.min,y.max,y.min}{Numeric value. The minimum and maximum
 quantity of random noise to be added to the projected x- and y-coordinates.
@@ -129,20 +130,20 @@ objective function to which they apply; 2) \code{abs} -- logical for
 calculating the utopia point internally (experimental).}
 }
 \value{
-\code{optimPPL} returns a matrix: the optimized sample configuration with
-the evolution of the energy state during the optimization as an attribute.
+\code{optimPPL} returns a matrix: the optimized sample configuration.
 
 \code{countPPL} returns a data.frame with three columns: a) the lower and b)
 upper limits of each lag-distance class, and c) the number of points or
 point-pairs per lag-distance class.
 
-\code{objPPL} returns a numeric value: the energy state of the sample configuration
-- the objective function value.
+\code{objPPL} returns a numeric value: the energy state of the sample
+configuration - the objective function value.
 }
 \description{
-Optimize a sample configuration for variogram estimation. A criterion is
-defined so that the optimized sample configuration has a given number of
-points or point-pairs contributing to each lag-distance class (\bold{PPL}).
+Optimize a sample configuration for variogram identification and estimation.
+A criterion is defined so that the optimized sample configuration has a given
+number of points or point-pairs contributing to each lag-distance class
+(\bold{PPL}).
 }
 \details{
 \strong{Distance}: Euclidean distances between points are used. This

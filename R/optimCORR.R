@@ -1,8 +1,9 @@
-#' Optimization of sample configurations for spatial trend estimation
+#' Optimization of sample configurations for spatial trend identification and
+#' estimation
 #'
-#' Optimize a sample configuration for trend estimation. A criterion is defined
-#' so that the sample reproduces the association/correlation between the 
-#' covariates (\bold{CORR}).
+#' Optimize a sample configuration for spatial trend identification and 
+#' estimation. A criterion is defined so that the sample reproduces the 
+#' bivariate association/correlation between the covariates (\bold{CORR}).
 #'
 #' @template spJitter_doc
 #' @template spSANN_doc
@@ -29,8 +30,7 @@
 #' of association (weak or strong).
 #'
 #' @return
-#' \code{optimCORR} returns a matrix: the optimized sample configuration with
-#' the evolution of the energy state during the optimization as an attribute.
+#' \code{optimCORR} returns a matrix: the optimized sample configuration.
 #' 
 #' \code{objCORR} returns a numeric value: the energy state of the sample
 #' configuration - the objective function value.
@@ -55,12 +55,16 @@
 #' objCORR(points = res, candi = candi, covars = covars, use.coords = TRUE)
 # MAIN FUNCTION ################################################################
 optimCORR <-
-  function (points, candi, covars, use.coords = FALSE, strata.type = "area", 
-            x.max, x.min, y.max, y.min, iterations,
-            acceptance = list(initial = 0.99, cooling = iterations / 10),
-            stopping = list(max.count = iterations / 10), plotit = TRUE,
-            boundary, progress = TRUE, verbose = TRUE, greedy = FALSE,
-            track = TRUE, weights = NULL, nadir = NULL, utopia = NULL) {
+  function (
+    # CORR
+    covars, use.coords = FALSE, strata.type = "area", 
+    # SPSANN
+    points, candi, x.max, x.min, y.max, y.min, iterations,
+    acceptance = list(initial = 0.99, cooling = iterations / 10),
+    stopping = list(max.count = iterations / 10), plotit = TRUE,
+    boundary, progress = TRUE, verbose = TRUE, greedy = FALSE, track = TRUE, 
+    # MOOP
+    weights = NULL, nadir = NULL, utopia = NULL) {
     
     # Check spsann arguments
     eval(.check_spsann_arguments())
@@ -89,7 +93,6 @@ optimCORR <-
 
     # Other settings for the simulated annealing algorithm
     old_scm <- scm
-    new_scm <- scm
     best_scm <- scm
     old_sm <- sm
     new_sm <- sm

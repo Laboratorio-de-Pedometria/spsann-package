@@ -23,8 +23,7 @@
 #' function defined by the user.
 #' 
 #' @return
-#' \code{optimUSER} returns a matrix: the optimized sample configuration with
-#' the evolution of the energy state during the optimization as an attribute.
+#' \code{optimUSER} returns a matrix: the optimized sample configuration.
 #'
 #' @author
 #' Alessandro Samuel-Rosa \email{alessandrosamuelrosa@@gmail.com}
@@ -79,12 +78,16 @@
 #' abline(0, 1, col = "red")
 # FUNCTION - MAIN ##############################################################
 optimUSER <-
-  function (points, fun, ...,
-            candi, x.max, x.min, y.max, y.min, iterations = 10000,
-            acceptance = list(initial = 0.99, cooling = iterations / 10),
-            stopping = list(max.count = iterations / 10), plotit = TRUE,
-            boundary, progress = TRUE, verbose = TRUE, track = TRUE, 
-            greedy = FALSE, weights = NULL, nadir = NULL, utopia = NULL) {
+  function (
+    # USER
+    fun, ...,
+    # SPSANN
+    points, candi, x.max, x.min, y.max, y.min, iterations = 10000,
+    acceptance = list(initial = 0.99, cooling = iterations / 10),
+    stopping = list(max.count = iterations / 10), plotit = TRUE,
+    boundary, progress = TRUE, verbose = TRUE, track = TRUE, greedy = FALSE, 
+    # MOOP
+    weights = NULL, nadir = NULL, utopia = NULL) {
     
     # Check spsann arguments
     eval(.check_spsann_arguments())
@@ -102,7 +105,6 @@ optimUSER <-
     energy0 <- .energyUSER(fun = fun, points = old_conf, ...)
     
     # Other settings for the simulated annealing algorithm
-    MOOP <- FALSE
     count <- 0
     old_energy <- energy0
     best_energy <- Inf

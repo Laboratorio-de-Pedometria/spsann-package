@@ -1,8 +1,9 @@
-#' Optimization of sample configurations for spatial trend estimation
+#' Optimization of sample configurations for spatial trend identification and
+#' estimation
 #'
-#' Optimize a sample configuration for trend estimation. A criterion is defined 
-#' so that the sample reproduces the marginal distribution of the covariates
-#' (\bold{DIST}).
+#' Optimize a sample configuration for spatial trend identification and 
+#' estimation. A criterion is defined so that the sample reproduces the 
+#' marginal distribution of the covariates (\bold{DIST}).
 #'
 #' @template spJitter_doc
 #' @template spSANN_doc
@@ -49,8 +50,7 @@
 #' covariate values that fall in each marginal sampling strata.
 #' 
 #' @return
-#' \code{optimDIST} returns a matrix: the optimized sample configuration with
-#' the evolution of the energy state during the optimization as an attribute.
+#' \code{optimDIST} returns a matrix: the optimized sample configuration.
 #'  
 #' \code{objDIST} returns a numeric value: the energy state of the sample
 #' configuration - the objective function value.
@@ -77,12 +77,16 @@
 #' objDIST(points = res, candi = candi, covars = covars, use.coords = TRUE)
 # MAIN FUNCTION ################################################################
 optimDIST <-
-  function (points, candi, covars, strata.type = "area", use.coords = FALSE, 
-            x.max, x.min, y.max, y.min, iterations,
-            acceptance = list(initial = 0.99, cooling = iterations / 10),
-            stopping = list(max.count = iterations / 10), plotit = TRUE,
-            boundary, progress = TRUE, verbose = TRUE, greedy = FALSE,
-            track = TRUE, weights = NULL, nadir = NULL, utopia = NULL) {
+  function (
+    # DIST
+    covars, strata.type = "area", use.coords = FALSE, 
+    # SPSANN
+    points, candi, x.max, x.min, y.max, y.min, iterations,
+    acceptance = list(initial = 0.99, cooling = iterations / 10),
+    stopping = list(max.count = iterations / 10), plotit = TRUE,
+    boundary, progress = TRUE, verbose = TRUE, greedy = FALSE, track = TRUE, 
+    # MOOP
+    weights = NULL, nadir = NULL, utopia = NULL) {
     
     # Check spsann arguments
     eval(.check_spsann_arguments())
@@ -111,7 +115,6 @@ optimDIST <-
                         n.cov = n_cov, covars.type = covars.type)
     
     # Other settings for the simulated annealing algorithm
-    MOOP <- FALSE
     old_sm <- sm
     new_sm <- sm
     best_sm <- sm

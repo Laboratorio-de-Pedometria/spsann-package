@@ -93,8 +93,7 @@ objective function to which they apply; 2) \code{abs} -- logical for
 calculating the utopia point internally (experimental).}
 }
 \value{
-\code{optimMSSD} returns a matrix: the optimized sample configuration with
-the evolution of the energy state during the optimization as an attribute.
+\code{optimMSSD} returns a matrix: the optimized sample configuration.
 
 \code{objMSSD} returns a numeric value: the energy state of the sample
 configuration - the objective function value.

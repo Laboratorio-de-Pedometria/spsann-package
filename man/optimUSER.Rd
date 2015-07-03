@@ -4,13 +4,20 @@
 \alias{optimUSER}
 \title{Optimization of sample configurations using a user-defined objective function}
 \usage{
-optimUSER(points, fun, ..., candi, x.max, x.min, y.max, y.min,
+optimUSER(fun, ..., points, candi, x.max, x.min, y.max, y.min,
   iterations = 10000, acceptance = list(initial = 0.99, cooling =
   iterations/10), stopping = list(max.count = iterations/10), plotit = TRUE,
   boundary, progress = TRUE, verbose = TRUE, track = TRUE,
   greedy = FALSE, weights = NULL, nadir = NULL, utopia = NULL)
 }
 \arguments{
+\item{fun}{A function defining the objective function that should be
+used to evaluate the energy state of the system configuration at each
+iteration. See \sQuote{Details} for more information.}
+
+\item{...}{Other arguments passed to the objective function. See
+\sQuote{Details} for more information.}
+
 \item{points}{Integer value, integer vector, data frame or matrix. If
 \code{points} is an integer value, it defines the number of points that
 should be randomly sampled from \code{candi} to form the starting system
@@ -21,13 +28,6 @@ it must have three columns in the following order: \code{[, "id"]} the
 row indexes of \code{candi} that correspond to each point, \code{[, "x"]}
 the projected x-coordinates, and \code{[, "y"]} the projected y-coordinates.
 Note that in the later case, \code{points} must be a subset of \code{candi}.}
-
-\item{fun}{A function defining the objective function that should be
-used to evaluate the energy state of the system configuration at each
-iteration. See \sQuote{Details} for more information.}
-
-\item{...}{Other arguments passed to the objective function. See
-\sQuote{Details} for more information.}
 
 \item{candi}{Data frame or matrix with the candidate locations for the
 perturbed points. \code{candi} must have two columns in the following
@@ -97,8 +97,7 @@ objective function to which they apply; 2) \code{abs} -- logical for
 calculating the utopia point internally (experimental).}
 }
 \value{
-\code{optimUSER} returns a matrix: the optimized sample configuration with
-the evolution of the energy state during the optimization as an attribute.
+\code{optimUSER} returns a matrix: the optimized sample configuration.
 }
 \description{
 Optimize a sample configuration using a user-defined objective function.

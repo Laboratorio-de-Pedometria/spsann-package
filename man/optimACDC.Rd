@@ -3,37 +3,22 @@
 \name{optimACDC}
 \alias{objACDC}
 \alias{optimACDC}
-\title{Optimization of sample configurations for spatial trend estimation}
+\title{Optimization of sample configurations for spatial trend identification and
+estimation}
 \usage{
-optimACDC(points, candi, covars, strata.type = "area", iterations,
-  use.coords = FALSE, x.max, x.min, y.max, y.min, weights = list(CORR = 0.5,
-  DIST = 0.5), nadir = list(sim = NULL, seeds = NULL, user = NULL, abs =
-  NULL), utopia = list(user = NULL, abs = NULL), acceptance = list(initial =
-  0.99, cooling = iterations/10), stopping = list(max.count = iterations/10),
-  plotit = TRUE, track = TRUE, boundary, progress = TRUE,
-  verbose = TRUE, greedy = FALSE)
+optimACDC(covars, strata.type = "area", use.coords = FALSE,
+  weights = list(CORR = 0.5, DIST = 0.5), nadir = list(sim = NULL, seeds =
+  NULL, user = NULL, abs = NULL), utopia = list(user = NULL, abs = NULL),
+  points, candi, iterations, x.max, x.min, y.max, y.min,
+  acceptance = list(initial = 0.99, cooling = iterations/10),
+  stopping = list(max.count = iterations/10), plotit = TRUE, track = TRUE,
+  boundary, progress = TRUE, verbose = TRUE, greedy = FALSE)
 
 objACDC(points, candi, covars, strata.type = "area", weights = list(CORR =
   0.5, DIST = 0.5), use.coords = FALSE, utopia = list(user = NULL, abs =
   NULL), nadir = list(sim = NULL, seeds = NULL, user = NULL, abs = NULL))
 }
 \arguments{
-\item{points}{Integer value, integer vector, data frame or matrix. If
-\code{points} is an integer value, it defines the number of points that
-should be randomly sampled from \code{candi} to form the starting system
-configuration. If \code{points} is a vector of integer values, it contains
-the row indexes of \code{candi} that correspond to the points that form the
-starting system configuration. If \code{points} is a data frame or matrix,
-it must have three columns in the following order: \code{[, "id"]} the
-row indexes of \code{candi} that correspond to each point, \code{[, "x"]}
-the projected x-coordinates, and \code{[, "y"]} the projected y-coordinates.
-Note that in the later case, \code{points} must be a subset of \code{candi}.}
-
-\item{candi}{Data frame or matrix with the candidate locations for the
-perturbed points. \code{candi} must have two columns in the following
-order: \code{[, "x"]} the projected x-coordinates, and \code{[, "y"]} the
-projected y-coordinates.}
-
 \item{covars}{Data frame or matrix with the covariates in the columns.}
 
 \item{strata.type}{Character value setting the type of stratification that
@@ -41,18 +26,8 @@ should be used to create the marginal sampling strata (or factor levels) for
 the numeric covariates. Available options are \code{"area"} for equal-area,
 and \code{"range"} for equal-range. Defaults to \code{strata.type = "area"}.}
 
-\item{iterations}{Integer. The maximum number of iterations that should be
-used for the optimization.}
-
 \item{use.coords}{Logical value. Should the geographic coordinates be used
 as covariates? Defaults to \code{use.coords = FALSE}.}
-
-\item{x.max,x.min,y.max,y.min}{Numeric value. The minimum and maximum
-quantity of random noise to be added to the projected x- and y-coordinates.
-The minimum quantity should be equal to, at least, the minimum distance
-between two neighbouring candidate locations. The units are the same as of
-the projected x- and y-coordinates. If missing, they will be estimated from
-\code{candi}.}
 
 \item{weights}{List with named sub-arguments. The weights assigned to each
 of the objective functions that form the multi-objective optimization
@@ -71,6 +46,32 @@ after the respective objective function to which they apply; 3) \code{abs}
 \code{user} -- a list of user-defined values named after the respective
 objective function to which they apply; 2) \code{abs} -- logical for
 calculating the utopia point internally (experimental).}
+
+\item{points}{Integer value, integer vector, data frame or matrix. If
+\code{points} is an integer value, it defines the number of points that
+should be randomly sampled from \code{candi} to form the starting system
+configuration. If \code{points} is a vector of integer values, it contains
+the row indexes of \code{candi} that correspond to the points that form the
+starting system configuration. If \code{points} is a data frame or matrix,
+it must have three columns in the following order: \code{[, "id"]} the
+row indexes of \code{candi} that correspond to each point, \code{[, "x"]}
+the projected x-coordinates, and \code{[, "y"]} the projected y-coordinates.
+Note that in the later case, \code{points} must be a subset of \code{candi}.}
+
+\item{candi}{Data frame or matrix with the candidate locations for the
+perturbed points. \code{candi} must have two columns in the following
+order: \code{[, "x"]} the projected x-coordinates, and \code{[, "y"]} the
+projected y-coordinates.}
+
+\item{iterations}{Integer. The maximum number of iterations that should be
+used for the optimization.}
+
+\item{x.max,x.min,y.max,y.min}{Numeric value. The minimum and maximum
+quantity of random noise to be added to the projected x- and y-coordinates.
+The minimum quantity should be equal to, at least, the minimum distance
+between two neighbouring candidate locations. The units are the same as of
+the projected x- and y-coordinates. If missing, they will be estimated from
+\code{candi}.}
 
 \item{acceptance}{List with two named sub-arguments: \code{initial} --
 numeric value between 0 and 1 defining the initial acceptance probability,
@@ -107,16 +108,16 @@ algorithm, that is, accepting only better system configurations? Defaults
 to \code{greedy = FALSE}. (experimental)}
 }
 \value{
-\code{optimACDC} returns a matrix: the optimized sample configuration with
-the evolution of the energy state during the optimization as an attribute.
+\code{optimACDC} returns a matrix: the optimized sample configuration.
 
 \code{objACDC} returns a numeric value: the energy state of the sample
 configuration - the objective function value.
 }
 \description{
-Optimize a sample configuration for spatial trend estimation. A criterion is
-defined so that the sample reproduces the association/correlation between the
-covariates, as well as their marginal distribution (\bold{ACDC}).
+Optimize a sample configuration for spatial trend identification and
+estimation. A criterion is defined so that the sample reproduces the
+bivariate association/correlation between the covariates, as well as their
+marginal distribution (\bold{ACDC}).
 }
 \details{
 See \code{optimDIST} and \code{optimCORR}.

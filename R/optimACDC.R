@@ -1,8 +1,10 @@
-#' Optimization of sample configurations for spatial trend estimation
+#' Optimization of sample configurations for spatial trend identification and
+#' estimation
 #'
-#' Optimize a sample configuration for spatial trend estimation. A criterion is 
-#' defined so that the sample reproduces the association/correlation between the
-#' covariates, as well as their marginal distribution (\bold{ACDC}).
+#' Optimize a sample configuration for spatial trend identification and 
+#' estimation. A criterion is defined so that the sample reproduces the 
+#' bivariate association/correlation between the covariates, as well as their 
+#' marginal distribution (\bold{ACDC}).
 #'
 #' @template spJitter_doc
 #' @template spSANN_doc
@@ -13,8 +15,7 @@
 #' See \code{optimDIST} and \code{optimCORR}.
 #' 
 #' @return
-#' \code{optimACDC} returns a matrix: the optimized sample configuration with
-#' the evolution of the energy state during the optimization as an attribute.
+#' \code{optimACDC} returns a matrix: the optimized sample configuration.
 #' 
 #' \code{objACDC} returns a numeric value: the energy state of the sample
 #' configuration - the objective function value.
@@ -67,17 +68,18 @@
 #' cor(cbind(candi[i, 1], candi[i, 2], covars[i]))
 # MAIN FUNCTION ################################################################
 optimACDC <-
-  function (points, candi, covars, strata.type = "area", iterations,
-            use.coords = FALSE, x.max, x.min, y.max, y.min,
-            
-            weights = list(CORR = 0.5, DIST = 0.5),
-            nadir = list(sim = NULL, seeds = NULL, user = NULL, abs = NULL),
-            utopia = list(user = NULL, abs = NULL),
-            
-            acceptance = list(initial = 0.99, cooling = iterations / 10),
-            stopping = list(max.count = iterations / 10), plotit = TRUE,
-            track = TRUE, boundary, progress = TRUE, verbose = TRUE, 
-            greedy = FALSE) {
+  function (
+    # DIST and/or CORR
+    covars, strata.type = "area", use.coords = FALSE, 
+    # MOOP
+    weights = list(CORR = 0.5, DIST = 0.5),
+    nadir = list(sim = NULL, seeds = NULL, user = NULL, abs = NULL),
+    utopia = list(user = NULL, abs = NULL),
+    # SPSANN
+    points, candi, iterations, x.max, x.min, y.max, y.min,
+    acceptance = list(initial = 0.99, cooling = iterations / 10),
+    stopping = list(max.count = iterations / 10), plotit = TRUE,
+    track = TRUE, boundary, progress = TRUE, verbose = TRUE, greedy = FALSE) {
     
     # Check spsann arguments
     eval(.check_spsann_arguments())
@@ -148,7 +150,6 @@ optimACDC <-
       }
       actual_prob <- acceptance[[1]] * exp(-k / acceptance[[2]])
       if (track) accept_probs[k] <- actual_prob
-      
       if (new_energy[1] <= old_energy[1]) {
         old_conf <- new_conf
         old_energy <- new_energy
@@ -302,7 +303,7 @@ optimACDC <-
     
     return (res)
   }
-# INTERNAL FUNCTION - NADIR FOR NUMERIC COVARIATES #############################
+# INTERNAL FUNCTION - COMPUTE THE NADIR VALUE ##################################
 .nadirACDC <-
   function (n.pts, n.cov, n.candi, nadir, candi, covars, pcm, pop.prop, 
             covars.type) {
@@ -353,13 +354,13 @@ optimACDC <-
   function (sm, n.cov, nadir, weights, n.pts, utopia, pcm, scm, covars.type,
             pop.prop) {
     
-    # Distribution
+    # DIST
     obj_dist <- .objDIST(sm = sm, n.pts = n.pts, n.cov = n.cov, 
                          pop.prop = pop.prop, covars.type = covars.type)
     obj_dist <- (obj_dist - utopia$DIST) / (nadir$DIST - utopia$DIST)
     obj_dist <- obj_dist * weights$DIST
     
-    # Correlation
+    # CORR
     obj_cor <- .objCORR(scm = scm, pcm = pcm)
     obj_cor <- (obj_cor - utopia$CORR) / (nadir$CORR - utopia$CORR)
     obj_cor <- obj_cor * weights$CORR

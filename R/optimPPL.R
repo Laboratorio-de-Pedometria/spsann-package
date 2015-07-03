@@ -1,8 +1,10 @@
-#' Optimization of sample configurations for variogram estimation
+#' Optimization of sample configurations for variogram identification and 
+#' estimation
 #'
-#' Optimize a sample configuration for variogram estimation. A criterion is
-#' defined so that the optimized sample configuration has a given number of
-#' points or point-pairs contributing to each lag-distance class (\bold{PPL}).
+#' Optimize a sample configuration for variogram identification and estimation. 
+#' A criterion is defined so that the optimized sample configuration has a given 
+#' number of points or point-pairs contributing to each lag-distance class 
+#' (\bold{PPL}).
 #' 
 #' @template spJitter_doc
 #' @template spSANN_doc
@@ -70,15 +72,14 @@
 #' lag-distance classes.
 #' 
 #' @return
-#' \code{optimPPL} returns a matrix: the optimized sample configuration with
-#' the evolution of the energy state during the optimization as an attribute.
+#' \code{optimPPL} returns a matrix: the optimized sample configuration.
 #'
 #' \code{countPPL} returns a data.frame with three columns: a) the lower and b)
 #' upper limits of each lag-distance class, and c) the number of points or 
 #' point-pairs per lag-distance class.
 #'
-#' \code{objPPL} returns a numeric value: the energy state of the sample configuration
-#' - the objective function value.
+#' \code{objPPL} returns a numeric value: the energy state of the sample 
+#' configuration - the objective function value.
 #'
 #' @references
 #' Bresler, E.; Green, R. E. \emph{Soil parameters and sampling scheme for
@@ -118,13 +119,17 @@
 #' tail(attr(res, "energy.state"), 1) # 160
 # FUNCTION - MAIN ##############################################################
 optimPPL <-
-  function (points, candi, lags = 7, lags.type = "exponential", lags.base = 2,
-            cutoff, criterion = "distribution", distri, pairs = FALSE,
-            x.max, x.min, y.max, y.min, iterations = 10000,
-            acceptance = list(initial = 0.99, cooling = iterations / 10),
-            stopping = list(max.count = iterations / 10), plotit = TRUE,
-            boundary, progress = TRUE, verbose = TRUE, track = TRUE, 
-            greedy = FALSE, weights = NULL, nadir = NULL, utopia = NULL) {
+  function (
+    # PPL
+    lags = 7, lags.type = "exponential", lags.base = 2, cutoff, 
+    criterion = "distribution", distri, pairs = FALSE,
+    # SPSANN
+    points, candi, x.max, x.min, y.max, y.min, iterations = 10000,
+    acceptance = list(initial = 0.99, cooling = iterations / 10),
+    stopping = list(max.count = iterations / 10), plotit = TRUE,
+    boundary, progress = TRUE, verbose = TRUE, track = TRUE, greedy = FALSE, 
+    # MOOP
+    weights = NULL, nadir = NULL, utopia = NULL) {
     
     # Check spsann arguments
     eval(.check_spsann_arguments())
@@ -146,8 +151,8 @@ optimPPL <-
     
     # Prepare cutoff and lags
     cutoff <- .cutoffPPL(cutoff = cutoff, x.max = x.max, y.max = y.max)
-    lags <- .lagsPPL(lags = lags, lags.type = lags.type, 
-                          cutoff = cutoff, lags.base = lags.base)
+    lags <- .lagsPPL(lags = lags, lags.type = lags.type, cutoff = cutoff, 
+                     lags.base = lags.base)
     n_lags <- length(lags) - 1
     
     # Initial energy state: points or point-pairs
@@ -159,7 +164,6 @@ optimPPL <-
                        criterion = criterion, distri = distri, pairs = pairs)
     
     # Other settings for the simulated annealing algorithm
-    MOOP <- FALSE
     old_dm <- dm
     best_dm <- dm
     count <- 0
