@@ -370,3 +370,15 @@ optimSPAN <-
     }
     return (res)
   }
+# INTERNAL FUNCTION - COMPUTE THE UTOPIA POINT #################################
+.utopiaSPAN <-
+  function (utopia) {
+    
+    if (!is.null(unlist(utopia$user))) {
+      list(CORR = utopia$user$CORR, DIST = utopia$user$DIST,
+           PPL = utopia$user$PPL, MSSD = utopia$user$MSSD)
+      
+    } else {
+      message("sorry but the utopia point cannot be calculated")
+    }
+  }
