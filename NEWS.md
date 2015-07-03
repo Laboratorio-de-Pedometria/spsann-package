@@ -1,3 +1,8 @@
+# Version 0.0.0.9010 (2015-07-03)
+* Using `utils::globalVariables` to avoid the `R CMD check` note 
+  `no visible binding for global variable [variable name]`. Source:
+  http://stackoverflow.com/a/12429344/3365410.
+
 # Version 0.0.0.9009 (2015-06-30)
 * Several internal function were renamed using a pattern that includes the name
   of the respective objective function. For example, `.optimPPLcheck()` was 
