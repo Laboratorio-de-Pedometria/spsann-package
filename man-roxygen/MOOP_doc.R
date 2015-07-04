@@ -8,7 +8,7 @@
 #' -- logical for calculating the nadir point internally (experimental).
 #'
 #' @param weights List with named sub-arguments. The weights assigned to each 
-#' of the objective functions that form the multi-objective optimization
+#' one of the objective functions that form the multi-objective optimization
 #' problem (MOOP). They must be named after the respective objective function 
 #' to which they apply. The weights must be equal to or larger than 0 and sum 
 #' to 1. The default option gives equal weights to all objective functions.
@@ -17,6 +17,10 @@
 #' \code{user} -- a list of user-defined values named after the respective 
 #' objective function to which they apply; 2) \code{abs} -- logical for 
 #' calculating the utopia point internally (experimental).
+#' 
+#' @note 
+#' We recommend using the Pareto maximum and minimum values to set the nadir 
+#' and utopia points. Using simulations is sub-optimal.
 #'
 #' @references
 #' Arora, J. \emph{Introduction to optimum design}. Waltham: Academic Press, p. 

@@ -42,6 +42,6 @@
 #' This function was derive with modifications from the method known as the 
 #' \emph{conditioned Latin Hypercube sampling} originally proposed by Minasny 
 #' and McBratney (2006), and implemented in the R-package 
-#' \pkg{\link[clhs]{clhs}}.
+#' \pkg{\link[clhs]{clhs}} by Pierre Roudier.
 
 
