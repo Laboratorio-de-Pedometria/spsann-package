@@ -2,8 +2,8 @@
 rm(list = ls())
 gc()
 require(pedometrics)
-sapply(list.files("src", full.names = TRUE, pattern = ".cpp$"), Rcpp::sourceCpp)
 sapply(list.files("R", full.names = TRUE, pattern = ".R$"), source)
+sapply(list.files("src", full.names = TRUE, pattern = ".cpp$"), Rcpp::sourceCpp)
 # 0) DEFAULT EXAMPLE ###########################################################
 require(sp)
 data(meuse.grid)
@@ -12,13 +12,12 @@ set.seed(2001)
 res <- optimPPL(points = 100, candi = candi, iterations = 100,
                 plotit = FALSE, track = FALSE, verbose = FALSE)
 tail(attr(res, "energy.state"), 1) # 160
-
+objPPL(points = res, candi = candi)
 
 
 countPPL(points = res, lags = 7, lags.type = "exponential", pairs = FALSE,
         lags.base = 2, cutoff = cutoff)
-objPPL(points = res, lags = 7, lags.type = "exponential", pairs = FALSE,
-      lags.base = 2, cutoff = cutoff, criterion = "distribution")
+
 # 1) Point pairs ###############################################################
 rm(list = ls())
 gc()

@@ -3,8 +3,8 @@ rm(list = ls())
 gc()
 require(pedometrics)
 require(SpatialTools)
-sapply(list.files("src", full.names = TRUE, pattern = ".cpp$"), Rcpp::sourceCpp)
 sapply(list.files("R", full.names = TRUE, pattern = ".R$"), source)
+sapply(list.files("src", full.names = TRUE, pattern = ".cpp$"), Rcpp::sourceCpp)
 # PREPARE DATA #################################################################
 require(sp)
 data(meuse.grid)
@@ -14,12 +14,8 @@ utopia <- list(user = list(DIST = 0, CORR = 0, PPL = 0, MSSD = 0))
 covars <- meuse.grid[, 5]
 set.seed(2001)
 res <- optimSPAN(points = 100, candi = candi, covars = covars, nadir = nadir,
-                 use.coords = TRUE, iterations = 1000, utopia = utopia, 
-                 verbose = FALSE, plotit = FALSE, track = FALSE)
-tail(attr(res, "energy")$obj, 1) # 
-str(res)
-
-# 1) FIRST TEST ################################################################
-x11()
-set.seed(2001)
-tmp <- optimPAN(points = points, candidates = candidates, x.max = x.max, x.min = x.min, y.max = y.max, y.min = y.min, iterations = iterations, acceptance = acceptance, stopping = stopping, PPL = PPL, ACDC = ACDC, PAN = PAN, plotit = plotit, boundary = boundary, progress = progress, verbose = verbose)
+                 use.coords = TRUE, iterations = 5000, utopia = utopia, 
+                 verbose = FALSE, plotit = TRUE, track = TRUE)
+tail(attr(res, "energy"), 1) # 0.7693468
+objSPAN(points = res, candi = candi, covars = covars, nadir = nadir,
+        use.coords = TRUE, utopia = utopia)
