@@ -272,8 +272,12 @@ optimPPL <-
 #' @rdname optimPPL
 #' @export
 objPPL <-
-  function (points, candi, lags = 7, lags.type = "exponential", lags.base = 2,
-            cutoff, criterion = "distribution", distri, pairs = FALSE) {
+  function (
+    # SPSANN
+    points, candi, x.max, x.min, y.max, y.min,
+    # PPL
+    lags = 7, lags.type = "exponential", lags.base = 2, cutoff, distri,
+    criterion = "distribution", pairs = FALSE) {
     
     # Check arguments
     check <- .checkPPL(lags = lags, lags.type = lags.type, pairs = pairs, 
@@ -284,19 +288,23 @@ objPPL <-
     # Prepare points and candi
     eval(.prepare_points())
     
-    # Prepare lags
-    lags <- .lagsPPL(lags = lags, lags.type = lags.type, 
-                     cutoff = cutoff, lags.base = lags.base)
+    # Prepare for jittering
+    eval(.prepare_jittering())
+    
+    # Prepare cutoff and lags
+    cutoff <- .cutoffPPL(cutoff = cutoff, x.max = x.max, y.max = y.max)
+    lags <- .lagsPPL(lags = lags, lags.type = lags.type, cutoff = cutoff, 
+                     lags.base = lags.base)
     n_lags <- length(lags) - 1
     
-    # Distance matrix and energy state
+    # Initial energy state: points or point-pairs
     dm <- SpatialTools::dist1(points[, 2:3])
     ppl <- .getPPL(lags = lags, n.lags = n_lags, dist.mat = dm, pairs = pairs)
     distri <- .distriPPL(n.lags = n_lags, n.pts = n_pts, criterion = criterion,
                          distri = distri, pairs = pairs)
-    res <- .objPPL(ppl = ppl, n.lags = n_lags, n.pts = n_pts, 
-                   criterion = criterion, distri = distri, pairs = pairs)
-    
+    res <- .objPPL(ppl = ppl, n.lags = n_lags, n.pts = n_pts, pairs = pairs,
+                   criterion = criterion, distri = distri)
+
     # Output
     return (res)
   }
