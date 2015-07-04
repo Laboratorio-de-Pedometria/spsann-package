@@ -1,34 +1,34 @@
-# Optimization of sample configurations for variogram and spatial trend 
-# identification and estimation, and for spatial interpolation
-# 
-# Optimize a sample configuration for variogram and spatial trend 
-# identification and estimation, and for spatial interpolation. An utility
-# function \emph{U} is defined so that the sample points cover, extend over,
-# spread over, \bold{SPAN} the feature, variogram and geographic spaces. The
-# utility function is obtained aggregating four single objective functions:
-# \bold{CORR}, \bold{DIST}, \bold{PPL}, and \bold{MSSD}.
-# 
-# @template spJitter_doc
-# @template spSANN_doc
-# @template ACDC_doc
-# @template MOOP_doc
-# 
-# @return
-# \code{optimSPAN()} returns a matrix: the optimized sample configuration.
-# 
-# @author Alessandro Samuel-Rosa \email{alessandrosamuelrosa@@gmail.com}
-# @keywords spatial optimize
-# @concept simulated annealing
-# @importFrom pedometrics cramer
-# @importFrom pedometrics is.numint
-# @importFrom pedometrics cont2cat
-# @importFrom SpatialTools dist2
-# @export
-# @examples
+#' Optimization of sample configurations for variogram and spatial trend 
+#' identification and estimation, and for spatial interpolation
+#' 
+#' Optimize a sample configuration for variogram and spatial trend 
+#' identification and estimation, and for spatial interpolation. An utility
+#' function \emph{U} is defined so that the sample points cover, extend over,
+#' spread over, \bold{SPAN} the feature, variogram and geographic spaces. The
+#' utility function is obtained aggregating four single objective functions:
+#' \bold{CORR}, \bold{DIST}, \bold{PPL}, and \bold{MSSD}.
+#' 
+#' @template spJitter_doc
+#' @template spSANN_doc
+#' @template ACDC_doc
+#' @template MOOP_doc
+#' 
+#' @return
+#' \code{optimSPAN()} returns a matrix: the optimized sample configuration.
+#' 
+#' @author Alessandro Samuel-Rosa \email{alessandrosamuelrosa@@gmail.com}
+#' @keywords spatial optimize
+#' @concept simulated annealing
+#' @importFrom pedometrics cramer
+#' @importFrom pedometrics is.numint
+#' @importFrom pedometrics cont2cat
+#' @importFrom SpatialTools dist2
+#' @export
+#' @examples
 # MAIN FUNCTION ################################################################
 optimSPAN <-
   function (            
-    # DIST and/or CORR
+    # DIST and CORR
     covars, strata.type = "area", use.coords = FALSE,
     # PPL
     lags = 7, lags.type = "exponential", lags.base = 2, cutoff, distri,
@@ -103,7 +103,7 @@ optimSPAN <-
                         distri = distri, pairs = pairs, dm.mssd = dm_mssd)
     
     # Other settings for the simulated annealing algorithm
-    # DIST and/or CORR
+    # DIST and CORR
     old_sm <- sm
     new_sm <- sm
     best_sm <- sm
@@ -130,7 +130,7 @@ optimSPAN <-
       eval(.plot_and_jitter())
       
       # Update base data and energy state
-      # DIST and/or CORR
+      # DIST and CORR
       new_sm[wp, ] <- covars[new_conf[wp, 1], ]
       new_scm <- .corCORR(obj = new_sm, covars.type = covars.type)
       # PPL
@@ -157,7 +157,7 @@ optimSPAN <-
         old_conf <- new_conf
         old_energy <- new_energy
         count <- 0
-        # DIST and/or CORR
+        # DIST and CORR
         old_sm <- new_sm
         old_scm <- new_scm
         # PPL
@@ -169,7 +169,7 @@ optimSPAN <-
           old_conf <- new_conf
           old_energy <- new_energy
           count <- count + 1
-          # DIST and/or CORR
+          # DIST and CORR
           old_sm <- new_sm
           old_scm <- new_scm
           # PPL
@@ -184,7 +184,7 @@ optimSPAN <-
           new_energy <- old_energy
           new_conf <- old_conf
           count <- count + 1
-          # DIST and/or CORR
+          # DIST and CORR
           new_sm <- old_sm
           new_scm <- old_scm
           # PPL
@@ -206,7 +206,7 @@ optimSPAN <-
         best_energy <- new_energy
         best_old_energy <- old_energy
         old_conf <- old_conf
-        # DIST and/or CORR
+        # DIST and CORR
         best_sm <- new_sm
         best_old_sm <- old_sm
         best_scm <- new_scm
@@ -227,7 +227,7 @@ optimSPAN <-
           old_energy <- best_old_energy
           new_energy <- best_energy
           count <- 0
-          # DIST and/or CORR
+          # DIST and CORR
           new_sm <- best_sm
           new_scm <- best_scm
           old_sm <- best_old_sm
@@ -251,6 +251,79 @@ optimSPAN <-
     
     # Prepare output
     eval(.prepare_output())
+  }
+# CALCULATE OBJECTIVE FUNCTION VALUE ###########################################
+#' @rdname optimSPAN
+#' @export
+objSPAN <-
+  function(
+    # SPSANN
+    points, candi, x.max, x.min, y.max, y.min,
+    # DIST and CORR
+    covars, strata.type = "area", use.coords = FALSE,
+    # PPL
+    lags = 7, lags.type = "exponential", lags.base = 2, cutoff, distri,
+    criterion = "distribution", pairs = FALSE,
+    # MOOP
+    weights = list(CORR = 1/6, DIST = 1/6, PPL = 1/3, MSSD = 1/3),
+    nadir = list(sim = NULL, seeds = NULL, user = NULL, abs = NULL),
+    utopia = list(user = NULL, abs = NULL)) {
+    
+    # Check other arguments
+    check <- .checkPPL(lags = lags, lags.type = lags.type, pairs = pairs,
+                       lags.base = lags.base, cutoff = cutoff, 
+                       criterion = criterion, distri = distri, fun = "optimPPL")
+    if (!is.null(check)) stop (check, call. = FALSE)
+    check <- .optimACDCcheck(candi = candi, covars = covars, 
+                             use.coords = use.coords, strata.type = strata.type)
+    if (!is.null(check)) stop (check, call. = FALSE)
+
+    # Prepare points and candi
+    eval(.prepare_points())
+    
+    # Prepare for jittering
+    eval(.prepare_jittering())
+    
+    # Prepare 'covars' and create the starting sample matrix 'sm'
+    eval(.prepare_acdc_covars())
+    
+    # Base data
+    # CORR
+    pcm <- .corCORR(obj = covars, covars.type = covars.type)
+    scm <- .corCORR(obj = sm, covars.type = covars.type)
+    # DIST
+    pop_prop <- .strataACDC(n.pts = n_pts, strata.type = strata.type, 
+                            covars = covars, covars.type = covars.type)
+    # PPL
+    cutoff <- .cutoffPPL(cutoff = cutoff, x.max = x.max, y.max = y.max)
+    lags <- .lagsPPL(lags = lags, lags.type = lags.type, cutoff = cutoff, 
+                     lags.base = lags.base)
+    n_lags <- length(lags) - 1
+    dm_ppl <- SpatialTools::dist1(conf0[, 2:3])
+    ppl <- .getPPL(lags = lags, n.lags = n_lags, dist.mat = dm_ppl, 
+                   pairs = pairs)
+    distri <- .distriPPL(n.lags = n_lags, n.pts = n_pts, criterion = criterion,
+                         distri = distri, pairs = pairs)
+    # MSSD
+    dm_mssd <- SpatialTools::dist2(candi[, 2:3], conf0[, 2:3])
+    
+    # Nadir and utopia points
+    nadir <- .nadirSPAN(n.pts = n_pts, n.cov = n_cov, n.candi = n_candi, 
+                        nadir = nadir, candi = candi, covars = covars, 
+                        pcm = pcm, pop.prop = pop_prop, lags = lags,
+                        covars.type = covars.type, n.lags = n_lags, 
+                        pairs = pairs, distri = distri, criterion = criterion)
+    utopia <- .utopiaSPAN(utopia = utopia)
+    
+    # Energy state
+    res <- .objSPAN(sm = sm, n.cov = n_cov, nadir = nadir, utopia = utopia,
+                    weights = weights, n.pts = n_pts, pcm = pcm, scm = scm,
+                    covars.type = covars.type, pop.prop = pop_prop, ppl = ppl, 
+                    n.lags = n_lags, criterion = criterion, distri = distri, 
+                    pairs = pairs, dm.mssd = dm_mssd)
+    
+    # Output
+    return (res)
   }
 # INTERNAL FUNCTION - CALCULATE THE CRITERION VALUE ############################
 # This function is used to calculate the criterion value of SPAN.
