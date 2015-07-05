@@ -8,13 +8,13 @@ identification and estimation, and for spatial interpolation}
 \usage{
 optimSPAN(covars, strata.type = "area", use.coords = FALSE, lags = 7,
   lags.type = "exponential", lags.base = 2, cutoff, distri,
-  criterion = "distribution", pairs = FALSE, weights = list(CORR = 1/6,
-  DIST = 1/6, PPL = 1/3, MSSD = 1/3), nadir = list(sim = NULL, seeds = NULL,
-  user = NULL, abs = NULL), utopia = list(user = NULL, abs = NULL), points,
-  candi, iterations, x.max, x.min, y.max, y.min, acceptance = list(initial =
+  criterion = "distribution", pairs = FALSE, points, candi,
+  iterations = 100, x.max, x.min, y.max, y.min, acceptance = list(initial =
   0.99, cooling = iterations/10), stopping = list(max.count = iterations/10),
-  plotit = TRUE, track = TRUE, boundary, progress = TRUE,
-  verbose = TRUE, greedy = FALSE)
+  plotit = FALSE, track = FALSE, boundary, progress = TRUE,
+  verbose = FALSE, greedy = FALSE, weights = list(CORR = 1/6, DIST = 1/6,
+  PPL = 1/3, MSSD = 1/3), nadir = list(sim = NULL, seeds = NULL, user = NULL,
+  abs = NULL), utopia = list(user = NULL, abs = NULL))
 
 objSPAN(points, candi, x.max, x.min, y.max, y.min, covars,
   strata.type = "area", use.coords = FALSE, lags = 7,
@@ -63,24 +63,6 @@ energy state of the system configuration, with options \code{"minimum"} and
 regarding the number of point-pairs per lag-distance class? Defaults to
 \code{pairs = FALSE}.}
 
-\item{weights}{List with named sub-arguments. The weights assigned to each
-one of the objective functions that form the multi-objective optimization
-problem (MOOP). They must be named after the respective objective function
-to which they apply. The weights must be equal to or larger than 0 and sum
-to 1. The default option gives equal weights to all objective functions.}
-
-\item{nadir}{List with named sub-arguments. Three options are available:
-1) \code{sim} -- the number of simulations that should be used to estimate
-the nadir point, and \code{seeds} -- vector defining the random seeds for
-each simulation; 2) \code{user} -- a list of user-defined nadir values named
-after the respective objective function to which they apply; 3) \code{abs}
--- logical for calculating the nadir point internally (experimental).}
-
-\item{utopia}{List with named sub-arguments. Two options are available: 1)
-\code{user} -- a list of user-defined values named after the respective
-objective function to which they apply; 2) \code{abs} -- logical for
-calculating the utopia point internally (experimental).}
-
 \item{points}{Integer value, integer vector, data frame or matrix. If
 \code{points} is an integer value, it defines the number of points that
 should be randomly sampled from \code{candi} to form the starting system
@@ -98,7 +80,7 @@ order: \code{[, "x"]} the projected x-coordinates, and \code{[, "y"]} the
 projected y-coordinates.}
 
 \item{iterations}{Integer. The maximum number of iterations that should be
-used for the optimization.}
+used for the optimization. Defaults to \code{iterations = 100}.}
 
 \item{x.max,x.min,y.max,y.min}{Numeric value. The minimum and maximum
 quantity of random noise to be added to the projected x- and y-coordinates.
@@ -122,11 +104,12 @@ improvement of the objective function value. Defaults to
 a) the progress of the objective function values and acceptance
 probabilities, and b) the original points, the perturbed points and the
 progress of the maximum perturbation in the x- and y-coordinates. The plots
-are updated at each 10 iterations. Defaults to \code{plotit = TRUE}.}
+are updated at each 10 iterations. Defaults to \code{plotit = FALSE}.}
 
 \item{track}{Logical value. Should the evolution of the energy state and
-acceptance probability be recorded and returned with the result? Defaults
-to \code{track = TRUE}.}
+acceptance probability be recorded and returned with the result? If
+\code{track = FALSE} (the default), only the starting and ending enery state
+values are returned with the result.}
 
 \item{boundary}{SpatialPolygon. The boundary of the spatial domain.
 If missing, it is estimated from \code{candi}.}
@@ -135,11 +118,29 @@ If missing, it is estimated from \code{candi}.}
 \code{progress = TRUE}.}
 
 \item{verbose}{Logical for printing messages about the progress of the
-optimization. Defaults to \code{verbose = TRUE}.}
+optimization. Defaults to \code{verbose = FALSE}.}
 
 \item{greedy}{Logical value. Should the optimization be done using a greedy
 algorithm, that is, accepting only better system configurations? Defaults
 to \code{greedy = FALSE}. (experimental)}
+
+\item{weights}{List with named sub-arguments. The weights assigned to each
+one of the objective functions that form the multi-objective optimization
+problem (MOOP). They must be named after the respective objective function
+to which they apply. The weights must be equal to or larger than 0 and sum
+to 1. The default option gives equal weights to all objective functions.}
+
+\item{nadir}{List with named sub-arguments. Three options are available:
+1) \code{sim} -- the number of simulations that should be used to estimate
+the nadir point, and \code{seeds} -- vector defining the random seeds for
+each simulation; 2) \code{user} -- a list of user-defined nadir values named
+after the respective objective function to which they apply; 3) \code{abs}
+-- logical for calculating the nadir point internally (experimental).}
+
+\item{utopia}{List with named sub-arguments. Two options are available: 1)
+\code{user} -- a list of user-defined values named after the respective
+objective function to which they apply; 2) \code{abs} -- logical for
+calculating the utopia point internally (experimental).}
 }
 \value{
 \code{optimSPAN()} returns a matrix: the optimized sample configuration.
@@ -170,8 +171,7 @@ utopia <- list(user = list(DIST = 0, CORR = 0, PPL = 0, MSSD = 0))
 covars <- meuse.grid[, 5]
 set.seed(2001)
 res <- optimSPAN(points = 100, candi = candi, covars = covars, nadir = nadir,
-                 use.coords = TRUE, iterations = 100, utopia = utopia,
-                 verbose = FALSE, plotit = FALSE, track = FALSE)
+                 use.coords = TRUE, utopia = utopia)
 tail(attr(res, "energy"), 1) # 0.7693468
 objSPAN(points = res, candi = candi, covars = covars, nadir = nadir,
         use.coords = TRUE, utopia = utopia)

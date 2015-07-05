@@ -43,18 +43,17 @@
 #' data(meuse.grid)
 #' candi <- meuse.grid[, 1:2]
 #' set.seed(2001)
-#' res <- optimMSSD(points = 100, candi = candi, iterations = 100,
-#'                  plotit = FALSE, track = FALSE, verbose = FALSE)
+#' res <- optimMSSD(points = 100, candi = candi)
 #' tail(attr(res, "energy.state"), 1) # 11531.03
 #' objMSSD(candi = candi, points = res)
 # FUNCTION - MAIN ##############################################################
 optimMSSD <-
   function (
     # SPSANN
-    points, candi, x.max, x.min, y.max, y.min, iterations = 10000,
+    points, candi, iterations = 100, x.max, x.min, y.max, y.min,
     acceptance = list(initial = 0.99, cooling = iterations / 10),
-    stopping = list(max.count = iterations / 10), plotit = TRUE,
-    boundary, progress = TRUE, verbose = TRUE, greedy = FALSE, track = TRUE, 
+    stopping = list(max.count = iterations / 10), plotit = FALSE, track = FALSE,
+    boundary, progress = TRUE, verbose = FALSE, greedy = FALSE,
     # MOOP
     weights = NULL, nadir = NULL, utopia = NULL) {
     

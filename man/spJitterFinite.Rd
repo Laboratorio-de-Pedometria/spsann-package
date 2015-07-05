@@ -59,10 +59,6 @@ in \code{points}. The reason for this is that the more points there are in
 \code{points}, the more likely it is that the new location already is
 occupied by another point.
 }
-\note{
-A future version will accept to use an infinite set of candidate locations
-and to perturb more than one point at a time.
-}
 \examples{
 require(sp)
 data(meuse.grid)
@@ -105,6 +101,4 @@ a geostatistical approach.} Wageningen: Wageningen University, p. 148, 1999.
 \concept{
 jitter perturb
 }
-\keyword{iteration}
-\keyword{spatial}
 

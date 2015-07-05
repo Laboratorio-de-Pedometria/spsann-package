@@ -43,13 +43,8 @@
 #' @author 
 #' Alessandro Samuel-Rosa \email{alessandrosamuelrosa@@gmail.com}
 #' 
-#' @note
-#' A future version will accept to use an infinite set of candidate locations 
-#' and to perturb more than one point at a time.
-#' 
 #' @seealso \code{ssaOptim}, \code{\link[sp]{zerodist}}, 
 #' \code{\link[base]{jitter}}, \code{\link[geoR]{jitter2d}}.
-#' @keywords iteration spatial
 #' @concept jitter perturb
 #' @export
 #' @examples

@@ -6,11 +6,11 @@
 \title{Optimization of sample configurations for spatial trend identification and
 estimation}
 \usage{
-optimCORR(covars, use.coords = FALSE, strata.type = "area", points, candi,
-  x.max, x.min, y.max, y.min, iterations, acceptance = list(initial = 0.99,
-  cooling = iterations/10), stopping = list(max.count = iterations/10),
-  plotit = TRUE, boundary, progress = TRUE, verbose = TRUE,
-  greedy = FALSE, track = TRUE, weights = NULL, nadir = NULL,
+optimCORR(covars, strata.type = "area", use.coords = FALSE, points, candi,
+  iterations = 100, x.max, x.min, y.max, y.min, acceptance = list(initial =
+  0.99, cooling = iterations/10), stopping = list(max.count = iterations/10),
+  plotit = FALSE, track = FALSE, boundary, progress = TRUE,
+  verbose = FALSE, greedy = FALSE, weights = NULL, nadir = NULL,
   utopia = NULL)
 
 objCORR(points, candi, covars, use.coords = FALSE, strata.type = "area")
@@ -18,13 +18,13 @@ objCORR(points, candi, covars, use.coords = FALSE, strata.type = "area")
 \arguments{
 \item{covars}{Data frame or matrix with the covariates in the columns.}
 
-\item{use.coords}{Logical value. Should the geographic coordinates be used
-as covariates? Defaults to \code{use.coords = FALSE}.}
-
 \item{strata.type}{Character value setting the type of stratification that
 should be used to create the marginal sampling strata (or factor levels) for
 the numeric covariates. Available options are \code{"area"} for equal-area,
 and \code{"range"} for equal-range. Defaults to \code{strata.type = "area"}.}
+
+\item{use.coords}{Logical value. Should the geographic coordinates be used
+as covariates? Defaults to \code{use.coords = FALSE}.}
 
 \item{points}{Integer value, integer vector, data frame or matrix. If
 \code{points} is an integer value, it defines the number of points that
@@ -42,15 +42,15 @@ perturbed points. \code{candi} must have two columns in the following
 order: \code{[, "x"]} the projected x-coordinates, and \code{[, "y"]} the
 projected y-coordinates.}
 
+\item{iterations}{Integer. The maximum number of iterations that should be
+used for the optimization. Defaults to \code{iterations = 100}.}
+
 \item{x.max,x.min,y.max,y.min}{Numeric value. The minimum and maximum
 quantity of random noise to be added to the projected x- and y-coordinates.
 The minimum quantity should be equal to, at least, the minimum distance
 between two neighbouring candidate locations. The units are the same as of
 the projected x- and y-coordinates. If missing, they will be estimated from
 \code{candi}.}
-
-\item{iterations}{Integer. The maximum number of iterations that should be
-used for the optimization.}
 
 \item{acceptance}{List with two named sub-arguments: \code{initial} --
 numeric value between 0 and 1 defining the initial acceptance probability,
@@ -67,7 +67,12 @@ improvement of the objective function value. Defaults to
 a) the progress of the objective function values and acceptance
 probabilities, and b) the original points, the perturbed points and the
 progress of the maximum perturbation in the x- and y-coordinates. The plots
-are updated at each 10 iterations. Defaults to \code{plotit = TRUE}.}
+are updated at each 10 iterations. Defaults to \code{plotit = FALSE}.}
+
+\item{track}{Logical value. Should the evolution of the energy state and
+acceptance probability be recorded and returned with the result? If
+\code{track = FALSE} (the default), only the starting and ending enery state
+values are returned with the result.}
 
 \item{boundary}{SpatialPolygon. The boundary of the spatial domain.
 If missing, it is estimated from \code{candi}.}
@@ -76,15 +81,11 @@ If missing, it is estimated from \code{candi}.}
 \code{progress = TRUE}.}
 
 \item{verbose}{Logical for printing messages about the progress of the
-optimization. Defaults to \code{verbose = TRUE}.}
+optimization. Defaults to \code{verbose = FALSE}.}
 
 \item{greedy}{Logical value. Should the optimization be done using a greedy
 algorithm, that is, accepting only better system configurations? Defaults
 to \code{greedy = FALSE}. (experimental)}
-
-\item{track}{Logical value. Should the evolution of the energy state and
-acceptance probability be recorded and returned with the result? Defaults
-to \code{track = TRUE}.}
 
 \item{weights}{List with named sub-arguments. The weights assigned to each
 one of the objective functions that form the multi-objective optimization
@@ -150,8 +151,7 @@ candi <- meuse.grid[, 1:2]
 covars <- meuse.grid[, 5]
 set.seed(2001)
 res <- optimCORR(points = 100, candi = candi, covars = covars,
-                 use.coords = TRUE, iterations = 100, plotit = FALSE,
-                 track = FALSE, verbose = FALSE)
+                 use.coords = TRUE)
 tail(attr(res, "energy"), 1) # 0.06386069
 objCORR(points = res, candi = candi, covars = covars, use.coords = TRUE)
 }

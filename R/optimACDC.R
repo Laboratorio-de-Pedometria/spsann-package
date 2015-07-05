@@ -38,8 +38,7 @@
 #' covars <- meuse.grid[, 5]
 #' set.seed(2001)
 #' res <- optimACDC(points = 100, candi = candi, covars = covars, nadir = nadir,
-#'                  use.coords = TRUE, iterations = 100, utopia = utopia, 
-#'                  verbose = FALSE)
+#'                  use.coords = TRUE, utopia = utopia)
 #' tail(attr(res, "energy")$obj, 1) # 0.5272031
 #' objACDC(points = res, candi = candi, covars = covars, use.coords = TRUE, 
 #'         nadir = nadir, utopia = utopia)
@@ -69,17 +68,17 @@
 # MAIN FUNCTION ################################################################
 optimACDC <-
   function (
-    # DIST and/or CORR
+    # DIST and CORR
     covars, strata.type = "area", use.coords = FALSE, 
+    # SPSANN
+    points, candi, iterations = 100, x.max, x.min, y.max, y.min,
+    acceptance = list(initial = 0.99, cooling = iterations / 10),
+    stopping = list(max.count = iterations / 10), plotit = FALSE, track = FALSE,
+    boundary, progress = TRUE, verbose = FALSE, greedy = FALSE,
     # MOOP
     weights = list(CORR = 0.5, DIST = 0.5),
     nadir = list(sim = NULL, seeds = NULL, user = NULL, abs = NULL),
-    utopia = list(user = NULL, abs = NULL),
-    # SPSANN
-    points, candi, iterations, x.max, x.min, y.max, y.min,
-    acceptance = list(initial = 0.99, cooling = iterations / 10),
-    stopping = list(max.count = iterations / 10), plotit = TRUE,
-    track = TRUE, boundary, progress = TRUE, verbose = TRUE, greedy = FALSE) {
+    utopia = list(user = NULL, abs = NULL)) {
     
     # Check spsann arguments
     eval(.check_spsann_arguments())

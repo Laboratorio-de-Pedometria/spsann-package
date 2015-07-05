@@ -32,8 +32,7 @@
 #' covars <- meuse.grid[, 5]
 #' set.seed(2001)
 #' res <- optimSPAN(points = 100, candi = candi, covars = covars, nadir = nadir,
-#'                  use.coords = TRUE, iterations = 100, utopia = utopia, 
-#'                  verbose = FALSE, plotit = FALSE, track = FALSE)
+#'                  use.coords = TRUE, utopia = utopia)
 #' tail(attr(res, "energy"), 1) # 0.7693468
 #' objSPAN(points = res, candi = candi, covars = covars, nadir = nadir,
 #'         use.coords = TRUE, utopia = utopia)
@@ -45,15 +44,15 @@ optimSPAN <-
     # PPL
     lags = 7, lags.type = "exponential", lags.base = 2, cutoff, distri,
     criterion = "distribution", pairs = FALSE,
+    # SPSANN
+    points, candi, iterations = 100, x.max, x.min, y.max, y.min, 
+    acceptance = list(initial = 0.99, cooling = iterations / 10),
+    stopping = list(max.count = iterations / 10), plotit = FALSE, track = FALSE,
+    boundary, progress = TRUE, verbose = FALSE, greedy = FALSE,
     # MOOP
     weights = list(CORR = 1/6, DIST = 1/6, PPL = 1/3, MSSD = 1/3),
     nadir = list(sim = NULL, seeds = NULL, user = NULL, abs = NULL),
-    utopia = list(user = NULL, abs = NULL),
-    # SPSANN
-    points, candi, iterations, x.max, x.min, y.max, y.min, 
-    acceptance = list(initial = 0.99, cooling = iterations / 10),
-    stopping = list(max.count = iterations / 10), plotit = TRUE,
-    track = TRUE, boundary, progress = TRUE, verbose = TRUE, greedy = FALSE) {
+    utopia = list(user = NULL, abs = NULL)) {
     
     # Check spsann arguments
     eval(.check_spsann_arguments())

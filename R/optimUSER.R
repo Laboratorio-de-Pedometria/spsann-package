@@ -53,16 +53,13 @@
 #' set.seed(2001)
 #' timeUSER <- Sys.time()
 #' resUSER <- optimUSER(points = 100, fun = objUSER, lags = lags, n_lags = 9,
-#'                      n_pts = 100, candi = candi, iterations = 100,
-#'                      plotit = FALSE, track = FALSE, verbose = FALSE)
+#'                      n_pts = 100, candi = candi)
 #' timeUSER <- Sys.time() - timeUSER
 #' 
 #' # Run the optimization using the respective function implemented in spsann
 #' set.seed(2001)
 #' timePPL <- Sys.time()
-#' resPPL <- optimPPL(points = 100, candi = candi, lags = lags, 
-#'                    iterations = 100, plotit = FALSE, track = FALSE, 
-#'                    verbose = FALSE)
+#' resPPL <- optimPPL(points = 100, candi = candi, lags = lags)
 #' timePPL <- Sys.time() - timePPL
 #' 
 #' # Compare results
@@ -80,10 +77,10 @@ optimUSER <-
     # USER
     fun, ...,
     # SPSANN
-    points, candi, x.max, x.min, y.max, y.min, iterations = 10000,
+    points, candi, iterations = 100, x.max, x.min, y.max, y.min,
     acceptance = list(initial = 0.99, cooling = iterations / 10),
-    stopping = list(max.count = iterations / 10), plotit = TRUE,
-    boundary, progress = TRUE, verbose = TRUE, track = TRUE, greedy = FALSE, 
+    stopping = list(max.count = iterations / 10), plotit = FALSE, track = FALSE,
+    boundary, progress = TRUE, verbose = FALSE, greedy = FALSE,
     # MOOP
     weights = NULL, nadir = NULL, utopia = NULL) {
     

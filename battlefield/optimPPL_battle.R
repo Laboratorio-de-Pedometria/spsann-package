@@ -9,8 +9,7 @@ require(sp)
 data(meuse.grid)
 candi <- meuse.grid[, 1:2]
 set.seed(2001)
-res <- optimPPL(points = 100, candi = candi, iterations = 100,
-                plotit = FALSE, track = FALSE, verbose = FALSE)
+res <- optimPPL(points = 100, candi = candi)
 tail(attr(res, "energy.state"), 1) # 160
 objPPL(points = res, candi = candi)
 

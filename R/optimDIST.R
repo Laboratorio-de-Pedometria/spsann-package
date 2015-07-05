@@ -72,20 +72,19 @@
 #' covars <- meuse.grid[, 5]
 #' set.seed(2001)
 #' res <- optimDIST(points = 100, candi = candi, covars = covars, 
-#'                  use.coords = TRUE, iterations = 100, plotit = FALSE, 
-#'                  track = FALSE, verbose = FALSE)
+#'                  use.coords = TRUE)
 #' tail(attr(res, "energy"), 1) # 1.6505
 #' objDIST(points = res, candi = candi, covars = covars, use.coords = TRUE)
 # MAIN FUNCTION ################################################################
 optimDIST <-
   function (
     # DIST
-    covars, strata.type = "area", use.coords = FALSE, 
+    covars, strata.type = "area", use.coords = FALSE,
     # SPSANN
-    points, candi, x.max, x.min, y.max, y.min, iterations,
+    points, candi, iterations = 100, x.max, x.min, y.max, y.min,
     acceptance = list(initial = 0.99, cooling = iterations / 10),
-    stopping = list(max.count = iterations / 10), plotit = TRUE,
-    boundary, progress = TRUE, verbose = TRUE, greedy = FALSE, track = TRUE, 
+    stopping = list(max.count = iterations / 10), plotit = FALSE, track = FALSE,
+    boundary, progress = TRUE, verbose = FALSE, greedy = FALSE,
     # MOOP
     weights = NULL, nadir = NULL, utopia = NULL) {
     

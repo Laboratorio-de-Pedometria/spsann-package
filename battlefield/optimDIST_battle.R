@@ -12,8 +12,7 @@ candi <- meuse.grid[, 1:2]
 covars <- meuse.grid[, 5]
 set.seed(2001)
 res <- optimDIST(points = 100, candi = candi, covars = covars, 
-                 use.coords = TRUE, iterations = 100, plotit = FALSE, 
-                 track = FALSE, verbose = FALSE)
+                 use.coords = TRUE)
 tail(attr(res, "energy"), 1) # 1.6505
 objDIST(points = res, candi = candi, covars = covars, use.coords = TRUE)
 

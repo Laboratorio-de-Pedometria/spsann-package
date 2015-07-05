@@ -1,8 +1,8 @@
 # Initial settings
 rm(list = ls())
 gc()
-sapply(list.files("src", full.names = TRUE, pattern = ".cpp$"), Rcpp::sourceCpp)
 sapply(list.files("R", full.names = TRUE, pattern = ".R$"), source)
+sapply(list.files("src", full.names = TRUE, pattern = ".cpp$"), Rcpp::sourceCpp)
 # 0) DEFAULT EXAMPLE ###########################################################
 require(sp)
 require(SpatialTools)
@@ -27,16 +27,13 @@ lags <- seq(1, 1000, length.out = 10)
 set.seed(2001)
 timeUSER <- Sys.time()
 resUSER <- optimUSER(points = 100, fun = objUSER, lags = lags, n_lags = 9,
-                     n_pts = 100, candi = candi, iterations = 100,
-                     plotit = FALSE, track = FALSE, verbose = FALSE)
+                     n_pts = 100, candi = candi)
 timeUSER <- Sys.time() - timeUSER
 
 # Run the optimization using the respective function implemented in spsann
 set.seed(2001)
 timePPL <- Sys.time()
-resPPL <- optimPPL(points = 100, candi = candi, lags = lags, 
-                   iterations = 100, plotit = FALSE, track = FALSE, 
-                   verbose = FALSE)
+resPPL <- optimPPL(points = 100, candi = candi, lags = lags)
 timePPL <- Sys.time() - timePPL
 
 # Compare results
