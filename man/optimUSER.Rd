@@ -79,7 +79,7 @@ algorithm, that is, accepting only better system configurations? Defaults
 to \code{greedy = FALSE}. (experimental)}
 
 \item{weights}{List with named sub-arguments. The weights assigned to each
-of the objective functions that form the multi-objective optimization
+one of the objective functions that form the multi-objective optimization
 problem (MOOP). They must be named after the respective objective function
 to which they apply. The weights must be equal to or larger than 0 and sum
 to 1. The default option gives equal weights to all objective functions.}
@@ -110,6 +110,10 @@ identification of each sample point (1, 2, ..., n), \code{[, 2]} the
 x-coordinates, and \code{[, 3]} the y-coordinates. The identification is
 useful to retrieve information from any data matrix used by the objective
 function defined by the user.
+}
+\note{
+We recommend using the Pareto maximum and minimum values to set the nadir
+and utopia points. Using simulations is sub-optimal.
 }
 \examples{
 require(sp)
@@ -178,9 +182,8 @@ Optimization}, v. 41, p. 853-862, 2009.
 }
 \concept{
 simulated annealing
-
-simulated annealing
 }
+\keyword{iteration}
 \keyword{optimize}
 \keyword{spatial}
 

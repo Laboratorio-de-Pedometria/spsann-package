@@ -37,6 +37,6 @@
 #' acceptance probability be recorded and returned with the result? Defaults
 #' to \code{track = TRUE}.
 #' 
-#' @keywords spatial optimize
+#' @keywords spatial optimize iteration
 #' 
 #' @concept simulated annealing

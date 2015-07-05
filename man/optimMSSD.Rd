@@ -75,7 +75,7 @@ acceptance probability be recorded and returned with the result? Defaults
 to \code{track = TRUE}.}
 
 \item{weights}{List with named sub-arguments. The weights assigned to each
-of the objective functions that form the multi-objective optimization
+one of the objective functions that form the multi-objective optimization
 problem (MOOP). They must be named after the respective objective function
 to which they apply. The weights must be equal to or larger than 0 and sum
 to 1. The default option gives equal weights to all objective functions.}
@@ -106,6 +106,10 @@ used is the mean squared shortest distance (\bold{MSSD}).
 Euclidean distances between points are calculated. This computation requires
 the coordinates to be projected. The user is responsible for making sure that
 this requirement is attained.
+}
+\note{
+We recommend using the Pareto maximum and minimum values to set the nadir
+and utopia points. Using simulations is sub-optimal.
 }
 \examples{
 require(sp)
@@ -154,8 +158,9 @@ k-means. \emph{Computers and Geosciences}. v. 36, p. 1261-1267, 2010.
 \concept{
 simulated annealing
 
-simulated annealing
+spatial interpolation
 }
+\keyword{iteration}
 \keyword{optimize}
 \keyword{spatial}
 

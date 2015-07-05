@@ -87,7 +87,7 @@ acceptance probability be recorded and returned with the result? Defaults
 to \code{track = TRUE}.}
 
 \item{weights}{List with named sub-arguments. The weights assigned to each
-of the objective functions that form the multi-objective optimization
+one of the objective functions that form the multi-objective optimization
 problem (MOOP). They must be named after the respective objective function
 to which they apply. The weights must be equal to or larger than 0 and sum
 to 1. The default option gives equal weights to all objective functions.}
@@ -138,7 +138,10 @@ of association (weak or strong).
 This function was derive with modifications from the method known as the
 \emph{conditioned Latin Hypercube sampling} originally proposed by Minasny
 and McBratney (2006), and implemented in the R-package
-\pkg{\link[clhs]{clhs}}.
+\pkg{\link[clhs]{clhs}} by Pierre Roudier.
+
+We recommend using the Pareto maximum and minimum values to set the nadir
+and utopia points. Using simulations is sub-optimal.
 }
 \examples{
 require(sp)
@@ -204,6 +207,7 @@ Optimization}, v. 41, p. 853-862, 2009.
 \concept{
 simulated annealing
 }
+\keyword{iteration}
 \keyword{optimize}
 \keyword{spatial}
 
