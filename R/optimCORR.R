@@ -55,11 +55,11 @@
 #' objCORR(points = res, candi = candi, covars = covars, use.coords = TRUE)
 # MAIN FUNCTION ################################################################
 optimCORR <-
-  function (
+  function (points, candi, iterations = 100,
     # CORR
     covars, strata.type = "area", use.coords = FALSE,
     # SPSANN
-    points, candi, iterations = 100, x.max, x.min, y.max, y.min,
+    x.max, x.min, y.max, y.min,
     acceptance = list(initial = 0.99, cooling = iterations / 10),
     stopping = list(max.count = iterations / 10), plotit = FALSE, track = FALSE,
     boundary, progress = TRUE, verbose = FALSE, greedy = FALSE,
@@ -195,7 +195,9 @@ optimCORR <-
 #' @rdname optimCORR
 #' @export
 objCORR <-
-  function (points, candi, covars, use.coords = FALSE, strata.type = "area") {
+  function (points, candi,
+    # CORR
+    covars, strata.type = "area", use.coords = FALSE) {
     
     # Check other arguments
     check <- .optimACDCcheck(candi = candi, covars = covars, 

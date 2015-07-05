@@ -14,10 +14,18 @@
 #' @template MOOP_doc
 #' @template PPL_doc
 #' 
+#' @details
+#' See \code{optimDIST}, \code{optimCORR}, \code{optimPPL}, and 
+#' \code{optimMSSD}.
+#' 
 #' @return
 #' \code{optimSPAN()} returns a matrix: the optimized sample configuration.
 #' 
+#' \code{objSPAN} returns a numeric value: the energy state of the sample
+#' configuration - the objective function value.
+#' 
 #' @author Alessandro Samuel-Rosa \email{alessandrosamuelrosa@@gmail.com}
+#' @aliases optimSPAN objSPAN
 #' @importFrom pedometrics cramer
 #' @importFrom pedometrics is.numint
 #' @importFrom pedometrics cont2cat
@@ -38,14 +46,14 @@
 #'         use.coords = TRUE, utopia = utopia)
 # MAIN FUNCTION ################################################################
 optimSPAN <-
-  function(            
+  function(points, candi, iterations = 100,
     # DIST and CORR
     covars, strata.type = "area", use.coords = FALSE,
     # PPL
-    lags = 7, lags.type = "exponential", lags.base = 2, cutoff, distri,
-    criterion = "distribution", pairs = FALSE,
+    lags = 7, lags.type = "exponential", lags.base = 2, cutoff, 
+    criterion = "distribution", distri, pairs = FALSE,
     # SPSANN
-    points, candi, iterations = 100, x.max, x.min, y.max, y.min, 
+    x.max, x.min, y.max, y.min, 
     acceptance = list(initial = 0.99, cooling = iterations / 10),
     stopping = list(max.count = iterations / 10), plotit = FALSE, track = FALSE,
     boundary, progress = TRUE, verbose = FALSE, greedy = FALSE,
@@ -267,14 +275,14 @@ optimSPAN <-
 #' @rdname optimSPAN
 #' @export
 objSPAN <-
-  function(
-    # SPSANN
-    points, candi, x.max, x.min, y.max, y.min,
+  function(points, candi, 
     # DIST and CORR
     covars, strata.type = "area", use.coords = FALSE,
     # PPL
-    lags = 7, lags.type = "exponential", lags.base = 2, cutoff, distri,
-    criterion = "distribution", pairs = FALSE,
+    lags = 7, lags.type = "exponential", lags.base = 2, cutoff, 
+    criterion = "distribution", distri, pairs = FALSE,
+    # SPSANN
+    x.max, x.min, y.max, y.min,
     # MOOP
     weights = list(CORR = 1/6, DIST = 1/6, PPL = 1/3, MSSD = 1/3),
     nadir = list(sim = NULL, seeds = NULL, user = NULL, abs = NULL),

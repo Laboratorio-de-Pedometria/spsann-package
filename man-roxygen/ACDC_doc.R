@@ -38,8 +38,4 @@
 #' algorithm incorporating operational constraints. \emph{5th Global Workshop on
 #' Digital Soil Mapping}. Sydney, p. 227-231, 2012.
 #'
-#' @note
-#' This function was derive with modifications from the method known as the 
-#' \emph{conditioned Latin Hypercube sampling} originally proposed by Minasny 
-#' and McBratney (2006), and implemented in the R-package 
-#' \pkg{\link[clhs]{clhs}} by Pierre Roudier.
+#' @concept spatial trend

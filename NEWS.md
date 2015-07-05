@@ -1,7 +1,12 @@
-# Version 0.0.0.9010 (2015-07-03)
+# Version 0.0.0.9010 (2015-07-05)
 * Using `utils::globalVariables` to avoid the `R CMD check` note 
-  `no visible binding for global variable [variable name]`. Source:
-  http://stackoverflow.com/a/12429344/3365410.
+  `no visible binding for global variable [variable name]`. Source of the 
+  solution: http://stackoverflow.com/a/12429344/3365410.
+* The package `fields` is not a dependency any more.
+* New default values were attributed to the following arguments: `plotit`, 
+  `track`, `verbose`, and `iteration`. The first three were set to `FALSE`, 
+  while the last was set to `100`.
+* `optimSPAN()` and `objSPAN()` are now full operational.
 
 # Version 0.0.0.9009 (2015-06-30)
 * Several internal function were renamed using a pattern that includes the name

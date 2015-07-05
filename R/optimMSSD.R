@@ -48,9 +48,9 @@
 #' objMSSD(candi = candi, points = res)
 # FUNCTION - MAIN ##############################################################
 optimMSSD <-
-  function (
+  function (points, candi, iterations = 100, 
     # SPSANN
-    points, candi, iterations = 100, x.max, x.min, y.max, y.min,
+    x.max, x.min, y.max, y.min,
     acceptance = list(initial = 0.99, cooling = iterations / 10),
     stopping = list(max.count = iterations / 10), plotit = FALSE, track = FALSE,
     boundary, progress = TRUE, verbose = FALSE, greedy = FALSE,
@@ -176,7 +176,7 @@ optimMSSD <-
 #' @rdname optimMSSD
 #' @export
 objMSSD <-
-  function (candi, points) {
+  function (points, candi) {
     
     # Prepare points and candi
     eval(.prepare_points())

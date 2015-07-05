@@ -1,6 +1,7 @@
 # Initial settings
 rm(list = ls())
 gc()
+require(pedometrics)
 sapply(list.files("R", full.names = TRUE, pattern = ".R$"), source)
 sapply(list.files("src", full.names = TRUE, pattern = ".cpp$"), Rcpp::sourceCpp)
 # 0) DEFAULT EXAMPLE ###########################################################
@@ -40,8 +41,6 @@ timePPL <- Sys.time() - timePPL
 timeUSER
 timePPL
 lapply(list(resUSER, resPPL), countPPL, lags = lags, pairs = FALSE)
-x <- attr(resUSER, "energy.state") # 58
-y <- attr(resPPL, "energy.state") # 58
-sapply(list(x, y), tail, 1)
-plot(x, y, asp = 1)
-abline(0, 1, col = "red")
+attr(resUSER, "energy.state") # 58
+attr(resPPL, "energy.state") # 58
+

@@ -11,7 +11,7 @@ optimMSSD(points, candi, iterations = 100, x.max, x.min, y.max, y.min,
   track = FALSE, boundary, progress = TRUE, verbose = FALSE,
   greedy = FALSE, weights = NULL, nadir = NULL, utopia = NULL)
 
-objMSSD(candi, points)
+objMSSD(points, candi)
 }
 \arguments{
 \item{points}{Integer value, integer vector, data frame or matrix. If
@@ -37,7 +37,7 @@ used for the optimization. Defaults to \code{iterations = 100}.}
 quantity of random noise to be added to the projected x- and y-coordinates.
 The minimum quantity should be equal to, at least, the minimum distance
 between two neighbouring candidate locations. The units are the same as of
-the projected x- and y-coordinates. If missing, they will be estimated from
+the projected x- and y-coordinates. If missing, they are estimated from
 \code{candi}.}
 
 \item{acceptance}{List with two named sub-arguments: \code{initial} --
@@ -110,7 +110,8 @@ this requirement is attained.
 }
 \note{
 We recommend using the Pareto maximum and minimum values to set the nadir
-and utopia points. Using simulations is sub-optimal.
+and utopia points in multi-objective optimization problems. Using
+simulations is sub-optimal.
 }
 \examples{
 require(sp)

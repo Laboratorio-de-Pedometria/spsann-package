@@ -63,11 +63,11 @@
 #'        vgm = vgm, maxdist = 500)
 # FUNCTION - MAIN ##############################################################
 optimMKV <-
-  function (
+  function (points, candi, iterations = 100, 
     # MKV
     covars, eqn = z ~ 1, vgm, krige.stat = "mean", ...,
     # SPSANN
-    points, candi, iterations = 100, x.max, x.min, y.max, y.min,
+    x.max, x.min, y.max, y.min,
     acceptance = list(initial = 0.99, cooling = iterations / 10),
     stopping = list(max.count = iterations / 10), plotit = FALSE, track = FALSE,
     boundary, progress = TRUE, verbose = FALSE, greedy = FALSE,
@@ -303,7 +303,9 @@ optimMKV <-
 #' @export
 #' @rdname optimMKV
 objMKV <-
-  function (points, candi, covars, eqn, vgm, krige.stat = "mean", ...) {
+  function (points, candi,
+    # MKV
+    covars, eqn = z ~ 1, vgm, krige.stat = "mean", ...) {
     
     # Prepare points and candi
     eval(.prepare_points())

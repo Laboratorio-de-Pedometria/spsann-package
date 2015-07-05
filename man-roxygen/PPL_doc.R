@@ -34,10 +34,6 @@
 #' characterizing soil hydraulic properties of a watershed}. Honolulu:
 #' University of Hawaii at Manoa, p. 42, 1982.
 #'
-#' Marler, R. T.; Arora, J. S. Function-transformation methods for
-#' multi-objective optimization. \emph{Engineering Optimization}. v. 37, p.
-#' 551-570, 2005.
-#' 
 #' Pettitt, A. N. & McBratney, A. B. Sampling designs for estimating spatial
 #' variance components. \emph{Applied Statistics}. v. 42, p. 185, 1993.
 #'
@@ -50,3 +46,5 @@
 #'
 #' Warrick, A. W.; Myers, D. E. Optimization of sampling locations for variogram
 #' calculations. \emph{Water Resources Research}. v. 23, p. 496-500, 1987.
+#' 
+#' @concept variogram

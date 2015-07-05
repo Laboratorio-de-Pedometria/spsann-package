@@ -6,26 +6,16 @@
 \title{Optimization of sample configurations for spatial trend identification and
 estimation}
 \usage{
-optimDIST(covars, strata.type = "area", use.coords = FALSE, points, candi,
-  iterations = 100, x.max, x.min, y.max, y.min, acceptance = list(initial =
-  0.99, cooling = iterations/10), stopping = list(max.count = iterations/10),
-  plotit = FALSE, track = FALSE, boundary, progress = TRUE,
-  verbose = FALSE, greedy = FALSE, weights = NULL, nadir = NULL,
-  utopia = NULL)
+optimDIST(points, candi, iterations = 100, covars, strata.type = "area",
+  use.coords = FALSE, x.max, x.min, y.max, y.min, acceptance = list(initial
+  = 0.99, cooling = iterations/10), stopping = list(max.count =
+  iterations/10), plotit = FALSE, track = FALSE, boundary,
+  progress = TRUE, verbose = FALSE, greedy = FALSE, weights = NULL,
+  nadir = NULL, utopia = NULL)
 
 objDIST(points, candi, covars, strata.type = "area", use.coords = FALSE)
 }
 \arguments{
-\item{covars}{Data frame or matrix with the covariates in the columns.}
-
-\item{strata.type}{Character value setting the type of stratification that
-should be used to create the marginal sampling strata (or factor levels) for
-the numeric covariates. Available options are \code{"area"} for equal-area,
-and \code{"range"} for equal-range. Defaults to \code{strata.type = "area"}.}
-
-\item{use.coords}{Logical value. Should the geographic coordinates be used
-as covariates? Defaults to \code{use.coords = FALSE}.}
-
 \item{points}{Integer value, integer vector, data frame or matrix. If
 \code{points} is an integer value, it defines the number of points that
 should be randomly sampled from \code{candi} to form the starting system
@@ -45,11 +35,21 @@ projected y-coordinates.}
 \item{iterations}{Integer. The maximum number of iterations that should be
 used for the optimization. Defaults to \code{iterations = 100}.}
 
+\item{covars}{Data frame or matrix with the covariates in the columns.}
+
+\item{strata.type}{Character value setting the type of stratification that
+should be used to create the marginal sampling strata (or factor levels) for
+the numeric covariates. Available options are \code{"area"} for equal-area,
+and \code{"range"} for equal-range. Defaults to \code{strata.type = "area"}.}
+
+\item{use.coords}{Logical value. Should the geographic coordinates be used
+as covariates? Defaults to \code{use.coords = FALSE}.}
+
 \item{x.max,x.min,y.max,y.min}{Numeric value. The minimum and maximum
 quantity of random noise to be added to the projected x- and y-coordinates.
 The minimum quantity should be equal to, at least, the minimum distance
 between two neighbouring candidate locations. The units are the same as of
-the projected x- and y-coordinates. If missing, they will be estimated from
+the projected x- and y-coordinates. If missing, they are estimated from
 \code{candi}.}
 
 \item{acceptance}{List with two named sub-arguments: \code{initial} --
@@ -156,13 +156,9 @@ empirically computing the proportion of points of the population of existing
 covariate values that fall in each marginal sampling strata.
 }
 \note{
-This function was derive with modifications from the method known as the
-\emph{conditioned Latin Hypercube sampling} originally proposed by Minasny
-and McBratney (2006), and implemented in the R-package
-\pkg{\link[clhs]{clhs}} by Pierre Roudier.
-
 We recommend using the Pareto maximum and minimum values to set the nadir
-and utopia points. Using simulations is sub-optimal.
+and utopia points in multi-objective optimization problems. Using
+simulations is sub-optimal.
 }
 \examples{
 require(sp)
@@ -226,6 +222,8 @@ Optimization}, v. 41, p. 853-862, 2009.
 }
 \concept{
 simulated annealing
+
+spatial trend
 }
 \keyword{iteration}
 \keyword{optimize}

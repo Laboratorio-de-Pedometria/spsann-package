@@ -14,13 +14,14 @@
 #' \sQuote{Details} for more information.
 #'
 #' @details
-#' The user-defined objective function has to be an object of class 
-#' \link[base]{function}. It has to include the argument \code{points}, which is
-#' defined internally as a matrix with three columns: \code{[, 1]} the 
-#' identification of each sample point (1, 2, ..., n), \code{[, 2]} the 
-#' x-coordinates, and \code{[, 3]} the y-coordinates. The identification is 
-#' useful to retrieve information from any data matrix used by the objective
-#' function defined by the user.
+#' The user-defined objective function \code{fun} must be an object of class 
+#' \code{\link[base]{function}} and include the argument \code{points}. The
+#' argument \code{points} is defined in \code{optimUSER} as a matrix with three 
+#' columns: \code{[, 1]} the identification of each sample point given by the
+#' respective row indexes of \code{candi}, \code{[, 2]} the x-coordinates, and 
+#' \code{[, 3]} the y-coordinates. The identification is useful to retrieve 
+#' information from any data matrix used by the objective function defined by 
+#' the user.
 #' 
 #' @return
 #' \code{optimUSER} returns a matrix: the optimized sample configuration.
@@ -66,18 +67,15 @@
 #' timeUSER
 #' timePPL
 #' lapply(list(resUSER, resPPL), countPPL, lags = lags, pairs = FALSE)
-#' x <- attr(resUSER, "energy.state") # 58
-#' y <- attr(resPPL, "energy.state") # 58
-#' sapply(list(x, y), tail, 1)
-#' plot(x, y, asp = 1)
-#' abline(0, 1, col = "red")
+#' attr(resUSER, "energy.state") # 58
+#' attr(resPPL, "energy.state") # 58
 # FUNCTION - MAIN ##############################################################
 optimUSER <-
-  function (
+  function (points, candi, iterations = 100,
     # USER
     fun, ...,
     # SPSANN
-    points, candi, iterations = 100, x.max, x.min, y.max, y.min,
+    x.max, x.min, y.max, y.min,
     acceptance = list(initial = 0.99, cooling = iterations / 10),
     stopping = list(max.count = iterations / 10), plotit = FALSE, track = FALSE,
     boundary, progress = TRUE, verbose = FALSE, greedy = FALSE,

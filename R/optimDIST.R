@@ -77,11 +77,11 @@
 #' objDIST(points = res, candi = candi, covars = covars, use.coords = TRUE)
 # MAIN FUNCTION ################################################################
 optimDIST <-
-  function (
+  function (points, candi, iterations = 100, 
     # DIST
     covars, strata.type = "area", use.coords = FALSE,
     # SPSANN
-    points, candi, iterations = 100, x.max, x.min, y.max, y.min,
+    x.max, x.min, y.max, y.min,
     acceptance = list(initial = 0.99, cooling = iterations / 10),
     stopping = list(max.count = iterations / 10), plotit = FALSE, track = FALSE,
     boundary, progress = TRUE, verbose = FALSE, greedy = FALSE,
@@ -247,7 +247,9 @@ optimDIST <-
 #' @rdname optimDIST
 #' @export
 objDIST <-
-  function (points, candi, covars, strata.type = "area", use.coords = FALSE) {
+  function (points, candi,
+    # DIST
+    covars, strata.type = "area", use.coords = FALSE) {
     
     # Check other arguments
     check <- .optimACDCcheck(candi = candi, covars = covars, 

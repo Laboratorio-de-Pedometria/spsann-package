@@ -66,12 +66,12 @@
 #' tail(attr(res, "energy.state"), 1) # 160
 # FUNCTION - MAIN ##############################################################
 optimPPL <-
-  function (
+  function (points, candi, iterations = 100, 
     # PPL
     lags = 7, lags.type = "exponential", lags.base = 2, cutoff, 
     criterion = "distribution", distri, pairs = FALSE,
     # SPSANN
-    points, candi, iterations = 100, x.max, x.min, y.max, y.min,
+    x.max, x.min, y.max, y.min,
     acceptance = list(initial = 0.99, cooling = iterations / 10),
     stopping = list(max.count = iterations / 10), plotit = FALSE, track = FALSE,
     boundary, progress = TRUE, verbose = FALSE, greedy = FALSE,
@@ -219,12 +219,12 @@ optimPPL <-
 #' @rdname optimPPL
 #' @export
 objPPL <-
-  function (
-    # SPSANN
-    points, candi, x.max, x.min, y.max, y.min,
+  function (points, candi, 
     # PPL
     lags = 7, lags.type = "exponential", lags.base = 2, cutoff, distri,
-    criterion = "distribution", pairs = FALSE) {
+    criterion = "distribution", pairs = FALSE,
+    # SPSANN
+    x.max, x.min, y.max, y.min) {
     
     # Check arguments
     check <- .checkPPL(lags = lags, lags.type = lags.type, pairs = pairs, 
@@ -259,8 +259,11 @@ objPPL <-
 #' @rdname optimPPL
 #' @export
 countPPL <-
-  function (points, candi, lags = 7, lags.type = "exponential", lags.base = 2,
-            cutoff, pairs = FALSE) {
+  function (points, candi,
+    # PPL
+    lags = 7, lags.type = "exponential", lags.base = 2, cutoff, pairs = FALSE,
+    # SPSANN
+    x.max, x.min, y.max, y.min) {
     
     # Check arguments
     check <- .checkPPL(lags = lags, lags.type = lags.type, pairs = pairs,

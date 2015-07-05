@@ -7,22 +7,41 @@
 \title{Optimization of sample configurations for variogram identification and
 estimation}
 \usage{
-optimPPL(lags = 7, lags.type = "exponential", lags.base = 2, cutoff,
-  criterion = "distribution", distri, pairs = FALSE, points, candi,
-  iterations = 100, x.max, x.min, y.max, y.min, acceptance = list(initial =
-  0.99, cooling = iterations/10), stopping = list(max.count = iterations/10),
-  plotit = FALSE, track = FALSE, boundary, progress = TRUE,
-  verbose = FALSE, greedy = FALSE, weights = NULL, nadir = NULL,
-  utopia = NULL)
+optimPPL(points, candi, iterations = 100, lags = 7,
+  lags.type = "exponential", lags.base = 2, cutoff,
+  criterion = "distribution", distri, pairs = FALSE, x.max, x.min, y.max,
+  y.min, acceptance = list(initial = 0.99, cooling = iterations/10),
+  stopping = list(max.count = iterations/10), plotit = FALSE,
+  track = FALSE, boundary, progress = TRUE, verbose = FALSE,
+  greedy = FALSE, weights = NULL, nadir = NULL, utopia = NULL)
 
-objPPL(points, candi, x.max, x.min, y.max, y.min, lags = 7,
-  lags.type = "exponential", lags.base = 2, cutoff, distri,
-  criterion = "distribution", pairs = FALSE)
+objPPL(points, candi, lags = 7, lags.type = "exponential", lags.base = 2,
+  cutoff, distri, criterion = "distribution", pairs = FALSE, x.max, x.min,
+  y.max, y.min)
 
 countPPL(points, candi, lags = 7, lags.type = "exponential",
-  lags.base = 2, cutoff, pairs = FALSE)
+  lags.base = 2, cutoff, pairs = FALSE, x.max, x.min, y.max, y.min)
 }
 \arguments{
+\item{points}{Integer value, integer vector, data frame or matrix. If
+\code{points} is an integer value, it defines the number of points that
+should be randomly sampled from \code{candi} to form the starting system
+configuration. If \code{points} is a vector of integer values, it contains
+the row indexes of \code{candi} that correspond to the points that form the
+starting system configuration. If \code{points} is a data frame or matrix,
+it must have three columns in the following order: \code{[, "id"]} the
+row indexes of \code{candi} that correspond to each point, \code{[, "x"]}
+the projected x-coordinates, and \code{[, "y"]} the projected y-coordinates.
+Note that in the later case, \code{points} must be a subset of \code{candi}.}
+
+\item{candi}{Data frame or matrix with the candidate locations for the
+perturbed points. \code{candi} must have two columns in the following
+order: \code{[, "x"]} the projected x-coordinates, and \code{[, "y"]} the
+projected y-coordinates.}
+
+\item{iterations}{Integer. The maximum number of iterations that should be
+used for the optimization. Defaults to \code{iterations = 100}.}
+
 \item{lags}{Integer value. The number of lag-distance classes. Alternatively,
 a vector of numeric values with the lower and upper limits of each
 lag-distance class. The lowest value must be larger than zero. Defaults to
@@ -52,30 +71,11 @@ distribution.}
 regarding the number of point-pairs per lag-distance class? Defaults to
 \code{pairs = FALSE}.}
 
-\item{points}{Integer value, integer vector, data frame or matrix. If
-\code{points} is an integer value, it defines the number of points that
-should be randomly sampled from \code{candi} to form the starting system
-configuration. If \code{points} is a vector of integer values, it contains
-the row indexes of \code{candi} that correspond to the points that form the
-starting system configuration. If \code{points} is a data frame or matrix,
-it must have three columns in the following order: \code{[, "id"]} the
-row indexes of \code{candi} that correspond to each point, \code{[, "x"]}
-the projected x-coordinates, and \code{[, "y"]} the projected y-coordinates.
-Note that in the later case, \code{points} must be a subset of \code{candi}.}
-
-\item{candi}{Data frame or matrix with the candidate locations for the
-perturbed points. \code{candi} must have two columns in the following
-order: \code{[, "x"]} the projected x-coordinates, and \code{[, "y"]} the
-projected y-coordinates.}
-
-\item{iterations}{Integer. The maximum number of iterations that should be
-used for the optimization. Defaults to \code{iterations = 100}.}
-
 \item{x.max,x.min,y.max,y.min}{Numeric value. The minimum and maximum
 quantity of random noise to be added to the projected x- and y-coordinates.
 The minimum quantity should be equal to, at least, the minimum distance
 between two neighbouring candidate locations. The units are the same as of
-the projected x- and y-coordinates. If missing, they will be estimated from
+the projected x- and y-coordinates. If missing, they are estimated from
 \code{candi}.}
 
 \item{acceptance}{List with two named sub-arguments: \code{initial} --
@@ -181,7 +181,8 @@ lag-distance classes.
 }
 \note{
 We recommend using the Pareto maximum and minimum values to set the nadir
-and utopia points. Using simulations is sub-optimal.
+and utopia points in multi-objective optimization problems. Using
+simulations is sub-optimal.
 }
 \examples{
 require(sp)
@@ -214,10 +215,6 @@ Bresler, E.; Green, R. E. \emph{Soil parameters and sampling scheme for
 characterizing soil hydraulic properties of a watershed}. Honolulu:
 University of Hawaii at Manoa, p. 42, 1982.
 
-Marler, R. T.; Arora, J. S. Function-transformation methods for
-multi-objective optimization. \emph{Engineering Optimization}. v. 37, p.
-551-570, 2005.
-
 Pettitt, A. N. & McBratney, A. B. Sampling designs for estimating spatial
 variance components. \emph{Applied Statistics}. v. 42, p. 185, 1993.
 
@@ -233,6 +230,8 @@ calculations. \emph{Water Resources Research}. v. 23, p. 496-500, 1987.
 }
 \concept{
 simulated annealing
+
+variogram
 }
 \keyword{iteration}
 \keyword{optimize}

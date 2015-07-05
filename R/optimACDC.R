@@ -19,6 +19,12 @@
 #' 
 #' \code{objACDC} returns a numeric value: the energy state of the sample
 #' configuration - the objective function value.
+#' 
+#' @note
+#' This function was derive with modifications from the method known as the 
+#' \emph{conditioned Latin Hypercube sampling} originally proposed by Minasny 
+#' and McBratney (2006), and implemented in the R-package 
+#' \pkg{\link[clhs]{clhs}} by Pierre Roudier.
 #'
 #' @author Alessandro Samuel-Rosa \email{alessandrosamuelrosa@@gmail.com}
 #' @seealso \code{\link[clhs]{clhs}}, \code{\link[pedometrics]{cramer}}
@@ -67,11 +73,11 @@
 #' cor(cbind(candi[i, 1], candi[i, 2], covars[i]))
 # MAIN FUNCTION ################################################################
 optimACDC <-
-  function (
+  function (points, candi, iterations = 100, 
     # DIST and CORR
     covars, strata.type = "area", use.coords = FALSE, 
     # SPSANN
-    points, candi, iterations = 100, x.max, x.min, y.max, y.min,
+    x.max, x.min, y.max, y.min,
     acceptance = list(initial = 0.99, cooling = iterations / 10),
     stopping = list(max.count = iterations / 10), plotit = FALSE, track = FALSE,
     boundary, progress = TRUE, verbose = FALSE, greedy = FALSE,
@@ -294,7 +300,7 @@ optimACDC <-
       # Compute the proportion of population points per marginal sampling strata
       count <- lapply(1:n_cov, function (i)
         hist(covars[, i], breaks[[i]], plot = FALSE)$counts)
-      prop <- lapply(1:n_cov, FUN = function (i) {count[[i]] / sum(count[[i]])})
+      prop <- lapply(1:n_cov, function (i) count[[i]] / sum(count[[i]]))
       
       # Output
       res <- list(breaks = breaks, prop = prop)  
@@ -383,10 +389,13 @@ optimACDC <-
 #' @rdname optimACDC
 #' @export
 objACDC <-
-  function (points, candi, covars, strata.type = "area", 
-            weights = list(CORR = 0.5, DIST = 0.5), use.coords = FALSE, 
-            utopia = list(user = NULL, abs = NULL),
-            nadir = list(sim = NULL, seeds = NULL, user = NULL, abs = NULL)) {
+  function (points, candi,
+    # DIST and CORR
+    covars, strata.type = "area", use.coords = FALSE,
+    # MOOP
+    weights = list(CORR = 0.5, DIST = 0.5),
+    nadir = list(sim = NULL, seeds = NULL, user = NULL, abs = NULL),
+    utopia = list(user = NULL, abs = NULL)) {
     
     # Check arguments
     check <- .optimACDCcheck(candi = candi, covars = covars, 

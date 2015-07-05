@@ -18,9 +18,10 @@
 #' objective function to which they apply; 2) \code{abs} -- logical for 
 #' calculating the utopia point internally (experimental).
 #' 
-#' @note 
+#' @note
 #' We recommend using the Pareto maximum and minimum values to set the nadir 
-#' and utopia points. Using simulations is sub-optimal.
+#' and utopia points in multi-objective optimization problems. Using 
+#' simulations is sub-optimal.
 #'
 #' @references
 #' Arora, J. \emph{Introduction to optimum design}. Waltham: Academic Press, p. 

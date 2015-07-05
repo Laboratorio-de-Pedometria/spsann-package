@@ -5,35 +5,16 @@
 \alias{optimMKV}
 \title{Optimization of sample configurations for spatial interpolation}
 \usage{
-optimMKV(covars, eqn = z ~ 1, vgm, krige.stat = "mean", ..., points, candi,
-  iterations = 100, x.max, x.min, y.max, y.min, acceptance = list(initial =
-  0.99, cooling = iterations/10), stopping = list(max.count = iterations/10),
-  plotit = FALSE, track = FALSE, boundary, progress = TRUE,
-  verbose = FALSE, greedy = FALSE, weights = NULL, nadir = NULL,
-  utopia = NULL)
+optimMKV(points, candi, iterations = 100, covars, eqn = z ~ 1, vgm,
+  krige.stat = "mean", ..., x.max, x.min, y.max, y.min,
+  acceptance = list(initial = 0.99, cooling = iterations/10),
+  stopping = list(max.count = iterations/10), plotit = FALSE,
+  track = FALSE, boundary, progress = TRUE, verbose = FALSE,
+  greedy = FALSE, weights = NULL, nadir = NULL, utopia = NULL)
 
-objMKV(points, candi, covars, eqn, vgm, krige.stat = "mean", ...)
+objMKV(points, candi, covars, eqn = z ~ 1, vgm, krige.stat = "mean", ...)
 }
 \arguments{
-\item{covars}{Data frame or matrix with the covariates in the columns.}
-
-\item{eqn}{Formula string that defines the dependent variable \code{z}
-as a linear model of the independent variables contained in \code{covars}.
-Defaults to \code{eqn = z ~ 1}, that is, ordinary kriging. See the
-argument \code{formula} in the function \code{\link[gstat]{krige}} for
-more information.}
-
-\item{vgm}{Object of class "variogramModel". See the argument
-\code{model} in the function \code{\link[gstat]{krige}} for more
-information.}
-
-\item{krige.stat}{Character value defining the statistic that should be used
-to summarize the kriging variance. Available options are \code{"mean"} and
-\code{"max"} for the mean and maximum kriging variance, respectively.
-Defaults to \code{krige.stat = "mean"}.}
-
-\item{...}{further arguments passed to \code{\link[gstat]{krige}}.}
-
 \item{points}{Integer value, integer vector, data frame or matrix. If
 \code{points} is an integer value, it defines the number of points that
 should be randomly sampled from \code{candi} to form the starting system
@@ -53,11 +34,30 @@ projected y-coordinates.}
 \item{iterations}{Integer. The maximum number of iterations that should be
 used for the optimization. Defaults to \code{iterations = 100}.}
 
+\item{covars}{Data frame or matrix with the covariates in the columns.}
+
+\item{eqn}{Formula string that defines the dependent variable \code{z}
+as a linear model of the independent variables contained in \code{covars}.
+Defaults to \code{eqn = z ~ 1}, that is, ordinary kriging. See the
+argument \code{formula} in the function \code{\link[gstat]{krige}} for
+more information.}
+
+\item{vgm}{Object of class "variogramModel". See the argument
+\code{model} in the function \code{\link[gstat]{krige}} for more
+information.}
+
+\item{krige.stat}{Character value defining the statistic that should be used
+to summarize the kriging variance. Available options are \code{"mean"} and
+\code{"max"} for the mean and maximum kriging variance, respectively.
+Defaults to \code{krige.stat = "mean"}.}
+
+\item{...}{further arguments passed to \code{\link[gstat]{krige}}.}
+
 \item{x.max,x.min,y.max,y.min}{Numeric value. The minimum and maximum
 quantity of random noise to be added to the projected x- and y-coordinates.
 The minimum quantity should be equal to, at least, the minimum distance
 between two neighbouring candidate locations. The units are the same as of
-the projected x- and y-coordinates. If missing, they will be estimated from
+the projected x- and y-coordinates. If missing, they are estimated from
 \code{candi}.}
 
 \item{acceptance}{List with two named sub-arguments: \code{initial} --
@@ -126,7 +126,8 @@ mean/maximum kriging variance (\bold{MKV}).
 }
 \note{
 We recommend using the Pareto maximum and minimum values to set the nadir
-and utopia points. Using simulations is sub-optimal.
+and utopia points in multi-objective optimization problems. Using
+simulations is sub-optimal.
 }
 \examples{
 require(sp)

@@ -6,24 +6,43 @@
 \title{Optimization of sample configurations for variogram and spatial trend
 identification and estimation, and for spatial interpolation}
 \usage{
-optimSPAN(covars, strata.type = "area", use.coords = FALSE, lags = 7,
-  lags.type = "exponential", lags.base = 2, cutoff, distri,
-  criterion = "distribution", pairs = FALSE, points, candi,
-  iterations = 100, x.max, x.min, y.max, y.min, acceptance = list(initial =
+optimSPAN(points, candi, iterations = 100, covars, strata.type = "area",
+  use.coords = FALSE, lags = 7, lags.type = "exponential",
+  lags.base = 2, cutoff, criterion = "distribution", distri,
+  pairs = FALSE, x.max, x.min, y.max, y.min, acceptance = list(initial =
   0.99, cooling = iterations/10), stopping = list(max.count = iterations/10),
   plotit = FALSE, track = FALSE, boundary, progress = TRUE,
   verbose = FALSE, greedy = FALSE, weights = list(CORR = 1/6, DIST = 1/6,
   PPL = 1/3, MSSD = 1/3), nadir = list(sim = NULL, seeds = NULL, user = NULL,
   abs = NULL), utopia = list(user = NULL, abs = NULL))
 
-objSPAN(points, candi, x.max, x.min, y.max, y.min, covars,
-  strata.type = "area", use.coords = FALSE, lags = 7,
-  lags.type = "exponential", lags.base = 2, cutoff, distri,
-  criterion = "distribution", pairs = FALSE, weights = list(CORR = 1/6,
-  DIST = 1/6, PPL = 1/3, MSSD = 1/3), nadir = list(sim = NULL, seeds = NULL,
-  user = NULL, abs = NULL), utopia = list(user = NULL, abs = NULL))
+objSPAN(points, candi, covars, strata.type = "area", use.coords = FALSE,
+  lags = 7, lags.type = "exponential", lags.base = 2, cutoff,
+  criterion = "distribution", distri, pairs = FALSE, x.max, x.min, y.max,
+  y.min, weights = list(CORR = 1/6, DIST = 1/6, PPL = 1/3, MSSD = 1/3),
+  nadir = list(sim = NULL, seeds = NULL, user = NULL, abs = NULL),
+  utopia = list(user = NULL, abs = NULL))
 }
 \arguments{
+\item{points}{Integer value, integer vector, data frame or matrix. If
+\code{points} is an integer value, it defines the number of points that
+should be randomly sampled from \code{candi} to form the starting system
+configuration. If \code{points} is a vector of integer values, it contains
+the row indexes of \code{candi} that correspond to the points that form the
+starting system configuration. If \code{points} is a data frame or matrix,
+it must have three columns in the following order: \code{[, "id"]} the
+row indexes of \code{candi} that correspond to each point, \code{[, "x"]}
+the projected x-coordinates, and \code{[, "y"]} the projected y-coordinates.
+Note that in the later case, \code{points} must be a subset of \code{candi}.}
+
+\item{candi}{Data frame or matrix with the candidate locations for the
+perturbed points. \code{candi} must have two columns in the following
+order: \code{[, "x"]} the projected x-coordinates, and \code{[, "y"]} the
+projected y-coordinates.}
+
+\item{iterations}{Integer. The maximum number of iterations that should be
+used for the optimization. Defaults to \code{iterations = 100}.}
+
 \item{covars}{Data frame or matrix with the covariates in the columns.}
 
 \item{strata.type}{Character value setting the type of stratification that
@@ -50,43 +69,24 @@ create exponentially spaced lag-distance classes. Used only when
 \item{cutoff}{Numeric value. The maximum distance up to which lag-distance
 classes are created. Used only when \code{lags} is an integer value.}
 
+\item{criterion}{Character value. The feature used to describe the
+energy state of the system configuration, with options \code{"minimum"} and
+\code{"distribution"}. Defaults to \code{objective = "distribution"}.}
+
 \item{distri}{Numeric vector. The distribution of points or point-pairs per
 lag-distance class that should be attained at the end of the optimization.
 Used only when \code{criterion = "distribution"}. Defaults to a uniform
 distribution.}
 
-\item{criterion}{Character value. The feature used to describe the
-energy state of the system configuration, with options \code{"minimum"} and
-\code{"distribution"}. Defaults to \code{objective = "distribution"}.}
-
 \item{pairs}{Logical value. Should the sample configuration be optimized
 regarding the number of point-pairs per lag-distance class? Defaults to
 \code{pairs = FALSE}.}
-
-\item{points}{Integer value, integer vector, data frame or matrix. If
-\code{points} is an integer value, it defines the number of points that
-should be randomly sampled from \code{candi} to form the starting system
-configuration. If \code{points} is a vector of integer values, it contains
-the row indexes of \code{candi} that correspond to the points that form the
-starting system configuration. If \code{points} is a data frame or matrix,
-it must have three columns in the following order: \code{[, "id"]} the
-row indexes of \code{candi} that correspond to each point, \code{[, "x"]}
-the projected x-coordinates, and \code{[, "y"]} the projected y-coordinates.
-Note that in the later case, \code{points} must be a subset of \code{candi}.}
-
-\item{candi}{Data frame or matrix with the candidate locations for the
-perturbed points. \code{candi} must have two columns in the following
-order: \code{[, "x"]} the projected x-coordinates, and \code{[, "y"]} the
-projected y-coordinates.}
-
-\item{iterations}{Integer. The maximum number of iterations that should be
-used for the optimization. Defaults to \code{iterations = 100}.}
 
 \item{x.max,x.min,y.max,y.min}{Numeric value. The minimum and maximum
 quantity of random noise to be added to the projected x- and y-coordinates.
 The minimum quantity should be equal to, at least, the minimum distance
 between two neighbouring candidate locations. The units are the same as of
-the projected x- and y-coordinates. If missing, they will be estimated from
+the projected x- and y-coordinates. If missing, they are estimated from
 \code{candi}.}
 
 \item{acceptance}{List with two named sub-arguments: \code{initial} --
@@ -144,6 +144,9 @@ calculating the utopia point internally (experimental).}
 }
 \value{
 \code{optimSPAN()} returns a matrix: the optimized sample configuration.
+
+\code{objSPAN} returns a numeric value: the energy state of the sample
+configuration - the objective function value.
 }
 \description{
 Optimize a sample configuration for variogram and spatial trend
@@ -153,14 +156,14 @@ spread over, \bold{SPAN} the feature, variogram and geographic spaces. The
 utility function is obtained aggregating four single objective functions:
 \bold{CORR}, \bold{DIST}, \bold{PPL}, and \bold{MSSD}.
 }
+\details{
+See \code{optimDIST}, \code{optimCORR}, \code{optimPPL}, and
+\code{optimMSSD}.
+}
 \note{
-This function was derive with modifications from the method known as the
-\emph{conditioned Latin Hypercube sampling} originally proposed by Minasny
-and McBratney (2006), and implemented in the R-package
-\pkg{\link[clhs]{clhs}} by Pierre Roudier.
-
 We recommend using the Pareto maximum and minimum values to set the nadir
-and utopia points. Using simulations is sub-optimal.
+and utopia points in multi-objective optimization problems. Using
+simulations is sub-optimal.
 }
 \examples{
 require(sp)
@@ -226,10 +229,6 @@ Bresler, E.; Green, R. E. \emph{Soil parameters and sampling scheme for
 characterizing soil hydraulic properties of a watershed}. Honolulu:
 University of Hawaii at Manoa, p. 42, 1982.
 
-Marler, R. T.; Arora, J. S. Function-transformation methods for
-multi-objective optimization. \emph{Engineering Optimization}. v. 37, p.
-551-570, 2005.
-
 Pettitt, A. N. & McBratney, A. B. Sampling designs for estimating spatial
 variance components. \emph{Applied Statistics}. v. 42, p. 185, 1993.
 
@@ -245,6 +244,10 @@ calculations. \emph{Water Resources Research}. v. 23, p. 496-500, 1987.
 }
 \concept{
 simulated annealing
+
+spatial trend
+
+variogram
 }
 \keyword{iteration}
 \keyword{optimize}

@@ -20,5 +20,5 @@
 #' quantity of random noise to be added to the projected x- and y-coordinates.
 #' The minimum quantity should be equal to, at least, the minimum distance
 #' between two neighbouring candidate locations. The units are the same as of 
-#' the projected x- and y-coordinates. If missing, they will be estimated from
+#' the projected x- and y-coordinates. If missing, they are estimated from
 #' \code{candi}.

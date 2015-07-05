@@ -4,20 +4,13 @@
 \alias{optimUSER}
 \title{Optimization of sample configurations using a user-defined objective function}
 \usage{
-optimUSER(fun, ..., points, candi, iterations = 100, x.max, x.min, y.max,
+optimUSER(points, candi, iterations = 100, fun, ..., x.max, x.min, y.max,
   y.min, acceptance = list(initial = 0.99, cooling = iterations/10),
   stopping = list(max.count = iterations/10), plotit = FALSE,
   track = FALSE, boundary, progress = TRUE, verbose = FALSE,
   greedy = FALSE, weights = NULL, nadir = NULL, utopia = NULL)
 }
 \arguments{
-\item{fun}{A function defining the objective function that should be
-used to evaluate the energy state of the system configuration at each
-iteration. See \sQuote{Details} for more information.}
-
-\item{...}{Other arguments passed to the objective function. See
-\sQuote{Details} for more information.}
-
 \item{points}{Integer value, integer vector, data frame or matrix. If
 \code{points} is an integer value, it defines the number of points that
 should be randomly sampled from \code{candi} to form the starting system
@@ -37,11 +30,18 @@ projected y-coordinates.}
 \item{iterations}{Integer. The maximum number of iterations that should be
 used for the optimization. Defaults to \code{iterations = 100}.}
 
+\item{fun}{A function defining the objective function that should be
+used to evaluate the energy state of the system configuration at each
+iteration. See \sQuote{Details} for more information.}
+
+\item{...}{Other arguments passed to the objective function. See
+\sQuote{Details} for more information.}
+
 \item{x.max,x.min,y.max,y.min}{Numeric value. The minimum and maximum
 quantity of random noise to be added to the projected x- and y-coordinates.
 The minimum quantity should be equal to, at least, the minimum distance
 between two neighbouring candidate locations. The units are the same as of
-the projected x- and y-coordinates. If missing, they will be estimated from
+the projected x- and y-coordinates. If missing, they are estimated from
 \code{candi}.}
 
 \item{acceptance}{List with two named sub-arguments: \code{initial} --
@@ -104,17 +104,19 @@ calculating the utopia point internally (experimental).}
 Optimize a sample configuration using a user-defined objective function.
 }
 \details{
-The user-defined objective function has to be an object of class
-\link[base]{function}. It has to include the argument \code{points}, which is
-defined internally as a matrix with three columns: \code{[, 1]} the
-identification of each sample point (1, 2, ..., n), \code{[, 2]} the
-x-coordinates, and \code{[, 3]} the y-coordinates. The identification is
-useful to retrieve information from any data matrix used by the objective
-function defined by the user.
+The user-defined objective function \code{fun} must be an object of class
+\code{\link[base]{function}} and include the argument \code{points}. The
+argument \code{points} is defined in \code{optimUSER} as a matrix with three
+columns: \code{[, 1]} the identification of each sample point given by the
+respective row indexes of \code{candi}, \code{[, 2]} the x-coordinates, and
+\code{[, 3]} the y-coordinates. The identification is useful to retrieve
+information from any data matrix used by the objective function defined by
+the user.
 }
 \note{
 We recommend using the Pareto maximum and minimum values to set the nadir
-and utopia points. Using simulations is sub-optimal.
+and utopia points in multi-objective optimization problems. Using
+simulations is sub-optimal.
 }
 \examples{
 require(sp)
@@ -153,11 +155,8 @@ timePPL <- Sys.time() - timePPL
 timeUSER
 timePPL
 lapply(list(resUSER, resPPL), countPPL, lags = lags, pairs = FALSE)
-x <- attr(resUSER, "energy.state") # 58
-y <- attr(resPPL, "energy.state") # 58
-sapply(list(x, y), tail, 1)
-plot(x, y, asp = 1)
-abline(0, 1, col = "red")
+attr(resUSER, "energy.state") # 58
+attr(resPPL, "energy.state") # 58
 }
 \author{
 Alessandro Samuel-Rosa \email{alessandrosamuelrosa@gmail.com}

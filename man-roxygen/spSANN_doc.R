@@ -41,3 +41,4 @@
 #' @keywords spatial optimize iteration
 #' 
 #' @concept simulated annealing
+#' 
