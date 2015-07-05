@@ -62,6 +62,7 @@
 #' @importFrom pedometrics is.all.factor
 #' @importFrom pedometrics is.any.factor
 #' @importFrom SpatialTools dist2
+#' @aliases optimDIST objDIST
 #' @import Rcpp
 #' @export
 #' @examples

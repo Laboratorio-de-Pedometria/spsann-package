@@ -35,10 +35,8 @@
 #' Alessandro Samuel-Rosa \email{alessandrosamuelrosa@@gmail.com}
 #' @seealso
 #' \code{\link[raster]{distanceFromPoints}}, \code{\link[spcosa]{stratify}}.
-#' @keywords spatial optimize
 #' @aliases optimMSSD objMSSD
-#' @concept simulated annealing
-#' @importFrom fields rdist
+#' @concept spatial interpolation
 #' @export
 #' @examples
 #' require(sp)

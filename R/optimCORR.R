@@ -41,6 +41,7 @@
 #' @importFrom pedometrics is.numint
 #' @importFrom pedometrics cont2cat
 #' @importFrom SpatialTools dist2
+#' @aliases optimCORR objCORR
 #' @export
 #' @examples
 #' require(sp)

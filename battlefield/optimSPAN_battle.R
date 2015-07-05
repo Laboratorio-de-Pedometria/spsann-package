@@ -14,8 +14,8 @@ utopia <- list(user = list(DIST = 0, CORR = 0, PPL = 0, MSSD = 0))
 covars <- meuse.grid[, 5]
 set.seed(2001)
 res <- optimSPAN(points = 100, candi = candi, covars = covars, nadir = nadir,
-                 use.coords = TRUE, iterations = 5000, utopia = utopia, 
-                 verbose = FALSE, plotit = TRUE, track = TRUE)
+                 use.coords = TRUE, iterations = 100, utopia = utopia, 
+                 verbose = FALSE, plotit = FALSE, track = FALSE)
 tail(attr(res, "energy"), 1) # 0.7693468
 objSPAN(points = res, candi = candi, covars = covars, nadir = nadir,
         use.coords = TRUE, utopia = utopia)

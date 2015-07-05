@@ -12,22 +12,34 @@
 #' @template spSANN_doc
 #' @template ACDC_doc
 #' @template MOOP_doc
+#' @template PPL_doc
 #' 
 #' @return
 #' \code{optimSPAN()} returns a matrix: the optimized sample configuration.
 #' 
 #' @author Alessandro Samuel-Rosa \email{alessandrosamuelrosa@@gmail.com}
-#' @keywords spatial optimize
-#' @concept simulated annealing
 #' @importFrom pedometrics cramer
 #' @importFrom pedometrics is.numint
 #' @importFrom pedometrics cont2cat
 #' @importFrom SpatialTools dist2
 #' @export
 #' @examples
+#' require(sp)
+#' data(meuse.grid)
+#' candi <- meuse.grid[, 1:2]
+#' nadir <- list(sim = 10, seeds = 1:10)
+#' utopia <- list(user = list(DIST = 0, CORR = 0, PPL = 0, MSSD = 0))
+#' covars <- meuse.grid[, 5]
+#' set.seed(2001)
+#' res <- optimSPAN(points = 100, candi = candi, covars = covars, nadir = nadir,
+#'                  use.coords = TRUE, iterations = 100, utopia = utopia, 
+#'                  verbose = FALSE, plotit = FALSE, track = FALSE)
+#' tail(attr(res, "energy"), 1) # 0.7693468
+#' objSPAN(points = res, candi = candi, covars = covars, nadir = nadir,
+#'         use.coords = TRUE, utopia = utopia)
 # MAIN FUNCTION ################################################################
 optimSPAN <-
-  function (            
+  function(            
     # DIST and CORR
     covars, strata.type = "area", use.coords = FALSE,
     # PPL
@@ -50,10 +62,10 @@ optimSPAN <-
     check <- .checkPPL(lags = lags, lags.type = lags.type, pairs = pairs,
                        lags.base = lags.base, cutoff = cutoff, 
                        criterion = criterion, distri = distri, fun = "optimPPL")
-    if (!is.null(check)) stop (check, call. = FALSE)
+    if (!is.null(check)) stop(check, call. = FALSE)
     check <- .optimACDCcheck(candi = candi, covars = covars, 
                              use.coords = use.coords, strata.type = strata.type)
-    if (!is.null(check)) stop (check, call. = FALSE)
+    if (!is.null(check)) stop(check, call. = FALSE)
     
     # Set plotting options
     eval(.plotting_options())
@@ -273,10 +285,10 @@ objSPAN <-
     check <- .checkPPL(lags = lags, lags.type = lags.type, pairs = pairs,
                        lags.base = lags.base, cutoff = cutoff, 
                        criterion = criterion, distri = distri, fun = "optimPPL")
-    if (!is.null(check)) stop (check, call. = FALSE)
+    if (!is.null(check)) stop(check, call. = FALSE)
     check <- .optimACDCcheck(candi = candi, covars = covars, 
                              use.coords = use.coords, strata.type = strata.type)
-    if (!is.null(check)) stop (check, call. = FALSE)
+    if (!is.null(check)) stop(check, call. = FALSE)
 
     # Prepare points and candi
     eval(.prepare_points())
@@ -323,7 +335,7 @@ objSPAN <-
                     pairs = pairs, dm.mssd = dm_mssd)
     
     # Output
-    return (res)
+    return(res)
   }
 # INTERNAL FUNCTION - CALCULATE THE CRITERION VALUE ############################
 # This function is used to calculate the criterion value of SPAN.
@@ -331,7 +343,7 @@ objSPAN <-
 # Scaling is done using the upper-lower bound approach.
 # Aggregation is done using the weighted sum method.
 .objSPAN <-
-  function (sm, n.cov, nadir, weights, n.pts, utopia, pcm, scm, covars.type,
+  function(sm, n.cov, nadir, weights, n.pts, utopia, pcm, scm, covars.type,
             pop.prop, ppl, n.lags, criterion, distri, pairs, dm.mssd) {
     
     # DIST
@@ -360,11 +372,11 @@ objSPAN <-
     res <- data.frame(obj = obj_dist + obj_cor + obj_ppl + obj_mssd, 
                       CORR = obj_cor, DIST = obj_dist, PPL = obj_ppl,
                       MSSD = obj_mssd)
-    return (res)
+    return(res)
   }
 # INTERNAL FUNCTION - COMPUTE THE NADIR VALUE ##################################
 .nadirSPAN <-
-  function (n.pts, n.cov, n.candi, nadir, candi, covars, pcm, pop.prop, 
+  function(n.pts, n.cov, n.candi, nadir, candi, covars, pcm, pop.prop, 
             covars.type, lags, n.lags, pairs, distri, criterion) {
     
     # Simulate the nadir point
@@ -418,11 +430,11 @@ objSPAN <-
         }
       }
     }
-    return (res)
+    return(res)
   }
 # INTERNAL FUNCTION - COMPUTE THE UTOPIA POINT #################################
 .utopiaSPAN <-
-  function (utopia) {
+  function(utopia) {
     
     if (!is.null(unlist(utopia$user))) {
       list(CORR = utopia$user$CORR, DIST = utopia$user$DIST,

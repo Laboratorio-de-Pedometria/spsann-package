@@ -28,8 +28,6 @@
 #' @author
 #' Alessandro Samuel-Rosa \email{alessandrosamuelrosa@@gmail.com}
 #' @aliases optimUSER
-#' @keywords spatial optimize
-#' @concept simulated annealing
 #' @export
 #' @examples
 #' require(sp)

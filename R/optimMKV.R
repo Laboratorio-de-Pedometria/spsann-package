@@ -45,10 +45,8 @@
 #' 
 #' @author
 #' Alessandro Samuel-Rosa \email{alessandrosamuelrosa@@gmail.com}
-#' @aliases optimMKV
-#' @keywords spatial optimize
-#' @concept simulated annealing
-# @importFrom plyr is.formula
+#' @aliases optimMKV objMKV
+#' @concept spatial interpolation
 #' @export
 #' @examples
 #' require(sp)
