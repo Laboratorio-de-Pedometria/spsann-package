@@ -1,18 +1,17 @@
-#' Optimization of sample configurations for spatial trend identification and
-#' estimation
+#' Optimization of sample configurations for spatial trend identification
+#' and estimation
 #'
 #' Optimize a sample configuration for spatial trend identification and 
-#' estimation. A criterion is defined so that the sample reproduces the 
-#' bivariate association/correlation between the covariates, as well as their 
-#' marginal distribution (\bold{ACDC}).
+#' estimation. An utility function \emph{U} is defined so that the sample 
+#' reproduces the bivariate association/correlation between the covariates, as 
+#' well as their marginal distribution.  (\bold{ACDC}). The utility function is 
+#' obtained aggregating two single objective functions: \bold{CORR} and 
+#' \bold{DIST}.
 #'
 #' @template spJitter_doc
 #' @template spSANN_doc
 #' @template ACDC_doc
 #' @template MOOP_doc
-#' 
-#' @details
-#' See \code{optimDIST} and \code{optimCORR}.
 #' 
 #' @return
 #' \code{optimACDC} returns a matrix: the optimized sample configuration.
@@ -21,7 +20,7 @@
 #' configuration - the objective function value.
 #' 
 #' @note
-#' This function was derive with modifications from the method known as the 
+#' This function was derived with modifications from the method known as the 
 #' \emph{conditioned Latin Hypercube sampling} originally proposed by Minasny 
 #' and McBratney (2006), and implemented in the R-package 
 #' \pkg{\link[clhs]{clhs}} by Pierre Roudier.

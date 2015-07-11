@@ -7,16 +7,18 @@
 #' @template spSANN_doc
 #' @template MOOP_doc
 #'
-#' @details
-#' Euclidean distances between points are calculated. This computation requires
-#' the coordinates to be projected. The user is responsible for making sure that
-#' this requirement is attained.
-#' 
 #' @return
 #' \code{optimMSSD} returns a matrix: the optimized sample configuration.
 #'
 #' \code{objMSSD} returns a numeric value: the energy state of the sample
 #' configuration - the objective function value.
+#' 
+#' @note
+#' This function was derived with modifications from the method known as the 
+#' \emph{spatial coverage sampling} originally proposed by Brus, de Gruijter and
+#' van Groenigen (2006), and implemented in the R-package 
+#' \pkg{\link[spcosa]{spcosa}} by Dennis Walvoort, Dick Brus and Jaap de 
+#' Gruijter.
 #' 
 #' @references
 #' Brus, D. J.; de Gruijter, J. J.; van Groenigen, J. W. Designing spatial

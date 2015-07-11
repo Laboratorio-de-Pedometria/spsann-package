@@ -134,12 +134,12 @@ calculating the utopia point internally (experimental).}
 \value{
 \code{optimPPL} returns a matrix: the optimized sample configuration.
 
+\code{objPPL} returns a numeric value: the energy state of the sample
+configuration - the objective function value.
+
 \code{countPPL} returns a data.frame with three columns: a) the lower and b)
 upper limits of each lag-distance class, and c) the number of points or
 point-pairs per lag-distance class.
-
-\code{objPPL} returns a numeric value: the energy state of the sample
-configuration - the objective function value.
 }
 \description{
 Optimize a sample configuration for variogram identification and estimation.
@@ -148,10 +148,6 @@ number of points or point-pairs contributing to each lag-distance class
 (\bold{PPL}).
 }
 \details{
-\strong{Distance}: Euclidean distances between points are used. This
-requires the coordinates to be projected. The user is responsible for making
-sure that this requirement is met.
-
 \strong{Distribution}: Using the default uniform distribution means that the
 number of point-pairs per lag-distance class (\code{pairs = TRUE}) is equal
 to \eqn{n \times (n - 1) / (2 \times lag)}, where \eqn{n} is the total number
@@ -179,10 +175,111 @@ second criterion is called using \code{criterion = "minimum"}. It corresponds
 to maximizing the minimum number of points or point-pairs observed over all
 lag-distance classes.
 }
-\note{
-We recommend using the Pareto maximum and minimum values to set the nadir
-and utopia points in multi-objective optimization problems. Using
-simulations is sub-optimal.
+\section{Distance between two points}{
+
+
+The distance between two points is computed as the Euclidean distance between
+them. This computation assumes that the optimization is operating in the
+two-dimensional Euclidean space, i.e. the coordinates of the sample points
+and candidate locations should not be provided as latitude/longitude. Package
+\pkg{spsann} has no mechanism to check if the coordinates are projected, and
+the user is responsible for making sure that this requirement is attained.
+}
+
+\section{Jittering methods}{
+
+
+There are two ways of jittering the coordinates. They differ on how the
+set of candidate locations is defined. The first method uses an
+\emph{infinite} set of candidate locations, that is, any point in the spatial
+domain can be selected as the new location of a perturbed point. All that
+this method needs is a polygon indicating the boundary of the spatial domain.
+This method is not implemented in the \pkg{spsann} package (yet) because it
+is computationally demanding: every time a point is jittered, it is necessary
+to check if it lays inside the spatial domain.
+
+The second method consists of using a \emph{finite} set of candidate
+locations for the perturbed points. A finite set of candidate locations is
+created by discretizing the spatial domain, that is, creating a fine grid of
+points that serve as candidate locations for the perturbed points. This is
+the only method currently implemented in the \pkg{spsann} package because it
+is one of the least computationally demanding.
+
+Using a finite set of candidate locations has one important inconvenience.
+When a point is selected to be jittered, it may be that the new location
+already is occupied by another point. If this happens, another location is
+iteratively sought for as many times as there are points in \code{points}.
+Because the more points there are in \code{points}, the more likely it is
+that the new location already is occupied by another point. If a solution is
+not found, the point selected to be jittered point is kept in its original
+location.
+}
+
+\section{Multi-objective optimization}{
+
+
+A method of solving a multi-objective optimization problem is to aggregate
+the objective functions into a single \emph{utility function}. In the
+\pkg{spsann} package, the aggregation is performed using the \emph{weighted
+sum method}, which incorporates in the weights the preferences of the user
+regarding the relative importance of each objective function.
+
+The weighted sum method is affected by the relative magnitude of the
+different function values. The objective functions implemented in the
+\pkg{spsann} package have different units and orders of magnitude. The
+consequence is that the objective function with the largest values will have
+a numerical dominance in the optimization. In other words, the weights will
+not express the true preferences of the user, and the meaning of the utility
+function becomes unclear.
+
+A solution to avoid the numerical dominance is to transform the objective
+functions so that they are constrained to the same approximate range of
+values. Several function-transformation methods can be used and the
+\pkg{spsann} offers a few of them. The \emph{upper-lower-bound approach}
+requires the user to inform the maximum (nadir point) and minimum (utopia
+point) absolute function values. The resulting function values will always
+range between 0 and 1.
+
+Using the \emph{upper-bound approach} requires the user to inform only the
+nadir point, while the utopia point is set to zero. The upper-bound approach
+for transformation aims at equalizing only the upper bounds of the objective
+functions. The resulting function values will always be smaller than or equal
+to 1.
+
+Sometimes, the absolute maximum and minimum values of an objective function
+can be calculated exactly. This seems not to be the case of the objective
+functions implemented in the \pkg{spsann} package. If the user is
+uncomfortable with informing the nadir and utopia points, there is the option
+for using \emph{numerical simulations}. It consists in computing the function
+value for many random sample configurations. The mean function value is used
+to set the nadir point, while the the utopia point is set to zero. This
+approach is similar to the upper-bound approach, but the function values will
+have the same orders of magnitude only at the starting point of the
+optimization. Function values larger than one are likely to occur during the
+optimization. We recommend the user to avoid this approach whenever possible
+because the effect of the starting point on the optimization as a whole
+usually is insignificant or arbitrary.
+
+The \emph{upper-lower-bound approach} with the \emph{Pareto maximum and
+minimum values} is the most elegant solution to transform the objective
+functions. However, it is the most time consuming. It works as follows:
+
+\enumerate{
+  \item Optimize a sample configuration with respect to each objective
+  function that composes the MOOP;
+  \item Compute the function value of every objective function for every
+  optimized sample configuration;
+  \item Record the maximum and minimum absolute function values computed for
+  each objective function--these are the Pareto maximum and minimum.
+}
+
+For example, consider that a MOOP is composed of two objective functions (A
+and B). The minimum absolute value for function A is obtained when the sample
+configuration is optimized with respect to function A. This is the Pareto
+minimum of function A. Consequently, the maximum absolute value for function
+A is obtained when the sample configuration is optimized regarding function
+B. This is the Pareto maximum of function A. The same logic applies for
+function B.
 }
 \examples{
 require(sp)

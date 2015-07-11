@@ -14,10 +14,6 @@
 #' @template MOOP_doc
 #' @template PPL_doc
 #' 
-#' @details
-#' See \code{optimDIST}, \code{optimCORR}, \code{optimPPL}, and 
-#' \code{optimMSSD}.
-#' 
 #' @return
 #' \code{optimSPAN()} returns a matrix: the optimized sample configuration.
 #' 

@@ -5,27 +5,6 @@
 #' @template spJitter_doc
 #' 
 #' @param which.point Integer values defining which point should be perturbed. 
-#'
-#' @details
-#' There are two ways of jittering the coordinates. They differ on how the
-#' set of candidate locations is defined. The first method is implemented in
-#' \code{spJitterFinite} and uses a finite set of candidate locations for the
-#' perturbed points. In other words, the set of candidate locations must be 
-#' discretized.
-#' 
-#' The second method uses an infinite set of candidate locations, that is, the
-#' candidate locations do not have to be discretized. All that is needed is a
-#' polygon indicating the boundary of the spatial domain. This method is not
-#' implemented (yet) because it is more computationally demanding. When a point
-#' is jittered, it is necessary to check if it lays inside the spatial domain.
-#' 
-#' Using a finite set of candidate location has one important inconvenience.
-#' When a point is jittered, it may be that the new location already was 
-#' occupied by another point. If this happens, \code{spJitterFinite} tries to
-#' find another new location for that point as many times as there are points 
-#' in \code{points}. The reason for this is that the more points there are in
-#' \code{points}, the more likely it is that the new location already is 
-#' occupied by another point.
 #' 
 #' @return
 #' A matrix with the jittered projected coordinates of the points.
@@ -34,8 +13,8 @@
 #' Edzer Pebesma, Jon Skoien with contributions from Olivier Baume, A. Chorti, 
 #' D.T. Hristopulos, S.J. Melles and G. Spiliopoulos (2013). 
 #' \emph{intamapInteractive: procedures for automated interpolation - methods 
-#' only to be used interactively, not included in intamap package.} R package 
-#' version 1.1-10.
+#' only to be used interactively, not included in \code{intamap} package.} R 
+#' package version 1.1-10.
 #' 
 #' van Groenigen, J.-W. \emph{Constrained optimization of spatial sampling: 
 #' a geostatistical approach.} Wageningen: Wageningen University, p. 148, 1999.

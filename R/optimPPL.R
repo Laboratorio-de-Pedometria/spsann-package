@@ -12,10 +12,7 @@
 #' @template PPL_doc
 #' 
 #' @details
-#' \strong{Distance}: Euclidean distances between points are used. This 
-#' requires the coordinates to be projected. The user is responsible for making
-#' sure that this requirement is met.
-#' 
+#'
 #' \strong{Distribution}: Using the default uniform distribution means that the
 #' number of point-pairs per lag-distance class (\code{pairs = TRUE}) is equal
 #' to \eqn{n \times (n - 1) / (2 \times lag)}, where \eqn{n} is the total number
@@ -46,12 +43,12 @@
 #' @return
 #' \code{optimPPL} returns a matrix: the optimized sample configuration.
 #'
+#' \code{objPPL} returns a numeric value: the energy state of the sample 
+#' configuration - the objective function value.
+#'
 #' \code{countPPL} returns a data.frame with three columns: a) the lower and b)
 #' upper limits of each lag-distance class, and c) the number of points or 
 #' point-pairs per lag-distance class.
-#'
-#' \code{objPPL} returns a numeric value: the energy state of the sample 
-#' configuration - the objective function value.
 #'
 #' @author
 #' Alessandro Samuel-Rosa \email{alessandrosamuelrosa@@gmail.com}
