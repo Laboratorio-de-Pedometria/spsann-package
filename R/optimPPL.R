@@ -11,35 +11,6 @@
 #' @template MOOP_doc
 #' @template PPL_doc
 #' 
-#' @details
-#'
-#' \strong{Distribution}: Using the default uniform distribution means that the
-#' number of point-pairs per lag-distance class (\code{pairs = TRUE}) is equal
-#' to \eqn{n \times (n - 1) / (2 \times lag)}, where \eqn{n} is the total number
-#' of points and \eqn{lag} is the number of lags. If \code{pairs = FALSE}, then
-#' it means that the number of points per lag is equal to the total number of
-#' points. This is the same as expecting that each point contributes to every
-#' lag. Distributions other than the available options can be easily 
-#' implemented changing the arguments \code{lags} and \code{distri}.
-#' 
-#' \strong{Type of lags}: Two types of lag-distance classes can be created by
-#' default. The first are evenly spaced lags (\code{lags.type = "equidistant"}).
-#' They are created by simply dividing the distance interval from 0.0001 to
-#' \code{cutoff} by the required number of lags. The minimum value of 0.0001
-#' guarantees that a point does not form a pair with itself. The second type of
-#' lags is defined by exponential spacings (\code{lags.type = "exponential"}).
-#' The spacings are defined by the base \eqn{b} of the exponential expression
-#' \eqn{b^n}, where \eqn{n} is the required number of lags. The base is defined
-#' using the argument \code{lags.base}.
-#'
-#' \strong{Criteria}: There are two optimizing criteria implemented. The first
-#' is called using \code{criterion = "distribution"} and is used to minimize the
-#' sum of the absolute differences between a pre-specified distribution and the
-#' observed distribution of points or point-pairs per lag-distance class. The
-#' second criterion is called using \code{criterion = "minimum"}. It corresponds
-#' to maximizing the minimum number of points or point-pairs observed over all
-#' lag-distance classes.
-#' 
 #' @return
 #' \code{optimPPL} returns a matrix: the optimized sample configuration.
 #'

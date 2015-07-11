@@ -14,6 +14,7 @@
 #' \sQuote{Details} for more information.
 #'
 #' @details
+#'
 #' The user-defined objective function \code{fun} must be an object of class 
 #' \code{\link[base]{function}} and include the argument \code{points}. The
 #' argument \code{points} is defined in \code{optimUSER} as a matrix with three 

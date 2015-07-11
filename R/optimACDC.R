@@ -12,6 +12,8 @@
 #' @template spSANN_doc
 #' @template ACDC_doc
 #' @template MOOP_doc
+#' @template CORR_doc
+#' @template DIST_doc
 #' 
 #' @return
 #' \code{optimACDC} returns a matrix: the optimized sample configuration.

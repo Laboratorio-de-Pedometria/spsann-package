@@ -33,6 +33,11 @@
 #' \code{objMKV} returns a numeric value: the energy state of the sample
 #' configuration - the objective function value.
 #'
+#' @note
+#' This function is based on the method originally proposed by Heuvelink, Brus 
+#' and de Gruijter (2006) and implemented in the R-package 
+#' \pkg{intamapInteractive} by Edzer Pebesma and Jon Skoien.
+#'
 #' @references
 #' Brus, D. J. & Heuvelink, G. B. M. Optimization of sample patterns for
 #' universal kriging of environmental variables. \emph{Geoderma}. v. 138, 

@@ -5,23 +5,23 @@
 #use_cran_badge()
 
 # Automatically build functions
+require(autofun)
 fun.name <- c(".check_spsann_arguments", ".plotting_options", 
               ".prepare_jittering", ".prepare_points", ".plot_and_jitter",
               ".prepare_output", ".prepare_acdc_covars")
-read.file <- c("R-autoFunction/check-spsann-arguments.R", 
-               "R-autoFunction/plotting-options.R",
-               "R-autoFunction/prepare-jittering.R",
-               "R-autoFunction/prepare-points.R",
-               "R-autoFunction/plot-and-jitter.R",
-               "R-autoFunction/prepare-output.R",
-               "R-autoFunction/prepare-acdc-covars.R")
+read.file <- c("R-autofun/check-spsann-arguments.R", 
+               "R-autofun/plotting-options.R",
+               "R-autofun/prepare-jittering.R",
+               "R-autofun/prepare-points.R",
+               "R-autofun/plot-and-jitter.R",
+               "R-autofun/prepare-output.R",
+               "R-autofun/prepare-acdc-covars.R")
 write.file <- c("R/check-spsann-arguments.R", "R/plotting-options.R",
                 "R/prepare-jittering.R", "R/prepare-points.R",
                 "R/plot-and-jitter.R", "R/prepare-output.R",
                 "R/prepare-acdc-covars.R")
 lapply(1:length(fun.name), function (i) 
-  ASRtools::autoFunction(fun.name = fun.name[i], read.file = read.file[i], 
-                         write.file = write.file[i]))
+  autofun(fun.name[i], read.file[i], write.file[i]))
 
 # turn on/off development mode
 devtools::dev_mode()

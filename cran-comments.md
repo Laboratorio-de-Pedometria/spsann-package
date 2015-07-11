@@ -17,6 +17,7 @@ R-devel/NEWS, `R CMD check --as-cran` now checks code usage (via `codetools`)
 with only the `base` package attached, so that functions from default packages 
 other than `base` which are used in the package code but not imported are 
 reported as undefined globals.
+Source: http://developer.r-project.org/blosxom.cgi/R-devel/2015/06/29#n2015-06-29
 
 ## Downstream dependencies
 There are no downstream dependencies of `spsann`

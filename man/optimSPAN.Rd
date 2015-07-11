@@ -156,19 +156,7 @@ spread over, \bold{SPAN} the feature, variogram and geographic spaces. The
 utility function is obtained aggregating four single objective functions:
 \bold{CORR}, \bold{DIST}, \bold{PPL}, and \bold{MSSD}.
 }
-\section{Distance between two points}{
-
-
-The distance between two points is computed as the Euclidean distance between
-them. This computation assumes that the optimization is operating in the
-two-dimensional Euclidean space, i.e. the coordinates of the sample points
-and candidate locations should not be provided as latitude/longitude. Package
-\pkg{spsann} has no mechanism to check if the coordinates are projected, and
-the user is responsible for making sure that this requirement is attained.
-}
-
 \section{Jittering methods}{
-
 
 There are two ways of jittering the coordinates. They differ on how the
 set of candidate locations is defined. The first method uses an
@@ -177,7 +165,7 @@ domain can be selected as the new location of a perturbed point. All that
 this method needs is a polygon indicating the boundary of the spatial domain.
 This method is not implemented in the \pkg{spsann} package (yet) because it
 is computationally demanding: every time a point is jittered, it is necessary
-to check if it lays inside the spatial domain.
+to check if it is inside the spatial domain.
 
 The second method consists of using a \emph{finite} set of candidate
 locations for the perturbed points. A finite set of candidate locations is
@@ -194,10 +182,33 @@ Because the more points there are in \code{points}, the more likely it is
 that the new location already is occupied by another point. If a solution is
 not found, the point selected to be jittered point is kept in its original
 location.
+
+A more elegant method can be defined using a finite set of candidate
+locations coupled with a form of \emph{two-stage random sampling} as
+implemented in \code{\link[spcosa]{spsample}}. Because the candidate
+locations are placed on a finite regular grid, they can be seen as being the
+centre nodes of a finite set of grid cells (or pixels of a raster image). In
+the first stage, one of the \dQuote{grid cells} is selected with replacement,
+i.e. independently of already being occupied by another sample point. The new
+location for the point chosen to be jittered is selected within that
+\dQuote{grid cell} by simple random sampling. This method guarantees that
+any location in the spatial domain can be a candidate location. It also
+discards the need to check if the new location already is occupied by
+another point. This method is not implemented (yet) in the \pkg{spsann}
+package.
+}
+
+\section{Distance between two points}{
+
+The distance between two points is computed as the Euclidean distance between
+them. This computation assumes that the optimization is operating in the
+two-dimensional Euclidean space, i.e. the coordinates of the sample points
+and candidate locations should not be provided as latitude/longitude. Package
+\pkg{spsann} has no mechanism to check if the coordinates are projected, and
+the user is responsible for making sure that this requirement is attained.
 }
 
 \section{Multi-objective optimization}{
-
 
 A method of solving a multi-objective optimization problem is to aggregate
 the objective functions into a single \emph{utility function}. In the
@@ -262,6 +273,105 @@ A is obtained when the sample configuration is optimized regarding function
 B. This is the Pareto maximum of function A. The same logic applies for
 function B.
 }
+
+\section{Association/Correlation between covariates}{
+
+The \emph{correlation} between two numeric covariates is measured using the
+Pearson's r, a descriptive statistic that ranges from $-1$ to $+1$.
+This statistic is also known as the linear correlation coefficient.
+
+When the set of covariates includes factor covariates, any numeric covariate
+is transformed into a factor covariate. The factor levels are defined
+using the marginal sampling strata created using one of the two methods
+available (equal-area or equal-range strata).
+
+The \emph{association} between two factor covariates is measured using the
+Cramér's v, a descriptive statistic that ranges from $0$ to $+1$. The closer
+to $+1$ the Cramér's v is, the stronger the association between two factor
+covariates. The main weakness of using the Cramér's v is that, while the
+Pearson's r shows the degree and direction of the association between two
+covariates (negative or positive), the Cramér's v only measures the degree
+of association (weak or strong).
+}
+
+\section{Marginal distribution of covariates}{
+
+Reproducing the marginal distribution of the numeric covariates depends upon
+the definition of marginal sampling strata. These marginal sampling strata
+are also used to define the factor levels of any numeric covariate when they
+are passed together with factor covariates.
+
+Two types of marginal sampling strata can be used. \emph{Equal-area}
+sampling strata are defined using the sample quantiles estimated with
+\code{\link[stats]{quantile}} using a discontinuous function
+(\code{type = 3}). This is to avoid creating breakpoints that do not occur
+in the population of existing covariate values.
+
+The function \code{\link[stats]{quantile}} commonly produces repeated
+break points. A break point will always be repeated if that value has a
+relatively high frequency in the population of covariate values. The number
+of repeated break points increases with the number of marginal sampling
+strata. Only unique break points are used to create marginal sampling strata.
+
+\emph{Equal-range} sampling strata are defined breaking the range of
+covariate values into pieces of equal size. This method usually creates
+break points that do not occur in the population of existing covariate
+values. Such break points are replaced by the nearest existing covariate
+value identified using Euclidean distances.
+
+Both stratification methods can produce marginal sampling strata that cover
+a range of values that do not exist in the population of covariate values.
+Any empty marginal sampling strata is merged with the closest non-empty
+marginal sampling strata. These are identified using Euclidean distances.
+
+The approaches used to define the marginal sampling strata result in each
+numeric covariate having a different number of marginal sampling strata,
+some of them with different area/size. Because the goal is to have a sample
+that reproduces the marginal distribution of the covariate, each marginal
+sampling strata will have a different number of sample points. The wanted
+distribution of the number of sample points per marginal strata is estimated
+empirically computing the proportion of points of the population of existing
+covariate values that fall in each marginal sampling strata.
+}
+
+\section{Lag-distance classes}{
+
+Two types of lag-distance classes can be created by default. The first are
+evenly spaced lags (\code{lags.type = "equidistant"}). They are created by
+simply dividing the distance interval from 0.0001 to \code{cutoff} by the
+required number of lags. The minimum value of 0.0001 guarantees that a
+point does not form a pair with itself. The second type of lags is defined by
+exponential spacings (\code{lags.type = "exponential"}). The spacings are
+defined by the base \eqn{b} of the exponential expression \eqn{b^n}, where
+\eqn{n} is the required number of lags. The base is defined using the
+argument \code{lags.base}.
+
+Using the default uniform distribution means that the
+number of point-pairs per lag-distance class (\code{pairs = TRUE}) is equal
+to \eqn{n \times (n - 1) / (2 \times lag)}, where \eqn{n} is the total number
+of points and \eqn{lag} is the number of lags. If \code{pairs = FALSE}, then
+it means that the number of points per lag is equal to the total number of
+points. This is the same as expecting that each point contributes to every
+lag. Distributions other than the available options can be easily
+implemented changing the arguments \code{lags} and \code{distri}.
+
+There are two optimizing criteria implemented. The first is called
+using \code{criterion = "distribution"} and is used to minimize the
+sum of the absolute differences between a pre-specified distribution and the
+observed distribution of points or point-pairs per lag-distance class. The
+second criterion is called using \code{criterion = "minimum"}. It corresponds
+to maximizing the minimum number of points or point-pairs observed over all
+lag-distance classes.
+}
+
+\section{Spatial coverage sampling}{
+
+Spatial coverage sampling is based on the knowledge that the kriging variance
+depends upon the distance between the sample points. As such, the better the
+spread of the sample points in the spatial domain, the smaller the kriging
+variance. This is similar to using a regular grid of sample points. However,
+a regular grid usually is suboptimal for irregularly shaped areas.
+}
 \examples{
 require(sp)
 data(meuse.grid)
@@ -280,6 +390,15 @@ objSPAN(points = res, candi = candi, covars = covars, nadir = nadir,
 Alessandro Samuel-Rosa \email{alessandrosamuelrosa@gmail.com}
 }
 \references{
+Edzer Pebesma, Jon Skoien with contributions from Olivier Baume, A. Chorti,
+D.T. Hristopulos, S.J. Melles and G. Spiliopoulos (2013).
+\emph{intamapInteractive: procedures for automated interpolation - methods
+only to be used interactively, not included in \code{intamap} package.} R
+package version 1.1-10.
+
+van Groenigen, J.-W. \emph{Constrained optimization of spatial sampling:
+a geostatistical approach.} Wageningen: Wageningen University, p. 148, 1999.
+
 Cramér, H. \emph{Mathematical methods of statistics}. Princeton: Princeton
 University Press, p. 575, 1946.
 

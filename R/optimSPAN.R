@@ -12,7 +12,10 @@
 #' @template spSANN_doc
 #' @template ACDC_doc
 #' @template MOOP_doc
+#' @template CORR_doc
+#' @template DIST_doc
 #' @template PPL_doc
+#' @template MSSD_doc
 #' 
 #' @return
 #' \code{optimSPAN()} returns a matrix: the optimized sample configuration.

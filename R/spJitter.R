@@ -9,16 +9,6 @@
 #' @return
 #' A matrix with the jittered projected coordinates of the points.
 #' 
-#' @references
-#' Edzer Pebesma, Jon Skoien with contributions from Olivier Baume, A. Chorti, 
-#' D.T. Hristopulos, S.J. Melles and G. Spiliopoulos (2013). 
-#' \emph{intamapInteractive: procedures for automated interpolation - methods 
-#' only to be used interactively, not included in \code{intamap} package.} R 
-#' package version 1.1-10.
-#' 
-#' van Groenigen, J.-W. \emph{Constrained optimization of spatial sampling: 
-#' a geostatistical approach.} Wageningen: Wageningen University, p. 148, 1999.
-#' 
 #' @author 
 #' Alessandro Samuel-Rosa \email{alessandrosamuelrosa@@gmail.com}
 #' 

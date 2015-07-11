@@ -19,7 +19,6 @@
 #' calculating the utopia point internally (experimental).
 #' 
 #' @section Multi-objective optimization:
-#'
 #' A method of solving a multi-objective optimization problem is to aggregate 
 #' the objective functions into a single \emph{utility function}. In the
 #' \pkg{spsann} package, the aggregation is performed using the \emph{weighted 

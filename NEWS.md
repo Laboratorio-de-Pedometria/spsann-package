@@ -1,3 +1,6 @@
+# Version 0.0.0.9011 (2015-07-13)
+* The documentation of all functions was significantly improved.
+
 # Version 0.0.0.9010 (2015-07-05)
 * Using `utils::globalVariables` to avoid the `R CMD check` note 
   `no visible binding for global variable [variable name]`. Source of the 
