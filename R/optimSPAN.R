@@ -138,7 +138,9 @@ optimSPAN <-
     old_energy <- energy0
     best_energy <- data.frame(obj = Inf, CORR = Inf, DIST = Inf, PPL = Inf, 
                               MSSD = Inf)
-    if (progress) pb <- txtProgressBar(min = 1, max = iterations, style = 3)
+    if (progress) {
+      pb <- utils::txtProgressBar(min = 1, max = iterations, style = 3) 
+    }
     time0 <- proc.time()
 
     # BEGIN THE ITERATIONS
@@ -168,7 +170,11 @@ optimSPAN <-
                              pairs = pairs, dm.mssd = new_dm_mssd)
 
       # Evaluate the new system configuration
-      random_prob <- runif(1)
+      if (greedy) {
+        random_prob <- 1
+      } else {
+        random_prob <- stats::runif(1)
+      }
       actual_prob <- acceptance[[1]] * exp(-k / acceptance[[2]])
       if (track) accept_probs[k] <- actual_prob
       if (new_energy[1] <= old_energy[1]) {
@@ -264,7 +270,7 @@ optimSPAN <-
           break
         }
       }
-      if (progress) setTxtProgressBar(pb, k)
+      if (progress) utils::setTxtProgressBar(pb, k)
     }
     
     # Prepare output

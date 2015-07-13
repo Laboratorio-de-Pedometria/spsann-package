@@ -111,7 +111,9 @@ optimMKV <-
     count <- 0
     old_energy <- energy0
     best_energy <- Inf
-    if (progress) pb <- txtProgressBar(min = 1, max = iterations, style = 3)
+    if (progress) {
+      pb <- utils::txtProgressBar(min = 1, max = iterations, style = 3) 
+    }
     time0 <- proc.time()
     
     # begin the main loop
@@ -129,7 +131,7 @@ optimMKV <-
       if (greedy) {
         random_prob <- 1
       } else {
-        random_prob <- runif(1)
+        random_prob <- stats::runif(1)
       }
       actual_prob <- acceptance[[1]] * exp(-k / acceptance[[2]])
       if (track) accept_probs[k] <- actual_prob
@@ -190,7 +192,7 @@ optimMKV <-
           break
         }
       }
-      if (progress) setTxtProgressBar(pb, k)
+      if (progress) utils::setTxtProgressBar(pb, k)
     }
     
     # Prepare output
@@ -228,7 +230,7 @@ optimMKV <-
   function (n_pts, eqn, pts, covars) {
     
     z <- rep(1, n_pts)
-    if (terms(eqn)[[3]] == 1) { # Simple and ordinary kriging
+    if (stats::terms(eqn)[[3]] == 1) { # Simple and ordinary kriging
       sm <- data.frame(z, pts[, 2:3])
       colnames(sm) <- c("z", "x", "y")
       
@@ -248,7 +250,7 @@ optimMKV <-
 .covarsMKV <-
   function (eqn, candi, covars) {
     
-    if (terms(eqn)[[3]] == 1) { # Simple and ordinary kriging
+    if (stats::terms(eqn)[[3]] == 1) { # Simple and ordinary kriging
       covars <- data.frame(candi[, 2:3])
       colnames(covars) <- c("x", "y")
       

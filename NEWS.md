@@ -1,5 +1,8 @@
 # Version 0.0.0.9011 (2015-07-13)
 * The documentation of all functions was significantly improved.
+* Functions from default packages other than `base` are now imported to comply
+  with the new change to the CRAN policy described at
+  http://developer.r-project.org/blosxom.cgi/R-devel/NEWS/2015/06/29#n2015-06-29.
 
 # Version 0.0.0.9010 (2015-07-05)
 * Using `utils::globalVariables` to avoid the `R CMD check` note 

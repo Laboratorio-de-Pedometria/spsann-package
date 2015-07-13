@@ -84,7 +84,9 @@ optimPPL <-
     count <- 0
     old_energy <- energy0
     best_energy <- Inf
-    if (progress) pb <- txtProgressBar(min = 1, max = iterations, style = 3)
+    if (progress) {
+      pb <- utils::txtProgressBar(min = 1, max = iterations, style = 3) 
+    }
     time0 <- proc.time()
     
     # Begin the iterations
@@ -116,7 +118,7 @@ optimPPL <-
       if (greedy) {
         random_prob <- 1
       } else {
-        random_prob <- runif(1)
+        random_prob <- stats::runif(1)
       }
       actual_prob <- acceptance$initial * exp(-k / acceptance$cooling)
       if (track) accept_probs[k] <- actual_prob
@@ -176,7 +178,7 @@ optimPPL <-
           break
         }
       }
-      if (progress) setTxtProgressBar(pb, k)
+      if (progress) utils::setTxtProgressBar(pb, k)
       
     }
     
