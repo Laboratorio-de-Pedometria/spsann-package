@@ -82,7 +82,9 @@ optimCORR <-
     count <- 0
     old_energy <- energy0
     best_energy <- Inf
-    if (progress) pb <- txtProgressBar(min = 1, max = iterations, style = 3)
+    if (progress) {
+      pb <- utils::txtProgressBar(min = 1, max = iterations, style = 3) 
+    }
     time0 <- proc.time()
 
     # Begin the main loop
@@ -100,7 +102,7 @@ optimCORR <-
       if (greedy) {
         random_prob <- 1
       } else {
-        random_prob <- runif(1)
+        random_prob <- stats::runif(1)
       }
       actual_prob <- acceptance[[1]] * exp(-k / acceptance[[2]])
       if (track) accept_probs[k] <- actual_prob
@@ -167,7 +169,7 @@ optimCORR <-
           break
         }
       }
-      if (progress) setTxtProgressBar(pb, k)
+      if (progress) utils::setTxtProgressBar(pb, k)
     }
     
     # Prepare output
@@ -207,7 +209,7 @@ objCORR <-
   function (obj, covars.type) {
     
     if (covars.type == "numeric") { 
-      cor(x = obj, use = "complete.obs")
+      stats::cor(x = obj, use = "complete.obs")
       
     } else { # Factor covariates
       pedometrics::cramer(x = obj)

@@ -5,3 +5,9 @@ if (getRversion() >= "2.15.1") {
                                    "n_candi", "wp", "conf0", "pre.distri",
                                    "pop.prop"))
 }
+
+# Import functions from default packages other than `base`
+# Source: http://stackoverflow.com/a/31314870/3365410
+#' @importFrom stats cor quantile runif terms
+#' @importFrom graphics axis hist legend lines mtext par plot points text
+#' @importFrom utils setTxtProgressBar txtProgressBar

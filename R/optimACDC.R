@@ -131,7 +131,9 @@ optimACDC <-
     count <- 0
     old_energy <- energy0
     best_energy <- data.frame(obj = Inf, CORR = Inf, DIST = Inf)
-    if (progress) pb <- txtProgressBar(min = 1, max = iterations, style = 3)
+    if (progress) {
+      pb <- utils::txtProgressBar(min = 1, max = iterations, style = 3) 
+    }
     time0 <- proc.time()
 
     # Begin the main loop
@@ -152,7 +154,7 @@ optimACDC <-
       if (greedy) {
         random_prob <- 1
       } else {
-        random_prob <- runif(1)
+        random_prob <- stats::runif(1)
       }
       actual_prob <- acceptance[[1]] * exp(-k / acceptance[[2]])
       if (track) accept_probs[k] <- actual_prob
@@ -220,7 +222,7 @@ optimACDC <-
           break
         }
       }
-      if (progress) setTxtProgressBar(pb, k)
+      if (progress) utils::setTxtProgressBar(pb, k)
     }
 
     # Prepare output
@@ -280,7 +282,7 @@ optimACDC <-
         
         # Compute the break points (discrete sample quantiles)
         probs <- seq(0, 1, length.out = n.pts + 1)
-        breaks <- lapply(covars, quantile, probs, na.rm = TRUE, type = 3)
+        breaks <- lapply(covars, stats::quantile, probs, na.rm = TRUE, type = 3)
         
       } else { # equal range strata
         
@@ -299,8 +301,9 @@ optimACDC <-
       breaks <- lapply(breaks, unique)
       
       # Compute the proportion of population points per marginal sampling strata
-      count <- lapply(1:n_cov, function (i)
-        hist(covars[, i], breaks[[i]], plot = FALSE)$counts)
+      count <- lapply(1:n_cov, function (i) {
+        stats::hist(covars[, i], breaks[[i]], plot = FALSE)$counts
+      })
       prop <- lapply(1:n_cov, function (i) count[[i]] / sum(count[[i]]))
       
       # Output

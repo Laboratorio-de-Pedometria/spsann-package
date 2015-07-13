@@ -1,9 +1,5 @@
 # Build package
 
-#use_travis()
-#use_cran_comments()
-#use_cran_badge()
-
 # Automatically build functions
 require(autofun)
 fun.name <- c(".check_spsann_arguments", ".plotting_options", 
@@ -21,7 +17,7 @@ write.file <- c("R/check-spsann-arguments.R", "R/plotting-options.R",
                 "R/plot-and-jitter.R", "R/prepare-output.R",
                 "R/prepare-acdc-covars.R")
 lapply(1:length(fun.name), function (i) 
-  autofun(fun.name[i], read.file[i], write.file[i]))
+  autofun::autofun(fun.name[i], read.file[i], write.file[i]))
 
 # turn on/off development mode
 devtools::dev_mode()

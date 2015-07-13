@@ -4,7 +4,8 @@
   function (energy0, energies, k, acceptance, accept_probs, boundary, new_conf,
             conf0, y_max0, y.max, x_max0, x.max, best.energy, best.k, MOOP, 
             wp, greedy = FALSE) {
-    par(mfrow = c(1, 2))
+    
+    graphics::par(mfrow = c(1, 2))
     
     # PLOT THE ENERGY STATES
     # Multi-objective optimization problem
@@ -12,76 +13,79 @@
       n <- ncol(energy0)
       l <- colnames(energy0)
       a <- rbind(energy0, energies)
-      plot(1, type = 'n', xlim = c(0, k), 
-           ylim = c(0, max(a)), #ylim = c(min(a), max(a)), 
-           xlab = "iteration", ylab = "energy state")
-      legend("topright", legend = l, lwd = 1, lty = 1:n)
+      graphics::plot(1, type = 'n', xlim = c(0, k), 
+                     ylim = c(0, max(a)), #ylim = c(min(a), max(a)), 
+                     xlab = "iteration", ylab = "energy state")
+      graphics::legend("topright", legend = l, lwd = 1, lty = 1:n)
       
       for(i in 1:ncol(a)) {
-        #lines(a[, i] ~ c(0:k), type = "l", lty = i)
-        lines(a[, i] ~ c(1:k), type = "l", lty = i)
+        #graphics::lines(a[, i] ~ c(0:k), type = "l", lty = i)
+        graphics::lines(a[, i] ~ c(1:k), type = "l", lty = i)
       }
-      lines(x = c(-k, 0), y = rep(energy0[1], 2), col = "red")
-      lines(x = rep(best.k, 2), y = c(-5, best.energy[1]), col = "green")
+      graphics::lines(x = c(-k, 0), y = rep(energy0[1], 2), col = "red")
+      graphics::lines(x = rep(best.k, 2), y = c(-5, best.energy[1]), 
+                      col = "green")
       
       # Single-objective optimization problem
     } else {
       a <- c(energy0, energies[1:k])
-      plot(a ~ c(0:k), type = "l", xlab = "iteration", ylab = "energy state")
-      lines(x = c(-k, 0), y = rep(energy0, 2), col = "red")
-      lines(x = rep(best.k, 2), y = c(-5, best.energy), col = "green") 
+      graphics::plot(a ~ c(0:k), type = "l", xlab = "iteration", 
+                     ylab = "energy state")
+      graphics::lines(x = c(-k, 0), y = rep(energy0, 2), col = "red")
+      graphics::lines(x = rep(best.k, 2), y = c(-5, best.energy), col = "green") 
     }
     
     # plot acceptance probability
     if (greedy == FALSE) {
       a <- c(acceptance[[1]], accept_probs[1:k])
-      par(new = TRUE)
-      plot(a ~ c(0:k), type = "l", axes = FALSE, bty = "n", xlab = "", 
-           ylab = "", col = "blue", ylim = c(0, acceptance[[1]]))
-      axis(side = 4, at = pretty(range(a)))
-      mtext("acceptance probability", side = 4, line = 3) 
+      graphics::par(new = TRUE)
+      graphics::plot(a ~ c(0:k), type = "l", axes = FALSE, bty = "n", xlab = "",
+                     ylab = "", col = "blue", ylim = c(0, acceptance[[1]]))
+      graphics::axis(side = 4, at = pretty(range(a)))
+      graphics::mtext("acceptance probability", side = 4, line = 3) 
     }
     
     # plot sample points
-    bb <- bbox(boundary)
+    bb <- sp::bbox(boundary)
     if (class(boundary) == "SpatialPoints") {
-      plot(boundary, pch = 20, cex = 0.1)
+      graphics::plot(boundary, pch = 20, cex = 0.1)
     } else {
-      plot(boundary)
+      graphics::plot(boundary)
     }
-    points(conf0[, 1], conf0[, 2], pch = 1, cex = 0.5, 
-           col = "lightgray")
-    points(new_conf[, 1], new_conf[, 2], pch = 20, cex = 0.5)
+    graphics::points(conf0[, 1], conf0[, 2], pch = 1, cex = 0.5, 
+                     col = "lightgray")
+    graphics::points(new_conf[, 1], new_conf[, 2], pch = 20, cex = 0.5)
     if (!missing(wp)) {
-      points(new_conf[wp, 1], new_conf[wp, 2], pch = 20, cex = 1, 
-             col = "red")
+      graphics::points(new_conf[wp, 1], new_conf[wp, 2], pch = 20, cex = 1, 
+                       col = "red")
     }
     
     # plot maximum shift in the x and y coordinates
     x <- c(bb[1, 1], bb[1, 2])
     y <- rep(bb[2, 1], 2) - 0.02 * y_max0
-    lines(x = x, y = y, col = "gray", lwd = 12)
+    graphics::lines(x = x, y = y, col = "gray", lwd = 12)
     
     y <- c(bb[2, 1], bb[2, 2])
     x <- rep(bb[1, 1], 2) - 0.02 * x_max0
-    lines(y = y, x = x, col = "gray", lwd = 12)
+    graphics::lines(y = y, x = x, col = "gray", lwd = 12)
     
     x <- c(bb[1, 1], bb[1, 1] + x.max)
     y <- rep(bb[2, 1], 2) - 0.02 * y_max0
-    lines(x = x, y = y, col = "orange", lwd = 12)
+    graphics::lines(x = x, y = y, col = "orange", lwd = 12)
     
     x <- rep(bb[1, 1], 2) - 0.02 * x_max0
     y <- c(bb[2, 1], bb[2, 1] + y.max)
-    lines(y = y, x = x, col = "orange", lwd = 12)
+    graphics::lines(y = y, x = x, col = "orange", lwd = 12)
     
     # plot labels for maximum shift in the x and y coordinates
     x <- bb[1, 1] + (bb[1, 2] - bb[1, 1]) / 2
     y <- bb[2, 1] - 0.02 * y_max0
-    text(x = x, y = y, labels = "maximum shift in the X axis")
+    graphics::text(x = x, y = y, labels = "maximum shift in the X axis")
     
     x <- bb[1, 1] - 0.02 * x_max0
     y <- bb[2, 1] + (bb[2, 2] - bb[2, 1]) / 2
-    text(y = y, x = x, srt = 90, labels = "maximum shift in the Y axis")
+    graphics::text(y = y, x = x, srt = 90, 
+                   labels = "maximum shift in the Y axis")
   }
 # THE ORIGINAL spSANN FUNCTION #################################################
 # .energyState <- 
@@ -99,7 +103,7 @@
 #             stopping = list(max.count = 200), progress = TRUE, 
 #             verbose = TRUE) {
 #     if (plotit){
-#       par0 <- par()
+#       par0 <- graphics::par()
 #     }
 #     n_pts             <- dim(points)[1]
 #     conf0       <- points
@@ -208,7 +212,7 @@
 #       close(pb)
 #     }
 #     if (plotit){
-#       par(par0)
+#       graphics::par(par0)
 #     }
 #     res <- new_conf
 #     criterion <- c(energy0, energies)
