@@ -228,13 +228,16 @@ B. This is the Pareto maximum of function A. The same logic applies for
 function B.
 }
 \examples{
+\dontrun{
+# This example takes more than 5 seconds to run!
 require(sp)
 data(meuse.grid)
 candi <- meuse.grid[, 1:2]
 set.seed(2001)
 res <- optimMSSD(points = 100, candi = candi)
-tail(attr(res, "energy.state"), 1) # 11531.03
+objSPSANN(res) # 11531.03
 objMSSD(candi = candi, points = res)
+}
 }
 \author{
 Alessandro Samuel-Rosa \email{alessandrosamuelrosa@gmail.com}

@@ -17,6 +17,8 @@
 #' @concept jitter perturb
 #' @export
 #' @examples
+#' \dontrun{
+#' # This example takes more than 5 seconds to run!
 #' require(sp)
 #' data(meuse.grid)
 #' meuse.grid <- as.matrix(meuse.grid[, 1:2])
@@ -37,6 +39,7 @@
 #' plot(meuse.grid[, 2:3], asp = 1, pch = 15, col = "gray")
 #' points(pts2[, 2:3], col = "red", cex = 0.5)
 #' points(pts3[, 2:3], pch = 19, col = "blue", cex = 0.5)
+#' }
 # FUNCTION #####################################################################
 spJitterFinite <-
   function (points, candi, x.max, x.min, y.max, y.min, which.point) {

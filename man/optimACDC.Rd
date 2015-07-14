@@ -306,6 +306,8 @@ empirically computing the proportion of points of the population of existing
 covariate values that fall in each marginal sampling strata.
 }
 \examples{
+\dontrun{
+# This example takes more than 5 seconds to run!
 require(sp)
 data(meuse.grid)
 candi <- meuse.grid[, 1:2]
@@ -313,9 +315,9 @@ nadir <- list(sim = 10, seeds = 1:10)
 utopia <- list(user = list(DIST = 0, CORR = 0))
 covars <- meuse.grid[, 5]
 set.seed(2001)
-res <- optimACDC(points = 100, candi = candi, covars = covars, nadir = nadir,
-                 use.coords = TRUE, utopia = utopia)
-tail(attr(res, "energy")$obj, 1) # 0.5272031
+res <- optimACDC(points = 100, candi = candi, covars = covars,
+                 nadir = nadir, use.coords = TRUE, utopia = utopia)
+objSPSANN(res) # 0.5272031
 objACDC(points = res, candi = candi, covars = covars, use.coords = TRUE,
         nadir = nadir, utopia = utopia)
 # MARGINAL DISTRIBUTION
@@ -341,6 +343,7 @@ cor(cbind(candi[, 1], candi[, 2], covars))
 cor(cbind(candi[res[, 1], 1], candi[res[, 1], 2], covars[res[, 1]]))
 # Random sample
 cor(cbind(candi[i, 1], candi[i, 2], covars[i]))
+}
 }
 \author{
 Alessandro Samuel-Rosa \email{alessandrosamuelrosa@gmail.com}

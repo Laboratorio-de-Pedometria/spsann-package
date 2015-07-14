@@ -231,6 +231,8 @@ B. This is the Pareto maximum of function A. The same logic applies for
 function B.
 }
 \examples{
+\dontrun{
+# This example takes more than 5 seconds to run!
 require(sp)
 require(SpatialTools)
 data(meuse.grid)
@@ -266,9 +268,10 @@ timePPL <- Sys.time() - timePPL
 # Compare results
 timeUSER
 timePPL
-lapply(list(resUSER, resPPL), countPPL, lags = lags, pairs = FALSE)
-attr(resUSER, "energy.state") # 58
-attr(resPPL, "energy.state") # 58
+lapply(list(resUSER, resPPL), countPPL, candi = candi, lags = lags)
+objSPSANN(resUSER) # 58
+objSPSANN(resPPL) # 58
+}
 }
 \author{
 Alessandro Samuel-Rosa \email{alessandrosamuelrosa@gmail.com}

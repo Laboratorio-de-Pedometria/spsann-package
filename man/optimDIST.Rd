@@ -274,6 +274,8 @@ empirically computing the proportion of points of the population of existing
 covariate values that fall in each marginal sampling strata.
 }
 \examples{
+\dontrun{
+# This example takes more than 5 seconds to run!
 require(sp)
 data(meuse.grid)
 candi <- meuse.grid[, 1:2]
@@ -281,8 +283,9 @@ covars <- meuse.grid[, 5]
 set.seed(2001)
 res <- optimDIST(points = 100, candi = candi, covars = covars,
                  use.coords = TRUE)
-tail(attr(res, "energy"), 1) # 1.6505
+objSPSANN(res) # 1.6505
 objDIST(points = res, candi = candi, covars = covars, use.coords = TRUE)
+}
 }
 \author{
 Alessandro Samuel-Rosa \email{alessandrosamuelrosa@gmail.com}

@@ -373,6 +373,8 @@ variance. This is similar to using a regular grid of sample points. However,
 a regular grid usually is suboptimal for irregularly shaped areas.
 }
 \examples{
+\dontrun{
+# This example takes more than 5 seconds to run!
 require(sp)
 data(meuse.grid)
 candi <- meuse.grid[, 1:2]
@@ -382,9 +384,10 @@ covars <- meuse.grid[, 5]
 set.seed(2001)
 res <- optimSPAN(points = 100, candi = candi, covars = covars, nadir = nadir,
                  use.coords = TRUE, utopia = utopia)
-tail(attr(res, "energy"), 1) # 0.7693468
+objSPSANN(res) # 0.7693468
 objSPAN(points = res, candi = candi, covars = covars, nadir = nadir,
         use.coords = TRUE, utopia = utopia)
+}
 }
 \author{
 Alessandro Samuel-Rosa \email{alessandrosamuelrosa@gmail.com}

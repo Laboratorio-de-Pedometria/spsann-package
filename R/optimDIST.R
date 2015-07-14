@@ -19,15 +19,12 @@
 #'
 #' @author Alessandro Samuel-Rosa \email{alessandrosamuelrosa@@gmail.com}
 #' @seealso \code{\link[clhs]{clhs}}
-#' @importFrom pedometrics is.numint
-#' @importFrom pedometrics cont2cat
-#' @importFrom pedometrics is.all.factor
-#' @importFrom pedometrics is.any.factor
-#' @importFrom SpatialTools dist2
 #' @aliases optimDIST objDIST
 #' @import Rcpp
 #' @export
 #' @examples
+#' \dontrun{
+#' # This example takes more than 5 seconds to run!
 #' require(sp)
 #' data(meuse.grid)
 #' candi <- meuse.grid[, 1:2]
@@ -35,8 +32,9 @@
 #' set.seed(2001)
 #' res <- optimDIST(points = 100, candi = candi, covars = covars, 
 #'                  use.coords = TRUE)
-#' tail(attr(res, "energy"), 1) # 1.6505
+#' objSPSANN(res) # 1.6505
 #' objDIST(points = res, candi = candi, covars = covars, use.coords = TRUE)
+#' }
 # MAIN FUNCTION ################################################################
 optimDIST <-
   function (points, candi, iterations = 100, 
@@ -184,7 +182,7 @@ optimDIST <-
       
       # Count the number of points per marginal sampling strata
       count <- lapply(1:n.cov, function (i) {
-        stats::hist(sm[, i], pop.prop[[1]][[i]], plot = FALSE)$counts
+        graphics::hist(sm[, i], pop.prop[[1]][[i]], plot = FALSE)$counts
       })
       
       # Compute the sample proportions

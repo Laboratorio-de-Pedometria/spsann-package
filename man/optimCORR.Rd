@@ -254,6 +254,8 @@ covariates (negative or positive), the Cramér's v only measures the degree
 of association (weak or strong).
 }
 \examples{
+\dontrun{
+# This example takes more than 5 seconds to run!
 require(sp)
 data(meuse.grid)
 candi <- meuse.grid[, 1:2]
@@ -261,8 +263,9 @@ covars <- meuse.grid[, 5]
 set.seed(2001)
 res <- optimCORR(points = 100, candi = candi, covars = covars,
                  use.coords = TRUE)
-tail(attr(res, "energy"), 1) # 0.06386069
+objSPSANN(res) # 0.06386069
 objCORR(points = res, candi = candi, covars = covars, use.coords = TRUE)
+}
 }
 \author{
 Alessandro Samuel-Rosa \email{alessandrosamuelrosa@gmail.com}

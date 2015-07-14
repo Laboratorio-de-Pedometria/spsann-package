@@ -26,12 +26,17 @@
 #' @aliases optimPPL countPPL objPPL
 #' @export
 #' @examples
+#' \dontrun{
+#' # This example takes more than 5 seconds to run!
 #' require(sp)
 #' data(meuse.grid)
 #' candi <- meuse.grid[, 1:2]
 #' set.seed(2001)
 #' res <- optimPPL(points = 100, candi = candi)
-#' tail(attr(res, "energy.state"), 1) # 160
+#' objSPSANN(res) # 160
+#' objPPL(points = res, candi = candi)
+#' countPPL(points = res, candi = candi)
+#' }
 # FUNCTION - MAIN ##############################################################
 optimPPL <-
   function (points, candi, iterations = 100, 
@@ -205,10 +210,10 @@ objPPL <-
     # Prepare points and candi
     eval(.prepare_points())
     
-    # Prepare for jittering
-    eval(.prepare_jittering())
-    
     # Prepare cutoff and lags
+    if (missing(cutoff)) {
+      eval(.prepare_jittering())
+    }
     cutoff <- .cutoffPPL(cutoff = cutoff, x.max = x.max, y.max = y.max)
     lags <- .lagsPPL(lags = lags, lags.type = lags.type, cutoff = cutoff, 
                      lags.base = lags.base)
@@ -243,11 +248,15 @@ countPPL <-
     # Prepare points and candi
     eval(.prepare_points())
     
-    # Prepare lags
-    lags <- .lagsPPL(lags = lags, lags.type = lags.type, cutoff = cutoff,
+    # Prepare cutoff and lags
+    if (missing(cutoff)) {
+      eval(.prepare_jittering())
+    }
+    cutoff <- .cutoffPPL(cutoff = cutoff, x.max = x.max, y.max = y.max)
+    lags <- .lagsPPL(lags = lags, lags.type = lags.type, cutoff = cutoff, 
                      lags.base = lags.base)
     n_lags <- length(lags) - 1
-    
+
     # Distance matrix and counts
     dm <- SpatialTools::dist1(points[, 2:3])
     res <- .getPPL(lags = lags, n.lags = n_lags, dist.mat = dm, pairs = pairs)
@@ -267,12 +276,12 @@ countPPL <-
     
     # Arguments 'lags' and 'cutoff'
     if (length(lags) == 1) {
-      if (fun != "optimPPL") {
-        if (missing(cutoff)) {
-          res <- c("'cutoff' is mandatory if the lag intervals are not set")
-          return (res)
-        }
-      }
+#       if (fun != "optimPPL") {
+#         if (missing(cutoff)) {
+#           res <- c("'cutoff' is mandatory if the lag intervals are not set")
+#           return (res)
+#         }
+#       }
     } else {
       if (!missing(cutoff)) {
         res <- c("'cutoff' cannot be used when the lag intervals are set")

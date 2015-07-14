@@ -25,12 +25,10 @@
 #' 
 #' @author Alessandro Samuel-Rosa \email{alessandrosamuelrosa@@gmail.com}
 #' @aliases optimSPAN objSPAN
-#' @importFrom pedometrics cramer
-#' @importFrom pedometrics is.numint
-#' @importFrom pedometrics cont2cat
-#' @importFrom SpatialTools dist2
 #' @export
 #' @examples
+#' \dontrun{
+#' # This example takes more than 5 seconds to run!
 #' require(sp)
 #' data(meuse.grid)
 #' candi <- meuse.grid[, 1:2]
@@ -40,9 +38,10 @@
 #' set.seed(2001)
 #' res <- optimSPAN(points = 100, candi = candi, covars = covars, nadir = nadir,
 #'                  use.coords = TRUE, utopia = utopia)
-#' tail(attr(res, "energy"), 1) # 0.7693468
+#' objSPSANN(res) # 0.7693468
 #' objSPAN(points = res, candi = candi, covars = covars, nadir = nadir,
 #'         use.coords = TRUE, utopia = utopia)
+#' }
 # MAIN FUNCTION ################################################################
 optimSPAN <-
   function(points, candi, iterations = 100,
