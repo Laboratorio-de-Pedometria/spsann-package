@@ -40,7 +40,7 @@ timePPL <- Sys.time() - timePPL
 # Compare results
 timeUSER
 timePPL
-lapply(list(resUSER, resPPL), countPPL, lags = lags, pairs = FALSE)
-attr(resUSER, "energy.state") # 58
-attr(resPPL, "energy.state") # 58
+lapply(list(resUSER, resPPL), countPPL, candi = candi, lags = lags)
+objSPSANN(resUSER) # 58
+objSPSANN(resPPL) # 58
 
