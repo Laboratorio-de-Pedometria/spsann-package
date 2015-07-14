@@ -4,7 +4,7 @@
 expression(if (!missing(candi)) {
   n_candi <- nrow(candi)
   candi <- as.matrix(cbind(id = 1:n_candi, candi))
-}, if (is.integer(points) || is.numint(points)) {
+}, if (is.integer(points) || pedometrics::is.numint(points)) {
   if (length(points) > 1) { # Integer vector
     points <- candi[points, ]
   }
