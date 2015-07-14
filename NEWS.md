@@ -1,3 +1,6 @@
+# Version 1.0.0 (2015-07-14)
+* Submission to CRAN.
+
 # Version 0.0.0.9012 (2015-07-14)
 * An auxiliary function (`objSPSANN()`) was created to retrieve the energy state
   of an optimized sample configuration (OSC) at a given point of the 
