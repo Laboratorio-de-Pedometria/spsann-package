@@ -23,8 +23,8 @@ lapply(1:length(fun.name), function (i)
 devtools::dev_mode()
 
 # check examples and documentation
-devtools::run_examples()
 devtools::check_doc()
+devtools::run_examples(run = FALSE)
 
 # check the package for Linux and Windows
 devtools::check()
