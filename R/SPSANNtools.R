@@ -1,4 +1,29 @@
-#' @importFrom sp bbox
+#' Auxiliary tools
+#' 
+#' Auxiliary tools used in the optimization of sample configurations using 
+#' spatial simulated annealing.
+#' 
+#' @param OSC Optimized Sample Configuration.
+#' 
+#' @param at Point of the optimization at which the energy state should be
+#' returned. Available options: \code{"start"}, for the start, and \code{"end"},
+#' for the end of the optimization. Defaults to \code{at = "end"}.
+#' 
+#' @param n Number of instances that should be returned. Defaults to 
+#' \code{n = 1}.
+#' 
+#' @aliases SPSANNtools objSPSANN
+#' @author Alessandro Samuel-Rosa \email{alessandrosamuelrosa@@gmail.com}
+#' 
+#' @export
+#' @rdname SPSANNtools
+# FUNCTION - RETRIEVE THE ENERGY STATE #########################################
+objSPSANN <- 
+  function (OSC, at = "end", n = 1) {
+    if (at == "start") res <- utils::head(attr(OSC, "energy"), n)
+    if (at == "end") res <- utils::tail(attr(OSC, "energy"), n)
+    return (res)
+  }
 # INTERNAL FUNCTION - PLOTTING #################################################
 .spSANNplot <-
   function (energy0, energies, k, acceptance, accept_probs, boundary, new_conf,
@@ -48,9 +73,9 @@
     # plot sample points
     bb <- sp::bbox(boundary)
     if (class(boundary) == "SpatialPoints") {
-      graphics::plot(boundary, pch = 20, cex = 0.1)
+      sp::plot(boundary, pch = 20, cex = 0.1)
     } else {
-      graphics::plot(boundary)
+      sp::plot(boundary)
     }
     graphics::points(conf0[, 1], conf0[, 2], pch = 1, cex = 0.5, 
                      col = "lightgray")
