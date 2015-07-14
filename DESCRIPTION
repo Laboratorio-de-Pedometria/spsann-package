@@ -1,10 +1,27 @@
 Package: spsann
 Type: Package
 Title: Optimization of Sample Configurations using Spatial Simulated Annealing
-Version: 0.0.0.9011
-Date: 2015-07-13
-Author: Alessandro Samuel-Rosa
-Maintainer: Alessandro Samuel-Rosa <alessandrosamuelrosa@gmail.com>
+Version: 0.0.0.9012
+Date: 2015-07-14
+Authors@R: c(
+    person("Alessandro", "Samuel-Rosa", email = "alessandrosamuelrosa@gmail.com", 
+           role = c("aut", "cre", "cph")),
+    person("Lucia Helena Cunha dos", "Anjos", email = "lanjos@ufrrj.br", 
+           role = "ths"),
+    person("Gustavo de Mattos", "Vasques", email = "gustavo.vasques@embrapa.br",
+           role = "ths"),
+    person("Gerard B M", "Heuvelink", email = "gerard.heuvelink@wur.nl", 
+           role = "ths"),
+    person("Edzer", "Pebesma", email = "edzer.pebesma@uni-muenster.de", 
+           role = "ctb"),
+    person("Jon", "Skoien", email = "jon.skoien@gmail.com", role = "ctb"),
+    person("Joshua", "French", email = "joshua.french@ucdenver.edu", 
+           role = "ctb"),
+    person("Pierre", "Roudier", email = "roudierp@landcareresearch.co.nz", 
+           role = "ctb"),
+    person("Dick", "Brus", email = "dick.brus@wur.nl", role = "ctb"),
+    person("Murray", "Lark", email = "mlark@bgs.ac.uk", role = "ctb")
+    )
 Description: Methods to optimize sample configurations using spatial simulated 
     annealing. Multiple objective functions are implemented for various 
     purposes, such as variogram estimation, trend estimation, and spatial 

@@ -1,3 +1,10 @@
+# Version 0.0.0.9012 (2015-07-14)
+* An auxiliary function (`objSPSANN()`) was created to retrieve the energy state
+  of an optimized sample configuration (OSC) at a given point of the 
+  optimization.
+* Long examples are not run anymore to avoid overload of `R CMD check`.
+* The authors' list was updated with the respective roles.
+
 # Version 0.0.0.9011 (2015-07-13)
 * The documentation of all functions was significantly improved.
 * Functions from default packages other than `base` are now imported to comply

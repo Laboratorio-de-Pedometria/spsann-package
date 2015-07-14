@@ -34,7 +34,7 @@ devtools::build_win()
 devtools::build()
 
 # upload to CRAN
-devtools::release()
+devtools::release(check = FALSE)
 
 
 
