@@ -30,7 +30,19 @@ a$energy.state <- criterion
 
 # Other attributes
 a$iterations <- k
-a$running.time <- round(c((proc.time() - time0) / 60)[3], 2)
+
+# Running time
+rt <- as.numeric(c(proc.time() - time0)[3])
+if (rt > 3600) {
+  rt <- list(time = round(rt / 3600, 2), unit = "hours")
+} else {
+  if (rt > 60) {
+    rt <- list(time = round(rt / 60, 2), unit = "minutes")
+  } else {
+    rt <- list(time = round(rt, 2), unit = "seconds")
+  }
+}
+a$running.time <- rt
 
 # MOOP
 if (MOOP) {
@@ -44,7 +56,7 @@ attributes(res) <- a
 
 # Print the number of iterations and running time
 cat("iterations = ", a$iterations, "\n", sep = "")
-cat("running time = ", a$running.time, " minutes", sep = "")
+cat("running time = ", rt$time, " ", rt$unit, sep = "")
 
 # Output
 return (res)

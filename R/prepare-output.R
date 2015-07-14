@@ -6,13 +6,21 @@ expression(if (progress) close(pb), res <- new_conf, a <- attributes(res),
       criterion <- rbind(energy0, energies)
     } else {
       criterion <- c(energy0, energies)
-    }, a$energy.state <- criterion, a$iterations <- k, a$running.time <- round(c((proc.time() - time0) / 60)[3], 2), 
-    if (MOOP) {
+    }, a$energy.state <- criterion, a$iterations <- k, rt <- as.numeric(c(proc.time() - time0)[3]), 
+    if (rt > 3600) {
+      rt <- list(time = round(rt / 3600, 2), unit = "hours")
+    } else {
+      if (rt > 60) {
+        rt <- list(time = round(rt / 60, 2), unit = "minutes")
+      } else {
+        rt <- list(time = round(rt, 2), unit = "seconds")
+      }
+    }, a$running.time <- rt, if (MOOP) {
       a$weights <- weights
       a$nadir <- nadir
       a$utopia <- utopia
     }, attributes(res) <- a, cat("iterations = ", a$iterations, "\n", sep = ""), 
-    cat("running time = ", a$running.time, " minutes", sep = ""), 
+    cat("running time = ", rt$time, " ", rt$unit, sep = ""), 
     return (res))
 }
 
