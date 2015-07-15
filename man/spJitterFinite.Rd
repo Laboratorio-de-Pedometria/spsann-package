@@ -90,8 +90,6 @@ and candidate locations should not be provided as latitude/longitude. Package
 the user is responsible for making sure that this requirement is attained.
 }
 \examples{
-\dontrun{
-# This example takes more than 5 seconds to run!
 require(sp)
 data(meuse.grid)
 meuse.grid <- as.matrix(meuse.grid[, 1:2])
@@ -112,7 +110,6 @@ pts3 <- spJitterFinite(points = pts2, candi = meuse.grid, x.min = 40,
 plot(meuse.grid[, 2:3], asp = 1, pch = 15, col = "gray")
 points(pts2[, 2:3], col = "red", cex = 0.5)
 points(pts3[, 2:3], pch = 19, col = "blue", cex = 0.5)
-}
 }
 \author{
 Alessandro Samuel-Rosa \email{alessandrosamuelrosa@gmail.com}

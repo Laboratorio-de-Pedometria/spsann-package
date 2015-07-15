@@ -1,5 +1,8 @@
 # Build package
 
+# turn on/off development mode
+devtools::dev_mode()
+
 # Automatically build functions
 require(autofun)
 fun.name <- c(".check_spsann_arguments", ".plotting_options", 
@@ -18,9 +21,6 @@ write.file <- c("R/check-spsann-arguments.R", "R/plotting-options.R",
                 "R/prepare-acdc-covars.R")
 lapply(1:length(fun.name), function (i) 
   autofun::autofun(fun.name[i], read.file[i], write.file[i]))
-
-# turn on/off development mode
-devtools::dev_mode()
 
 # check examples and documentation
 devtools::check_doc()

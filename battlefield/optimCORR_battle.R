@@ -11,11 +11,17 @@ data(meuse.grid)
 candi <- meuse.grid[, 1:2]
 covars <- meuse.grid[, 5]
 set.seed(2001)
+# \dontrun{
+# This example takes more than 5 seconds to run!
 res <- optimCORR(points = 100, candi = candi, covars = covars, 
                  use.coords = TRUE)
 objSPSANN(res) # 0.06386069
 objCORR(points = res, candi = candi, covars = covars, use.coords = TRUE)
-
+# }
+# Random sample
+pts <- sample(1:nrow(candi), 5)
+pts <- cbind(pts, candi[pts, ])
+objCORR(points = pts, candi = candi, covars = covars, use.coords = TRUE)
 # 1) FACTOR COVARIATES WITH THE COORDINATES ####################################
 rm(list = ls())
 gc()

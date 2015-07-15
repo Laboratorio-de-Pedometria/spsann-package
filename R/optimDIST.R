@@ -23,18 +23,22 @@
 #' @import Rcpp
 #' @export
 #' @examples
-#' \dontrun{
-#' # This example takes more than 5 seconds to run!
 #' require(sp)
 #' data(meuse.grid)
 #' candi <- meuse.grid[, 1:2]
 #' covars <- meuse.grid[, 5]
 #' set.seed(2001)
+#' \dontrun{
+#' # This example takes more than 5 seconds to run!
 #' res <- optimDIST(points = 100, candi = candi, covars = covars, 
 #'                  use.coords = TRUE)
 #' objSPSANN(res) # 1.6505
 #' objDIST(points = res, candi = candi, covars = covars, use.coords = TRUE)
 #' }
+#' # Random sample
+#' pts <- sample(1:nrow(candi), 5)
+#' pts <- cbind(pts, candi[pts, ])
+#' objDIST(points = pts, candi = candi, covars = covars, use.coords = TRUE)
 # MAIN FUNCTION ################################################################
 optimDIST <-
   function (points, candi, iterations = 100, 
