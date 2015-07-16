@@ -21,7 +21,7 @@
 #' are updated at each 10 iterations. Defaults to \code{plotit = FALSE}.
 #' 
 #' @param boundary SpatialPolygon. The boundary of the spatial domain. 
-#' If missing, it is calculated as the bounding box of \code{candi} using bbox.
+#' If missing, it is calculated as the bounding box of \code{candi} using \code{\link[sp]{bbox}}.
 #' 
 #' @param progress Logical for printing a progress bar. Defaults to 
 #' \code{progress = TRUE}.
