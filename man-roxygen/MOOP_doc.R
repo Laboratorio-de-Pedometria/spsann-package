@@ -19,21 +19,21 @@
 #' calculating the utopia point internally (experimental).
 #' 
 #' @section Multi-objective optimization:
-#' A method of solving a multi-objective optimization problem is to aggregate 
+#' A method for solving a multi-objective optimization problem is to aggregate 
 #' the objective functions into a single \emph{utility function}. In the
-#' \pkg{spsann} package, the aggregation is performed using the \emph{weighted 
-#' sum method}, which incorporates in the weights the preferences of the user 
-#' regarding the relative importance of each objective function.
+#' \pkg{spsann} package, the aggregation is performed by \emph{weighted 
+#' sum}, with the weights representing the relative importance of each
+#' objective function and provided by the \code{weights} argument.
 #' 
 #' The weighted sum method is affected by the relative magnitude of the 
-#' different function values. The objective functions implemented in the
+#' objective functions values. The objective functions implemented in the
 #' \pkg{spsann} package have different units and orders of magnitude. The 
-#' consequence is that the objective function with the largest values will have 
-#' a numerical dominance in the optimization. In other words, the weights will 
+#' consequence is that the objective function with the largest values would have 
+#' a numerical dominance in the optimization. In other words, the weights would 
 #' not express the true preferences of the user, and the meaning of the utility 
-#' function becomes unclear.
+#' function would become unclear.
 #' 
-#' A solution to avoid the numerical dominance is to transform the objective
+#' The implemented solution to avoid this issue is to transform the objective
 #' functions so that they are constrained to the same approximate range of 
 #' values. Several function-transformation methods can be used and the 
 #' \pkg{spsann} offers a few of them. The \emph{upper-lower-bound approach}
@@ -48,18 +48,18 @@
 #' to 1.
 #' 
 #' Sometimes, the absolute maximum and minimum values of an objective function 
-#' can be calculated exactly. This seems not to be the case of the objective 
-#' functions implemented in the \pkg{spsann} package. If the user is 
+#' can be calculated exactly, but this seems not to be the case for the objective 
+#' functions implemented in the \pkg{spsann} package. Thus, if the user is 
 #' uncomfortable with informing the nadir and utopia points, there is the option
-#' for using \emph{numerical simulations}. It consists in computing the function 
-#' value for many random sample configurations. The mean function value is used
+#' for using \emph{numerical simulations}. It consists of computing the function 
+#' values from simulated random sample configurations. The mean function value is used
 #' to set the nadir point, while the the utopia point is set to zero. This
 #' approach is similar to the upper-bound approach, but the function values will
 #' have the same orders of magnitude only at the starting point of the 
 #' optimization. Function values larger than one are likely to occur during the 
 #' optimization. We recommend the user to avoid this approach whenever possible
 #' because the effect of the starting point on the optimization as a whole 
-#' usually is insignificant or arbitrary.
+#' usually is insignificant or arbitrary. THIS LAST SENTENCE IS NOT CLEAR TO ME.
 #' 
 #' The \emph{upper-lower-bound approach} with the \emph{Pareto maximum and 
 #' minimum values} is the most elegant solution to transform the objective 
@@ -79,7 +79,10 @@
 #' configuration is optimized with respect to function A. This is the Pareto
 #' minimum of function A. Consequently, the maximum absolute value for function
 #' A is obtained when the sample configuration is optimized regarding function
-#' B. This is the Pareto maximum of function A. The same logic applies for 
+#' B. 
+THIS SENTENCE IS NOT CLEAR TO ME. WHY "CONSEQUENTLY"? AND WHY IS THE PARETO MINIMUM
+OBTAINED BY OPTIMIZING B (AND NOT FROM A COMPLETELY RANDOM SAMPLE CONFIGURATION, FOR EXAMPLE)?
+This is the Pareto maximum of function A. The same logic applies for 
 #' function B.
 #'
 #' @references
