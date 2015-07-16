@@ -3,7 +3,7 @@
 #' @section Marginal distribution of covariates:
 #' Reproducing the marginal distribution of the numeric covariates depends upon
 #' the definition of marginal sampling strata. These marginal sampling strata 
-#' are also used to define the factor levels of any numeric covariate when they 
+#' are also used to define the factor levels of all numeric covariates that  
 #' are passed together with factor covariates.
 #' 
 #' Two types of marginal sampling strata can be used. \emph{Equal-area} 
@@ -18,7 +18,7 @@
 #' of repeated break points increases with the number of marginal sampling 
 #' strata. Only unique break points are used to create marginal sampling strata.
 #' 
-#' \emph{Equal-range} sampling strata are defined breaking the range of 
+#' \emph{Equal-range} sampling strata are defined by breaking the range of 
 #' covariate values into pieces of equal size. This method usually creates
 #' break points that do not occur in the population of existing covariate 
 #' values. Such break points are replaced by the nearest existing covariate 
@@ -35,6 +35,7 @@
 #' that reproduces the marginal distribution of the covariate, each marginal 
 #' sampling strata will have a different number of sample points. The wanted 
 #' distribution of the number of sample points per marginal strata is estimated 
-#' empirically computing the proportion of points of the population of existing 
-#' covariate values that fall in each marginal sampling strata.
+#' empirically as the proportion of points in the population of existing 
+#' covariate values that fall in each marginal sampling strata. 
+
 
