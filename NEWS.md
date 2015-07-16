@@ -1,3 +1,6 @@
+# Version 1.0.0.9000
+* Improved and updated repository documentation.
+
 # Version 1.0.0 (2015-07-14)
 * Submission to CRAN.
 
