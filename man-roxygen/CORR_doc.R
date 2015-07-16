@@ -5,9 +5,9 @@
 #' Pearson's r, a descriptive statistic that ranges from $-1$ to $+1$. 
 #' This statistic is also known as the linear correlation coefficient.
 #' 
-#' When the set of covariates includes factor covariates, any numeric covariate 
-#' is transformed into a factor covariate. The factor levels are defined 
-#' using the marginal sampling strata created using one of the two methods 
+#' When the set of covariates includes factor covariates, all numeric covariates 
+#' are transformed into factor covariates. The factor levels are defined 
+#' using the marginal sampling strata created from one of the two methods 
 #' available (equal-area or equal-range strata).
 #' 
 #' The \emph{association} between two factor covariates is measured using the 
