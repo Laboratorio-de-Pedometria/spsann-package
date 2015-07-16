@@ -46,7 +46,7 @@
 #' iteratively sought for as many times as there are points in \code{points}. 
 #' Because the more points there are in \code{points}, the more likely it is 
 #' that the new location already is occupied by another point. If a solution is
-#' not found, the point selected to be jittered point is kept in its original 
+#' not found, the point selected to be jittered is kept in its original 
 #' location.
 #' 
 #' A more elegant method can be defined using a finite set of candidate 
@@ -55,18 +55,18 @@
 #' locations are placed on a finite regular grid, they can be seen as being the 
 #' centre nodes of a finite set of grid cells (or pixels of a raster image). In 
 #' the first stage, one of the \dQuote{grid cells} is selected with replacement,
-#' i.e. independently of already being occupied by another sample point. The new
+#' i.e. even if it is already occupied by another sample point. The new
 #' location for the point chosen to be jittered is selected within that  
 #' \dQuote{grid cell} by simple random sampling. This method guarantees that 
 #' any location in the spatial domain can be a candidate location. It also
-#' discards the need to check if the new location already is occupied by
+#' discards the need to check if the new location is already occupied by
 #' another point. This method is not implemented (yet) in the \pkg{spsann} 
 #' package.
 #'
 #' @section Distance between two points:
 #' The distance between two points is computed as the Euclidean distance between
 #' them. This computation assumes that the optimization is operating in the 
-#' two-dimensional Euclidean space, i.e. the coordinates of the sample points 
+#' two-dimensional plane Euclidean space, i.e. the coordinates of the sample points 
 #' and candidate locations should not be provided as latitude/longitude. Package 
 #' \pkg{spsann} has no mechanism to check if the coordinates are projected, and
 #' the user is responsible for making sure that this requirement is attained.
