@@ -3,9 +3,9 @@
 .prepare_acdc_covars<-function(...){
 expression(if (use.coords) {
   covars <- data.frame(covars, candi[, 2:3])
-}, covars.type <- ifelse(pedometrics::is.any.factor(covars), "factor", "numeric"), 
+}, covars.type <- ifelse(pedometrics::anyFactor(covars), "factor", "numeric"), 
     if (covars.type == "factor") {
-      if (!pedometrics::is.all.factor(covars)) {
+      if (!pedometrics::allFactor(covars)) {
         i <- which(sapply(covars, is.factor) == FALSE)
         mes <- paste("converting ", length(i), 
                      " numeric covariates to factor covariates", sep = "")

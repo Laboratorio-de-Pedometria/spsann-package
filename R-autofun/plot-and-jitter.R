@@ -13,7 +13,7 @@
 # 2. 
 # 
 wp <- sample(1:n_pts, 1)
-if (plotit && pedometrics::is.numint(k / 10)) {
+if (plotit && pedometrics::isNumint(k / 10)) {
   .spSANNplot(energy0 = energy0, energies = energies, k = k, 
               acceptance = acceptance, accept_probs = accept_probs,
               boundary = boundary, new_conf = new_conf[, 2:3], 

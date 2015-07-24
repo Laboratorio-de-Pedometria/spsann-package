@@ -16,11 +16,11 @@ if (use.coords) {
 }
 
 # Factor or numeric?
-covars.type <- ifelse(pedometrics::is.any.factor(covars), "factor", "numeric")
+covars.type <- ifelse(pedometrics::anyFactor(covars), "factor", "numeric")
 
 # Convert numeric covariates to factor covariates
 if (covars.type == "factor") {
-  if (!pedometrics::is.all.factor(covars)) {
+  if (!pedometrics::allFactor(covars)) {
     i <- which(sapply(covars, is.factor) == FALSE)
     mes <- paste("converting ", length(i), 
                  " numeric covariates to factor covariates", sep = "")

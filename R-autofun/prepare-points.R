@@ -22,7 +22,7 @@ if (!missing(candi)) {
 if (is.matrix(points) || is.data.frame(points)) { # Data frame of matrix
   points <- as.matrix(points)
 } else {
-  if (is.integer(points) || pedometrics::is.numint(points)) {
+  if (is.integer(points) || pedometrics::isNumint(points)) {
     if (length(points) > 1) { # Integer vector
       points <- candi[points, ]
     }

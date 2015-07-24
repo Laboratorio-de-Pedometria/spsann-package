@@ -14,7 +14,7 @@ expression(res <- NULL, aa <- c("points", "candi"), bb <- c(missing(points), mis
         res <- c("'candi' must have two named numeric columns: 'x' and 'y'")
       } else {
         # Argument 'iterations'
-        if (!pedometrics::is.numint(iterations) || length(iterations) > 1) {
+        if (!pedometrics::isNumint(iterations) || length(iterations) > 1) {
           res <- c("'iterations' must be an integer value")
         } else {
           # Argument 'acceptance'
