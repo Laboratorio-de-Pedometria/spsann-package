@@ -29,6 +29,6 @@ sapply(list.files("src", full.names = TRUE, pattern = ".cpp$"), Rcpp::sourceCpp)
 data(meuse.grid)
 candi <- meuse.grid[, 1:2]
 set.seed(2001)
-res <- optimMSSD(points = 100, candi = candi, iterations = 100, greedy = TRUE)
+res <- optimMSSD(points = 100, candi = candi, greedy = TRUE)
 objSPSANN(res) # 13566.74
 objMSSD(candi = candi, points = res)

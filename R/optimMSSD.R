@@ -57,14 +57,15 @@
 #' objMSSD(candi = candi, points = pts)
 # FUNCTION - MAIN ##############################################################
 optimMSSD <-
-  function (points, candi, iterations = 100, 
-    # SPSANN
-    x.max, x.min, y.max, y.min,
-    acceptance = list(initial = 0.99, cooling = iterations / 10),
-    stopping = list(max.count = iterations / 10), plotit = FALSE, track = FALSE,
-    boundary, progress = TRUE, verbose = FALSE, greedy = FALSE,
-    # MOOP
-    weights = NULL, nadir = NULL, utopia = NULL) {
+  function (points, candi, iterations = 100,
+            # SPSANN
+            x.max, x.min, y.max, y.min,
+            acceptance = list(initial = 0.99, cooling = iterations / 10),
+            stopping = list(max.count = iterations / 10), plotit = FALSE,
+            track = FALSE, boundary, progress = TRUE, verbose = FALSE, 
+            greedy = FALSE,
+            # MOOP
+            weights = NULL, nadir = NULL, utopia = NULL) {
     
     # Check spsann arguments
     eval(.check_spsann_arguments())
@@ -215,5 +216,16 @@ objMSSD <-
     sub_dm <- dist.mat[, which.pts]
     min_dist_id <- apply(sub_dm, MARGIN = 1, FUN = which.min)
     return (min_dist_id)
+  }
+# 
+.subsetCandi <-
+  function (candi, cellsize) {
+    x <- seq(min(candi[, 1]), max(candi[, 1]), by = cellsize * 2)
+    y <- seq(min(candi[, 2]), max(candi[, 2]), by = cellsize * 2)
+    xy <- expand.grid(x, y)
+    colnames(xy) <- colnames(candi)
+    dup <- rbind(xy, candi)
+    dup <- which(duplicated(dup)) - nrow(xy)
+    return (dup)
   }
 # End!
