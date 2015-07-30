@@ -82,6 +82,10 @@ optimMKV <-
     # MOOP
     weights = NULL, nadir = NULL, utopia = NULL) {
     
+    # Check suggests
+    pkg <- c("gstat")
+    eval(.check_suggests())
+    
     # Check spsann arguments
     eval(.check_spsann_arguments())
     
@@ -314,8 +318,12 @@ optimMKV <-
 #' @rdname optimMKV
 objMKV <-
   function (points, candi,
-    # MKV
-    covars, eqn = z ~ 1, vgm, krige.stat = "mean", ...) {
+            # MKV
+            covars, eqn = z ~ 1, vgm, krige.stat = "mean", ...) {
+    
+    # Check suggests
+    pkg <- c("gstat")
+    eval(.check_suggests())
     
     # Prepare points and candi
     eval(.prepare_points())
