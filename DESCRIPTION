@@ -1,26 +1,29 @@
 Package: spsann
 Type: Package
 Title: Optimization of Sample Configurations using Spatial Simulated Annealing
-Version: 1.0.0.9000
-Date: 2015-07-14
+Version: 1.0.1
+Date: 2015-07-30
 Authors@R: c(
-    person("Alessandro", "Samuel-Rosa", email = "alessandrosamuelrosa@gmail.com", 
-           role = c("aut", "cre", "cph")),
-    person("Lucia Helena Cunha dos", "Anjos", email = "lanjos@ufrrj.br", 
-           role = "ths"),
-    person("Gustavo de Mattos", "Vasques", email = "gustavo.vasques@embrapa.br",
-           role = "ths"),
-    person("Gerard B M", "Heuvelink", email = "gerard.heuvelink@wur.nl", 
-           role = "ths"),
-    person("Edzer", "Pebesma", email = "edzer.pebesma@uni-muenster.de", 
-           role = "ctb"),
-    person("Jon", "Skoien", email = "jon.skoien@gmail.com", role = "ctb"),
-    person("Joshua", "French", email = "joshua.french@ucdenver.edu", 
-           role = "ctb"),
-    person("Pierre", "Roudier", email = "roudierp@landcareresearch.co.nz", 
-           role = "ctb"),
-    person("Dick", "Brus", email = "dick.brus@wur.nl", role = "ctb"),
-    person("Murray", "Lark", email = "mlark@bgs.ac.uk", role = "ctb")
+    person("Alessandro", "Samuel-Rosa", role = c("aut", "cre"),
+            email = "alessandrosamuelrosa@gmail.com"),
+    person("Lucia Helena Cunha dos", "Anjos", role = "ths",
+           email = "lanjos@ufrrj.br"),
+    person("Gustavo de Mattos", "Vasques", role = "ths",
+           email = "gustavo.vasques@embrapa.br"),
+    person("Gerard B M", "Heuvelink", role = "ths",
+           email = "gerard.heuvelink@wur.nl"),
+    person("Edzer", "Pebesma", role = "ctb", 
+           email = "edzer.pebesma@uni-muenster.de"),
+    person("Jon", "Skoien", role = "ctb", 
+           email = "jon.skoien@gmail.com"),
+    person("Joshua", "French", role = "ctb", 
+           email = "joshua.french@ucdenver.edu"),
+    person("Pierre", "Roudier", role = "ctb",
+           email = "roudierp@landcareresearch.co.nz"),
+    person("Dick", "Brus", role = "ctb",
+           email = "dick.brus@wur.nl"),
+    person("Murray", "Lark", role = "ctb",
+           email = "mlark@bgs.ac.uk")
     )
 Description: Methods to optimize sample configurations using spatial simulated 
     annealing. Multiple objective functions are implemented for various 
@@ -28,11 +31,12 @@ Description: Methods to optimize sample configurations using spatial simulated
     interpolation. A general purpose spatial simulated annealing function
     enables the user to define his/her own objective function.
 License: GPL (>= 2)
-Imports:
-    gstat,
+Imports: 
     pedometrics,
     Rcpp (>= 0.11.3),
     sp,
     SpatialTools
+Suggests: 
+    gstat
 LinkingTo: Rcpp
 Encoding: UTF-8

@@ -1,6 +1,7 @@
-# Version 1.0.0.9000
-* Improved and updated repository documentation.
-* Updated dependencies of the package `pedometrics`.
+# Version 1.0.1 (2015-07-30)
+* Improved and updated documentation.
+* ***gstat*** is not a dependence any more.
+* Fixed breaks due to changes in dependencies (***pedometrics***).
 
 # Version 1.0.0 (2015-07-14)
 * Submission to CRAN.
@@ -9,20 +10,20 @@
 * An auxiliary function (`objSPSANN()`) was created to retrieve the energy state
   of an optimized sample configuration (OSC) at a given point of the 
   optimization.
-* Long examples are not run anymore to avoid overload of `R CMD check`.
+* Long examples are not run any more to avoid overload of `R CMD check`.
 * The authors' list was updated with the respective roles.
 
 # Version 0.0.0.9011 (2015-07-13)
 * The documentation of all functions was significantly improved.
-* Functions from default packages other than `base` are now imported to comply
-  with the new change to the CRAN policy described at
+* Functions from default packages other than ***base*** are now imported to
+  comply with the new change to the CRAN policy described at
   http://developer.r-project.org/blosxom.cgi/R-devel/NEWS/2015/06/29#n2015-06-29.
 
 # Version 0.0.0.9010 (2015-07-05)
 * Using `utils::globalVariables` to avoid the `R CMD check` note 
   `no visible binding for global variable [variable name]`. Source of the 
   solution: http://stackoverflow.com/a/12429344/3365410.
-* The package `fields` is not a dependency any more.
+* The package ***fields*** is not a dependency any more.
 * New default values were attributed to the following arguments: `plotit`, 
   `track`, `verbose`, and `iteration`. The first three were set to `FALSE`, 
   while the last was set to `100`.
@@ -48,9 +49,9 @@
 * A new `autofun` was created to set-up the covariates (`covar`).
 
 # Version 0.0.0.9007 (2015-06-12)
-* The `rgeos` and `plyr` packages are not dependencies any more.
+* The ***rgeos*** and ***plyr*** packages are not dependencies any more.
 * The `boundary` of the spatial domain can now be estimated internally. The user 
-  should use the `rgeos` package if a more precise `boundary` is needed.
+  should use the ***rgeos*** package if a more precise `boundary` is needed.
 * Now using a directory called 'R-autoFunction', where R code chunks that are 
   used in several functions of both families of `obj...()` and `optim...()`
   functions are included in individual files. These R code chunks are used to
@@ -99,5 +100,5 @@
 
 # Version 0.0.0.9000 (2015-01-08)
 * in-development package;
-* importing functions from the package `pedometrics`;
+* importing functions from the package ***pedometrics***;
 * preparing documentation.

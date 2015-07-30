@@ -38,6 +38,5 @@ old_conf <- conf0
 #if (COST) cm <- cost[points[, 1]]
 #
 # COMMAND
-# # Prepare points and candi #################################################
+# # Prepare points and candi
 # eval(.prepare_points())
-# ############################################################################

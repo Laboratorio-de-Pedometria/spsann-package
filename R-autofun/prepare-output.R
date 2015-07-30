@@ -62,6 +62,5 @@ cat("running time = ", rt$time, " ", rt$unit, sep = "")
 return (res)
 #
 # COMMAND
-# # Prepare output ###########################################################
+# # Prepare output
 # eval(.prepare_output())
-# ############################################################################

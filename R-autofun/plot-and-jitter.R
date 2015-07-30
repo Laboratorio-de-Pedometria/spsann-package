@@ -34,6 +34,5 @@ y.max <- y_max0 - (k / iterations) * (y_max0 - y.min)
 # }
 #
 # COMMAND
-# # Plotting and jittering #################################################
+# # Plotting and jittering
 # eval(.plot_and_jitter())
-# ##########################################################################

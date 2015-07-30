@@ -11,8 +11,3 @@ if (getRversion() >= "2.15.1") {
 #' @importFrom stats cor quantile runif terms
 #' @importFrom graphics axis hist legend lines mtext par plot points text
 #' @importFrom utils setTxtProgressBar txtProgressBar head tail
-
-# Import functions from non-default packages ###################################
-#' @importFrom sp plot bbox
-#' @importFrom pedometrics cramer is.numint cont2cat is.all.factor is.any.factor
-#' @importFrom SpatialTools dist2

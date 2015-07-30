@@ -15,9 +15,9 @@
 #' @aliases SPSANNtools objSPSANN
 #' @author Alessandro Samuel-Rosa \email{alessandrosamuelrosa@@gmail.com}
 #' 
+# FUNCTION - RETRIEVE THE ENERGY STATE #########################################
 #' @export
 #' @rdname SPSANNtools
-# FUNCTION - RETRIEVE THE ENERGY STATE #########################################
 objSPSANN <- 
   function (OSC, at = "end", n = 1) {
     if (at == "start") res <- utils::head(attr(OSC, "energy"), n)

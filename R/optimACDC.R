@@ -298,9 +298,9 @@ optimACDC <-
       breaks <- lapply(breaks, unique)
       
       # Compute the proportion of population points per marginal sampling strata
-      count <- lapply(1:n_cov, function (i) {
+      count <- lapply(1:n_cov, function (i) 
         graphics::hist(covars[, i], breaks[[i]], plot = FALSE)$counts
-      })
+      )
       prop <- lapply(1:n_cov, function (i) count[[i]] / sum(count[[i]]))
       
       # Output

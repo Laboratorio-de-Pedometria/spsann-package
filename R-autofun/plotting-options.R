@@ -43,12 +43,11 @@ if (plotit) {
     x <- as.numeric(rownames(y))
     yx <- cbind(rep(x, 2), c(y[, 1], y[, 2]))
     
-    boundary <- SpatialPoints(unique(rbind(xy, yx)))
+    boundary <- sp::SpatialPoints(unique(rbind(xy, yx)))
   }
   rm(x, d, y, xy, yx)
 }
 #
 # COMMAND
-# # Set plotting options ####################################################
+# # Set plotting options
 # eval(.plotting_options())
-# ############################################################################
