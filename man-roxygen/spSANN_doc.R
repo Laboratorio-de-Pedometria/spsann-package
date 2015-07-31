@@ -1,7 +1,7 @@
 #  Template documentation for spatial simulated annealing
 ################################################################################
 #' @param iterations Integer. The maximum number of iterations that should be
-#' used for the optimization. Defaults to \code{iterations = 100}. IS 100 A GOOD NUMBER? I WOULD THINK IT IS TOO LITTLE.
+#' used for the optimization. Defaults to \code{iterations = 100}.
 #' 
 #' @param acceptance List with two named sub-arguments: \code{initial} -- 
 #' numeric value between 0 and 1 defining the initial acceptance probability, 
@@ -21,7 +21,7 @@
 #' are updated at each 10 iterations. Defaults to \code{plotit = FALSE}.
 #' 
 #' @param boundary SpatialPolygon. The boundary of the spatial domain. 
-#' If missing, it is calculated as the bounding box of \code{candi} using \code{\link[sp]{bbox}}.
+#' If missing, it is estimated from \code{candi}.
 #' 
 #' @param progress Logical for printing a progress bar. Defaults to 
 #' \code{progress = TRUE}.

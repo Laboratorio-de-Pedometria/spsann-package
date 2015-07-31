@@ -81,7 +81,7 @@ the projected x- and y-coordinates. If missing, they are estimated from
 \item{acceptance}{List with two named sub-arguments: \code{initial} --
 numeric value between 0 and 1 defining the initial acceptance probability,
 and \code{cooling} -- a numeric value defining the exponential factor by
-witch the acceptance probability decreases at each iteration. Defaults to
+which the acceptance probability decreases at each iteration. Defaults to
 \code{acceptance = list(initial = 0.99, cooling = iterations / 10)}.}
 
 \item{stopping}{List with one named sub-argument: \code{max.count} --
@@ -97,7 +97,7 @@ are updated at each 10 iterations. Defaults to \code{plotit = FALSE}.}
 
 \item{track}{Logical value. Should the evolution of the energy state and
 acceptance probability be recorded and returned with the result? If
-\code{track = FALSE} (the default), only the starting and ending enery state
+\code{track = FALSE} (the default), only the starting and ending energy state
 values are returned with the result.}
 
 \item{boundary}{SpatialPolygon. The boundary of the spatial domain.
