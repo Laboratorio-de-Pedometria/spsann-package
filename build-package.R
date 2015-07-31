@@ -1,5 +1,8 @@
 # Build package
 
+# Dependencies
+update(devtools::package_deps())
+
 # turn on/off development mode
 devtools::dev_mode()
 
