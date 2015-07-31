@@ -1,12 +1,12 @@
 #  Template documentation for spatial simulated annealing
 ################################################################################
 #' @param iterations Integer. The maximum number of iterations that should be
-#' used for the optimization. Defaults to \code{iterations = 100}.
+#' used for the optimization. Defaults to \code{iterations = 100}. IS 100 A GOOD NUMBER? I WOULD THINK IT IS TOO LITTLE.
 #' 
 #' @param acceptance List with two named sub-arguments: \code{initial} -- 
 #' numeric value between 0 and 1 defining the initial acceptance probability, 
 #' and \code{cooling} -- a numeric value defining the exponential factor by
-#' witch the acceptance probability decreases at each iteration. Defaults to 
+#' which the acceptance probability decreases at each iteration. Defaults to 
 #' \code{acceptance = list(initial = 0.99, cooling = iterations / 10)}.
 #' 
 #' @param stopping List with one named sub-argument: \code{max.count} -- 
@@ -21,7 +21,7 @@
 #' are updated at each 10 iterations. Defaults to \code{plotit = FALSE}.
 #' 
 #' @param boundary SpatialPolygon. The boundary of the spatial domain. 
-#' If missing, it is estimated from \code{candi}.
+#' If missing, it is calculated as the bounding box of \code{candi} using \code{\link[sp]{bbox}}.
 #' 
 #' @param progress Logical for printing a progress bar. Defaults to 
 #' \code{progress = TRUE}.
@@ -35,7 +35,7 @@
 #' 
 #' @param track Logical value. Should the evolution of the energy state and 
 #' acceptance probability be recorded and returned with the result? If 
-#' \code{track = FALSE} (the default), only the starting and ending enery state
+#' \code{track = FALSE} (the default), only the starting and ending energy state
 #' values are returned with the result.
 #' 
 #' @keywords spatial optimize iteration
