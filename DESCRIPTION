@@ -1,8 +1,8 @@
 Package: spsann
 Type: Package
 Title: Optimization of Sample Configurations using Spatial Simulated Annealing
-Version: 1.0.1
-Date: 2015-07-30
+Version: 1.0-2
+Date: 2015-08-19
 Authors@R: c(
     person("Alessandro", "Samuel-Rosa", role = c("aut", "cre"),
             email = "alessandrosamuelrosa@gmail.com"),

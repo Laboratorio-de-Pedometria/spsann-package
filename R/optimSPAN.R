@@ -167,7 +167,24 @@ optimSPAN <-
                              pop.prop = pop_prop, ppl = ppl, n.lags = n_lags,
                              criterion = criterion, distri = distri, 
                              pairs = pairs, dm.mssd = new_dm_mssd)
-
+      
+      # Avoid the following error:
+      # Error in if (new_energy[1] <= old_energy[1]) { : 
+      #   missing value where TRUE/FALSE needed
+      # Source: http://stackoverflow.com/a/7355280/3365410
+      # ASR: The reason for the error is unknown to me.
+      if (is.na(new_energy)) {
+        new_energy <- old_energy
+        new_conf <- old_conf
+        # DIST and CORR
+        new_sm <- old_sm
+        new_scm <- old_scm
+        # PPL
+        new_dm_ppl <- old_dm_ppl
+        # MSSD
+        new_dm_mssd <- old_dm_mssd
+      }
+      
       # Evaluate the new system configuration
       if (greedy) {
         random_prob <- 1

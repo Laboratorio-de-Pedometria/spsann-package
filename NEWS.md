@@ -1,9 +1,14 @@
-# Version 1.0.1 (2015-07-30)
+# Version 1.0-2 (2015-08-19)
+* Corrected a bug in `optimCORR()` that was causing the following error: Error
+  in if (new_energy <= old_energy) { : missing value where TRUE/FALSE needed. 
+  This bug affects `optimACDC()` and `optimSPAN()`.
+
+# Version 1.0-1 (2015-07-30)
 * Improved and updated documentation.
 * ***gstat*** is not a dependence any more.
 * Fixed breaks due to changes in dependencies (***pedometrics***).
 
-# Version 1.0.0 (2015-07-14)
+# Version 1.0-0 (2015-07-14)
 * Submission to CRAN.
 
 # Version 0.0.0.9012 (2015-07-14)
