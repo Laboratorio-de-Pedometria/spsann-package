@@ -1,5 +1,5 @@
-#' Optimization of sample configurations for spatial trend identification and
-#' estimation
+#' Optimization of sample configurations for spatial trend identification
+#' and estimation (II)
 #'
 #' Optimize a sample configuration for spatial trend identification and 
 #' estimation. A criterion is defined so that the sample reproduces the 

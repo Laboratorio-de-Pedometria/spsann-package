@@ -1,10 +1,10 @@
 #' Optimization of sample configurations for spatial trend identification
-#' and estimation
+#' and estimation (III)
 #'
 #' Optimize a sample configuration for spatial trend identification and 
 #' estimation. An utility function \emph{U} is defined so that the sample 
 #' reproduces the bivariate association/correlation between the covariates, as 
-#' well as their marginal distribution.  (\bold{ACDC}). The utility function is 
+#' well as their marginal distribution (\bold{ACDC}). The utility function is 
 #' obtained aggregating two single objective functions: \bold{CORR} and 
 #' \bold{DIST}.
 #'
