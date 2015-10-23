@@ -20,8 +20,8 @@
 #' @rdname SPSANNtools
 objSPSANN <- 
   function (OSC, at = "end", n = 1) {
-    if (at == "start") res <- utils::head(attr(OSC, "energy"), n)
-    if (at == "end") res <- utils::tail(attr(OSC, "energy"), n)
+    if (at == "start") res <- utils::head(attr(OSC, "energy.state"), n)
+    if (at == "end") res <- utils::tail(attr(OSC, "energy.state"), n)
     return (res)
   }
 # INTERNAL FUNCTION - PLOTTING #################################################
@@ -45,7 +45,8 @@ objSPSANN <-
       
       for(i in 1:ncol(a)) {
         #graphics::lines(a[, i] ~ c(0:k), type = "l", lty = i)
-        graphics::lines(a[, i] ~ c(1:k), type = "l", lty = i)
+        col <- ifelse(i == 1, "red", "black")
+        graphics::lines(a[, i] ~ c(1:k), type = "l", lty = i, col = col)
       }
       graphics::lines(x = c(-k, 0), y = rep(energy0[1], 2), col = "red")
       graphics::lines(x = rep(best.k, 2), y = c(-5, best.energy[1]), 
