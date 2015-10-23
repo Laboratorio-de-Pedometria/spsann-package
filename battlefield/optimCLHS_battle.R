@@ -10,10 +10,12 @@ require(sp)
 data(meuse.grid)
 candi <- meuse.grid[, 1:2]
 covars <- meuse.grid[, 5]
+weights <- list(O1 = 0.5, O3 = 0.5)
 set.seed(2001)
-res <- optimCLHS(points = 100, candi = candi, covars = covars,
-                 use.coords = TRUE, iter = 100)
-objSPSANN(res) # 
+res <- optimCLHS(points = 100, candi = candi, covars = covars, use.coords = T, 
+                 weights = weights, iterations = 100)
+objSPSANN(res) # 70.71275
+
 objCLHS(points = res, candi = candi, covars = covars, use.coords = TRUE)
 # MARGINAL DISTRIBUTION
 par(mfrow = c(3, 3))
@@ -48,7 +50,8 @@ data(meuse.grid)
 candi <- meuse.grid[, 1:2]
 covars <- meuse.grid[, 6:7]
 set.seed(2001)
-res <- optimCLHS(points = 100, candi = candi, covars = covars, use.coords = T)
+res <- optimCLHS(points = 100, candi = candi, covars = covars, 
+                 use.coords = TRUE, iter = 1000, plotit = T)
 objSPSANN(res) # 
 objCLHS(points = res, candi = candi, covars = covars, use.coords = TRUE)
 
