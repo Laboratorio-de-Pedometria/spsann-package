@@ -43,7 +43,9 @@ if (plotit) {
     x <- as.numeric(rownames(y))
     yx <- cbind(rep(x, 2), c(y[, 1], y[, 2]))
     
-    boundary <- sp::SpatialPoints(unique(rbind(xy, yx)))
+    boundary <- unique(rbind(xy, yx))
+    rownames(boundary) <- 1:nrow(boundary)
+    boundary <- sp::SpatialPoints(boundary)
   }
   rm(x, d, y, xy, yx)
 }
