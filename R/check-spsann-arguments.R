@@ -80,6 +80,7 @@ expression(res <- NULL, aa <- c("points", "candi"), bb <- c(missing(points), mis
         }  
       }
     }, if (track || plotit) {
+      if (plotit) { track <- TRUE }
       accept_probs <- vector()
       if (MOOP) {
         energies <- as.data.frame(matrix(NA, nrow = 1, ncol = length(weights) + 1))
