@@ -141,6 +141,9 @@ optimCLHS <-
     weights = list(O1 = 1/3, O2 = 1/3, O3 = 1/3)) {
     
     # Check spsann arguments
+    # ASR: The next two lines are needed to pass the argument check for MOOP
+    utopia <- list(utopia = NA)
+    nadir <- list(nadir = NA)
     eval(.check_spsann_arguments())
     
     # Check other arguments
@@ -178,7 +181,7 @@ optimCLHS <-
     sm <- covars[points[, 1], ]
     
     # Base data and initial energy state
-    if (any(covars_type == c("numeric", "both")) {
+    if (any(covars_type == c("numeric", "both"))) {
       
       # O3
       pcm <- stats::cor(x = covars[, id_num], use = "complete.obs")
@@ -194,14 +197,14 @@ optimCLHS <-
       
       # Count the number of points per marginal sampling strata and compare 
       # with the expected count
-      sm_count <- lapply(1:length(id_num), function (i) 
-        graphics::hist(sm[, id_num], breaks, plot = FALSE)$counts - 1)
+      sm_count <- sapply(1:length(id_num), function (i) 
+        graphics::hist(sm[id_num][, i], breaks[[i]], plot = FALSE)$counts - 1)
       
       # Energy
       obj_O1 <- weights$O1 * sum(abs(sm_count))
     }
     
-    if (any(covars_type == c("factor", "both")) {
+    if (any(covars_type == c("factor", "both"))) {
       
       # O2
       
@@ -258,10 +261,10 @@ optimCLHS <-
       pb <- utils::txtProgressBar(min = 1, max = iterations, style = 3) 
     }
     time0 <- proc.time()
-
+    
     # Begin the main loop
     for (k in 1:iterations) {
-      
+    
       # Plotting and jittering
       eval(.plot_and_jitter())
       
@@ -271,19 +274,20 @@ optimCLHS <-
       # Recompute energy state
       new_sm[wp, ] <- covars[new_conf[wp, 1], ]
       
-      if (any(covars_type == c("numeric", "both")) {
+      if (any(covars_type == c("numeric", "both"))) {
         
         # O3
         new_scm <- stats::cor(x = new_sm[, id_num], use = "complete.obs")
         obj_O3 <- weights$O3 * sum(abs(pcm - new_scm))
         
         # O1
-        new_sm_count <- lapply(1:length(id_num), function (i)
-          graphics::hist(new_sm[, id_num], breaks, plot = FALSE)$counts - 1)
+        new_sm_count <- sapply(1:length(id_num), function (i)
+          graphics::hist(new_sm[, id_num][, i], breaks[[i]], 
+                         plot = FALSE)$counts - 1)
         obj_O1 <- weights$O1 * sum(abs(new_sm_count))
         
       }
-      if (any(covars_type == c("factor", "both")) {
+      if (any(covars_type == c("factor", "both"))) {
         new_sm_prop <- lapply(sm[, id_fac], function(x) table(x) / n_pts)
         new_sm_prop <- sapply(1:length(id_fac), function (i)
           sum(abs(new_sm_prop[[i]] - pop_prop[[i]])))
@@ -448,7 +452,7 @@ optimCLHS <-
 .objCLHS <-
   function (sm, n.cov, weights, n.pts, pcm, scm, covars.type, pop.prop) {
     
-    if (any(covars_type == c("numeric", "both")) {
+    if (any(covars_type == c("numeric", "both"))) {
       # O1
       obj_O1 <-
         .objO1(sm = sm, n.pts = n.pts, n.cov = n.cov, covars.type = covars.type)
@@ -459,7 +463,7 @@ optimCLHS <-
       obj_O3 <- obj_O3 * weights$O3
     }
     
-    if (any(covars_type == c("factor", "both")) {
+    if (any(covars_type == c("factor", "both"))) {
     # O2
     obj_O2 <- 
       .objO2(sm = sm, n.pts = n.pts, n.cov = n.cov, pop.prop = pop.prop, 
