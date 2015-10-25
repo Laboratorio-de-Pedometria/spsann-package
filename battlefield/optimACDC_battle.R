@@ -15,9 +15,9 @@ covars <- meuse.grid[, 5]
 set.seed(2001)
 res <- optimACDC(points = 100, candi = candi, covars = covars, nadir = nadir,
                  use.coords = TRUE, utopia = utopia)
-objSPSANN(res) # 0.5272031
-objACDC(points = res, candi = candi, covars = covars, use.coords = TRUE, 
-        nadir = nadir, utopia = utopia)
+objSPSANN(res) - # 0.5272031
+  objACDC(points = res, candi = candi, covars = covars, use.coords = TRUE, 
+          nadir = nadir, utopia = utopia)
 # MARGINAL DISTRIBUTION
 par(mfrow = c(3, 3))
 # Covariates

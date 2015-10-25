@@ -242,15 +242,15 @@ Sometimes, the absolute maximum and minimum values of an objective function
 can be calculated exactly. This seems not to be the case of the objective
 functions implemented in the \pkg{spsann} package. If the user is
 uncomfortable with informing the nadir and utopia points, there is the option
-for using \emph{numerical simulations}. It consists in computing the function
-value for many random sample configurations. The mean function value is used
-to set the nadir point, while the the utopia point is set to zero. This
-approach is similar to the upper-bound approach, but the function values will
-have the same orders of magnitude only at the starting point of the
-optimization. Function values larger than one are likely to occur during the
-optimization. We recommend the user to avoid this approach whenever possible
-because the effect of the starting point on the optimization as a whole
-usually is insignificant or arbitrary.
+for using \emph{numerical simulations}. It consists in computing the
+function value for many random sample configurations. The mean function
+value is used to set the nadir point, while the the utopia point is set to
+zero. This approach is similar to the upper-bound approach, but the function
+values will have the same orders of magnitude only at the starting point of
+the optimization. Function values larger than one are likely to occur during
+the optimization. We recommend the user to avoid this approach whenever
+possible because the effect of the starting point on the optimization as a
+whole usually is insignificant or arbitrary.
 
 The \emph{upper-lower-bound approach} with the \emph{Pareto maximum and
 minimum values} is the most elegant solution to transform the objective
@@ -384,9 +384,9 @@ covars <- meuse.grid[, 5]
 set.seed(2001)
 res <- optimSPAN(points = 100, candi = candi, covars = covars, nadir = nadir,
                  use.coords = TRUE, utopia = utopia)
-objSPSANN(res) # 0.7693468
-objSPAN(points = res, candi = candi, covars = covars, nadir = nadir,
-        use.coords = TRUE, utopia = utopia)
+objSPSANN(res) - # 0.776184
+  objSPAN(points = res, candi = candi, covars = covars, nadir = nadir,
+          use.coords = TRUE, utopia = utopia)
 }
 }
 \author{

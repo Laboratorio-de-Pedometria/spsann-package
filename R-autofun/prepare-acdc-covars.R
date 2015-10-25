@@ -1,4 +1,4 @@
-# Prepare ACDC covariates
+# Prepare ACDC covariates and base data
 #
 # SUMMARY
 # 1. Check if the coordinates should be used;

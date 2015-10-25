@@ -38,9 +38,9 @@
 #' set.seed(2001)
 #' res <- optimSPAN(points = 100, candi = candi, covars = covars, nadir = nadir,
 #'                  use.coords = TRUE, utopia = utopia)
-#' objSPSANN(res) # 0.7693468
-#' objSPAN(points = res, candi = candi, covars = covars, nadir = nadir,
-#'         use.coords = TRUE, utopia = utopia)
+#' objSPSANN(res) - # 0.776184
+#'   objSPAN(points = res, candi = candi, covars = covars, nadir = nadir,
+#'           use.coords = TRUE, utopia = utopia)
 #' }
 # MAIN FUNCTION ################################################################
 optimSPAN <-

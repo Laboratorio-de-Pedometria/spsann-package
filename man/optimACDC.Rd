@@ -4,7 +4,7 @@
 \alias{objACDC}
 \alias{optimACDC}
 \title{Optimization of sample configurations for spatial trend identification
-and estimation}
+and estimation (III)}
 \usage{
 optimACDC(points, candi, iterations = 100, covars, strata.type = "area",
   use.coords = FALSE, x.max, x.min, y.max, y.min, acceptance = list(initial
@@ -118,7 +118,7 @@ configuration - the objective function value.
 Optimize a sample configuration for spatial trend identification and
 estimation. An utility function \emph{U} is defined so that the sample
 reproduces the bivariate association/correlation between the covariates, as
-well as their marginal distribution.  (\bold{ACDC}). The utility function is
+well as their marginal distribution (\bold{ACDC}). The utility function is
 obtained aggregating two single objective functions: \bold{CORR} and
 \bold{DIST}.
 }
@@ -214,15 +214,15 @@ Sometimes, the absolute maximum and minimum values of an objective function
 can be calculated exactly. This seems not to be the case of the objective
 functions implemented in the \pkg{spsann} package. If the user is
 uncomfortable with informing the nadir and utopia points, there is the option
-for using \emph{numerical simulations}. It consists in computing the function
-value for many random sample configurations. The mean function value is used
-to set the nadir point, while the the utopia point is set to zero. This
-approach is similar to the upper-bound approach, but the function values will
-have the same orders of magnitude only at the starting point of the
-optimization. Function values larger than one are likely to occur during the
-optimization. We recommend the user to avoid this approach whenever possible
-because the effect of the starting point on the optimization as a whole
-usually is insignificant or arbitrary.
+for using \emph{numerical simulations}. It consists in computing the
+function value for many random sample configurations. The mean function
+value is used to set the nadir point, while the the utopia point is set to
+zero. This approach is similar to the upper-bound approach, but the function
+values will have the same orders of magnitude only at the starting point of
+the optimization. Function values larger than one are likely to occur during
+the optimization. We recommend the user to avoid this approach whenever
+possible because the effect of the starting point on the optimization as a
+whole usually is insignificant or arbitrary.
 
 The \emph{upper-lower-bound approach} with the \emph{Pareto maximum and
 minimum values} is the most elegant solution to transform the objective
@@ -317,9 +317,9 @@ covars <- meuse.grid[, 5]
 set.seed(2001)
 res <- optimACDC(points = 100, candi = candi, covars = covars,
                  nadir = nadir, use.coords = TRUE, utopia = utopia)
-objSPSANN(res) # 0.5272031
-objACDC(points = res, candi = candi, covars = covars, use.coords = TRUE,
-        nadir = nadir, utopia = utopia)
+objSPSANN(res) - # 0.5272031
+  objACDC(points = res, candi = candi, covars = covars, use.coords = TRUE,
+          nadir = nadir, utopia = utopia)
 # MARGINAL DISTRIBUTION
 par(mfrow = c(3, 3))
 # Covariates

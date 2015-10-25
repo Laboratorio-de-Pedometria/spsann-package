@@ -42,12 +42,12 @@ set.seed(2001)
 res <- countPPL(points = points, candi = candi)
 set.seed(2001)
 objPPL(points = points, candi = candi)
-sum(points - res$points) # 216
+sum(points - res$ppl) # 216
 # vector of indexes
 points <- 1:100
 res <- countPPL(points = points, candi = candi)
 objPPL(points = points, candi = candi)
-sum(length(points) - res$points) # 200
+sum(length(points) - res$ppl) # 200
 
 # 3) Unit test #################################################################
 rm(list = ls())
