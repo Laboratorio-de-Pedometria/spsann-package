@@ -28,6 +28,10 @@ expression(if (plotit) {
     boundary <- sp::SpatialPoints(boundary)
   }
   rm(x, d, y, xy, yx)
+  
+  # Open two new plotting devices
+  grDevices::dev.new()
+  grDevices::dev.new()
 })
 }
 

@@ -5,6 +5,7 @@
 # 2. If plotting is required, record the current plotting options;
 # 3. Force the plotting options to be reset at the end of the optimization;
 # 4. Estimate the 'boundary' if it is missing;
+# 5. Open two new plotting devices.
 #  
 # NOTES
 # 1. The estimated boundary is an object of class SpatialPoints. An object of
@@ -48,6 +49,10 @@ if (plotit) {
     boundary <- sp::SpatialPoints(boundary)
   }
   rm(x, d, y, xy, yx)
+  
+  # Open two new plotting devices
+  grDevices::dev.new()
+  grDevices::dev.new()
 }
 #
 # COMMAND

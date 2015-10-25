@@ -20,9 +20,12 @@
 #' @rdname SPSANNtools
 objSPSANN <- 
   function (OSC, at = "end", n = 1) {
-    if (at == "start") res <- utils::head(attr(OSC, "energy.state"), n)
-    if (at == "end") res <- utils::tail(attr(OSC, "energy.state"), n)
-    return (res)
+    
+    # Energy state at the start
+    if (at == "start") return (utils::head(attr(OSC, "energy.state"), n))
+    
+    # Energy state at the end
+    if (at == "end") return(utils::tail(attr(OSC, "energy.state"), n))
   }
 # INTERNAL FUNCTION - PLOTTING #################################################
 .spSANNplot <-
@@ -30,23 +33,27 @@ objSPSANN <-
             conf0, y_max0, y.max, x_max0, x.max, best.energy, best.k, MOOP, 
             wp, greedy = FALSE) {
     
-    graphics::par(mfrow = c(1, 2))
+    # graphics::par(mfrow = c(1, 2))
     
-    # PLOT THE ENERGY STATES
+    # PLOT ENERGY STATES
+    grDevices::dev.set(grDevices::dev.prev())
+    graphics::par(mar = c(5, 4, 4, 4) + 0.1)
+    
     # Multi-objective optimization problem
     if (MOOP) {
       n <- ncol(energy0)
       l <- colnames(energy0)
       a <- rbind(energy0, energies)
+      col <- c("red", rep("black", n - 1))
       graphics::plot(1, type = 'n', xlim = c(0, k), 
                      ylim = c(0, max(a)), #ylim = c(min(a), max(a)), 
                      xlab = "iteration", ylab = "energy state")
-      graphics::legend("topright", legend = l, lwd = 1, lty = 1:n)
+      graphics::legend("topright", legend = l, lwd = 1, lty = 1:n, col = col)
       
       for(i in 1:ncol(a)) {
-        #graphics::lines(a[, i] ~ c(0:k), type = "l", lty = i)
-        col <- ifelse(i == 1, "red", "black")
-        graphics::lines(a[, i] ~ c(1:k), type = "l", lty = i, col = col)
+        # graphics::lines(a[, i] ~ c(0:k), type = "l", lty = i)
+        # col <- ifelse(i == 1, "red", "black")
+        graphics::lines(a[, i] ~ c(1:k), type = "l", lty = i, col = col[i])
       }
       graphics::lines(x = c(-k, 0), y = rep(energy0[1], 2), col = "red")
       graphics::lines(x = rep(best.k, 2), y = c(-5, best.energy[1]), 
@@ -71,7 +78,9 @@ objSPSANN <-
       graphics::mtext("acceptance probability", side = 4, line = 3) 
     }
     
-    # plot sample points
+    # PLOT SAMPLE CONFIGURATION
+    grDevices::dev.set(grDevices::dev.next())
+    
     bb <- sp::bbox(boundary)
     if (class(boundary) == "SpatialPoints") {
       sp::plot(boundary, pch = 20, cex = 0.1)
