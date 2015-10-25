@@ -7,9 +7,15 @@ update(devtools::package_deps())
 devtools::dev_mode()
 
 # Automatically build functions
-fun.name <- c(".check_spsann_arguments", ".plotting_options", 
-              ".prepare_jittering", ".prepare_points", ".plot_and_jitter",
-              ".prepare_output", ".prepare_acdc_covars", ".check_suggests")
+fun.name <- c(".check_spsann_arguments",
+              ".plotting_options", 
+              ".prepare_jittering",
+              ".prepare_points",
+              ".plot_and_jitter",
+              ".prepare_output", 
+              ".prepare_acdc_covars", 
+              ".check_suggests",
+              ".prepare_clhs_covars")
 read.file <- c("R-autofun/check-spsann-arguments.R", 
                "R-autofun/plotting-options.R",
                "R-autofun/prepare-jittering.R",
@@ -17,11 +23,17 @@ read.file <- c("R-autofun/check-spsann-arguments.R",
                "R-autofun/plot-and-jitter.R",
                "R-autofun/prepare-output.R",
                "R-autofun/prepare-acdc-covars.R",
-               "R-autofun/check-suggests.R")
-write.file <- c("R/check-spsann-arguments.R", "R/plotting-options.R",
-                "R/prepare-jittering.R", "R/prepare-points.R",
-                "R/plot-and-jitter.R", "R/prepare-output.R",
-                "R/prepare-acdc-covars.R", "R/check-suggests.R")
+               "R-autofun/check-suggests.R",
+               "R-autofun/prepare-clhs-covars.R")
+write.file <- c("R/check-spsann-arguments.R",
+                "R/plotting-options.R",
+                "R/prepare-jittering.R",
+                "R/prepare-points.R",
+                "R/plot-and-jitter.R",
+                "R/prepare-output.R",
+                "R/prepare-acdc-covars.R", 
+                "R/check-suggests.R",
+                "R/prepare-clhs-covars.R")
 lapply(1:length(fun.name), function (i) 
   autofun::autofun(fun.name[i], read.file[i], write.file[i]))
 

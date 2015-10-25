@@ -1,7 +1,14 @@
-# Version 1.0-2 (2015-08-19)
+# Version 1.0-2 (2015-10-25)
 * Corrected a bug in `optimCORR()` that was causing the following error: Error
   in if (new_energy <= old_energy) { : missing value where TRUE/FALSE needed. 
-  This bug affects `optimACDC()` and `optimSPAN()`.
+  This bug used to affect `optimACDC()` and `optimSPAN()`.
+* Created a version of the method proposed by Minasny and McBratney (2006),
+  known as the conditioned Latin hypercube sampling (`optimCLHS`).
+* Improved and updated the documentation of several functions.
+* Improved the plotting functionality: each plot (the evolution of the
+  energy state and the new system configuration) is now displayed in a separate
+  device. This allows for a better visualization and allows the user to focus on
+  a single plot if so s/he wishes.
 
 # Version 1.0-1 (2015-07-30)
 * Improved and updated documentation.
