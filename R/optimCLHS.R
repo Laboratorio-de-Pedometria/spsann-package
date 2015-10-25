@@ -90,18 +90,20 @@
 #' @author Alessandro Samuel-Rosa \email{alessandrosamuelrosa@@gmail.com}
 #' @seealso \code{\link[clhs]{clhs}}, \code{\link[spsann]{optimACDC}}
 #' @concept spatial trend
+#' @export
 #' @examples
 #' \dontrun{
-#' # This example takes more than 5 seconds to run!
 #' require(sp)
 #' data(meuse.grid)
 #' candi <- meuse.grid[, 1:2]
 #' covars <- meuse.grid[, 5]
+#' weights <- list(O1 = 0.5, O3 = 0.5)
 #' set.seed(2001)
 #' res <- optimCLHS(points = 100, candi = candi, covars = covars, 
-#'                  use.coords = TRUE, iter = 100)
-#' objSPSANN(res) # 
-#' objCLHS(points = res, candi = candi, covars = covars, use.coords = TRUE) 
+#'                  use.coords = TRUE, weights = weights, iterations = 100)
+#' objSPSANN(res) - # 106.0691
+#' objCLHS(points = res, candi = candi, covars = covars, use.coords = TRUE, 
+#'         weights = weights)
 #' 
 #' # MARGINAL DISTRIBUTION
 #' par(mfrow = c(3, 3))
@@ -160,103 +162,21 @@ optimCLHS <-
     # Prepare for jittering
     eval(.prepare_jittering())
     
-    # Prepare 'covars' and create the starting sample matrix 'sm'
-    # Use coordinates?
-    if (use.coords) { covars <- data.frame(covars, candi[, 2:3]) }
-    n_cov <- ncol(covars)
-    # Factor or numeric?
-    if (pedometrics::anyFactor(covars)) {
-      if (pedometrics::allFactor(covars)) {
-        id_fac <- 1:n_cov
-        covars_type <- "factor"
-      } else {
-        id_fac <- which(sapply(covars, is.factor))
-        id_num <- which(sapply(covars, is.numeric))
-        covars_type <- "both"
-      }
-    } else {
-      id_num <- 1:n_cov
-      covars_type <- "numeric"
-    }
-    sm <- covars[points[, 1], ]
+    # Prepare 'covars' and base data
+    eval(.prepare_clhs_covars())
     
-    # Base data and initial energy state
-    if (any(covars_type == c("numeric", "both"))) {
-      
-      # O3
-      pcm <- stats::cor(x = covars[, id_num], use = "complete.obs")
-      scm <- stats::cor(x = sm[, id_num], use = "complete.obs")
-      
-      # Energy
-      obj_O3 <- weights$O3 * sum(abs(pcm - scm))
-      
-      # O1
-      # Compute the break points (continuous sample quantiles)
-      probs <- seq(0, 1, length.out = n_pts + 1)
-      breaks <- lapply(covars[, id_num], stats::quantile, probs, na.rm = TRUE)
-      
-      # Count the number of points per marginal sampling strata and compare 
-      # with the expected count
-      sm_count <- sapply(1:length(id_num), function (i) 
-        graphics::hist(sm[id_num][, i], breaks[[i]], plot = FALSE)$counts - 1)
-      
-      # Energy
-      obj_O1 <- weights$O1 * sum(abs(sm_count))
-    }
-    
-    if (any(covars_type == c("factor", "both"))) {
-      
-      # O2
-      
-      # Compute the proportion of population points per marginal factor level
-      pop_prop <- lapply(covars[, id_fac], function(x) table(x) / n_candi)
-      
-      # Compute the sample proportions
-      sm_prop <- lapply(sm[, id_fac], function(x) table(x) / n_pts)
-      
-      # Compare the sample and population proportions
-      sm_prop <- sapply(1:length(id_fac), function (i)
-        sum(abs(sm_prop[[i]] - pop_prop[[i]])))
-      
-      # Energy (O2)
-      obj_O2 <- weights$O2 * sum(sm_prop)
-    }
-    
-    # Initial energy state
-    if (covars_type == "both") {
-      obj <- obj_O1 + obj_O2 + obj_O3
-      energy0 <- data.frame(obj = obj, O1 = obj_O1, O2 = obj_O2, O3 = obj_O3)
-      best_energy <- data.frame(obj = Inf, O1 = Inf, O2 = Inf, O3 = Inf)
-    }
-    if (covars_type == "numeric") {
-      energy0 <- data.frame(obj = obj_O1 + obj_O3, O1 = obj_O1, O3 = obj_O3)
-      best_energy <- data.frame(obj = Inf, O1 = Inf, O3 = Inf)
-    }
-    if (covars_type == "factor") {
-      energy0 <- data.frame(obj = obj_O2)
-      best_energy <- data.frame(obj = Inf)
-    }
+    # Compute initial energy state
+    energy0 <- .objCLHS(sm = sm, breaks = breaks, id_num = id_num, pcm = pcm, 
+               id_fac = id_fac, n_pts = n_pts, pop_prop = pop_prop, 
+               weights = weights, covars_type = covars_type)
 
     # Other settings for the simulated annealing algorithm
-    # ASR: How can we update these objects?
-    # if (any(covars_type == c("numeric", "both")) {
-      # old_scm <- scm
-      # new_scm <- scm
-      # best_scm <- scm
-      # old_sm_count <- sm_count
-      # new_sm_count <- sm_count
-      # best_sm_count <- sm_count
-    # }
-    # if (any(covars_type == c("factor", "both")) {
-      # old_sm_prop <- sm_prop
-      # new_sm_prop <- sm_prop
-      # best_sm_prop <- sm_prop
-    # }
     old_sm <- sm
     new_sm <- sm
     best_sm <- sm
     count <- 0
     old_energy <- energy0
+    best_energy <- .bestEnergyCLHS(covars_type = covars_type)
     if (progress) { 
       pb <- utils::txtProgressBar(min = 1, max = iterations, style = 3) 
     }
@@ -268,78 +188,30 @@ optimCLHS <-
       # Plotting and jittering
       eval(.plot_and_jitter())
       
-      # Update sample matrix
-      # Recompute sample correlation matrix, marginal distribution, and
-      # class proportions.
-      # Recompute energy state
+      # Update sample matrix and compute the new energy state
       new_sm[wp, ] <- covars[new_conf[wp, 1], ]
+      new_energy <-
+        .objCLHS(sm = new_sm, breaks = breaks, id_num = id_num, pcm = pcm,
+                 id_fac = id_fac, n_pts = n_pts, pop_prop = pop_prop,
+                 weights = weights, covars_type = covars_type)
       
-      if (any(covars_type == c("numeric", "both"))) {
-        
-        # O3
-        new_scm <- stats::cor(x = new_sm[, id_num], use = "complete.obs")
-        obj_O3 <- weights$O3 * sum(abs(pcm - new_scm))
-        
-        # O1
-        new_sm_count <- sapply(1:length(id_num), function (i)
-          graphics::hist(new_sm[, id_num][, i], breaks[[i]], 
-                         plot = FALSE)$counts - 1)
-        obj_O1 <- weights$O1 * sum(abs(new_sm_count))
-        
-      }
-      if (any(covars_type == c("factor", "both"))) {
-        new_sm_prop <- lapply(sm[, id_fac], function(x) table(x) / n_pts)
-        new_sm_prop <- sapply(1:length(id_fac), function (i)
-          sum(abs(new_sm_prop[[i]] - pop_prop[[i]])))
-        
-        # Energy (O2)
-        obj_O2 <- weights$O2 * sum(new_sm_prop)
-      }
-      
-      if (covars_type == "both") {
-        obj <- obj_O1 + obj_O2 + obj_O3
-        new_energy <- 
-          data.frame(obj = obj, O1 = obj_O1, O2 = obj_O2, O3 = obj_O3)
-      }
-      if (covars_type == "numeric") {
-        new_energy <- 
-          data.frame(obj = obj_O1 + obj_O3, O1 = obj_O1, O3 = obj_O3)
-      }
-      if (covars_type == "factor") {
-        new_energy <- data.frame(obj = obj_O2)
-      }
-      
-      # Evaluate the new system configuration
+      # Cooling schedule
       random_prob <- ifelse(greedy, 1, stats::runif(1))
       actual_prob <- acceptance[[1]] * exp(-k / acceptance[[2]])
       if (track) { accept_probs[k] <- actual_prob }
+      
+      # Evaluate the new system configuration
       if (new_energy[1] <= old_energy[1]) {
         old_conf <- new_conf
         old_energy <- new_energy
         count <- 0
         old_sm <- new_sm
-        # ASR: How can we update these objects?
-        # if (any(covars_type == c("numeric", "both")) {
-          # old_scm <- new_scm
-          # old_sm_count <- new_sm_count
-        # }
-        # if (any(covars_type == c("factor", "both")) {
-          # old_sm_prop <- new_sm_prop
-        # }
       } else {
         if (new_energy[1] > old_energy[1] & random_prob <= actual_prob) {
           old_conf <- new_conf
           old_energy <- new_energy
           count <- count + 1
           old_sm <- new_sm
-          # ASR: How can we update these objects?
-          # if (any(covars_type == c("numeric", "both")) {
-            # old_scm <- new_scm
-            # old_sm_count <- new_sm_count
-          # }
-          # if (any(covars_type == c("factor", "both")) {
-            # old_sm_prop <- new_sm_prop
-          # }
           if (verbose) {
             cat("\n", count, "iteration(s) with no improvement... p = ",
                 random_prob, "\n")
@@ -349,14 +221,6 @@ optimCLHS <-
           new_conf <- old_conf
           count <- count + 1
           new_sm <- old_sm
-          # ASR: How can we update these objects?
-          # if (any(covars_type == c("numeric", "both")) {
-            # new_scm <- old_scm
-            # new_sm_count <- old_sm_count
-          # }
-          # if (any(covars_type == c("factor", "both")) {
-            # new_sm_prop <- old_sm_prop
-          # }
           if (verbose) {
             cat("\n", count, "iteration(s) with no improvement... stops at",
                 stopping[[1]], "\n")
@@ -374,17 +238,6 @@ optimCLHS <-
         old_conf <- old_conf
         best_sm <- new_sm
         best_old_sm <- old_sm
-        # ASR: How can we update these objects?
-        # if (any(covars_type == c("numeric", "both")) {
-          # best_scm <- new_scm
-          # best_old_scm <- old_scm
-          # best_sm_count <- new_sm_count
-          # best_old_sm_count <- old_sm_count
-        # }
-        # if (any(covars_type == c("factor", "both")) {
-          # best_sm_prop <- new_sm_prop
-          # best_old_sm_prop <- old_sm_prop
-        # }
       }
       
       # Freezing parameters
@@ -397,17 +250,6 @@ optimCLHS <-
           count <- 0
           new_sm <- best_sm
           old_sm <- best_old_sm
-          # ASR: How can we update these objects?
-          # if (any(covars_type == c("numeric", "both")) {
-            # new_scm <- best_scm
-            # old_scm <- best_old_scm
-            # new_sm_count <- best_sm_count
-            # old_sm_count <- best_old_sm_count
-          # }
-          # if (any(covars_type == c("factor", "both")) {
-            # new_sm_prop <- best_sm_prop
-            # old_sm_prop <- best_old_sm_prop
-          # }
           cat("\n", "reached maximum count with suboptimal configuration\n")
           cat("\n", "restarting with previously best configuration\n")
           cat("\n", count, "iteration(s) with no improvement... stops at",
@@ -432,17 +274,14 @@ optimCLHS <-
     # covars
     if (is.vector(covars)) {
       if (use.coords == FALSE) {
-        res <- "'covars' must have two or more columns"
-        return (res)
+        return ("'covars' must have two or more columns")
       }
       if (nrow(candi) != length(covars)) {
-        res <- "'candi' and 'covars' must have the same number of rows"
-        return (res)
+        return ("'candi' and 'covars' must have the same number of rows")
       }
     } else {
       if (nrow(candi) != nrow(covars)) {
-        res <- "'candi' and 'covars' must have the same number of rows"
-        return (res)
+        return ("'candi' and 'covars' must have the same number of rows")
       }
     }
   }
@@ -450,39 +289,30 @@ optimCLHS <-
 # This function is used to calculate the criterion value of CLHS.
 # Aggregation is done using the weighted sum method.
 .objCLHS <-
-  function (sm, n.cov, weights, n.pts, pcm, scm, covars.type, pop.prop) {
+  function (sm, breaks, id_num, pcm, id_fac, n_pts, pop_prop, weights,
+            covars_type) {
     
+    # Objective functions
     if (any(covars_type == c("numeric", "both"))) {
-      # O1
-      obj_O1 <-
-        .objO1(sm = sm, n.pts = n.pts, n.cov = n.cov, covars.type = covars.type)
-      obj_O1 <- obj_O1 * weights$O1
-      
-      # O3
-      obj_O3 <- .objO3(scm = scm, pcm = pcm)
-      obj_O3 <- obj_O3 * weights$O3
+      obj_O1 <- weights$O1 * .objO1(sm = sm, breaks = breaks, id_num = id_num)
+      obj_O3 <- weights$O3 * .objO3(sm = sm, id_num = id_num, pcm = pcm)
     }
-    
     if (any(covars_type == c("factor", "both"))) {
-    # O2
-    obj_O2 <- 
-      .objO2(sm = sm, n.pts = n.pts, n.cov = n.cov, pop.prop = pop.prop, 
-             covars.type = covars.type)
-    obj_O2 <- obj_O2 * weights$O2
+      obj_O2 <- weights$O2 * 
+        .objO2(sm = sm, id_fac = id_fac, n_pts = n_pts, pop_prop = pop_prop)
     }
     
-    # Prepare output
+    # Output
     if (covars_type == "both") {
       obj <- obj_O1 + obj_O2 + obj_O3
-      res <- data.frame(obj = obj, O1 = obj_O1, O2 = obj_O2, O3 = obj_O3)
+      return (data.frame(obj = obj, O1 = obj_O1, O2 = obj_O2, O3 = obj_O3))
+    } else {
+      if (covars_type == "numeric") {
+        return (data.frame(obj = obj_O1 + obj_O3, O1 = obj_O1, O3 = obj_O3))
+      } else {
+        return (data.frame(obj = obj_O2))
+      }
     }
-    if (covars_type == "numeric") {
-      res <- data.frame(obj = obj_O1 + obj_O3, O1 = obj_O1, O3 = obj_O3)
-    }
-    if (covars_type == "factor") {
-      res <- data.frame(obj = obj_O2)
-    }
-    return (res)
   }
 # CALCULATE OBJECTIVE FUNCTION VALUE ###########################################
 #' @rdname optimCLHS
@@ -499,23 +329,66 @@ objCLHS <-
     # Prepare points and candi
     eval(.prepare_points())
     
-    # Prepare 'covars' and create the starting sample matrix 'sm'
-    eval(.prepare_acdc_covars())
+    # Prepare 'covars' and and base data
+    eval(.prepare_clhs_covars())
     
-    # Compute base data
-    pcm <- .corCORR(obj = covars, covars.type = covars.type)
-    scm <- .corCORR(obj = sm, covars.type = covars.type)
-    pop_prop <- .strataACDC(n.pts = n_pts, strata.type = strata.type,
-                            covars = covars, covars.type = covars.type)
-    nadir <- .nadirACDC(n.pts = n_pts, n.cov = n_cov, n.candi = n_candi, 
-                        pcm = pcm, nadir = nadir, candi = candi, 
-                        covars = covars, pop.prop = pop_prop, 
-                        covars.type = covars.type)
-    utopia <- .utopiaACDC(utopia = utopia)
+    # Output energy state
+    return (.objCLHS(sm = sm, breaks = breaks, id_num = id_num, pcm = pcm, 
+                     id_fac = id_fac, n_pts = n_pts, pop_prop = pop_prop, 
+                     weights = weights, covars_type = covars_type))
+  }
+# INTERNAL FUNCTION - CALCULATE THE CRITERION VALUE (O1) #######################
+# sm: sample matrix
+# breaks: break points of the marginal sampling strata
+# id_num: number of the column containing numeric covariates
+.objO1 <- 
+  function (sm, breaks, id_num) {
     
-    # Compute the energy state
-    energy <- .objACDC(sm = sm, pop.prop = pop_prop, covars.type = covars.type, 
-                       weights = weights, pcm = pcm, scm = scm, n.pts = n_pts, 
-                       n.cov = n_cov, utopia = utopia, nadir = nadir)
-    return (energy)
+    # Count the number of points per marginal sampling strata and compare 
+    # with the expected count
+    sm_count <- sapply(1:length(id_num), function (i) 
+      graphics::hist(sm[id_num][, i], breaks[[i]], plot = FALSE)$counts - 1)
+    
+    # Output
+    return (sum(abs(sm_count)))
+  }
+# INTERNAL FUNCTION - CALCULATE THE CRITERION VALUE (O2) #######################
+# sm: sample matrix
+# n_pts: number of points
+# id_fac: columns of sm containing factor covariates
+# pop_prop: population class proportions
+.objO2 <-
+  function (sm, id_fac, n_pts, pop_prop) {
+    
+    # Compute the sample proportions
+    sm_prop <- lapply(sm[, id_fac], function(x) table(x) / n_pts)
+    
+    # Compare the sample and population proportions
+    sm_prop <- sapply(1:length(id_fac), function (i)
+      sum(abs(sm_prop[[i]] - pop_prop[[i]])))
+    
+    # Output
+    return (sum(sm_prop))
+  }
+# INTERNAL FUNCTION - CALCULATE THE CRITERION VALUE (O3) #######################
+# sm: sample matrix
+# id_num: columns of sm containing numeric covariates
+# pcm: population correlation matrix
+.objO3 <-
+  function (sm, id_num, pcm) {
+    scm <- stats::cor(x = sm[, id_num], use = "complete.obs")
+    return (sum(abs(pcm - scm)))
+  }
+# INTERNAL FUNCTION - PREPARE OBJECT TO STORE THE BEST ENERGY STATE ############
+.bestEnergyCLHS <-
+  function (covars_type) {
+    if (covars_type == "both") {
+      return (data.frame(obj = Inf, O1 = Inf, O2 = Inf, O3 = Inf))
+    } else {
+      if (covars_type == "numeric") {
+        return (data.frame(obj = Inf, O1 = Inf, O3 = Inf))
+      } else {
+        return (data.frame(obj = Inf))
+      }
+    }
   }

@@ -12,11 +12,12 @@ candi <- meuse.grid[, 1:2]
 covars <- meuse.grid[, 5]
 weights <- list(O1 = 0.5, O3 = 0.5)
 set.seed(2001)
-res <- optimCLHS(points = 100, candi = candi, covars = covars, use.coords = T, 
-                 weights = weights, iterations = 100)
-objSPSANN(res) # 70.71275
+res <- optimCLHS(points = 100, candi = candi, covars = covars, 
+                 use.coords = TRUE, weights = weights, iterations = 100)
+objSPSANN(res) - # 106.0691
+  objCLHS(points = res, candi = candi, covars = covars, use.coords = TRUE, 
+          weights = weights)
 
-objCLHS(points = res, candi = candi, covars = covars, use.coords = TRUE)
 # MARGINAL DISTRIBUTION
 par(mfrow = c(3, 3))
 # Covariates
@@ -52,8 +53,8 @@ covars <- meuse.grid[, 6:7]
 set.seed(2001)
 res <- optimCLHS(points = 100, candi = candi, covars = covars, 
                  use.coords = TRUE, iter = 1000, plotit = T)
-objSPSANN(res) # 
-objCLHS(points = res, candi = candi, covars = covars, use.coords = TRUE)
+objSPSANN(res) - # 34.67483
+  objCLHS(points = res, candi = candi, covars = covars, use.coords = TRUE)
 
 # 2) FACTOR COVARIATES USING THE COORDINATES WITH A FEW POINTS #################
 rm(list = ls())
@@ -66,8 +67,8 @@ covars <- meuse.grid[, 6:7]
 set.seed(2001)
 res <-  optimCLHS(points = 10, candi = candi, covars = covars, 
                   use.coords = TRUE, iterations = 200)
-objSPSANN(res) # 
-objCLHS(points = res, candi = candi, covars = covars, use.coords = TRUE)
+objSPSANN(res) - # 1.541098
+  objCLHS(points = res, candi = candi, covars = covars, use.coords = TRUE)
 
 # 3) CATEGORICAL COVARIATES WITH MANY COVARIATES AND MANY POINTS ###############
 rm(list = ls())
@@ -78,6 +79,7 @@ data(meuse.grid)
 candi <- meuse.grid[, 1:2]
 covars <- meuse.grid[, rep(c(6, 7), 10)]
 set.seed(2001)
-res <- optimCLHS(points = 500, candi = candi, covars = covars, use.coords = T)
-objSPSANN(res) # 
-objCLHS(points = res, candi = candi, covars = covars, use.coords = TRUE)
+res <- optimCLHS(points = 500, candi = candi, covars = covars, use.coords = T,
+                 iter = 200)
+objSPSANN(res) - # 548.6776
+  objCLHS(points = res, candi = candi, covars = covars, use.coords = TRUE)
