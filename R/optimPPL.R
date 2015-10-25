@@ -55,9 +55,10 @@ optimPPL <-
     eval(.check_spsann_arguments())
     
     # Check other arguments
-    check <- .checkPPL(lags = lags, lags.type = lags.type, pairs = pairs,
-                       lags.base = lags.base, cutoff = cutoff, 
-                       criterion = criterion, distri = distri, fun = "optimPPL")
+    check <- 
+      .checkPPL(lags = lags, lags.type = lags.type, pairs = pairs,
+                lags.base = lags.base, cutoff = cutoff, criterion = criterion,
+                distri = distri, fun = "optimPPL")
     if (!is.null(check)) stop (check, call. = FALSE)
     
     # Set plotting options
@@ -89,7 +90,7 @@ optimPPL <-
     count <- 0
     old_energy <- energy0
     best_energy <- Inf
-    if (progress) {
+    if (progress) { 
       pb <- utils::txtProgressBar(min = 1, max = iterations, style = 3) 
     }
     time0 <- proc.time()
@@ -120,13 +121,13 @@ optimPPL <-
                             criterion = criterion, distri = distri, ppl = ppl)
                             
       # Evaluate the new system configuration
-      if (greedy) {
-        random_prob <- 1
-      } else {
-        random_prob <- stats::runif(1)
-      }
+      
+      
+      
+      
+      random_prob <- ifelse(greedy, 1, stats::runif(1))
       actual_prob <- acceptance$initial * exp(-k / acceptance$cooling)
-      if (track) accept_probs[k] <- actual_prob
+      if (track) { accept_probs[k] <- actual_prob }
       if (new_energy <= old_energy) {
         old_conf <- new_conf
         old_energy <- new_energy
