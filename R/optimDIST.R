@@ -112,35 +112,35 @@ optimDIST <-
                              n.cov = n_cov, covars.type = covars.type)
       
       # Evaluate the new system configuration
-      random_prob <- ifelse(greedy, 1, stats::runif(1))
-      actual_prob <- acceptance[[1]] * exp(-k / acceptance[[2]])
-      if (track) accept_probs[k] <- actual_prob
-      if (new_energy <= old_energy) {
+      if (acceptance$by == "iterations") {
+        if (new_energy <= old_energy) { 
+          accept <- 1
+          count <- 0
+        } else {
+          random_prob <- ifelse(greedy, 1, stats::runif(1))
+          accept <- ifelse(random_prob <= actual_prob, 1, 0)
+          if (track) accept_probs[k] <- actual_prob
+          count <- count + 1
+        }
+      } else {
+        
+      }
+      
+      if (accept) {
         old_conf <- new_conf
         old_energy <- new_energy
-        count <- 0
         old_sm <- new_sm
       } else {
-        if (new_energy > old_energy & random_prob <= actual_prob) {
-          old_conf <- new_conf
-          old_energy <- new_energy
-          count <- count + 1
-          old_sm <- new_sm
-          if (verbose) {
-            cat("\n", count, "iteration(s) with no improvement... p = ",
-                random_prob, "\n")
-          }
-        } else {
-          new_energy <- old_energy
-          new_conf <- old_conf
-          count <- count + 1
-          new_sm <- old_sm
-          if (verbose) {
-            cat("\n", count, "iteration(s) with no improvement... stops at",
-                stopping[[1]], "\n")
-          }
+        new_energy <- old_energy
+        new_conf <- old_conf
+        new_sm <- old_sm
+        if (verbose) {
+          cat("\n", count, "iteration(s) with no improvement... stops at",
+              stopping[[1]], "\n")
         }
       }
+      
+
       # Best energy state
       if (track) energies[k] <- new_energy
       if (new_energy < best_energy / 1.0000001) {
