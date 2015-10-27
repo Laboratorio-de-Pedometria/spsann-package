@@ -73,9 +73,16 @@ objSPSANN <-
       a <- c(acceptance[[1]], accept_probs[1:k])
       graphics::par(new = TRUE)
       graphics::plot(a ~ c(0:k), type = "l", axes = FALSE, bty = "n", xlab = "",
-                     ylab = "", col = "blue", ylim = c(0, acceptance[[1]]))
+                     ylab = "", col = "blue", 
+                     # ylim = c(0, acceptance[[1]])
+                     ylim = c(0, 1))
       graphics::axis(side = 4, at = pretty(range(a)))
-      graphics::mtext("acceptance probability", side = 4, line = 3) 
+      if (acceptance$by == "iterations") {
+        graphics::mtext("acceptance probability", side = 4, line = 3)
+      } else {
+        graphics::mtext("temperature", side = 4, line = 3)
+      }
+      
     }
     
     # PLOT SAMPLE CONFIGURATION
