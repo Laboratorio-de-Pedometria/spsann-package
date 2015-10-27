@@ -1,11 +1,10 @@
-#' This is a test!
 #' Optimization of sample configurations for variogram identification and 
 #' estimation
 #'
 #' Optimize a sample configuration for variogram identification and estimation. 
-#' A criterion is defined so that the optimized sample configuration has a given 
-#' number of points or point-pairs contributing to each lag-distance class 
-#' (\bold{PPL}).
+#' A criterion is defined so that the optimized sample configuration has a 
+#' given number of points or point-pairs contributing to each lag-distance 
+#' class (\bold{PPL}).
 #' 
 #' @template spJitter_doc
 #' @template spSANN_doc
@@ -46,7 +45,8 @@ optimPPL <-
     criterion = "distribution", distri, pairs = FALSE,
     # SPSANN
     x.max, x.min, y.max, y.min,
-    acceptance = list(initial = 0.99, cooling = iterations / 10),
+    acceptance = list(initial = 0.90, cooling = iterations / 10, 
+                      by = "iterations", temperature = 5, calibrate = TRUE),
     stopping = list(max.count = iterations / 10), plotit = FALSE, track = FALSE,
     boundary, progress = TRUE, verbose = FALSE, greedy = FALSE,
     # MOOP
@@ -97,7 +97,9 @@ optimPPL <-
     time0 <- proc.time()
     
     # Begin the iterations
-    for (k in 1:iterations) {
+    k <- 0
+    repeat {
+      k <- k + 1
       
       # Plotting and jittering
       eval(.plot_and_jitter())
@@ -122,10 +124,6 @@ optimPPL <-
                             criterion = criterion, distri = distri, ppl = ppl)
                             
       # Evaluate the new system configuration
-      
-      
-      
-      
       random_prob <- ifelse(greedy, 1, stats::runif(1))
       actual_prob <- acceptance$initial * exp(-k / acceptance$cooling)
       if (track) { accept_probs[k] <- actual_prob }
@@ -186,7 +184,8 @@ optimPPL <-
         }
       }
       if (progress) utils::setTxtProgressBar(pb, k)
-      
+     
+      if (k == iterations) { break }
     }
     
     # Prepare output
