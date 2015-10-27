@@ -1,3 +1,4 @@
+#' This is a test!
 #' Optimization of sample configurations for variogram identification and 
 #' estimation
 #'
