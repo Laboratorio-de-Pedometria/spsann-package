@@ -8,10 +8,11 @@ and estimation (II)}
 \usage{
 optimDIST(points, candi, iterations = 100, covars, strata.type = "area",
   use.coords = FALSE, x.max, x.min, y.max, y.min, acceptance = list(initial
-  = 0.99, cooling = iterations/10), stopping = list(max.count =
-  iterations/10), plotit = FALSE, track = FALSE, boundary,
-  progress = TRUE, verbose = FALSE, greedy = FALSE, weights = NULL,
-  nadir = NULL, utopia = NULL)
+  = 0.9, cooling = iterations/10, by = "iterations", temperature = 5,
+  temperature.decrease = 0.95), stopping = list(max.count = iterations/10),
+  plotit = FALSE, track = FALSE, boundary, progress = TRUE,
+  verbose = FALSE, greedy = FALSE, weights = NULL, nadir = NULL,
+  utopia = NULL)
 
 objDIST(points, candi, covars, strata.type = "area", use.coords = FALSE)
 }

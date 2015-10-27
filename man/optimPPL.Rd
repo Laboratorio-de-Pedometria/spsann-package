@@ -10,7 +10,8 @@ estimation}
 optimPPL(points, candi, iterations = 100, lags = 7,
   lags.type = "exponential", lags.base = 2, cutoff,
   criterion = "distribution", distri, pairs = FALSE, x.max, x.min, y.max,
-  y.min, acceptance = list(initial = 0.99, cooling = iterations/10),
+  y.min, acceptance = list(initial = 0.9, cooling = iterations/10, by =
+  "iterations", temperature = 5, calibrate = TRUE, temperature.decrease = 0.95),
   stopping = list(max.count = iterations/10), plotit = FALSE,
   track = FALSE, boundary, progress = TRUE, verbose = FALSE,
   greedy = FALSE, weights = NULL, nadir = NULL, utopia = NULL)
@@ -143,9 +144,9 @@ point-pairs per lag-distance class.
 }
 \description{
 Optimize a sample configuration for variogram identification and estimation.
-A criterion is defined so that the optimized sample configuration has a given
-number of points or point-pairs contributing to each lag-distance class
-(\bold{PPL}).
+A criterion is defined so that the optimized sample configuration has a
+given number of points or point-pairs contributing to each lag-distance
+class (\bold{PPL}).
 }
 \section{Jittering methods}{
 
