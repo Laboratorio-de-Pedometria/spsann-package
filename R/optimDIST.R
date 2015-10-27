@@ -112,11 +112,7 @@ optimDIST <-
                              n.cov = n_cov, covars.type = covars.type)
       
       # Evaluate the new system configuration
-      if (greedy) {
-        random_prob <- 1
-      } else {
-        random_prob <- stats::runif(1)
-      }
+      random_prob <- ifelse(greedy, 1, stats::runif(1))
       actual_prob <- acceptance[[1]] * exp(-k / acceptance[[2]])
       if (track) accept_probs[k] <- actual_prob
       if (new_energy <= old_energy) {
