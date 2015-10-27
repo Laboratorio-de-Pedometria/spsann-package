@@ -1,3 +1,9 @@
+# Version 1.0-2.9000 (2015-10-27)
+* Now `x.max` and `y.max` are, by default, set to half of the length of the x
+  and y axis of the bounding box of `candi`. In the same manner, the argument 
+  `cutoff` of the `optimPPL()` function is set, by default, to half the diagonal
+  of the bounding box of `candi`.
+
 # Version 1.0-2 (2015-10-25)
 * Corrected a bug in `optimCORR()` that was causing the following error: Error
   in if (new_energy <= old_energy) { : missing value where TRUE/FALSE needed. 

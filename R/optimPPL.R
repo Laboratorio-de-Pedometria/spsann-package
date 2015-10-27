@@ -433,7 +433,7 @@ countPPL <-
   function (cutoff, x.max, y.max) {
     
     if (missing(cutoff)) {
-      cutoff <- sqrt(x.max ^ 2 + y.max ^ 2) / 2
+      cutoff <- sqrt(x.max ^ 2 + y.max ^ 2)
     }
     
     return (cutoff)
