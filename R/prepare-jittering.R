@@ -6,11 +6,13 @@ expression(if (missing(x.min) && missing(x.max) && missing(y.min) && missing(y.m
   x <- SpatialTools::dist1(as.matrix(candi[, "x"]))
   id <- x > 0
   x.min <- min(x[id])
-  x.max <- max(x)
+  x.max <- max(x) / 2
+  
   y <- SpatialTools::dist1(as.matrix(candi[, "y"]))
   id <- y > 0
   y.min <- min(y[id])
-  y.max <- max(y)
+  y.max <- max(y) / 2
+  
   rm(x, id, y)
 }, x_max0 <- x.max, y_max0 <- y.max)
 }

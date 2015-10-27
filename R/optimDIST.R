@@ -47,7 +47,7 @@ optimDIST <-
     # SPSANN
     x.max, x.min, y.max, y.min,
     acceptance = list(initial = 0.90, cooling = iterations / 10, 
-                      by = "iterations", temperature = 5, calibrate = TRUE,
+                      by = "iterations", temperature = 5,
                       temperature.decrease = 0.95),
     stopping = list(max.count = iterations / 10), plotit = FALSE, track = FALSE,
     boundary, progress = TRUE, verbose = FALSE, greedy = FALSE,
@@ -96,6 +96,8 @@ optimDIST <-
       actual_prob <- acceptance$initial
     } else {
       actual_temp <- acceptance$temperature
+      wp <- 0
+      nacc <- 0
     }
     
     # Begin the iterations
@@ -131,6 +133,7 @@ optimDIST <-
         old_conf <- new_conf
         old_energy <- new_energy
         old_sm <- new_sm
+        nacc <- nacc + 1
       } else {
         new_energy <- old_energy
         new_conf <- old_conf
@@ -177,6 +180,16 @@ optimDIST <-
         actual_prob <- acceptance$initial * exp(-k / acceptance$cooling)
       } else {
         actual_temp <- actual_temp * acceptance$temperature.decrease
+        if (wp == n_pts) {
+          wp <- 0
+        }
+        if (k == n_pts) {
+          if ((nacc / n_pts) < acceptance$initial) {
+            cat("temperature is too low... only ", nacc / n_pts * 100, 
+                "of acceptance in the first chain", sep = "")
+            break
+          }
+        }
       }
       
       if (k == iterations) { break }

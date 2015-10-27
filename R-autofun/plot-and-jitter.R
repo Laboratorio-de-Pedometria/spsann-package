@@ -12,7 +12,11 @@
 # 1. 
 # 2. 
 # 
-wp <- sample(1:n_pts, 1)
+if (acceptance$by == "iterations") {
+  wp <- sample(1:n_pts, 1)
+} else {
+  wp <- wp + 1
+}
 if (plotit && pedometrics::isNumint(k / 10)) {
   .spSANNplot(energy0 = energy0, energies = energies, k = k, 
               acceptance = acceptance, accept_probs = accept_probs,
