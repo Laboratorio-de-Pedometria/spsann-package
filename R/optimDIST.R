@@ -180,8 +180,8 @@ optimDIST <-
       if (acceptance$by == "iterations") {
         actual_prob <- acceptance$initial * exp(-k / acceptance$cooling)
       } else {
-        actual_temp <- actual_temp * acceptance$temperature.decrease
         if (wp == n_pts) {
+          actual_temp <- actual_temp * acceptance$temperature.decrease
           wp <- 0
         }
         if (k == n_pts) {
