@@ -92,8 +92,16 @@ optimDIST <-
     }
     time0 <- proc.time()
 
-    # Begin the main loop
-    for (k in 1:iterations) {
+    if (acceptance$by == "iterations") {
+      actual_prob <- acceptance$initial
+    } else {
+      actual_temp <- acceptance$temperature
+    }
+    
+    # Begin the iterations
+    k <- 0
+    repeat {
+      k <- k + 1
       
       # Plotting and jittering
       eval(.plot_and_jitter())
@@ -168,6 +176,14 @@ optimDIST <-
         }
       }
       if (progress) utils::setTxtProgressBar(pb, k)
+      
+      if (acceptance$by == "iterations") {
+        actual_prob <- acceptance$initial * exp(-k / acceptance$cooling)
+      } else {
+        actual_temp <- actual_temp * acceptance$temperature.decrease
+      }
+      
+      if (k == iterations) { break }
     }
     
     # Prepare output

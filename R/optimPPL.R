@@ -46,7 +46,8 @@ optimPPL <-
     # SPSANN
     x.max, x.min, y.max, y.min,
     acceptance = list(initial = 0.90, cooling = iterations / 10, 
-                      by = "iterations", temperature = 5, calibrate = TRUE),
+                      by = "iterations", temperature = 5, calibrate = TRUE,
+                      temperature.decrease = 0.95),
     stopping = list(max.count = iterations / 10), plotit = FALSE, track = FALSE,
     boundary, progress = TRUE, verbose = FALSE, greedy = FALSE,
     # MOOP
@@ -96,6 +97,12 @@ optimPPL <-
     }
     time0 <- proc.time()
     
+    if (acceptance$by == "iterations") {
+      actual_prob <- acceptance$initial
+    } else {
+      actual_temp <- acceptance$temperature
+    }
+    
     # Begin the iterations
     k <- 0
     repeat {
@@ -125,7 +132,6 @@ optimPPL <-
                             
       # Evaluate the new system configuration
       random_prob <- ifelse(greedy, 1, stats::runif(1))
-      actual_prob <- acceptance$initial * exp(-k / acceptance$cooling)
       if (track) { accept_probs[k] <- actual_prob }
       if (new_energy <= old_energy) {
         old_conf <- new_conf
@@ -185,6 +191,12 @@ optimPPL <-
       }
       if (progress) utils::setTxtProgressBar(pb, k)
      
+      if (acceptance$by == "iterations") {
+        actual_prob <- acceptance$initial * exp(-k / acceptance$cooling)
+      } else {
+        actual_temp <- actual_temp * acceptance$temperature.decrease
+      }
+      
       if (k == iterations) { break }
     }
     
