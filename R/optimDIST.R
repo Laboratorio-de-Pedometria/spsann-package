@@ -127,6 +127,7 @@ optimDIST <-
       } else {
         accept <- min(1, exp((old_energy - new_energy) / actual_temp))
         accept <- floor(rbinom(n = 1, size = 1, prob = accept))
+        if (track) accept_probs[k] <- actual_temp / acceptance$temperature
       }
       
       if (accept) {
