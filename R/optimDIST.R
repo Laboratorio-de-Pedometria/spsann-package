@@ -123,7 +123,8 @@ optimDIST <-
           count <- count + 1
         }
       } else {
-        
+        accept <- min(1, exp((old_energy - new_energy) / actual_temp))
+        accept <- floor(rbinom(n = 1, size = 1, prob = accept))
       }
       
       if (accept) {
@@ -140,7 +141,6 @@ optimDIST <-
         }
       }
       
-
       # Best energy state
       if (track) energies[k] <- new_energy
       if (new_energy < best_energy / 1.0000001) {
