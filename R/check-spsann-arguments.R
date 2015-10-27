@@ -19,10 +19,11 @@ expression(res <- NULL, aa <- c("points", "candi"), bb <- c(missing(points), mis
         } else {
           # Argument 'acceptance'
           aa <- !is.list(acceptance)
-          bb <- length(acceptance) != 2
+          # bb <- length(acceptance) != 2
           cc <- is.null(names(acceptance))
-          dd <- !all(c(names(acceptance) == c("initial", "cooling")) == TRUE)
-          if (aa || bb || cc || dd) {
+          # dd <- !all(c(names(acceptance) == c("initial", "cooling")) == TRUE)
+          if (aa || cc) {
+          # if (aa || bb || cc || dd) {
             res <- paste("'acceptance' must be a list with two named ",
                          "sub-arguments: 'initial' and 'cooling'", sep = "")
           } else {
