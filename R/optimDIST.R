@@ -46,7 +46,9 @@ optimDIST <-
     covars, strata.type = "area", use.coords = FALSE,
     # SPSANN
     x.max, x.min, y.max, y.min,
-    acceptance = list(initial = 0.99, cooling = iterations / 10),
+    acceptance = list(initial = 0.90, cooling = iterations / 10, 
+                      by = "iterations", temperature = 5, calibrate = TRUE,
+                      temperature.decrease = 0.95),
     stopping = list(max.count = iterations / 10), plotit = FALSE, track = FALSE,
     boundary, progress = TRUE, verbose = FALSE, greedy = FALSE,
     # MOOP
