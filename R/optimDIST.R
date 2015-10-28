@@ -98,6 +98,8 @@ optimDIST <-
       actual_temp <- acceptance$temperature
       wp <- 0
       nacc <- 0
+      chain <- 1
+      n_chains <- iterations / n_pts
     }
     
     # Begin the iterations

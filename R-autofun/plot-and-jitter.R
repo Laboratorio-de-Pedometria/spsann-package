@@ -1,5 +1,8 @@
 # Plotting and jittering
 # 
+# COMMAND
+# eval(.plot_and_jitter())
+# 
 # SUMMARY
 # 1. Select one point to be jittered;
 # 2. Plot the evlolution of the energy state, and the old and new system
@@ -30,13 +33,18 @@ new_conf <- spJitterFinite(points = old_conf, candi = candi, x.max = x.max,
                            x.min = x.min, y.max = y.max, y.min = y.min,
                            #cellsize = cellsize, finite = finite,
                            which.point = wp)
-x.max <- x_max0 - (k / iterations) * (x_max0 - x.min)
-y.max <- y_max0 - (k / iterations) * (y_max0 - y.min)
+if (acceptance$by == "iterations") {
+  x.max <- x_max0 - (k / iterations) * (x_max0 - x.min)
+  y.max <- y_max0 - (k / iterations) * (y_max0 - y.min)
+} else {
+  if (wp == n_pts) {
+    chain <- chain + 1
+    x.max <- x_max0 - (chain / n_chains) * (x_max0 - x.min)
+    y.max <- y_max0 - (chain / n_chains) * (y_max0 - y.min)
+  }
+}
 # if (COST) {
 #   new_row <- cost[new_conf[wp, 1]]
 #   new_cm[wp] <- new_row
 # }
 #
-# COMMAND
-# # Plotting and jittering
-# eval(.plot_and_jitter())

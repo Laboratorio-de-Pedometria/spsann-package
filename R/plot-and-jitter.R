@@ -16,7 +16,15 @@ expression(if (acceptance$by == "iterations") {
 }, new_conf <- spJitterFinite(points = old_conf, candi = candi, x.max = x.max, 
                            x.min = x.min, y.max = y.max, y.min = y.min,
                            #cellsize = cellsize, finite = finite,
-                           which.point = wp), x.max <- x_max0 - (k / iterations) * (x_max0 - x.min), 
-    y.max <- y_max0 - (k / iterations) * (y_max0 - y.min))
+                           which.point = wp), if (acceptance$by == "iterations") {
+  x.max <- x_max0 - (k / iterations) * (x_max0 - x.min)
+  y.max <- y_max0 - (k / iterations) * (y_max0 - y.min)
+} else {
+  if (wp == n_pts) {
+    chain <- chain + 1
+    x.max <- x_max0 - (chain / n_chains) * (x_max0 - x.min)
+    y.max <- y_max0 - (chain / n_chains) * (y_max0 - y.min)
+  }
+})
 }
 
