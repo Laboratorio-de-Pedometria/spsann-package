@@ -122,7 +122,8 @@ if (track || plotit) {
 }
 # Output and cleanup
 if (!is.null(res)) stop (res, call. = FALSE)
-rm(aa, bb, cc, dd, res)
+# rm(aa, bb, cc, dd, res)
+rm(aa, bb, cc, res)
 #
 # COMMAND
 # # Check spsann arguments ###################################################

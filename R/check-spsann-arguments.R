@@ -89,6 +89,6 @@ expression(res <- NULL, aa <- c("points", "candi"), bb <- c(missing(points), mis
       } else {
         energies <- vector()
       }
-    }, if (!is.null(res)) stop (res, call. = FALSE), rm(aa, bb, cc, dd, res))
+    }, if (!is.null(res)) stop (res, call. = FALSE), rm(aa, bb, cc, res))
 }
 
