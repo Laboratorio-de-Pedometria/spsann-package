@@ -10,11 +10,17 @@ require(sp)
 data(meuse.grid)
 candi <- meuse.grid[, 1:2]
 covars <- meuse.grid[, 5]
+schedule <- list(initial.acceptance = 0.90, 
+                 initial.temperature = 0.5,
+                 temperature.decrease = 0.95, chains = 500, 
+                 chain.length = 1, stopping = 10)
 set.seed(2001)
 # \dontrun{
 # This example takes more than 5 seconds to run!
 res <- optimDIST(points = 100, candi = candi, covars = covars, 
-                 use.coords = TRUE)
+                 use.coords = TRUE, schedule = schedule, plotit = TRUE)
+plot(attr(res, "energy.state"), type = "l")
+
 objSPSANN(res) # 1.6505
 objDIST(points = res, candi = candi, covars = covars, use.coords = TRUE)
 # }
