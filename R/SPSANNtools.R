@@ -29,7 +29,9 @@ objSPSANN <-
   }
 # INTERNAL FUNCTION - PLOTTING #################################################
 .spSANNplot <-
-  function (energy0, energies, k, acceptance, accept_probs, boundary, new_conf,
+  function (energy0, energies, k, 
+            # acceptance, accept_probs, 
+            boundary, new_conf,
             conf0, y_max0, y.max, x_max0, x.max, best.energy, best.k, MOOP, 
             wp, greedy = FALSE) {
     
@@ -69,21 +71,21 @@ objSPSANN <-
     }
     
     # plot acceptance probability
-    if (greedy == FALSE) {
-      a <- c(acceptance[[1]], accept_probs[1:k])
-      graphics::par(new = TRUE)
-      graphics::plot(a ~ c(0:k), type = "l", axes = FALSE, bty = "n", xlab = "",
-                     ylab = "", col = "blue", 
-                     # ylim = c(0, acceptance[[1]])
-                     ylim = c(0, 1))
-      graphics::axis(side = 4, at = pretty(range(a)))
-      if (acceptance$by == "iterations") {
-        graphics::mtext("acceptance probability", side = 4, line = 3)
-      } else {
-        graphics::mtext("temperature", side = 4, line = 3)
-      }
-      
-    }
+#     if (greedy == FALSE) {
+#       a <- c(acceptance[[1]], accept_probs[1:k])
+#       graphics::par(new = TRUE)
+#       graphics::plot(a ~ c(0:k), type = "l", axes = FALSE, bty = "n", xlab = "",
+#                      ylab = "", col = "blue", 
+#                      # ylim = c(0, acceptance[[1]])
+#                      ylim = c(0, 1))
+#       graphics::axis(side = 4, at = pretty(range(a)))
+#       if (acceptance$by == "iterations") {
+#         graphics::mtext("acceptance probability", side = 4, line = 3)
+#       } else {
+#         graphics::mtext("temperature", side = 4, line = 3)
+#       }
+#       
+#     }
     
     # PLOT SAMPLE CONFIGURATION
     grDevices::dev.set(grDevices::dev.next())
