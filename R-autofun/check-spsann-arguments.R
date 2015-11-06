@@ -32,30 +32,30 @@ if (any(bb)) {
     res <- c("'candi' must have two named numeric columns: 'x' and 'y'")
   } else {
     # Argument 'iterations'
-    if (!pedometrics::isNumint(iterations) || length(iterations) > 1) {
-      res <- c("'iterations' must be an integer value")
-    } else {
+    # if (!pedometrics::isNumint(iterations) || length(iterations) > 1) {
+      # res <- c("'iterations' must be an integer value")
+    # } else {
       # Argument 'acceptance'
-      aa <- !is.list(acceptance)
+      # aa <- !is.list(acceptance)
       # bb <- length(acceptance) != 2
-      cc <- is.null(names(acceptance))
+      # cc <- is.null(names(acceptance))
       # dd <- !all(c(names(acceptance) == c("initial", "cooling")) == TRUE)
-      if (aa || cc) {
+      # if (aa || cc) {
       # if (aa || bb || cc || dd) {
-        res <- paste("'acceptance' must be a list with two named ",
-                     "sub-arguments: 'initial' and 'cooling'", sep = "")
-      } else {
+        # res <- paste("'acceptance' must be a list with two named ",
+                     # "sub-arguments: 'initial' and 'cooling'", sep = "")
+      # } else {
         # Argument 'stopping'
-        aa <- !is.list(stopping)
-        bb <- length(stopping) != 1
-        cc <- is.null(names(stopping))
-        dd <- !all(c(names(stopping) == "max.count") == TRUE)
-        if (aa || bb || cc || dd) {
-          res <- paste("'stopping' must be a list with one named ",
-                       "sub-argument: 'max.count'", sep = "")
-        }
-      }
-    }
+        # aa <- !is.list(stopping)
+        # bb <- length(stopping) != 1
+        # cc <- is.null(names(stopping))
+        # dd <- !all(c(names(stopping) == "max.count") == TRUE)
+        # if (aa || bb || cc || dd) {
+          # res <- paste("'stopping' must be a list with one named ",
+                       # "sub-argument: 'max.count'", sep = "")
+        # }
+      # }
+    # }
   }
 }
 # Multi-objective optimization
