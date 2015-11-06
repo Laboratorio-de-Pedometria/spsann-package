@@ -41,15 +41,15 @@
 #' objDIST(points = pts, candi = candi, covars = covars, use.coords = TRUE)
 # MAIN FUNCTION ################################################################
 optimDIST <-
-  function (points, candi, iterations = 100, 
+  function (points, candi,
     # DIST
     covars, strata.type = "area", use.coords = FALSE,
     # SPSANN
     x.max, x.min, y.max, y.min,
-    acceptance = list(initial = 0.90, cooling = iterations / 10, 
-                      by = "iterations", temperature = 5,
-                      temperature.decrease = 0.95),
-    stopping = list(max.count = iterations / 10), plotit = FALSE, track = FALSE,
+    schedule = list(initial.acceptance = 0.90, initial.temperature = 5,
+                    temperature.decrease = 0.95, chains = 500, 
+                    chain.length = 1, stopping = points),
+    plotit = FALSE, track = FALSE,
     boundary, progress = TRUE, verbose = FALSE, greedy = FALSE,
     # MOOP
     weights = NULL, nadir = NULL, utopia = NULL) {
@@ -188,8 +188,8 @@ optimDIST <-
         }
         if (k == n_pts) {
           if ((nacc / n_pts) < acceptance$initial) {
-            cat("temperature is too low... only ", nacc / n_pts * 100, 
-                "of acceptance in the first chain", sep = "")
+            cat("temperature is too low... only ", round(nacc / n_pts, 2), 
+                " of acceptance in the first chain", sep = "")
             break
           }
         }
