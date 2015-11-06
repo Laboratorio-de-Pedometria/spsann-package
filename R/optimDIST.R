@@ -42,17 +42,18 @@
 # MAIN FUNCTION ################################################################
 optimDIST <-
   function (points, candi,
-    # DIST
-    covars, strata.type = "area", use.coords = FALSE,
-    # SPSANN
-    x.max, x.min, y.max, y.min,
-    schedule = list(initial.acceptance = 0.90, initial.temperature = 5,
-                    temperature.decrease = 0.95, chains = 500, 
-                    chain.length = 1, stopping = points),
-    plotit = FALSE, track = FALSE,
-    boundary, progress = TRUE, verbose = FALSE, greedy = FALSE,
-    # MOOP
-    weights = NULL, nadir = NULL, utopia = NULL) {
+            # DIST
+            covars, strata.type = "area", use.coords = FALSE,
+            # SPSANN
+            x.max, x.min, y.max, y.min,
+            schedule = list(initial.acceptance = 0.90, 
+                            initial.temperature = 0.05,
+                            temperature.decrease = 0.95, chains = 500, 
+                            chain.length = 1, stopping = 5),
+            plotit = FALSE, track = FALSE,
+            boundary, progress = TRUE, verbose = FALSE, greedy = FALSE,
+            # MOOP
+            weights = NULL, nadir = NULL, utopia = NULL) {
     
     # Check spsann arguments
     eval(.check_spsann_arguments())
@@ -84,119 +85,93 @@ optimDIST <-
     old_sm <- sm
     new_sm <- sm
     best_sm <- sm
-    count <- 0
     old_energy <- energy0
     best_energy <- Inf
     if (progress) {
-      pb <- utils::txtProgressBar(min = 1, max = iterations, style = 3) 
+      max <- n_pts * schedule$chains * schedule$chain.length
+      pb <- utils::txtProgressBar(min = 1, max = max, style = 3) 
     }
     time0 <- proc.time()
-
-    if (acceptance$by == "iterations") {
-      actual_prob <- acceptance$initial
-    } else {
-      actual_temp <- acceptance$temperature
-      wp <- 0
-      nacc <- 0
-      chain <- 1
-      n_chains <- iterations / n_pts
-    }
     
-    # Begin the iterations
-    k <- 0
-    repeat {
-      k <- k + 1
+    actual_temp <- schedule$initial.temperature
+    k <- 0 # number of tries
+    
+    # Initiate the annealing schedule
+    for (i in 1:schedule$chains) {
+      n_accept <- 0
       
-      # Plotting and jittering
-      eval(.plot_and_jitter())
+      for (j in 1:schedule$chain.length) { # Initiate one chain
+        
+        for (wp in 1:n_pts) { # Initiate loop through points
+          k <- k + 1
+          
+          # Plotting and jittering
+          eval(.plot_and_jitter())
+          
+          # Update sample and correlation matrices, and energy state
+          new_sm[wp, ] <- covars[new_conf[wp, 1], ]
+          new_energy <- 
+            .objDIST(sm = new_sm, pop.prop = pop_prop, n.pts = n_pts, 
+                     n.cov = n_cov, covars.type = covars.type)
+          
+          # Evaluate the new system configuration
+          accept <- min(1, exp((old_energy - new_energy) / actual_temp))
+          accept <- floor(rbinom(n = 1, size = 1, prob = accept))
+          if (track) 
+            accept_probs[k] <- actual_temp / schedule$initial.temperature
+          
+          if (accept) {
+            old_conf <- new_conf
+            old_energy <- new_energy
+            old_sm <- new_sm
+            n_accept <- n_accept + 1
+          } else {
+            new_energy <- old_energy
+            new_conf <- old_conf
+            new_sm <- old_sm
+            if (verbose) {
+              cat("\n", count, "iteration(s) with no improvement... stops at",
+                  stopping[[1]], "\n")
+            }
+          }
+          
+          if (track) energies[k] <- new_energy
+          # Best energy state
+          if (new_energy < best_energy / 1.0000001) {
+            best_k <- k
+            best_conf <- new_conf
+            best_energy <- new_energy
+            best_old_energy <- old_energy
+            old_conf <- old_conf
+            best_sm <- new_sm
+            best_old_sm <- old_sm
+          }
+          
+          if (progress) utils::setTxtProgressBar(pb, k)
+        } # End loop through points
+        
+      } # End the chain
       
-      # Update sample and correlation matrices, and energy state
-      new_sm[wp, ] <- covars[new_conf[wp, 1], ]
-      new_energy <- .objDIST(sm = new_sm, pop.prop = pop_prop, n.pts = n_pts, 
-                             n.cov = n_cov, covars.type = covars.type)
-      
-      # Evaluate the new system configuration
-      if (acceptance$by == "iterations") {
-        if (new_energy <= old_energy) { 
-          accept <- 1
-          count <- 0
-        } else {
-          random_prob <- ifelse(greedy, 1, stats::runif(1))
-          accept <- ifelse(random_prob <= actual_prob, 1, 0)
-          if (track) accept_probs[k] <- actual_prob
-          count <- count + 1
-        }
-      } else {
-        accept <- min(1, exp((old_energy - new_energy) / actual_temp))
-        accept <- floor(rbinom(n = 1, size = 1, prob = accept))
-        if (track) accept_probs[k] <- actual_temp / acceptance$temperature
-      }
-      
-      if (accept) {
-        old_conf <- new_conf
-        old_energy <- new_energy
-        old_sm <- new_sm
-        nacc <- nacc + 1
-      } else {
-        new_energy <- old_energy
-        new_conf <- old_conf
-        new_sm <- old_sm
-        if (verbose) {
-          cat("\n", count, "iteration(s) with no improvement... stops at",
-              stopping[[1]], "\n")
-        }
-      }
-      
-      # Best energy state
-      if (track) energies[k] <- new_energy
-      if (new_energy < best_energy / 1.0000001) {
-        best_k <- k
-        best_conf <- new_conf
-        best_energy <- new_energy
-        best_old_energy <- old_energy
-        old_conf <- old_conf
-        best_sm <- new_sm
-        best_old_sm <- old_sm
-      }
-      
-      # Freezing parameters
-      if (count == stopping[[1]]) {
-        if (new_energy > best_energy * 1.000001) {
-          old_conf <- old_conf
-          new_conf <- best_conf
-          old_energy <- best_old_energy
-          new_energy <- best_energy
-          count <- 0
-          new_sm <- best_sm
-          old_sm <- best_old_sm
-          cat("\n", "reached maximum count with suboptimal configuration\n")
-          cat("\n", "restarting with previously best configuration\n")
-          cat("\n", count, "iteration(s) with no improvement... stops at",
-              stopping[[1]], "\n")
-        } else {
+      # Check the proportion of accepted swaps in the first chain
+      if (i == 1) {
+        x <- round(n_accept / c(n_pts * schedule$chain.length), 2)
+        if (x < schedule$initial.acceptance) {
+          cat("\nlow temperature: only ", x," of acceptance in the 1st chain", 
+              sep = "")
           break
         }
       }
-      if (progress) utils::setTxtProgressBar(pb, k)
       
-      if (acceptance$by == "iterations") {
-        actual_prob <- acceptance$initial * exp(-k / acceptance$cooling)
-      } else {
-        if (wp == n_pts) {
-          actual_temp <- actual_temp * acceptance$temperature.decrease
-          wp <- 0
-        }
-        if (k == n_pts) {
-          if ((nacc / n_pts) < acceptance$initial) {
-            cat("temperature is too low... only ", round(nacc / n_pts, 2), 
-                " of acceptance in the first chain", sep = "")
-            break
-          }
-        }
-      }
+      # Count the number chains without any change in the objective function
+      tnacc <- ifelse(n_accept == 0, tnacc + 1, 0)
+      if (tnacc > schedule$stopping) { break }
       
-      if (k == iterations) { break }
-    }
+      # Update control parameters
+      actual_temp <- actual_temp * schedule$temperature.decrease
+      x.max <- x_max0 - (i / schedule$chains) * (x_max0 - x.min)
+      y.max <- y_max0 - (i / schedule$chains) * (y_max0 - y.min)
+      
+    } # End the annealing schedule
     
     # Prepare output
     eval(.prepare_output())
