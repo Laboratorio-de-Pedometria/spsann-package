@@ -6,12 +6,11 @@
 \title{Optimization of sample configurations for spatial trend identification
 and estimation (II)}
 \usage{
-optimDIST(points, candi, iterations = 100, covars, strata.type = "area",
-  use.coords = FALSE, x.max, x.min, y.max, y.min, acceptance = list(initial
-  = 0.9, cooling = iterations/10, by = "iterations", temperature = 5,
-  temperature.decrease = 0.95), stopping = list(max.count = iterations/10),
-  plotit = FALSE, track = FALSE, boundary, progress = TRUE,
-  verbose = FALSE, greedy = FALSE, weights = NULL, nadir = NULL,
+optimDIST(points, candi, covars, strata.type = "area", use.coords = FALSE,
+  schedule = list(initial.acceptance = 0.9, initial.temperature = 0.05,
+  temperature.decrease = 0.95, chains = 500, chain.length = 1, stopping = 5,
+  x.max, x.min, y.max, y.min), plotit = FALSE, track = FALSE, boundary,
+  progress = TRUE, verbose = FALSE, weights = NULL, nadir = NULL,
   utopia = NULL)
 
 objDIST(points, candi, covars, strata.type = "area", use.coords = FALSE)
@@ -33,9 +32,6 @@ perturbed points. \code{candi} must have two columns in the following
 order: \code{[, "x"]} the projected x-coordinates, and \code{[, "y"]} the
 projected y-coordinates.}
 
-\item{iterations}{Integer. The maximum number of iterations that should be
-used for the optimization. Defaults to \code{iterations = 100}.}
-
 \item{covars}{Data frame or matrix with the covariates in the columns.}
 
 \item{strata.type}{Character value setting the type of stratification that
@@ -45,24 +41,6 @@ and \code{"range"}, for equal-range. Defaults to \code{strata.type = "area"}.}
 
 \item{use.coords}{Logical value. Should the geographic coordinates be used
 as covariates? Defaults to \code{use.coords = FALSE}.}
-
-\item{x.max,x.min,y.max,y.min}{Numeric value. The minimum and maximum
-quantity of random noise to be added to the projected x- and y-coordinates.
-The minimum quantity should be equal to, at least, the minimum distance
-between two neighbouring candidate locations. The units are the same as of
-the projected x- and y-coordinates. If missing, they are estimated from
-\code{candi}.}
-
-\item{acceptance}{List with two named sub-arguments: \code{initial} --
-numeric value between 0 and 1 defining the initial acceptance probability,
-and \code{cooling} -- a numeric value defining the exponential factor by
-which the acceptance probability decreases at each iteration. Defaults to
-\code{acceptance = list(initial = 0.99, cooling = iterations / 10)}.}
-
-\item{stopping}{List with one named sub-argument: \code{max.count} --
-integer value defining the maximum allowable number of iterations without
-improvement of the objective function value. Defaults to
-\code{stopping = list(max.count = iterations / 10)}.}
 
 \item{plotit}{Logical for plotting the optimization results. This includes
 a) the progress of the objective function values and acceptance
@@ -84,10 +62,6 @@ If missing, it is estimated from \code{candi}.}
 \item{verbose}{Logical for printing messages about the progress of the
 optimization. Defaults to \code{verbose = FALSE}.}
 
-\item{greedy}{Logical value. Should the optimization be done using a greedy
-algorithm, that is, accepting only better system configurations? Defaults
-to \code{greedy = FALSE}. (experimental)}
-
 \item{weights}{List with named sub-arguments. The weights assigned to each
 one of the objective functions that form the multi-objective optimization
 problem (MOOP). They must be named after the respective objective function
@@ -105,6 +79,27 @@ after the respective objective function to which they apply; 3) \code{abs}
 \code{user} -- a list of user-defined values named after the respective
 objective function to which they apply; 2) \code{abs} -- logical for
 calculating the utopia point internally (experimental).}
+
+\item{x.max,x.min,y.max,y.min}{Numeric value. The minimum and maximum
+quantity of random noise to be added to the projected x- and y-coordinates.
+The minimum quantity should be equal to, at least, the minimum distance
+between two neighbouring candidate locations. The units are the same as of
+the projected x- and y-coordinates. If missing, they are estimated from
+\code{candi}.}
+
+\item{iterations}{Integer. The maximum number of iterations that should be
+used for the optimization. Defaults to \code{iterations = 100}.}
+
+\item{acceptance}{List with two named sub-arguments: \code{initial} --
+numeric value between 0 and 1 defining the initial acceptance probability,
+and \code{cooling} -- a numeric value defining the exponential factor by
+which the acceptance probability decreases at each iteration. Defaults to
+\code{acceptance = list(initial = 0.99, cooling = iterations / 10)}.}
+
+\item{stopping}{List with one named sub-argument: \code{max.count} --
+integer value defining the maximum allowable number of iterations without
+improvement of the objective function value. Defaults to
+\code{stopping = list(max.count = iterations / 10)}.}
 }
 \value{
 \code{optimDIST} returns a matrix: the optimized sample configuration.

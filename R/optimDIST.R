@@ -51,7 +51,7 @@ optimDIST <-
                             chain.length = 1, stopping = 5,
                             x.max, x.min, y.max, y.min),
             plotit = FALSE, track = FALSE,
-            boundary, progress = TRUE, verbose = FALSE, greedy = FALSE,
+            boundary, progress = TRUE, verbose = FALSE,
             # MOOP
             weights = NULL, nadir = NULL, utopia = NULL) {
     
