@@ -4,10 +4,9 @@
 # eval(.prepare_jittering())
 # 
 # SUMMARY
-# 1. Check if 'x.min', 'x.max', 'y.min', and 'y.max', are missing;
-# 2. If missing, estimate them from 'candi';
-# 3. Set 'x_max0' and 'y_max0', which are used later during the optimization;
-# 4. FUTURE FEATURE: Determine 'cellsize', the x- and y- dimensions of the
+# 1. If needed, estimate 'x.min', 'x.max', 'y.min', and 'y.max' from 'candi';
+# 2. Set 'x_max0' and 'y_max0';
+# 3. FUTURE FEATURE: Determine 'cellsize', the x- and y- dimensions of the
 #    individual elements of 'candi'.
 #
 # NOTES
@@ -19,7 +18,8 @@
 #    candidate locations will be enabled. The idea is to use the same strategy
 #    used in 'spcosa::spsample()'.
 #
-if (missing(x.min) && missing(x.max) && missing(y.min) && missing(y.max)) {
+if (is.null(schedule$x.min) && is.null(schedule$x.max) && 
+    is.null(schedule$y.min) && is.null(schedule$y.max)) {
   message("estimating 'x.min', 'x.max', 'y.min', and 'y.max' from 'candi'")
   x <- SpatialTools::dist1(as.matrix(candi[, "x"]))
   id <- x > 0
@@ -32,6 +32,11 @@ if (missing(x.min) && missing(x.max) && missing(y.min) && missing(y.max)) {
   y.max <- max(y) / 2
   
   rm(x, id, y)
+} else {
+  x.min <- schedule$x.min
+  x.max <- schedule$x.max
+  y.min <- schedule$y.min
+  y.max <- schedule$y.max
 }
 x_max0 <- x.max
 y_max0 <- y.max

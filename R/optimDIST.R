@@ -45,11 +45,11 @@ optimDIST <-
             # DIST
             covars, strata.type = "area", use.coords = FALSE,
             # SPSANN
-            x.max, x.min, y.max, y.min,
             schedule = list(initial.acceptance = 0.90, 
                             initial.temperature = 0.05,
                             temperature.decrease = 0.95, chains = 500, 
-                            chain.length = 1, stopping = 5),
+                            chain.length = 1, stopping = 5,
+                            x.max, x.min, y.max, y.min),
             plotit = FALSE, track = FALSE,
             boundary, progress = TRUE, verbose = FALSE, greedy = FALSE,
             # MOOP
@@ -94,7 +94,7 @@ optimDIST <-
     time0 <- proc.time()
     
     actual_temp <- schedule$initial.temperature
-    k <- 0 # number of tries
+    k <- 0 # count the number of jitters
     
     # Initiate the annealing schedule
     for (i in 1:schedule$chains) {
@@ -129,10 +129,6 @@ optimDIST <-
             new_energy <- old_energy
             new_conf <- old_conf
             new_sm <- old_sm
-            if (verbose) {
-              cat("\n", count, "iteration(s) with no improvement... stops at",
-                  stopping[[1]], "\n")
-            }
           }
           
           if (track) energies[k] <- new_energy
@@ -163,8 +159,17 @@ optimDIST <-
       }
       
       # Count the number chains without any change in the objective function
-      no_change <- ifelse(n_accept == 0, no_change + 1, 0)
-      if (no_change > schedule$stopping) { break }
+      if (n_accept == 0) {
+        no_change <- no_change + 1
+        if (no_change > schedule$stopping) { break }
+        if (verbose) {
+          cat("\n", no_change, "chain(s) with no improvement... stops at",
+              schedule$stopping, "\n")
+        }
+      } else {
+        no_change <-  0
+      }
+      # no_change <- ifelse(n_accept == 0, no_change + 1, 0)
       
       # Update control parameters
       actual_temp <- actual_temp * schedule$temperature.decrease
