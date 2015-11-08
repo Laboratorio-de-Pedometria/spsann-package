@@ -117,8 +117,8 @@ optimDIST <-
           # Evaluate the new system configuration
           accept <- min(1, exp((old_energy - new_energy) / actual_temp))
           accept <- floor(rbinom(n = 1, size = 1, prob = accept))
-          if (track) 
-            accept_probs[k] <- actual_temp / schedule$initial.temperature
+          # if (track) 
+            # accept_probs[k] <- actual_temp / schedule$initial.temperature
           
           if (accept) {
             old_conf <- new_conf
@@ -163,8 +163,8 @@ optimDIST <-
       }
       
       # Count the number chains without any change in the objective function
-      tnacc <- ifelse(n_accept == 0, tnacc + 1, 0)
-      if (tnacc > schedule$stopping) { break }
+      no_change <- ifelse(n_accept == 0, no_change + 1, 0)
+      if (no_change > schedule$stopping) { break }
       
       # Update control parameters
       actual_temp <- actual_temp * schedule$temperature.decrease
