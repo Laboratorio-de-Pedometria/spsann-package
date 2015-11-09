@@ -45,12 +45,7 @@ optimDIST <-
             # DIST
             covars, strata.type = "area", use.coords = FALSE,
             # SPSANN
-            schedule = list(initial.acceptance = 0.90, 
-                            initial.temperature = 0.05,
-                            temperature.decrease = 0.95, chains = 500, 
-                            chain.length = 1, stopping = 5,
-                            x.max, x.min, y.max, y.min),
-            plotit = FALSE, track = FALSE,
+            schedule = scheduleSPSANN(), plotit = FALSE, track = FALSE,
             boundary, progress = TRUE, verbose = FALSE,
             # MOOP
             weights = NULL, nadir = NULL, utopia = NULL) {
