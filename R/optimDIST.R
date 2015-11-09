@@ -117,9 +117,6 @@ optimDIST <-
           # Evaluate the new system configuration
           accept <- min(1, exp((old_energy - new_energy) / actual_temp))
           accept <- floor(rbinom(n = 1, size = 1, prob = accept))
-          # if (track) 
-            # accept_probs[k] <- actual_temp / schedule$initial.temperature
-          
           if (accept) {
             old_conf <- new_conf
             old_energy <- new_energy
@@ -130,9 +127,9 @@ optimDIST <-
             new_conf <- old_conf
             new_sm <- old_sm
           }
-          
           if (track) energies[k] <- new_energy
-          # Best energy state
+          
+          # Record best energy state
           if (new_energy < best_energy / 1.0000001) {
             best_k <- k
             best_conf <- new_conf
@@ -152,16 +149,30 @@ optimDIST <-
       if (i == 1) {
         x <- round(n_accept / c(n_pts * schedule$chain.length), 2)
         if (x < schedule$initial.acceptance) {
-          cat("\nlow temperature: only ", x," of acceptance in the 1st chain", 
+          cat("\nlow temperature: only ", x," of acceptance in the 1st chain\n", 
               sep = "")
           break
         }
       }
       
-      # Count the number chains without any change in the objective function
+      # Count the number of chains without any change in the objective function.
+      # Restart with the previously best configuration if it exists.
       if (n_accept == 0) {
         no_change <- no_change + 1
-        if (no_change > schedule$stopping) { break }
+        if (no_change > schedule$stopping) {
+          if (new_energy > best_energy * 1.000001) {
+            old_conf <- old_conf
+            new_conf <- best_conf
+            old_energy <- best_old_energy
+            new_energy <- best_energy
+            no_change <- 0
+            new_sm <- best_sm
+            old_sm <- best_old_sm
+            cat("\nrestarting with previously best configuration\n")
+          } else { 
+            break 
+          }
+        }
         if (verbose) {
           cat("\n", no_change, "chain(s) with no improvement... stops at",
               schedule$stopping, "\n")
@@ -169,7 +180,6 @@ optimDIST <-
       } else {
         no_change <-  0
       }
-      # no_change <- ifelse(n_accept == 0, no_change + 1, 0)
       
       # Update control parameters
       actual_temp <- actual_temp * schedule$temperature.decrease
