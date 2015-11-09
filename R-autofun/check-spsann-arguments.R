@@ -17,6 +17,7 @@
 #    http://www.r-bloggers.com/a-warning-about-warning/
 # 
 res <- NULL
+
 # Check missing arguments
 aa <- c("points", "candi")
 bb <- c(missing(points), missing(candi))
@@ -24,6 +25,7 @@ if (any(bb)) {
   i <- which(bb == TRUE)
   res <- c("missing argument: '", aa[i], "'\n", sep = "")
 } else {
+  
   # Argument 'candi'
   aa <- any(apply(candi, 2, is.numeric) == FALSE)
   bb <- ncol(candi) != 2
@@ -31,33 +33,14 @@ if (any(bb)) {
   if (aa || bb || cc) {
     res <- c("'candi' must have two named numeric columns: 'x' and 'y'")
   } else {
-    # Argument 'iterations'
-    # if (!pedometrics::isNumint(iterations) || length(iterations) > 1) {
-      # res <- c("'iterations' must be an integer value")
-    # } else {
-      # Argument 'acceptance'
-      # aa <- !is.list(acceptance)
-      # bb <- length(acceptance) != 2
-      # cc <- is.null(names(acceptance))
-      # dd <- !all(c(names(acceptance) == c("initial", "cooling")) == TRUE)
-      # if (aa || cc) {
-      # if (aa || bb || cc || dd) {
-        # res <- paste("'acceptance' must be a list with two named ",
-                     # "sub-arguments: 'initial' and 'cooling'", sep = "")
-      # } else {
-        # Argument 'stopping'
-        # aa <- !is.list(stopping)
-        # bb <- length(stopping) != 1
-        # cc <- is.null(names(stopping))
-        # dd <- !all(c(names(stopping) == "max.count") == TRUE)
-        # if (aa || bb || cc || dd) {
-          # res <- paste("'stopping' must be a list with one named ",
-                       # "sub-argument: 'max.count'", sep = "")
-        # }
-      # }
-    # }
+    
+    # Argument 'schedule'
+    if (!is.list(schedule) || length(schedule) != 10) {
+      res <- c("'schedule' must be a list with 10 sub-arguments")
+    }
   }
 }
+
 # Multi-objective optimization
 aa <- all(c(!is.null(weights), !is.null(utopia), !is.null(nadir)))
 MOOP <- ifelse(aa, TRUE, FALSE)

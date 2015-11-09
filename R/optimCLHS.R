@@ -131,14 +131,12 @@
 #' }
 # MAIN FUNCTION ################################################################
 optimCLHS <-
-  function (points, candi, iterations = 50000, 
+  function (points, candi,
     # O1, O2, and O3
     covars, use.coords = FALSE, 
     # SPSANN
-    x.max, x.min, y.max, y.min,
-    acceptance = list(initial = 0.80, cooling = iterations / 10),
-    stopping = list(max.count = iterations / 10), plotit = FALSE, track = FALSE,
-    boundary, progress = TRUE, verbose = FALSE, greedy = FALSE,
+    schedule = scheduleSPSANN(), plotit = FALSE, track = FALSE,
+    boundary, progress = TRUE, verbose = FALSE,
     # MOOP
     weights = list(O1 = 1/3, O2 = 1/3, O3 = 1/3)) {
     

@@ -71,14 +71,12 @@
 #' }
 # MAIN FUNCTION ################################################################
 optimACDC <-
-  function (points, candi, iterations = 100, 
+  function (points, candi, 
     # DIST and CORR
     covars, strata.type = "area", use.coords = FALSE, 
     # SPSANN
-    x.max, x.min, y.max, y.min,
-    acceptance = list(initial = 0.99, cooling = iterations / 10),
-    stopping = list(max.count = iterations / 10), plotit = FALSE, track = FALSE,
-    boundary, progress = TRUE, verbose = FALSE, greedy = FALSE,
+    schedule = scheduleSPSANN(), plotit = FALSE, track = FALSE,
+    boundary, progress = TRUE, verbose = FALSE,
     # MOOP
     weights = list(CORR = 0.5, DIST = 0.5),
     nadir = list(sim = NULL, seeds = NULL, user = NULL, abs = NULL),

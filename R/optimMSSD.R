@@ -57,13 +57,10 @@
 #' objMSSD(candi = candi, points = pts)
 # FUNCTION - MAIN ##############################################################
 optimMSSD <-
-  function (points, candi, iterations = 100,
+  function (points, candi,
             # SPSANN
-            x.max, x.min, y.max, y.min,
-            acceptance = list(initial = 0.99, cooling = iterations / 10),
-            stopping = list(max.count = iterations / 10), plotit = FALSE,
-            track = FALSE, boundary, progress = TRUE, verbose = FALSE, 
-            greedy = FALSE,
+            schedule = scheduleSPSANN(), plotit = FALSE, track = FALSE, 
+            boundary, progress = TRUE, verbose = FALSE, 
             # MOOP
             weights = NULL, nadir = NULL, utopia = NULL) {
     

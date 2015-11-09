@@ -44,17 +44,15 @@
 #' }
 # MAIN FUNCTION ################################################################
 optimSPAN <-
-  function(points, candi, iterations = 100,
+  function(points, candi,
     # DIST and CORR
     covars, strata.type = "area", use.coords = FALSE,
     # PPL
     lags = 7, lags.type = "exponential", lags.base = 2, cutoff, 
     criterion = "distribution", distri, pairs = FALSE,
     # SPSANN
-    x.max, x.min, y.max, y.min, 
-    acceptance = list(initial = 0.99, cooling = iterations / 10),
-    stopping = list(max.count = iterations / 10), plotit = FALSE, track = FALSE,
-    boundary, progress = TRUE, verbose = FALSE, greedy = FALSE,
+    schedule = scheduleSPSANN(), plotit = FALSE, track = FALSE,
+    boundary, progress = TRUE, verbose = FALSE,
     # MOOP
     weights = list(CORR = 1/6, DIST = 1/6, PPL = 1/3, MSSD = 1/3),
     nadir = list(sim = NULL, seeds = NULL, user = NULL, abs = NULL),
