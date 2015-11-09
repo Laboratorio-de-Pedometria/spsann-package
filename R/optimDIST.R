@@ -27,12 +27,13 @@
 #' data(meuse.grid)
 #' candi <- meuse.grid[, 1:2]
 #' covars <- meuse.grid[, 5]
+#' schedule <- scheduleSPSANN(initial.temperature = 0.5, chains = 1)
 #' set.seed(2001)
 #' \dontrun{
 #' # This example takes more than 5 seconds to run!
-#' res <- optimDIST(points = 100, candi = candi, covars = covars, 
-#'                  use.coords = TRUE)
-#' objSPSANN(res) # 1.6505
+#' res <- optimDIST(points = 100, candi = candi, covars = covars,
+#'                  use.coords = TRUE, plotit = TRUE, schedule = schedule)
+#' objSPSANN(res) # 2.170422
 #' objDIST(points = res, candi = candi, covars = covars, use.coords = TRUE)
 #' }
 #' # Random sample
