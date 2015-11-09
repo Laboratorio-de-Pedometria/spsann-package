@@ -110,8 +110,14 @@ optimUSER <-
     }
     time0 <- proc.time()
     
-    # Begin the iterations    
-    for (k in 1:iterations) {
+    # Initiate the annealing schedule
+    for (i in 1:schedule$chains) {
+      n_accept <- 0
+      
+      for (j in 1:schedule$chain.length) { # Initiate one chain
+        
+        for (wp in 1:n_pts) { # Initiate loop through points
+          k <- k + 1
       
       # Plotting and jittering
       eval(.plot_and_jitter())
@@ -120,39 +126,19 @@ optimUSER <-
       new_energy <- .energyUSER(fun = fun, points = new_conf, ...)
       
       # Evaluate the new system configuration
-      if (greedy) {
-        random_prob <- 1
-      } else {
-        random_prob <- stats::runif(1)
-      }
-      actual_prob <- acceptance$initial * exp(-k / acceptance$cooling)
-      if (track) accept_probs[k] <- actual_prob
-      if (new_energy <= old_energy) {
+      accept <- min(1, exp((old_energy - new_energy) / actual_temp))
+      accept <- floor(rbinom(n = 1, size = 1, prob = accept))
+      if (accept) {
         old_conf <- new_conf
         old_energy <- new_energy
-        count <- 0
+        n_accept <- n_accept + 1
       } else {
-        if (new_energy > old_energy && random_prob <= actual_prob) {
-          old_conf <- new_conf
-          old_energy <- new_energy
-          count <- count + 1
-          if (verbose) {
-            cat("\n", count, "iteration(s) with no improvement... p = ",
-                random_prob, "\n")
-          }
-        } else {
-          new_energy <- old_energy
-          new_conf <- old_conf
-          count <- count + 1
-          if (verbose) {
-            cat("\n", count, "iteration(s) with no improvement... stops at",
-                stopping$max.count, "\n")
-          }
-        }
+        new_energy <- old_energy
+        new_conf <- old_conf
       }
-      
-      # Best energy state
       if (track) energies[k] <- new_energy
+      
+      # Record best energy state
       if (new_energy < best_energy / 1.0000001) {
         best_k <- k
         best_conf <- new_conf
@@ -161,24 +147,52 @@ optimUSER <-
         old_conf <- old_conf
       }
       
-      # Freezing parameters
-      if (count == stopping$max.count) {
-        if (new_energy > best_energy * 1.000001) {
-          old_conf <- old_conf
-          new_conf <- best_conf
-          old_energy <- best_old_energy
-          new_energy <- best_energy
-          count <- 0
-          cat("\n", "reached maximum count with suboptimal configuration\n")
-          cat("\n", "restarting with previously best configuration\n")
-          cat("\n", count, "iteration(s) with no improvement... stops at",
-              stopping$max.count, "\n")
-        } else {
+      
+      if (progress) utils::setTxtProgressBar(pb, k)
+        } # End loop through points
+        
+      } # End the chain
+      
+      # Check the proportion of accepted swaps in the first chain
+      if (i == 1) {
+        x <- round(n_accept / c(n_pts * schedule$chain.length), 2)
+        if (x < schedule$initial.acceptance) {
+          cat("\nlow temperature: only ", x," of acceptance in the 1st chain\n", 
+              sep = "")
           break
         }
       }
-      if (progress) utils::setTxtProgressBar(pb, k)
-    }
+      
+      # Count the number of chains without any change in the objective function.
+      # Restart with the previously best configuration if it exists.
+      if (n_accept == 0) {
+        no_change <- no_change + 1
+        if (no_change > schedule$stopping) {
+          if (new_energy > best_energy * 1.000001) {
+            old_conf <- old_conf
+            new_conf <- best_conf
+            old_energy <- best_old_energy
+            new_energy <- best_energy
+            no_change <- 0
+            cat("\nrestarting with previously best configuration\n")
+          } else { 
+            break 
+          }
+        }
+        if (verbose) {
+          cat("\n", no_change, "chain(s) with no improvement... stops at",
+              schedule$stopping, "\n")
+        }
+      } else {
+        no_change <-  0
+      }
+      
+      # Update control parameters
+      actual_temp <- actual_temp * schedule$temperature.decrease
+      x.max <- x_max0 - (i / schedule$chains) * (x_max0 - x.min)
+      y.max <- y_max0 - (i / schedule$chains) * (y_max0 - y.min)
+      
+    } # End the annealing schedule
     
     # Prepare output
     eval(.prepare_output())
