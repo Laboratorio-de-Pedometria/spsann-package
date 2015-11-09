@@ -83,14 +83,13 @@ optimDIST <-
     best_sm <- sm
     old_energy <- energy0
     best_energy <- Inf
+    actual_temp <- schedule$initial.temperature
+    k <- 0 # count the number of jitters
     if (progress) {
       max <- n_pts * schedule$chains * schedule$chain.length
       pb <- utils::txtProgressBar(min = 1, max = max, style = 3) 
     }
     time0 <- proc.time()
-    
-    actual_temp <- schedule$initial.temperature
-    k <- 0 # count the number of jitters
     
     # Initiate the annealing schedule
     for (i in 1:schedule$chains) {

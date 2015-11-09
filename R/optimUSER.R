@@ -100,11 +100,13 @@ optimUSER <-
     energy0 <- .energyUSER(fun = fun, points = old_conf, ...)
     
     # Other settings for the simulated annealing algorithm
-    count <- 0
     old_energy <- energy0
     best_energy <- Inf
+    actual_temp <- schedule$initial.temperature
+    k <- 0 # count the number of jitters
     if (progress) {
-      pb <- utils::txtProgressBar(min = 1, max = iterations, style = 3) 
+      max <- n_pts * schedule$chains * schedule$chain.length
+      pb <- utils::txtProgressBar(min = 1, max = max, style = 3)
     }
     time0 <- proc.time()
     

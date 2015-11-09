@@ -85,19 +85,15 @@ optimPPL <-
     # Other settings for the simulated annealing algorithm
     old_dm <- dm
     best_dm <- dm
-    count <- 0
     old_energy <- energy0
     best_energy <- Inf
+    actual_temp <- schedule$initial.temperature
+    k <- 0 # count the number of jitters
     if (progress) { 
-      pb <- utils::txtProgressBar(min = 1, max = iterations, style = 3) 
+      max <- n_pts * schedule$chains * schedule$chain.length
+      pb <- utils::txtProgressBar(min = 1, max = max, style = 3)
     }
     time0 <- proc.time()
-    
-    if (acceptance$by == "iterations") {
-      actual_prob <- acceptance$initial
-    } else {
-      actual_temp <- acceptance$temperature
-    }
     
     # Begin the iterations
     k <- 0

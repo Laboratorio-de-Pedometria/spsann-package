@@ -117,17 +117,19 @@ optimACDC <-
                         covars.type = covars.type)
 
     # Other settings for the simulated annealing algorithm
-    old_scm <- scm
-    new_scm <- scm
-    best_scm <- scm
     old_sm <- sm
     new_sm <- sm
     best_sm <- sm
-    count <- 0
+    old_scm <- scm
+    new_scm <- scm
+    best_scm <- scm
     old_energy <- energy0
     best_energy <- data.frame(obj = Inf, CORR = Inf, DIST = Inf)
+    actual_temp <- schedule$initial.temperature
+    k <- 0 # count the number of jitters
     if (progress) {
-      pb <- utils::txtProgressBar(min = 1, max = iterations, style = 3) 
+      max <- n_pts * schedule$chains * schedule$chain.length
+      pb <- utils::txtProgressBar(min = 1, max = max, style = 3)
     }
     time0 <- proc.time()
 
