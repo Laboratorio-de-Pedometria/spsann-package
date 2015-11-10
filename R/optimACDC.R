@@ -5,9 +5,10 @@
 #' estimation. An utility function \emph{U} is defined so that the sample 
 #' reproduces the bivariate association/correlation between the covariates, as 
 #' well as their marginal distribution (\bold{ACDC}). The utility function is 
-#' obtained aggregating two single objective functions: \bold{CORR} and 
+#' obtained aggregating two objective functions: \bold{CORR} and 
 #' \bold{DIST}.
 #'
+#' @inheritParams spJitterFinite
 #' @template spJitter_doc
 #' @template spSANN_doc
 #' @template ACDC_doc
@@ -31,43 +32,22 @@
 #' @seealso \code{\link[clhs]{clhs}}, \code{\link[pedometrics]{cramer}}
 #' @export
 #' @examples
-#' \dontrun{
-#' # This example takes more than 5 seconds to run!
 #' require(sp)
 #' data(meuse.grid)
 #' candi <- meuse.grid[, 1:2]
 #' nadir <- list(sim = 10, seeds = 1:10)
 #' utopia <- list(user = list(DIST = 0, CORR = 0))
 #' covars <- meuse.grid[, 5]
+#' schedule <- scheduleSPSANN(chains = 1, initial.temperature = 1)
+#' \dontrun{
+#' # This example takes more than 5 seconds to run!
 #' set.seed(2001)
 #' res <- optimACDC(points = 100, candi = candi, covars = covars, 
-#'                  nadir = nadir, use.coords = TRUE, utopia = utopia)
-#' objSPSANN(res) - # 0.5272031
-#'   objACDC(points = res, candi = candi, covars = covars, use.coords = TRUE, 
-#'           nadir = nadir, utopia = utopia)
-#' # MARGINAL DISTRIBUTION
-#' par(mfrow = c(3, 3))
-#' # Covariates
-#' i <- sample(1:nrow(candi), 100)
-#' hist(candi[, 1], breaks = 10)
-#' hist(candi[, 2], breaks = 10)
-#' hist(covars, breaks = 10)
-#' # Optimized sample
-#' hist(candi[res[, 1], 1], breaks = 10)
-#' hist(candi[res[, 1], 2], breaks = 10)
-#' hist(covars[res[, 1]], breaks = 10)
-#' # Random sample
-#' hist(candi[i, 1], breaks = 10)
-#' hist(candi[i, 2], breaks = 10)
-#' hist(covars[i], breaks = 10)
-#' 
-#' # LINEAR CORRELATION
-#' # Covariates
-#' cor(cbind(candi[, 1], candi[, 2], covars))
-#' # Optimized sample
-#' cor(cbind(candi[res[, 1], 1], candi[res[, 1], 2], covars[res[, 1]]))
-#' # Random sample
-#' cor(cbind(candi[i, 1], candi[i, 2], covars[i]))
+#'                  nadir = nadir, use.coords = TRUE, utopia = utopia, 
+#'                  schedule = schedule)
+#' objSPSANN(res)
+#' objACDC(points = res, candi = candi, covars = covars, use.coords = TRUE, 
+#'         nadir = nadir, utopia = utopia)
 #' }
 # MAIN FUNCTION ################################################################
 optimACDC <-
@@ -158,7 +138,7 @@ optimACDC <-
       #   missing value where TRUE/FALSE needed
       # Source: http://stackoverflow.com/a/7355280/3365410
       # ASR: The reason for the error is unknown to me.
-      if (is.na(new_energy)) {
+      if (is.na(new_energy[1])) {
         new_energy <- old_energy
         new_conf <- old_conf
         new_sm <- old_sm
@@ -166,7 +146,7 @@ optimACDC <-
       }
       
       # Evaluate the new system configuration
-      accept <- min(1, exp((old_energy - new_energy) / actual_temp))
+      accept <- min(1, exp((old_energy[[1]] - new_energy[[1]]) / actual_temp))
       accept <- floor(rbinom(n = 1, size = 1, prob = accept))
       if (accept) {
         old_conf <- new_conf
@@ -180,10 +160,10 @@ optimACDC <-
         new_sm <- old_sm
         new_scm <- old_scm
       }
-      if (track) energies[k] <- new_energy
+      if (track) energies[k, ] <- new_energy
       
       # Record best energy state
-      if (new_energy[1] < best_energy[1] / 1.0000001) {
+      if (new_energy[[1]] < best_energy[[1]] / 1.0000001) {
         best_k <- k
         best_conf <- new_conf
         best_energy <- new_energy
@@ -215,7 +195,7 @@ optimACDC <-
       if (n_accept == 0) {
         no_change <- no_change + 1
         if (no_change > schedule$stopping) {
-          if (new_energy > best_energy * 1.000001) {
+          if (new_energy[[1]] > best_energy[[1]] * 1.000001) {
             old_conf <- old_conf
             new_conf <- best_conf
             old_energy <- best_old_energy

@@ -8,6 +8,7 @@
 #' utility function is obtained aggregating four single objective functions:
 #' \bold{CORR}, \bold{DIST}, \bold{PPL}, and \bold{MSSD}.
 #' 
+#' @inheritParams spJitterFinite
 #' @template spJitter_doc
 #' @template spSANN_doc
 #' @template ACDC_doc
@@ -35,28 +36,30 @@
 #' nadir <- list(sim = 10, seeds = 1:10)
 #' utopia <- list(user = list(DIST = 0, CORR = 0, PPL = 0, MSSD = 0))
 #' covars <- meuse.grid[, 5]
+#' schedule <- scheduleSPSANN(chains = 1, initial.temperature = 1)
 #' set.seed(2001)
-#' res <- optimSPAN(points = 100, candi = candi, covars = covars, nadir = nadir,
-#'                  use.coords = TRUE, utopia = utopia)
-#' objSPSANN(res) - # 0.776184
+#' res <- optimSPAN(points = 100, candi = candi, covars = covars, 
+#'                  nadir = nadir, use.coords = TRUE, utopia = utopia, 
+#'                  schedule = schedule)
+#' objSPSANN(res) -
 #'   objSPAN(points = res, candi = candi, covars = covars, nadir = nadir,
 #'           use.coords = TRUE, utopia = utopia)
 #' }
 # MAIN FUNCTION ################################################################
 optimSPAN <-
   function(points, candi,
-    # DIST and CORR
-    covars, strata.type = "area", use.coords = FALSE,
-    # PPL
-    lags = 7, lags.type = "exponential", lags.base = 2, cutoff, 
-    criterion = "distribution", distri, pairs = FALSE,
-    # SPSANN
-    schedule = scheduleSPSANN(), plotit = FALSE, track = FALSE,
-    boundary, progress = TRUE, verbose = FALSE,
-    # MOOP
-    weights = list(CORR = 1/6, DIST = 1/6, PPL = 1/3, MSSD = 1/3),
-    nadir = list(sim = NULL, seeds = NULL, user = NULL, abs = NULL),
-    utopia = list(user = NULL, abs = NULL)) {
+           # DIST and CORR
+           covars, strata.type = "area", use.coords = FALSE,
+           # PPL
+           lags = 7, lags.type = "exponential", lags.base = 2, cutoff, 
+           criterion = "distribution", distri, pairs = FALSE,
+           # SPSANN
+           schedule = scheduleSPSANN(), plotit = FALSE, track = FALSE,
+           boundary, progress = TRUE, verbose = FALSE,
+           # MOOP
+           weights = list(CORR = 1/6, DIST = 1/6, PPL = 1/3, MSSD = 1/3),
+           nadir = list(sim = NULL, seeds = NULL, user = NULL, abs = NULL),
+           utopia = list(user = NULL, abs = NULL)) {
     
     # Check spsann arguments
     eval(.check_spsann_arguments())
@@ -141,7 +144,7 @@ optimSPAN <-
       pb <- utils::txtProgressBar(min = 1, max = max, style = 3)
     }
     time0 <- proc.time()
-
+    
     # Initiate the annealing schedule
     for (i in 1:schedule$chains) {
       n_accept <- 0
@@ -150,96 +153,97 @@ optimSPAN <-
         
         for (wp in 1:n_pts) { # Initiate loop through points
           k <- k + 1
-
-      # Plotting and jittering
-      eval(.plot_and_jitter())
-      
-      # Update base data and energy state
-      # DIST and CORR
-      new_sm[wp, ] <- covars[new_conf[wp, 1], ]
-      new_scm <- .corCORR(obj = new_sm, covars.type = covars.type)
-      # PPL
-      new_dm_ppl <- .updatePPLCpp(x = new_conf[, 2:3], dm = old_dm_ppl, idx = wp)
-      ppl <- .getPPL(lags = lags, n.lags = n_lags, dist.mat = new_dm_ppl, 
-                     pairs = pairs)
-      # MSSD
-      x2 <- matrix(new_conf[wp, 2:3], nrow = 1)
-      new_dm_mssd <- .updateMSSDCpp(x1 = candi[, 2:3], x2 = x2, 
-                                    dm = old_dm_mssd, idx = wp)
-      # Energy state
-      new_energy <- .objSPAN(sm = new_sm, n.cov = n_cov, nadir = nadir, 
-                             weights = weights, n.pts = n_pts, utopia = utopia, 
-                             pcm = pcm, scm = new_scm, covars.type = covars.type, 
-                             pop.prop = pop_prop, ppl = ppl, n.lags = n_lags,
-                             criterion = criterion, distri = distri, 
-                             pairs = pairs, dm.mssd = new_dm_mssd)
-      
-      # Avoid the following error:
-      # Error in if (new_energy[1] <= old_energy[1]) { : 
-      #   missing value where TRUE/FALSE needed
-      # Source: http://stackoverflow.com/a/7355280/3365410
-      # ASR: The reason for the error is unknown to me.
-      if (is.na(new_energy)) {
-        new_energy <- old_energy
-        new_conf <- old_conf
-        # DIST and CORR
-        new_sm <- old_sm
-        new_scm <- old_scm
-        # PPL
-        new_dm_ppl <- old_dm_ppl
-        # MSSD
-        new_dm_mssd <- old_dm_mssd
-      }
-      
-      # Evaluate the new system configuration
-      accept <- min(1, exp((old_energy - new_energy) / actual_temp))
-      accept <- floor(rbinom(n = 1, size = 1, prob = accept))
-      if (accept) {
-        old_conf <- new_conf
-        old_energy <- new_energy
-        # DIST and CORR
-        old_sm <- new_sm
-        old_scm <- new_scm
-        # PPL
-        old_dm_ppl <- new_dm_ppl
-        # MSSD
-        old_dm_mssd <- new_dm_mssd
-        n_accept <- n_accept + 1
-      } else {
-        new_energy <- old_energy
-        new_conf <- old_conf
-        # DIST and CORR
-        new_sm <- old_sm
-        new_scm <- old_scm
-        # PPL
-        new_dm_ppl <- old_dm_ppl
-        # MSSD
-        new_dm_mssd <- old_dm_mssd
-      }
-      if (track) energies[k] <- new_energy
-
-      # Record best energy state
-      if (new_energy[1] < best_energy[1] / 1.0000001) {
-        best_k <- k
-        best_conf <- new_conf
-        best_energy <- new_energy
-        best_old_energy <- old_energy
-        old_conf <- old_conf
-        # DIST and CORR
-        best_sm <- new_sm
-        best_old_sm <- old_sm
-        best_scm <- new_scm
-        best_old_scm <- old_scm
-        # PPL
-        best_dm_ppl <- new_dm_ppl
-        best_old_dm_ppl <- old_dm_ppl
-        # MSSD
-        best_dm_mssd <- new_dm_mssd
-        best_old_dm_mssd <- old_dm_mssd
-      }
-
-      
-      if (progress) utils::setTxtProgressBar(pb, k)
+          
+          # Plotting and jittering
+          eval(.plot_and_jitter())
+          
+          # Update base data and energy state
+          # DIST and CORR
+          new_sm[wp, ] <- covars[new_conf[wp, 1], ]
+          new_scm <- .corCORR(obj = new_sm, covars.type = covars.type)
+          # PPL
+          new_dm_ppl <- .updatePPLCpp(x = new_conf[, 2:3], dm = old_dm_ppl, idx = wp)
+          ppl <- .getPPL(lags = lags, n.lags = n_lags, dist.mat = new_dm_ppl, 
+                         pairs = pairs)
+          # MSSD
+          x2 <- matrix(new_conf[wp, 2:3], nrow = 1)
+          new_dm_mssd <- .updateMSSDCpp(x1 = candi[, 2:3], x2 = x2, 
+                                        dm = old_dm_mssd, idx = wp)
+          # Energy state
+          new_energy <- .objSPAN(sm = new_sm, n.cov = n_cov, nadir = nadir, 
+                                 weights = weights, n.pts = n_pts, utopia = utopia, 
+                                 pcm = pcm, scm = new_scm, covars.type = covars.type, 
+                                 pop.prop = pop_prop, ppl = ppl, n.lags = n_lags,
+                                 criterion = criterion, distri = distri, 
+                                 pairs = pairs, dm.mssd = new_dm_mssd)
+          
+          # Avoid the following error:
+          # Error in if (new_energy[1] <= old_energy[1]) { : 
+          #   missing value where TRUE/FALSE needed
+          # Source: http://stackoverflow.com/a/7355280/3365410
+          # ASR: The reason for the error is unknown to me.
+          if (is.na(new_energy[[1]])) {
+            new_energy <- old_energy
+            new_conf <- old_conf
+            # DIST and CORR
+            new_sm <- old_sm
+            new_scm <- old_scm
+            # PPL
+            new_dm_ppl <- old_dm_ppl
+            # MSSD
+            new_dm_mssd <- old_dm_mssd
+          }
+          
+          # Evaluate the new system configuration
+          accept <- 
+            min(1, exp((old_energy[[1]] - new_energy[[1]]) / actual_temp))
+          accept <- floor(rbinom(n = 1, size = 1, prob = accept))
+          if (accept) {
+            old_conf <- new_conf
+            old_energy <- new_energy
+            # DIST and CORR
+            old_sm <- new_sm
+            old_scm <- new_scm
+            # PPL
+            old_dm_ppl <- new_dm_ppl
+            # MSSD
+            old_dm_mssd <- new_dm_mssd
+            n_accept <- n_accept + 1
+          } else {
+            new_energy <- old_energy
+            new_conf <- old_conf
+            # DIST and CORR
+            new_sm <- old_sm
+            new_scm <- old_scm
+            # PPL
+            new_dm_ppl <- old_dm_ppl
+            # MSSD
+            new_dm_mssd <- old_dm_mssd
+          }
+          if (track) energies[k, ] <- new_energy
+          
+          # Record best energy state
+          if (new_energy[[1]] < best_energy[[1]] / 1.0000001) {
+            best_k <- k
+            best_conf <- new_conf
+            best_energy <- new_energy
+            best_old_energy <- old_energy
+            old_conf <- old_conf
+            # DIST and CORR
+            best_sm <- new_sm
+            best_old_sm <- old_sm
+            best_scm <- new_scm
+            best_old_scm <- old_scm
+            # PPL
+            best_dm_ppl <- new_dm_ppl
+            best_old_dm_ppl <- old_dm_ppl
+            # MSSD
+            best_dm_mssd <- new_dm_mssd
+            best_old_dm_mssd <- old_dm_mssd
+          }
+          
+          
+          if (progress) utils::setTxtProgressBar(pb, k)
         } # End loop through points
         
       } # End the chain
@@ -259,7 +263,7 @@ optimSPAN <-
       if (n_accept == 0) {
         no_change <- no_change + 1
         if (no_change > schedule$stopping) {
-          if (new_energy > best_energy * 1.000001) {
+          if (new_energy[[1]] > best_energy[[1]] * 1.000001) {
             old_conf <- old_conf
             new_conf <- best_conf
             old_energy <- best_old_energy

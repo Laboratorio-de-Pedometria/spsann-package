@@ -9,6 +9,7 @@
 #' the factor covariates (\bold{CLHS}). The utility function is obtained
 #' aggregating three objective functions: \bold{O1}, \bold{O2}, and \bold{O3}.
 #'
+#' @inheritParams spJitterFinite
 #' @template spJitter_doc
 #' @template spSANN_doc
 #' @inheritParams optimACDC
@@ -92,53 +93,30 @@
 #' @concept spatial trend
 #' @export
 #' @examples
-#' \dontrun{
 #' require(sp)
 #' data(meuse.grid)
 #' candi <- meuse.grid[, 1:2]
 #' covars <- meuse.grid[, 5]
 #' weights <- list(O1 = 0.5, O3 = 0.5)
+#' schedule <- scheduleSPSANN(chains = 1, initial.temperature = 10)
+#' \dontrun{
 #' set.seed(2001)
 #' res <- optimCLHS(points = 100, candi = candi, covars = covars, 
-#'                  use.coords = TRUE, weights = weights, iterations = 100)
-#' objSPSANN(res) - # 106.0691
-#' objCLHS(points = res, candi = candi, covars = covars, use.coords = TRUE, 
-#'         weights = weights)
-#' 
-#' # MARGINAL DISTRIBUTION
-#' par(mfrow = c(3, 3))
-#' # Covariates
-#' i <- sample(1:nrow(candi), 100)
-#' hist(candi[, 1], breaks = 10)
-#' hist(candi[, 2], breaks = 10)
-#' hist(covars, breaks = 10)
-#' # Optimized sample
-#' hist(candi[res[, 1], 1], breaks = 10)
-#' hist(candi[res[, 1], 2], breaks = 10)
-#' hist(covars[res[, 1]], breaks = 10)
-#' # Random sample
-#' hist(candi[i, 1], breaks = 10)
-#' hist(candi[i, 2], breaks = 10)
-#' hist(covars[i], breaks = 10)
-#' 
-#' # LINEAR CORRELATION
-#' # Covariates
-#' cor(cbind(candi[, 1], candi[, 2], covars))
-#' # Optimized sample
-#' cor(cbind(candi[res[, 1], 1], candi[res[, 1], 2], covars[res[, 1]]))
-#' # Random sample
-#' cor(cbind(candi[i, 1], candi[i, 2], covars[i]))
+#'                  use.coords = TRUE, weights = weights, schedule = schedule)
+#' objSPSANN(res) -
+#'   objCLHS(points = res, candi = candi, covars = covars, use.coords = TRUE, 
+#'           weights = weights)
 #' }
 # MAIN FUNCTION ################################################################
 optimCLHS <-
   function (points, candi,
-    # O1, O2, and O3
-    covars, use.coords = FALSE, 
-    # SPSANN
-    schedule = scheduleSPSANN(), plotit = FALSE, track = FALSE,
-    boundary, progress = TRUE, verbose = FALSE,
-    # MOOP
-    weights = list(O1 = 1/3, O2 = 1/3, O3 = 1/3)) {
+            # O1, O2, and O3
+            covars, use.coords = FALSE, 
+            # SPSANN
+            schedule = scheduleSPSANN(), plotit = FALSE, track = FALSE,
+            boundary, progress = TRUE, verbose = FALSE,
+            # MOOP
+            weights = list(O1 = 1/3, O2 = 1/3, O3 = 1/3)) {
     
     # Check spsann arguments
     # ASR: The next two lines are needed to pass the argument check for MOOP
@@ -165,9 +143,9 @@ optimCLHS <-
     
     # Compute initial energy state
     energy0 <- .objCLHS(sm = sm, breaks = breaks, id_num = id_num, pcm = pcm, 
-               id_fac = id_fac, n_pts = n_pts, pop_prop = pop_prop, 
-               weights = weights, covars_type = covars_type)
-
+                        id_fac = id_fac, n_pts = n_pts, pop_prop = pop_prop, 
+                        weights = weights, covars_type = covars_type)
+    
     # Other settings for the simulated annealing algorithm
     old_sm <- sm
     new_sm <- sm
@@ -190,45 +168,45 @@ optimCLHS <-
         
         for (wp in 1:n_pts) { # Initiate loop through points
           k <- k + 1
-    
-      # Plotting and jittering
-      eval(.plot_and_jitter())
-      
-      # Update sample matrix and compute the new energy state
-      new_sm[wp, ] <- covars[new_conf[wp, 1], ]
-      new_energy <-
-        .objCLHS(sm = new_sm, breaks = breaks, id_num = id_num, pcm = pcm,
-                 id_fac = id_fac, n_pts = n_pts, pop_prop = pop_prop,
-                 weights = weights, covars_type = covars_type)
-      
-      # Evaluate the new system configuration
-      accept <- min(1, exp((old_energy - new_energy) / actual_temp))
-      accept <- floor(rbinom(n = 1, size = 1, prob = accept))
-      if (accept) {
-        old_conf <- new_conf
-        old_energy <- new_energy
-        old_sm <- new_sm
-        n_accept <- n_accept + 1
-      } else {
-        new_energy <- old_energy
-        new_conf <- old_conf
-        new_sm <- old_sm
-      }
-      if (track) energies[k] <- new_energy
-      
-      # Record best energy state
-      if (new_energy[1] < best_energy[1] / 1.0000001) {
-        best_k <- k
-        best_conf <- new_conf
-        best_energy <- new_energy
-        best_old_energy <- old_energy
-        old_conf <- old_conf
-        best_sm <- new_sm
-        best_old_sm <- old_sm
-      }
-      
-      
-      if (progress) utils::setTxtProgressBar(pb, k)
+          
+          # Plotting and jittering
+          eval(.plot_and_jitter())
+          
+          # Update sample matrix and compute the new energy state
+          new_sm[wp, ] <- covars[new_conf[wp, 1], ]
+          new_energy <-
+            .objCLHS(sm = new_sm, breaks = breaks, id_num = id_num, pcm = pcm,
+                     id_fac = id_fac, n_pts = n_pts, pop_prop = pop_prop,
+                     weights = weights, covars_type = covars_type)
+          
+          # Evaluate the new system configuration
+          accept <- min(1, exp((old_energy[[1]] - new_energy[[1]]) / actual_temp))
+          accept <- floor(rbinom(n = 1, size = 1, prob = accept))
+          if (accept) {
+            old_conf <- new_conf
+            old_energy <- new_energy
+            old_sm <- new_sm
+            n_accept <- n_accept + 1
+          } else {
+            new_energy <- old_energy
+            new_conf <- old_conf
+            new_sm <- old_sm
+          }
+          if (track) energies[k, ] <- new_energy
+          
+          # Record best energy state
+          if (new_energy[[1]] < best_energy[[1]] / 1.0000001) {
+            best_k <- k
+            best_conf <- new_conf
+            best_energy <- new_energy
+            best_old_energy <- old_energy
+            old_conf <- old_conf
+            best_sm <- new_sm
+            best_old_sm <- old_sm
+          }
+          
+          
+          if (progress) utils::setTxtProgressBar(pb, k)
         } # End loop through points
         
       } # End the chain
@@ -248,7 +226,7 @@ optimCLHS <-
       if (n_accept == 0) {
         no_change <- no_change + 1
         if (no_change > schedule$stopping) {
-          if (new_energy > best_energy * 1.000001) {
+          if (new_energy[[1]] > best_energy[[1]] * 1.000001) {
             old_conf <- old_conf
             new_conf <- best_conf
             old_energy <- best_old_energy
