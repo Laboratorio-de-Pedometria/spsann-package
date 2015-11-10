@@ -27,6 +27,11 @@
 #' are the same as of the projected x- and y-coordinates. If missing, they 
 #' are estimated from \code{candi}.
 #' 
+#' @param cellsize Vector with two numeric values defining the horizontal (x) 
+#' and vertical (y) spacing between the candidate locations in \code{candi}. A 
+#' single value can be used if the spacing in the x- and y-coordinates is the
+#' same.
+#' 
 #' @param which.point Integer values defining which point should be perturbed. 
 #' 
 #' @return
@@ -46,8 +51,9 @@
 #' meuse.grid <- matrix(cbind(1:dim(meuse.grid)[1], meuse.grid), ncol = 3)
 #' pts1 <- sample(c(1:dim(meuse.grid)[1]), 155)
 #' pts2 <- meuse.grid[pts1, ]
-#' pts3 <- spJitterFinite(points = pts2, candi = meuse.grid, x.min = 40,
-#'                       x.max = 100, y.min = 40, y.max = 100, which.point = 10)
+#' pts3 <- spJitter(points = pts2, candi = meuse.grid, x.min = 40,
+#'                  x.max = 100, y.min = 40, y.max = 100, 
+#'                  which.point = 10, cellsize = 40)
 #' plot(meuse.grid[, 2:3], asp = 1, pch = 15, col = "gray")
 #' points(pts2[, 2:3], col = "red", cex = 0.5)
 #' points(pts3[, 2:3], pch = 19, col = "blue", cex = 0.5)
@@ -55,74 +61,75 @@
 #' # Cluster of points
 #' pts1 <- c(1:55)
 #' pts2 <- meuse.grid[pts1, ]
-#' pts3 <- spJitterFinite(points = pts2, candi = meuse.grid, x.min = 40,
-#'                       x.max = 80, y.min = 40, y.max = 80, which.point = 1)
+#' pts3 <- spJitter(points = pts2, candi = meuse.grid, x.min = 40,
+#'                 x.max = 80, y.min = 40, y.max = 80, 
+#'                 which.point = 1, cellsize = 40)
 #' plot(meuse.grid[, 2:3], asp = 1, pch = 15, col = "gray")
 #' points(pts2[, 2:3], col = "red", cex = 0.5)
 #' points(pts3[, 2:3], pch = 19, col = "blue", cex = 0.5)
 # FUNCTION #####################################################################
-spJitterFinite <-
-  function (points, candi, x.max, x.min, y.max, y.min, which.point) {
+spJitter <-
+  function (points, candi, x.max, x.min, y.max, y.min, which.point, cellsize) {
+    
+    if (length(cellsize) == 1) { cellsize <- rep(cellsize, 2) }
     
     # Get candidate locations using Cpp
     pt1 <- .spJitterCpp(points[, 2:3], candi[, 2:3], x.max, x.min, y.max, 
                         y.min, which.point)
-      
+    
     # Get candidate locations
     pt1 <- pt1[pt1 != 0]
     
     # Select one candidate location
-    #pt2 <- candi[sample(pt1, 1), ]
-    pt2 <- sample(pt1, 1)
+    pt2 <- candi[sample(pt1, 1), ]
     
-    # Check if it already is in the sample (duplicated)
-    #dup <- duplicated(rbind(pt2, points))
-    dup <- duplicated(c(pt2, points[, 1]))
+    # Compute the new x- and y-coordinates
+    pt3 <- runif(n = 2, min = -0.5, max = 0.5) * cellsize
+    pt2[-1] <- pt2[-1] + pt3
     
-    # If it already exists, return the original point
-    #     if (any(dup)) {
-    #       pt2 <- candi[which.point, ]
-    #     }
-    
-    # If it already exists, we try to find another point as many times as
-    # there are point in the sample. The reason for this choice is that the 
-    # more points we have, the more likely it is that the candidate point
-    # already is included in the sample.
-    if (any(dup)) {
-      ntry <- 0
-      while (any(dup)) {
-        pt2 <- sample(pt1, 1)
-        dup <- duplicated(c(pt2, points[, 1]))
-        ntry <- ntry + 1
-        if (ntry == length(nrow(points))) {
-          pt2 <- which.point
-          break
-        }
-      }
-    }
-    
-    #     if (any(dup)) {
-    #       pt11 <- candi[pt1, ]
-    #       dup11 <- duplicated(rbind(pt11, points))
-    #       if (nrow(pt11) == length(which(dup11 == TRUE))) {
-    #         # We return the old point as the new point.
-    #         # This is to avoid an infinite loop in the end of the optimization
-    #         # when the objective function results in clusters of points such
-    #         # as PPL
-    #         pt2 <- candi[which.point, ]
-    #       } else {
-    #         while (any(dup)) {
-    #           pt2 <- candi[sample(pt1, 1), ]
-    #           dup2 <- duplicated(rbind(pt2, points))
-    #         }
-    #       }
-    #     }
-    
+    # Output
     res <- points
-    #res[which.point, ] <- pt2
-    res[which.point, ] <- candi[pt2, ]
+    res[which.point, ] <- pt2
     return (res)
   }
+# spJitterFinite ###############################################################
+# spJitterFinite <-
+#   function (points, candi, x.max, x.min, y.max, y.min, which.point) {
+#     
+#     # Get candidate locations using Cpp
+#     pt1 <- .spJitterCpp(points[, 2:3], candi[, 2:3], x.max, x.min, y.max, 
+#                         y.min, which.point)
+#       
+#     # Get candidate locations
+#     pt1 <- pt1[pt1 != 0]
+#     
+#     # Select one candidate location
+#     pt2 <- sample(pt1, 1)
+#     
+#     # Check if it already is in the sample (duplicated)
+#     dup <- duplicated(c(pt2, points[, 1]))
+#     
+#     # If it already exists, we try to find another point as many times as
+#     # there are point in the sample. The reason for this choice is that the 
+#     # more points we have, the more likely it is that the candidate point
+#     # already is included in the sample.
+#     if (any(dup)) {
+#       ntry <- 0
+#       while (any(dup)) {
+#         pt2 <- sample(pt1, 1)
+#         dup <- duplicated(c(pt2, points[, 1]))
+#         ntry <- ntry + 1
+#         if (ntry == length(nrow(points))) {
+#           pt2 <- which.point
+#           break
+#         }
+#       }
+#     }
+#     
+#     res <- points
+#     res[which.point, ] <- candi[pt2, ]
+#     return (res)
+#   }
 # OLD spJitterFinite FUNCTION ##################################################
 # parameters of the old implementation
 # \item{where}{An object of class SpatialPolygons defining the spatial domain 
