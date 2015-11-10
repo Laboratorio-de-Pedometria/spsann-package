@@ -20,6 +20,8 @@ expression(if (is.null(schedule$x.min) && is.null(schedule$x.max) &&
   x.max <- schedule$x.max
   y.min <- schedule$y.min
   y.max <- schedule$y.max
-}, x_max0 <- x.max, y_max0 <- y.max)
+}, x_max0 <- x.max, y_max0 <- y.max, if (is.null(schedule$cellsize)) {
+  schedule$cellsize <- c(x.min, y.min)
+})
 }
 

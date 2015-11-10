@@ -40,6 +40,6 @@ if (is.null(schedule$x.min) && is.null(schedule$x.max) &&
 }
 x_max0 <- x.max
 y_max0 <- y.max
-# if (missing(cellsize)) {
-#   cellsize <- c(x.min, y.min)
-# }
+if (is.null(schedule$cellsize)) {
+  schedule$cellsize <- c(x.min, y.min)
+}
