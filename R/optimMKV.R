@@ -4,7 +4,7 @@
 #' model. A criterion is defined so that the sample configuration minimizes the
 #' mean/maximum kriging variance (\bold{MKV}).
 #'
-#' @inheritParams spJitterFinite
+#' @inheritParams spJitter
 #' @template spJitter_doc
 #' @template spSANN_doc
 #' @template MOOP_doc

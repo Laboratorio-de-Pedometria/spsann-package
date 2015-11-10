@@ -5,7 +5,7 @@
 #' estimation. A criterion is defined so that the sample reproduces the 
 #' bivariate association/correlation between the covariates (\bold{CORR}).
 #'
-#' @inheritParams spJitterFinite
+#' @inheritParams spJitter
 #' @template spJitter_doc
 #' @template spSANN_doc
 #' @template ACDC_doc

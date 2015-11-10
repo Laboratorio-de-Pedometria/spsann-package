@@ -2,7 +2,7 @@
 #'
 #' Optimize a sample configuration using a user-defined objective function.
 #' 
-#' @inheritParams spJitterFinite
+#' @inheritParams spJitter
 #' @template spJitter_doc
 #' @template spSANN_doc
 #' @template MOOP_doc

@@ -8,7 +8,7 @@
 #' obtained aggregating two objective functions: \bold{CORR} and 
 #' \bold{DIST}.
 #'
-#' @inheritParams spJitterFinite
+#' @inheritParams spJitter
 #' @template spJitter_doc
 #' @template spSANN_doc
 #' @template ACDC_doc
@@ -45,9 +45,9 @@
 #' res <- optimACDC(points = 100, candi = candi, covars = covars, 
 #'                  nadir = nadir, use.coords = TRUE, utopia = utopia, 
 #'                  schedule = schedule)
-#' objSPSANN(res)
-#' objACDC(points = res, candi = candi, covars = covars, use.coords = TRUE, 
-#'         nadir = nadir, utopia = utopia)
+#' objSPSANN(res) -
+#'   objACDC(points = res, candi = candi, covars = covars, use.coords = TRUE, 
+#'           nadir = nadir, utopia = utopia)
 #' }
 # MAIN FUNCTION ################################################################
 optimACDC <-

@@ -5,7 +5,7 @@
 #' estimation. A criterion is defined so that the sample reproduces the 
 #' marginal distribution of the covariates (\bold{DIST}).
 #'
-#' @inheritParams spJitterFinite
+#' @inheritParams spJitter
 #' @template spJitter_doc
 #' @template spSANN_doc
 #' @template ACDC_doc

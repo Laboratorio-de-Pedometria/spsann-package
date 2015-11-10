@@ -9,7 +9,7 @@
 #' the factor covariates (\bold{CLHS}). The utility function is obtained
 #' aggregating three objective functions: \bold{O1}, \bold{O2}, and \bold{O3}.
 #'
-#' @inheritParams spJitterFinite
+#' @inheritParams spJitter
 #' @template spJitter_doc
 #' @template spSANN_doc
 #' @inheritParams optimACDC

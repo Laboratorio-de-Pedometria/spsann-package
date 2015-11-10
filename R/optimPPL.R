@@ -6,7 +6,7 @@
 #' given number of points or point-pairs contributing to each lag-distance 
 #' class (\bold{PPL}).
 #' 
-#' @inheritParams spJitterFinite
+#' @inheritParams spJitter
 #' @template spJitter_doc
 #' @template spSANN_doc
 #' @template MOOP_doc

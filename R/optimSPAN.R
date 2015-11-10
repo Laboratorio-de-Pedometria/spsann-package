@@ -8,7 +8,7 @@
 #' utility function is obtained aggregating four single objective functions:
 #' \bold{CORR}, \bold{DIST}, \bold{PPL}, and \bold{MSSD}.
 #' 
-#' @inheritParams spJitterFinite
+#' @inheritParams spJitter
 #' @template spJitter_doc
 #' @template spSANN_doc
 #' @template ACDC_doc

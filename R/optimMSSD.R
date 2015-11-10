@@ -3,7 +3,7 @@
 #' Optimize a sample configuration for spatial interpolation. The criterion 
 #' used is the mean squared shortest distance (\bold{MSSD}).
 #'
-#' @inheritParams spJitterFinite
+#' @inheritParams spJitter
 #' @template spJitter_doc
 #' @template spSANN_doc
 #' @template MOOP_doc

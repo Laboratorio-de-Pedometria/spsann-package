@@ -3,7 +3,14 @@
 #' Set the control parameters for the cooling schedule of \pkg{spsann} 
 #' functions.
 #' 
-#' @inheritParams spJitterFinite
+#' @inheritParams spJitter
+#' 
+#' @param x.max,x.min,y.max,y.min Numeric value defining the minimum and 
+#' maximum quantity of random noise to be added to the projected x- and 
+#' y-coordinates. The minimum quantity should be equal to, at least, the 
+#' minimum distance between two neighbouring candidate locations. The units 
+#' are the same as of the projected x- and y-coordinates. If missing, they 
+#' are estimated from \code{candi}.
 #' 
 #' @param initial.acceptance Numeric value between 0 and 1 defining the initial
 #' acceptance probability. Defaults to \code{initial.acceptance = 0.95}.
@@ -47,7 +54,7 @@
 scheduleSPSANN <-
   function (initial.acceptance = 0.95, initial.temperature = 0.001,
             temperature.decrease = 0.95, chains = 500, chain.length = 1,
-            stopping = 10, x.max, x.min, y.max, y.min) {
+            stopping = 10, x.max, x.min, y.max, y.min, cellsize) {
     
     if (initial.acceptance > 1 || initial.acceptance < 0)
       stop ("'initial.acceptance' must be between 0 and 1")
@@ -65,6 +72,7 @@ scheduleSPSANN <-
     if (missing(x.min)) x.min <- NULL
     if (missing(y.max)) y.max <- NULL
     if (missing(y.min)) y.min <- NULL
+    if (missing(cellsize)) cellsize <- NULL
     
     # Output
     res <- list(initial.acceptance = initial.acceptance, 
@@ -72,6 +80,6 @@ scheduleSPSANN <-
                 temperature.decrease = temperature.decrease, 
                 chains = chains, chain.length = chain.length, 
                 stopping = stopping, x.max = x.max, x.min = x.min, 
-                y.max = y.max, y.min = y.min)
+                y.max = y.max, y.min = y.min, cellsize = cellsize)
     return (res)
   }
