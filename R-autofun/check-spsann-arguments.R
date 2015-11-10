@@ -35,8 +35,8 @@ if (any(bb)) {
   } else {
     
     # Argument 'schedule'
-    if (!is.list(schedule) || length(schedule) != 10) {
-      res <- c("'schedule' must be a list with 10 sub-arguments")
+    if (!is.list(schedule) || length(schedule) != 11) {
+      res <- c("'schedule' must be a list with 11 sub-arguments")
     }
   }
 }
