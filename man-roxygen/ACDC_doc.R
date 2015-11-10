@@ -29,11 +29,6 @@
 #' R. A.; McBratney, A. B.; Minasny, B. (Eds.) \emph{Proximal Soil Sensing}.
 #' Amsterdam: Springer, p. 111-119, 2010.
 #'
-#' Mulder, V. L.; de Bruin, S.; Schaepman, M. E. Representing major soil
-#' variability at regional scale by constrained Latin hypercube sampling of
-#' remote sensing data. \emph{International Journal of Applied Earth Observation
-#' and Geoinformation}, v. 21, p. 301-310, 2013.
-#'
 #' Roudier, P.; Beaudette, D.; Hewitt, A. A conditioned Latin hypercube sampling
 #' algorithm incorporating operational constraints. \emph{5th Global Workshop on
 #' Digital Soil Mapping}. Sydney, p. 227-231, 2012.
