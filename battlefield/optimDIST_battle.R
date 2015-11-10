@@ -5,6 +5,7 @@ require(pedometrics)
 require(sp)
 sapply(list.files("R", full.names = TRUE, pattern = ".R$"), source)
 sapply(list.files("src", full.names = TRUE, pattern = ".cpp$"), Rcpp::sourceCpp)
+
 # 0) DEFAULT EXAMPLE ###########################################################
 require(sp)
 data(meuse.grid)
@@ -15,7 +16,7 @@ set.seed(2001)
 # \dontrun{
 # This example takes more than 5 seconds to run!
 res <- optimDIST(points = 100, candi = candi, covars = covars,
-                 use.coords = TRUE, plotit = TRUE, schedule = schedule)
+                 use.coords = TRUE, schedule = schedule)
 objSPSANN(res) # 2.170422
 objDIST(points = res, candi = candi, covars = covars, use.coords = TRUE)
 # }
