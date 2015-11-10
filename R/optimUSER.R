@@ -2,6 +2,7 @@
 #'
 #' Optimize a sample configuration using a user-defined objective function.
 #' 
+#' @inheritParams spJitterFinite
 #' @template spJitter_doc
 #' @template spSANN_doc
 #' @template MOOP_doc
@@ -38,6 +39,7 @@
 #' require(SpatialTools)
 #' data(meuse.grid)
 #' candi <- meuse.grid[, 1:2]
+#' schedule <- scheduleSPSANN(chains = 1, initial.temperature = 30)
 #' 
 #' # Define the objective function - number of points per lag distance class
 #' objUSER <-
@@ -57,21 +59,22 @@
 #' set.seed(2001)
 #' timeUSER <- Sys.time()
 #' resUSER <- optimUSER(points = 100, fun = objUSER, lags = lags, n_lags = 9,
-#'                      n_pts = 100, candi = candi)
+#'                      n_pts = 100, candi = candi, schedule = schedule)
 #' timeUSER <- Sys.time() - timeUSER
 #' 
 #' # Run the optimization using the respective function implemented in spsann
 #' set.seed(2001)
 #' timePPL <- Sys.time()
-#' resPPL <- optimPPL(points = 100, candi = candi, lags = lags)
+#' resPPL <- optimPPL(points = 100, candi = candi, lags = lags, 
+#'                    schedule = schedule)
 #' timePPL <- Sys.time() - timePPL
 #' 
 #' # Compare results
 #' timeUSER
 #' timePPL
 #' lapply(list(resUSER, resPPL), countPPL, candi = candi, lags = lags)
-#' objSPSANN(resUSER) # 58
-#' objSPSANN(resPPL) # 58
+#' objSPSANN(resUSER) # 92
+#' objSPSANN(resPPL) # 92
 #' }
 # FUNCTION - MAIN ##############################################################
 optimUSER <-

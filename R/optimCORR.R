@@ -5,6 +5,7 @@
 #' estimation. A criterion is defined so that the sample reproduces the 
 #' bivariate association/correlation between the covariates (\bold{CORR}).
 #'
+#' @inheritParams spJitterFinite
 #' @template spJitter_doc
 #' @template spSANN_doc
 #' @template ACDC_doc
@@ -26,12 +27,13 @@
 #' data(meuse.grid)
 #' candi <- meuse.grid[, 1:2]
 #' covars <- meuse.grid[, 5]
+#' schedule <- scheduleSPSANN(initial.temperature = 0.5, chains = 1)
 #' set.seed(2001)
 #' \dontrun{
 #' # This example takes more than 5 seconds to run!
 #' res <- optimCORR(points = 100, candi = candi, covars = covars, 
-#'                  use.coords = TRUE)
-#' objSPSANN(res) # 0.06386069
+#'                  use.coords = TRUE, schedule = schedule)
+#' objSPSANN(res) # 0.2614252
 #' objCORR(points = res, candi = candi, covars = covars, use.coords = TRUE)
 #' }
 #' # Random sample

@@ -3,6 +3,7 @@
 #' Optimize a sample configuration for spatial interpolation. The criterion 
 #' used is the mean squared shortest distance (\bold{MSSD}).
 #'
+#' @inheritParams spJitterFinite
 #' @template spJitter_doc
 #' @template spSANN_doc
 #' @template MOOP_doc
@@ -44,12 +45,12 @@
 #' require(sp)
 #' data(meuse.grid)
 #' candi <- meuse.grid[, 1:2]
+#' schedule <- scheduleSPSANN(chains = 1)
 #' set.seed(2001)
 #' \dontrun{
 #' # This example takes more than 5 seconds to run!
-#' res <- optimMSSD(points = 100, candi = candi)
-#' objSPSANN(res) # 11531.03
-#' objMSSD(candi = candi, points = res)
+#' res <- optimMSSD(points = 100, candi = candi, schedule = schedule)
+#' objSPSANN(res) - objMSSD(candi = candi, points = res)
 #' }
 #' # Random sample
 #' pts <- sample(1:nrow(candi), 5)

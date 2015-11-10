@@ -5,6 +5,7 @@
 #' estimation. A criterion is defined so that the sample reproduces the 
 #' marginal distribution of the covariates (\bold{DIST}).
 #'
+#' @inheritParams spJitterFinite
 #' @template spJitter_doc
 #' @template spSANN_doc
 #' @template ACDC_doc
@@ -29,10 +30,10 @@
 #' covars <- meuse.grid[, 5]
 #' schedule <- scheduleSPSANN(initial.temperature = 0.5, chains = 1)
 #' set.seed(2001)
-#' \dontrun{
+#' # \dontrun{
 #' # This example takes more than 5 seconds to run!
 #' res <- optimDIST(points = 100, candi = candi, covars = covars,
-#'                  use.coords = TRUE, plotit = TRUE, schedule = schedule)
+#'                  use.coords = TRUE, schedule = schedule)
 #' objSPSANN(res) # 2.170422
 #' objDIST(points = res, candi = candi, covars = covars, use.coords = TRUE)
 #' }

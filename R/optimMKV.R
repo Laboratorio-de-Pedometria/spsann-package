@@ -4,6 +4,7 @@
 #' model. A criterion is defined so that the sample configuration minimizes the
 #' mean/maximum kriging variance (\bold{MKV}).
 #'
+#' @inheritParams spJitterFinite
 #' @template spJitter_doc
 #' @template spSANN_doc
 #' @template MOOP_doc
@@ -54,31 +55,32 @@
 #' @concept spatial interpolation
 #' @export
 #' @examples
-#' \dontrun{
-#' # This example takes more than 5 seconds to run!
 #' require(sp)
 #' require(gstat)
 #' data(meuse.grid)
 #' candi <- meuse.grid[, 1:2]
 #' covars <- as.data.frame(meuse.grid)
 #' vgm <- vgm(psill = 10, model = "Exp", range = 500, nugget = 8)
-#' set.seed(2001)
-#' res <- optimMKV(points = 100, candi = candi, covars = covars, maxdist = 500,
-#'                 eqn = z ~ dist, vgm = vgm)
-#' objSPSANN(res) # 11.9878
-#' objMKV(points = res, candi = candi, covars = covars, eqn = z ~ dist, 
-#'        vgm = vgm, maxdist = 500)
+#' schedule <- scheduleSPSANN(initial.temperature = 0.5, chains = 1)
+#' \dontrun{
+#' # This example takes more than 5 seconds to run!
+#' set.seed(1984)
+#' res <- optimMKV(points = 100, candi = candi, covars = covars, maxdist = 600,
+#'                 eqn = z ~ dist, vgm = vgm, schedule = schedule)
+#' objSPSANN(res) -
+#'   objMKV(points = res, candi = candi, covars = covars, eqn = z ~ dist, 
+#'          vgm = vgm, maxdist = 600)
 #' }
 # FUNCTION - MAIN ##############################################################
 optimMKV <-
   function (points, candi,
-    # MKV
-    covars, eqn = z ~ 1, vgm, krige.stat = "mean", ...,
-    # SPSANN
-    schedule = scheduleSPSANN(), plotit = FALSE, track = FALSE,
-    boundary, progress = TRUE, verbose = FALSE,
-    # MOOP
-    weights = NULL, nadir = NULL, utopia = NULL) {
+            # MKV
+            covars, eqn = z ~ 1, vgm, krige.stat = "mean", ...,
+            # SPSANN
+            schedule = scheduleSPSANN(), plotit = FALSE, track = FALSE,
+            boundary, progress = TRUE, verbose = FALSE,
+            # MOOP
+            weights = NULL, nadir = NULL, utopia = NULL) {
     
     # Check suggests
     pkg <- c("gstat")
@@ -131,43 +133,44 @@ optimMKV <-
         
         for (wp in 1:n_pts) { # Initiate loop through points
           k <- k + 1
-      
-      # Plotting and jittering
-      eval(.plot_and_jitter())
-      
-      # Update sample matrix and energy state
-      new_sm[wp, ] <- cbind(1, covars[new_conf[wp, 1], ])
-      new_energy <- .objMKV(eqn = eqn, sm = new_sm, covars = covars, vgm = vgm, 
-                            krige.stat = krige.stat, debug.level = 0, ...)
-      
-      # Evaluate the new system configuration
-      accept <- min(1, exp((old_energy - new_energy) / actual_temp))
-      accept <- floor(rbinom(n = 1, size = 1, prob = accept))
-      if (accept) {
-        old_conf <- new_conf
-        old_energy <- new_energy
-        old_sm <- new_sm
-        n_accept <- n_accept + 1
-      } else {
-        new_energy <- old_energy
-        new_conf <- old_conf
-        new_sm <- old_sm
-      }
-      if (track) energies[k] <- new_energy
-      
-      # Record best energy state
-      if (new_energy < best_energy / 1.0000001) {
-        best_k <- k
-        best_conf <- new_conf
-        best_energy <- new_energy
-        best_old_energy <- old_energy
-        old_conf <- old_conf
-        best_sm <- new_sm
-        best_old_sm <- old_sm
-      }
-      
-      
-      if (progress) utils::setTxtProgressBar(pb, k)
+          
+          # Plotting and jittering
+          eval(.plot_and_jitter())
+          
+          # Update sample matrix and energy state
+          new_sm[wp, ] <- cbind(1, covars[new_conf[wp, 1], ])
+          new_energy <- .objMKV(eqn = eqn, sm = new_sm, covars = covars, 
+                                vgm = vgm, krige.stat = krige.stat, 
+                                debug.level = 0, ...)
+          
+          # Evaluate the new system configuration
+          accept <- min(1, exp((old_energy - new_energy) / actual_temp))
+          accept <- floor(rbinom(n = 1, size = 1, prob = accept))
+          if (accept) {
+            old_conf <- new_conf
+            old_energy <- new_energy
+            old_sm <- new_sm
+            n_accept <- n_accept + 1
+          } else {
+            new_energy <- old_energy
+            new_conf <- old_conf
+            new_sm <- old_sm
+          }
+          if (track) energies[k] <- new_energy
+          
+          # Record best energy state
+          if (new_energy < best_energy / 1.0000001) {
+            best_k <- k
+            best_conf <- new_conf
+            best_energy <- new_energy
+            best_old_energy <- old_energy
+            old_conf <- old_conf
+            best_sm <- new_sm
+            best_old_sm <- old_sm
+          }
+          
+          
+          if (progress) utils::setTxtProgressBar(pb, k)
         } # End loop through points
         
       } # End the chain

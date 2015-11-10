@@ -6,6 +6,7 @@
 #' given number of points or point-pairs contributing to each lag-distance 
 #' class (\bold{PPL}).
 #' 
+#' @inheritParams spJitterFinite
 #' @template spJitter_doc
 #' @template spSANN_doc
 #' @template MOOP_doc
@@ -31,10 +32,10 @@
 #' require(sp)
 #' data(meuse.grid)
 #' candi <- meuse.grid[, 1:2]
+#' schedule <- scheduleSPSANN(chains = 1, initial.temperature = 30)
 #' set.seed(2001)
-#' res <- optimPPL(points = 100, candi = candi)
-#' objSPSANN(res) # 160
-#' objPPL(points = res, candi = candi)
+#' res <- optimPPL(points = 100, candi = candi, schedule = schedule)
+#' objSPSANN(res) - objPPL(points = res, candi = candi)
 #' countPPL(points = res, candi = candi)
 #' }
 # FUNCTION - MAIN ##############################################################
