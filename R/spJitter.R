@@ -74,8 +74,9 @@ spJitter <-
     if (length(cellsize) == 1) { cellsize <- rep(cellsize, 2) }
     
     # Get candidate locations using Cpp
-    pt1 <- .spJitterCpp(points[, 2:3], candi[, 2:3], x.max, x.min, y.max, 
-                        y.min, which.point)
+    pt1 <- .spJitterCpp(x = points[, 2:3], y = candi[, 2:3], xmax = x.max, 
+                        xmin = x.min, ymax = y.max, ymin = y.min, 
+                        idx = which.point)
     
     # Get candidate locations
     pt1 <- pt1[pt1 != 0]
