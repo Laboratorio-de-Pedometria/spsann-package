@@ -192,8 +192,8 @@ optimUSER <-
       
       # Update control parameters
       actual_temp <- actual_temp * schedule$temperature.decrease
-      x.max <- x_max0 - (i / schedule$chains) * (x_max0 - x.min)
-      y.max <- y_max0 - (i / schedule$chains) * (y_max0 - y.min)
+      x.max <- x_max0 - (i / schedule$chains) * (x_max0 - x.min) + cellsize[1]
+      y.max <- y_max0 - (i / schedule$chains) * (y_max0 - y.min) + cellsize[2]
       
     } # End the annealing schedule
     

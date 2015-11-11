@@ -98,7 +98,7 @@
 #' candi <- meuse.grid[, 1:2]
 #' covars <- meuse.grid[, 5]
 #' weights <- list(O1 = 0.5, O3 = 0.5)
-#' schedule <- scheduleSPSANN(chains = 1, initial.temperature = 10)
+#' schedule <- scheduleSPSANN(chains = 1, initial.temperature = 20)
 #' \dontrun{
 #' set.seed(2001)
 #' res <- optimCLHS(points = 100, candi = candi, covars = covars, 
@@ -249,8 +249,8 @@ optimCLHS <-
       
       # Update control parameters
       actual_temp <- actual_temp * schedule$temperature.decrease
-      x.max <- x_max0 - (i / schedule$chains) * (x_max0 - x.min)
-      y.max <- y_max0 - (i / schedule$chains) * (y_max0 - y.min)
+      x.max <- x_max0 - (i / schedule$chains) * (x_max0 - x.min) + cellsize[1]
+      y.max <- y_max0 - (i / schedule$chains) * (y_max0 - y.min) + cellsize[2]
       
     } # End the annealing schedule
     

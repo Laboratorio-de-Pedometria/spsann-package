@@ -33,8 +33,8 @@
 #' # This example takes more than 5 seconds to run!
 #' res <- optimCORR(points = 100, candi = candi, covars = covars, 
 #'                  use.coords = TRUE, schedule = schedule)
-#' objSPSANN(res) # 0.2614252
-#' objCORR(points = res, candi = candi, covars = covars, use.coords = TRUE)
+#' objSPSANN(res) -
+#'   objCORR(points = res, candi = candi, covars = covars, use.coords = TRUE)
 #' }
 #' # Random sample
 #' pts <- sample(1:nrow(candi), 5)
@@ -197,8 +197,8 @@ optimCORR <-
       
       # Update control parameters
       actual_temp <- actual_temp * schedule$temperature.decrease
-      x.max <- x_max0 - (i / schedule$chains) * (x_max0 - x.min)
-      y.max <- y_max0 - (i / schedule$chains) * (y_max0 - y.min)
+      x.max <- x_max0 - (i / schedule$chains) * (x_max0 - x.min) + cellsize[1]
+      y.max <- y_max0 - (i / schedule$chains) * (y_max0 - y.min) + cellsize[2]
       
     } # End the annealing schedule
     
