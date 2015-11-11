@@ -27,7 +27,7 @@ IntegerVector spJitterCpp(NumericMatrix x, NumericMatrix y, double xmax,
    dy[0] = pt0[1] - ymax + ymin;
    dy[1] = pt0[1] + ymax + ymin;
    
-   /* Get the row index of the candidates points that fall within the search
+   /* Get the row index of the candidate points that fall within the search
       window */
    for (i = 0; i < nrow; i++) {
      if (y(i, 0) >= dx[0] && y(i, 0) <= dx[1] && 
