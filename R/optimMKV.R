@@ -109,8 +109,8 @@ optimMKV <-
     
     # Initial energy state
     energy0 <- .objMKV(eqn = eqn, sm = sm, covars = covars, vgm = vgm, 
-                       krige.stat = krige.stat, ...)
-    
+                       krige.stat = krige.stat, k = 0, ...)
+      
     # Other settings for the simulated annealing algorithm
     old_sm <- sm
     new_sm <- sm
@@ -141,7 +141,16 @@ optimMKV <-
           new_sm[wp, ] <- cbind(1, covars[new_conf[wp, 1], ])
           new_energy <- .objMKV(eqn = eqn, sm = new_sm, covars = covars, 
                                 vgm = vgm, krige.stat = krige.stat, 
-                                debug.level = 0, ...)
+                                debug.level = 0, k = k, ...)
+          
+          # Avoid 'LDLfactor' error in 'krige' function
+          # https://stat.ethz.ch/pipermail/r-sig-geo/2009-November/006919.html
+          if (is.na(new_energy)) {
+            new_energy <- old_energy
+            new_conf <- old_conf
+            new_sm <- old_sm
+            message("skipped 'LDLfactor' error in 'krige' function")
+          }
           
           # Evaluate the new system configuration
           accept <- min(1, exp((old_energy - new_energy) / actual_temp))
@@ -213,8 +222,8 @@ optimMKV <-
       
       # Update control parameters
       actual_temp <- actual_temp * schedule$temperature.decrease
-      x.max <- x_max0 - (i / schedule$chains) * (x_max0 - x.min)
-      y.max <- y_max0 - (i / schedule$chains) * (y_max0 - y.min)
+      x.max <- x_max0 - (i / schedule$chains) * (x_max0 - x.min) + cellsize[1]
+      y.max <- y_max0 - (i / schedule$chains) * (y_max0 - y.min) + cellsize[2]
       
     } # End the annealing schedule
     
@@ -228,17 +237,21 @@ optimMKV <-
 # vgm: variogram model
 # krige.stat: statistic to summarize the kriging variance
 .objMKV <-
-  function (eqn, sm, covars, vgm, krige.stat, ...) {
+  function (eqn, sm, covars, vgm, krige.stat, k, ...) {
     
     res <- gstat::krige(formula = eqn, locations = ~ x + y, data = sm,
-                        newdata = covars, model = vgm, ...)$var1.var
+                        newdata = covars, model = vgm,
+                        set = list(cn_max = 1e10),
+                        ...)$var1.var
+    # We use 'set = list(cn_max = 1e10)' to avoid the LDFfactor error,
+    # but do not accept the new system configuration.
+    # https://stat.ethz.ch/pipermail/r-sig-geo/2009-November/006919.html
     
     # Calculate the energy state value
     if (krige.stat == "mean") { # Mean kriging variance
-      res <- mean(res)
-      
+      res <- ifelse(k == 0, mean(res, na.rm = TRUE), mean(res))
     } else { # Maximum kriging variance
-      res <- max(res)
+      res <- ifelse(k == 0, max(res, na.rm = TRUE), max(res))
     }
     
     # Output
@@ -254,11 +267,13 @@ optimMKV <-
     
     z <- rep(1, n_pts)
     if (stats::terms(eqn)[[3]] == 1) { # Simple and ordinary kriging
-      sm <- data.frame(z, pts[, 2:3])
+      # sm <- data.frame(z, pts[, 2:3])
+      sm <- data.frame(z, pts[, c("x", "y")])
       colnames(sm) <- c("z", "x", "y")
       
     } else { # Universal kriging
-      sm <- data.frame(z, pts[, 2:3],
+      # sm <- data.frame(z, pts[, 2:3], covars[pts[, 1], all.vars(eqn)[-1]])
+      sm <- data.frame(z, pts[, c("x", "y")], 
                        covars[pts[, 1], all.vars(eqn)[-1]])
       colnames(sm) <- c("z", "x", "y", all.vars(eqn)[-1])
     }
@@ -350,7 +365,7 @@ objMKV <-
     
     # Energy state
     res <- .objMKV(eqn = eqn, sm = sm, covars = covars, vgm = vgm, 
-                   krige.stat = krige.stat, ...)
+                   krige.stat = krige.stat, k = 0, ...)
     
     # Output
     return (res)
