@@ -54,7 +54,7 @@
 scheduleSPSANN <-
   function (initial.acceptance = 0.95, initial.temperature = 0.001,
             temperature.decrease = 0.95, chains = 500, chain.length = 1,
-            stopping = 10, x.max, x.min, y.max, y.min, cellsize) {
+            stopping = 10, x.max, x.min = 0, y.max, y.min = 0, cellsize) {
     
     if (initial.acceptance > 1 || initial.acceptance < 0)
       stop ("'initial.acceptance' must be between 0 and 1")
@@ -69,10 +69,16 @@ scheduleSPSANN <-
     if (stopping < 1 || !pedometrics::isNumint(stopping))
       stop ("'stopping' must be an integer larger than 0")
     if (missing(x.max)) x.max <- NULL
-    if (missing(x.min)) x.min <- NULL
+    # if (missing(x.min)) x.min <- NULL
     if (missing(y.max)) y.max <- NULL
-    if (missing(y.min)) y.min <- NULL
-    if (missing(cellsize)) cellsize <- NULL
+    # if (missing(y.min)) y.min <- NULL
+    if (missing(cellsize)) {
+      cellsize <- NULL
+    } else {
+     if (length(cellsize) == 1) {
+       cellsize <- rep(cellsize, 2)
+     }
+    }
     
     # Output
     res <- list(initial.acceptance = initial.acceptance, 
