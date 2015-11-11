@@ -17,8 +17,8 @@ set.seed(2001)
 # This example takes more than 5 seconds to run!
 res <- optimDIST(points = 100, candi = candi, covars = covars,
                  use.coords = TRUE, schedule = schedule)
-objSPSANN(res) # 2.170422
-objDIST(points = res, candi = candi, covars = covars, use.coords = TRUE)
+objSPSANN(res) -
+  objDIST(points = res, candi = candi, covars = covars, use.coords = TRUE)
 # }
 # Random sample
 pts <- sample(1:nrow(candi), 5)
@@ -37,7 +37,7 @@ schedule <- scheduleSPSANN(initial.temperature = 1e-10)
 set.seed(2001)
 res <- optimDIST(points = 100, candi = candi, covars = covars,
                  use.coords = TRUE, schedule = schedule, plotit = TRUE)
-objSPSANN(res) # 1.471279
+objSPSANN(res) # 1.492452
 objDIST(points = res, candi = candi, covars = covars, use.coords = TRUE)
 
 # 2) FACTOR COVARIATES WITH THE COORDINATES ####################################
@@ -52,7 +52,7 @@ schedule <- scheduleSPSANN(initial.temperature = 0.5, chains = 1)
 set.seed(2001)
 res <- optimDIST(points = 100, candi = candi, covars = covars, 
                  use.coords = TRUE, schedule = schedule, plotit = TRUE)
-objSPSANN(res) # 1.50455
+objSPSANN(res) # 1.570828
 objDIST(points = res, candi = candi, covars = covars, use.coords = TRUE)
 
 # 3) FACTOR AND NUMERIC COVARIATES WITH THE COORDINATES ########################
@@ -67,9 +67,5 @@ schedule <- scheduleSPSANN(initial.temperature = 0.5, chains = 1)
 set.seed(2001)
 resA <- optimDIST(points = 100, candi = candi, covars = covars, 
                   use.coords = TRUE, plotit = TRUE, schedule = schedule)
-objSPSANN(resA) # 3.507973
+objSPSANN(resA) # 3.313735
 objDIST(points = resA, candi = candi, covars = covars, use.coords = TRUE)
-
-# CLEAN WORKSPACE
-rm(list = ls())
-gc()

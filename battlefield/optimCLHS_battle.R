@@ -12,7 +12,7 @@ data(meuse.grid)
 candi <- meuse.grid[, 1:2]
 covars <- meuse.grid[, 5]
 weights <- list(O1 = 0.5, O3 = 0.5)
-schedule <- scheduleSPSANN(chains = 1, initial.temperature = 10)
+schedule <- scheduleSPSANN(chains = 1, initial.temperature = 20)
 set.seed(2001)
 res <- optimCLHS(points = 100, candi = candi, covars = covars, 
                  use.coords = TRUE, weights = weights, schedule = schedule)
@@ -20,7 +20,7 @@ objSPSANN(res) -
   objCLHS(points = res, candi = candi, covars = covars, use.coords = TRUE, 
           weights = weights)
 
-# 1) FACTOR COVARIATES USING THE COORDINATES ###################################
+# 1) FACTOR COVARIATES USING THE COORDINATES AND MANY CHAINS ####################
 rm(list = ls())
 gc()
 sapply(list.files("R", full.names = TRUE, pattern = ".R$"), source)
@@ -28,10 +28,10 @@ sapply(list.files("src", full.names = TRUE, pattern = ".cpp$"), Rcpp::sourceCpp)
 data(meuse.grid)
 candi <- meuse.grid[, 1:2]
 covars <- meuse.grid[, 6:7]
-schedule <- scheduleSPSANN(chains = 1, initial.temperature = 10)
+schedule <- scheduleSPSANN(chains = 100, initial.temperature = 10)
 set.seed(2001)
 res <- optimCLHS(points = 100, candi = candi, covars = covars, 
-                 use.coords = TRUE, schedule = schedule)
+                 use.coords = TRUE, schedule = schedule, plotit = TRUE)
 objSPSANN(res) -
   objCLHS(points = res, candi = candi, covars = covars, use.coords = TRUE)
 

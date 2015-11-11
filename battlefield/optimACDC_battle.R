@@ -17,7 +17,7 @@ schedule <- scheduleSPSANN(chains = 1, initial.temperature = 1)
 set.seed(2001)
 res <- optimACDC(points = 100, candi = candi, covars = covars, nadir = nadir,
                  use.coords = TRUE, utopia = utopia, schedule = schedule)
-objSPSANN(res)
+objSPSANN(res) -
   objACDC(points = res, candi = candi, covars = covars, use.coords = TRUE, 
           nadir = nadir, utopia = utopia)
 

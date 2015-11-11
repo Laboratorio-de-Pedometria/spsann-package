@@ -17,8 +17,8 @@ set.seed(2001)
 # This example takes more than 5 seconds to run!
 res <- optimCORR(points = 100, candi = candi, covars = covars, 
                  use.coords = TRUE, schedule = schedule)
-objSPSANN(res) # 0.2614252
-objCORR(points = res, candi = candi, covars = covars, use.coords = TRUE)
+objSPSANN(res) -
+  objCORR(points = res, candi = candi, covars = covars, use.coords = TRUE)
 # }
 # Random sample
 pts <- sample(1:nrow(candi), 5)
@@ -33,9 +33,9 @@ sapply(list.files("src", full.names = TRUE, pattern = ".cpp$"), Rcpp::sourceCpp)
 data(meuse.grid)
 candi <- meuse.grid[, 1:2]
 covars <- meuse.grid[, 6:7]
-schedule <- scheduleSPSANN(initial.temperature = 0.5, chains = 1)
+schedule <- scheduleSPSANN(initial.temperature = 0.5, chains = 10)
 set.seed(2001)
 res <- optimCORR(points = 100, candi = candi, covars = covars, 
                  use.coords = TRUE, schedule = schedule, plotit = TRUE)
-objSPSANN(res) # 3.604078
+objSPSANN(res) # 3.744234
 objCORR(points = res, candi = candi, covars = covars, use.coords = TRUE)
