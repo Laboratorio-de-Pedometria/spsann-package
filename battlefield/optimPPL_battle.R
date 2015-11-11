@@ -19,18 +19,18 @@ objSPSANN(res) - objPPL(points = res, candi = candi)
 countPPL(points = res, candi = candi)
 # }
 
-# 1) Point pairs ###############################################################
+# 1) Point pairs with many chains ##############################################
 rm(list = ls())
 gc()
 sapply(list.files("R", full.names = TRUE, pattern = ".R$"), source)
 sapply(list.files("src", full.names = TRUE, pattern = ".cpp$"), Rcpp::sourceCpp)
 data(meuse.grid)
 candi <- meuse.grid[, 1:2]
-schedule <- scheduleSPSANN(chains = 1)
+schedule <- scheduleSPSANN(chains = 500, initial.temperature = 500)
 set.seed(2001)
-res <- optimPPL(points = 100, candi = candi, pairs = TRUE, schedule = schedule)
-objSPSANN(res) # 6869.143
-objPPL(points = res, pairs = TRUE, candi = candi)
+res <- optimPPL(points = 100, candi = candi, pairs = TRUE, schedule = schedule,
+                plotit = TRUE)
+objSPSANN(res) - objPPL(points = res, pairs = TRUE, candi = candi)
 countPPL(points = res, candi = candi, pairs = TRUE)
 
 # 2) Points per lag - select sample points from candi ##########################

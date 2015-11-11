@@ -44,6 +44,4 @@ timePPL <- Sys.time() - timePPL
 timeUSER
 timePPL
 lapply(list(resUSER, resPPL), countPPL, candi = candi, lags = lags)
-objSPSANN(resUSER) # 92
-objSPSANN(resPPL) # 92
-
+objSPSANN(resUSER) - objSPSANN(resPPL)

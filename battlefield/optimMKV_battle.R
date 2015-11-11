@@ -16,13 +16,14 @@ data(meuse.grid)
 candi <- meuse.grid[, 1:2]
 covars <- as.data.frame(meuse.grid)
 vgm <- vgm(psill = 10, model = "Exp", range = 500, nugget = 8)
-schedule <- scheduleSPSANN(initial.temperature = 0.5, chains = 1)
-set.seed(1984)
-res <- optimMKV(points = 100, candi = candi, covars = covars, maxdist = 600,
-                eqn = z ~ dist, vgm = vgm, schedule = schedule)
+schedule <- scheduleSPSANN(initial.temperature = 10, chains = 1)
+set.seed(2001)
+res <- optimMKV(points = 100, candi = candi, covars = covars, 
+                eqn = z ~ dist, vgm = vgm, schedule = schedule,
+                maxdist = 500)
 objSPSANN(res) -
   objMKV(points = res, candi = candi, covars = covars, eqn = z ~ dist, 
-         vgm = vgm, maxdist = 600)
+         vgm = vgm, maxdist = 500)
 # }
 
 # 1) GREEDY ALGORITHM ##########################################################
@@ -39,10 +40,10 @@ schedule <- scheduleSPSANN(initial.temperature = 0.001, initial.acceptance = 0,
 set.seed(2001)
 res <- optimMKV(points = 100, candi = candi, covars = covars, vgm = vgm, 
                 eqn = z ~ dist, schedule = schedule, plotit = TRUE, 
-                maxdist = 1000)
-objSPSANN(res) # 11.76088
-objMKV(points = res, candi = candi, covars = covars, eqn = z ~ dist, 
-       vgm = vgm, maxdist = 1000)
+                maxdist = 500)
+objSPSANN(res) - 
+  objMKV(points = res, candi = candi, covars = covars, eqn = z ~ dist, 
+         vgm = vgm, maxdist = 500)
 
 # 2) MANY COVARIATES ###########################################################
 rm(list = ls())
@@ -53,10 +54,11 @@ data(meuse.grid)
 candi <- meuse.grid[, 1:2]
 covars <- as.data.frame(meuse.grid)
 vgm <- vgm(psill = 10, model = "Exp", range = 500, nugget = 8)
-schedule <- scheduleSPSANN(initial.temperature = 0.5, chains = 1)
+schedule <- scheduleSPSANN(initial.temperature = 10, chains = 1)
 set.seed(2001)
 res <- optimMKV(points = 100, candi = candi, covars = covars, vgm = vgm,
-                eqn = z ~ dist + soil + ffreq + x + y, plotit = TRUE)
-objSPSANN(res) # 12.05515
-objMKV(points = res, candi = candi, covars = covars, 
-       eqn = z ~ dist + soil + ffreq + x + y, vgm = vgm)
+                eqn = z ~ dist + soil + ffreq, plotit = TRUE, 
+                schedule = schedule)
+objSPSANN(res) -
+  objMKV(points = res, candi = candi, covars = covars, 
+         eqn = z ~ dist + soil + ffreq, vgm = vgm)
