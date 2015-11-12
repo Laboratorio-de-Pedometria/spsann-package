@@ -4,7 +4,7 @@
 #' 1) \code{sim} -- the number of simulations that should be used to estimate 
 #' the nadir point, and \code{seeds} -- vector defining the random seeds for
 #' each simulation; 2) \code{user} -- a list of user-defined nadir values named 
-#' after the respective objective function to which they apply; 3) \code{abs} 
+#' after the respective objective functions to which they apply; 3) \code{abs} 
 #' -- logical for calculating the nadir point internally (experimental).
 #'
 #' @param weights List with named sub-arguments. The weights assigned to each 
@@ -15,19 +15,19 @@
 #'
 #' @param utopia List with named sub-arguments. Two options are available: 1) 
 #' \code{user} -- a list of user-defined values named after the respective 
-#' objective function to which they apply; 2) \code{abs} -- logical for 
+#' objective functions to which they apply; 2) \code{abs} -- logical for 
 #' calculating the utopia point internally (experimental).
 #' 
 #' @section Multi-objective optimization:
 #' A method of solving a multi-objective optimization problem is to aggregate 
 #' the objective functions into a single \emph{utility function}. In the
-#' \pkg{spsann} package, the aggregation is performed using the \emph{weighted 
+#' \pkg{spsann}-package, the aggregation is performed using the \emph{weighted 
 #' sum method}, which incorporates in the weights the preferences of the user 
 #' regarding the relative importance of each objective function.
 #' 
 #' The weighted sum method is affected by the relative magnitude of the 
 #' different function values. The objective functions implemented in the
-#' \pkg{spsann} package have different units and orders of magnitude. The 
+#' \pkg{spsann}-package have different units and orders of magnitude. The 
 #' consequence is that the objective function with the largest values will have 
 #' a numerical dominance in the optimization. In other words, the weights will 
 #' not express the true preferences of the user, and the meaning of the utility 
@@ -36,10 +36,10 @@
 #' A solution to avoid the numerical dominance is to transform the objective
 #' functions so that they are constrained to the same approximate range of 
 #' values. Several function-transformation methods can be used and the 
-#' \pkg{spsann} offers a few of them. The \emph{upper-lower-bound approach}
-#' requires the user to inform the maximum (nadir point) and minimum (utopia
-#' point) absolute function values. The resulting function values will always 
-#' range between 0 and 1.
+#' \pkg{spsann}-package offers a few of them. The \emph{upper-lower-bound 
+#' approach} requires the user to inform the maximum (nadir point) and minimum 
+#' (utopia point) absolute function values. The resulting function values will 
+#' always range between 0 and 1.
 #' 
 #' Using the \emph{upper-bound approach} requires the user to inform only the
 #' nadir point, while the utopia point is set to zero. The upper-bound approach
@@ -49,9 +49,9 @@
 #' 
 #' Sometimes, the absolute maximum and minimum values of an objective function 
 #' can be calculated exactly. This seems not to be the case of the objective 
-#' functions implemented in the \pkg{spsann} package. If the user is 
+#' functions implemented in the \pkg{spsann}-package. If the user is 
 #' uncomfortable with informing the nadir and utopia points, there is the option
-#' for using \emph{numerical simulations}. It consists in computing the 
+#' for using \emph{numerical simulations}. It consists of computing the 
 #' function value for many random sample configurations. The mean function 
 #' value is used to set the nadir point, while the the utopia point is set to
 #' zero. This approach is similar to the upper-bound approach, but the function
@@ -68,14 +68,15 @@
 #' \enumerate{
 #'   \item Optimize a sample configuration with respect to each objective
 #'   function that composes the MOOP;
-#'   \item Compute the function value of every objective function for every
-#'   optimized sample configuration;
+#'   \item Compute the function value of every objective function that composes 
+#'   the MOOP for every optimized sample configuration;
 #'   \item Record the maximum and minimum absolute function values computed for 
-#'   each objective function--these are the Pareto maximum and minimum.
+#'   each objective function that composes the MOOP -- these are the Pareto
+#'   maximum and minimum.
 #' }
 #' 
-#' For example, consider that a MOOP is composed of two objective functions (A 
-#' and B). The minimum absolute value for function A is obtained when the sample
+#' For example, consider that a MOOP is composed of two objective functions: A 
+#' and B. The minimum absolute value for function A is obtained when the sample
 #' configuration is optimized with respect to function A. This is the Pareto
 #' minimum of function A. Consequently, the maximum absolute value for function
 #' A is obtained when the sample configuration is optimized regarding function

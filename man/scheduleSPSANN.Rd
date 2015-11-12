@@ -6,21 +6,28 @@
 \usage{
 scheduleSPSANN(initial.acceptance = 0.95, initial.temperature = 0.001,
   temperature.decrease = 0.95, chains = 500, chain.length = 1,
-  stopping = 10, x.max, x.min, y.max, y.min)
+  stopping = 10, x.max, x.min = 0, y.max, y.min = 0, cellsize)
 }
 \arguments{
 \item{initial.acceptance}{Numeric value between 0 and 1 defining the initial
-acceptance probability. Defaults to \code{initial.acceptance = 0.95}.}
+acceptance probability, i.e. the proportion of proposed system configurations
+that should be accepted in the first Markov chain. The optimization is
+stopped and a warning is issued if this value is not attained. Defaults to
+\code{initial.acceptance = 0.95}.}
 
 \item{initial.temperature}{Numeric value larger than 0 defining the initial
-temperature of the system. Defaults to \code{initial.temperature = 0.001}.}
+temperature of the system. A low \code{initial.temperature}, combined with a
+low \code{initial.acceptance} result in the algorithm to behave as a greedy
+algorighm, i.e. only better system configurations are accepted. Defaults to
+\code{initial.temperature = 0.001}.}
 
-\item{temperature.decrease}{Numeric value between 0 and 1 defining the factor
-by which the temperature is decreased at the end of each Markov chain.
-Defaults to \code{temperature.decrease = 0.95}.}
+\item{temperature.decrease}{Numeric value between 0 and 1 used as a
+multiplying factor to decrease the temperature at the end of each Markov
+chain. Defaults to \code{temperature.decrease = 0.95}.}
 
-\item{chains}{Integer value defining the maximum number of Markov chains.
-Defaults to \code{chains = 500}.}
+\item{chains}{Integer value defining the maximum number of Markov chains,
+i.e. the number of cycles of jitters at which the temperature and the size
+of the search graph should be kept constant. Defaults to \code{chains = 500}.}
 
 \item{chain.length}{Integer value defining the length of each Markov chain
 relative to the number of points. Defaults to \code{chain.length = 1}, i.e.
@@ -30,33 +37,17 @@ one time the number of points.}
 Markov chains without improvement of the objective function value. Defaults
 to \code{stopping = 10}.}
 
-\item{x.max}{Numeric value. The minimum and maximum
-quantity of random noise to be added to the projected x- and y-coordinates.
-The minimum quantity should be equal to, at least, the minimum distance
-between two neighbouring candidate locations. The units are the same as of
-the projected x- and y-coordinates. If missing, they are estimated from
-\code{candi}.}
+\item{x.max,x.min,y.max,y.min}{Numeric value defining the minimum and
+maximum quantity of random noise to be added to the projected x- and
+y-coordinates. The units are the same as of the projected x- and
+y-coordinates. If missing, they are estimated from \code{candi}, \code{x.min}
+and \code{y.min} being set to zero, and \code{x.max} and \code{y.max} being
+set to half the maximum distance in the x- and y-coordinates, respectively.}
 
-\item{x.min}{Numeric value. The minimum and maximum
-quantity of random noise to be added to the projected x- and y-coordinates.
-The minimum quantity should be equal to, at least, the minimum distance
-between two neighbouring candidate locations. The units are the same as of
-the projected x- and y-coordinates. If missing, they are estimated from
-\code{candi}.}
-
-\item{y.max}{Numeric value. The minimum and maximum
-quantity of random noise to be added to the projected x- and y-coordinates.
-The minimum quantity should be equal to, at least, the minimum distance
-between two neighbouring candidate locations. The units are the same as of
-the projected x- and y-coordinates. If missing, they are estimated from
-\code{candi}.}
-
-\item{y.min}{Numeric value. The minimum and maximum
-quantity of random noise to be added to the projected x- and y-coordinates.
-The minimum quantity should be equal to, at least, the minimum distance
-between two neighbouring candidate locations. The units are the same as of
-the projected x- and y-coordinates. If missing, they are estimated from
-\code{candi}.}
+\item{cellsize}{Vector with two numeric values defining the horizontal (x)
+and vertical (y) spacing between the candidate locations in \code{candi}. A
+single value can be used if the spacing in the x- and y-coordinates is the
+same.}
 }
 \value{
 A list with a set of control parameters of the cooling schedule.
@@ -64,6 +55,28 @@ A list with a set of control parameters of the cooling schedule.
 \description{
 Set the control parameters for the cooling schedule of \pkg{spsann}
 functions.
+}
+\section{Cooling schedule}{
+
+
+\subsection{Search graph}{
+The \emph{search graph} corresponds to the set of effective candidate
+locations for a point selected to be jittered. The size of the search graph,
+i.e. area within which a point can be moved around, is correlated with the
+concept of \emph{temperature}. A larger search graph is equivalent to higher
+temperatures, which potentially result in more movement or \sQuote{agitation}
+of the set of points or \sQuote{particles}.
+
+The current version of the \pkg{spsann}-package uses a linear cooling
+schedule which depends upon the number of jitters to control the size of the
+search graph. The equations are as follows:
+
+$$
+x.max.b <- x.max.a - k / iterations * (x.max.a - x.min)
+
+y.max.b <- y.max.a - k / iterations * (y.max.a - y.min)
+$$
+}
 }
 \examples{
 schedule <- scheduleSPSANN()

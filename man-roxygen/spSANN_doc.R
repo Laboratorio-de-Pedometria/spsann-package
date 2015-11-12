@@ -1,7 +1,7 @@
 #  Template documentation for spatial simulated annealing
 ################################################################################
-#' @param schedule List with 10 named sub-arguments defining the control
-#' parameters of the cooling schedule. See \code{scheduleSPSANN}.
+#' @param schedule List with 11 named sub-arguments defining the control
+#' parameters of the cooling schedule. See \code{\link[spsann]{scheduleSPSANN}}.
 #' 
 #' @param plotit Logical for plotting the optimization results, including
 #' a) the progress of the objective function, and b) the starting (gray) and
@@ -10,7 +10,8 @@
 #' \code{plotit = FALSE}.
 #' 
 #' @param boundary SpatialPolygon defining the boundary of the spatial domain. 
-#' It is estimated from \code{candi} if missing and \code{plotit = TRUE}.
+#' If missing and \code{plotit = TRUE}, \code{boundary} is estimated from
+#' \code{candi}.
 #' 
 #' @param progress Logical for printing a progress bar. Defaults to 
 #' \code{progress = TRUE}.
@@ -20,7 +21,7 @@
 #' 
 #' @param track Logical value. Should the evolution of the energy state be 
 #' recorded and returned with the result? If \code{track = FALSE} (the default),
-#' only the starting and ending energy states are returned with the result.
+#' only the starting and ending energy states are returned with the results.
 #' 
 #' @keywords spatial optimize iteration
 #' 

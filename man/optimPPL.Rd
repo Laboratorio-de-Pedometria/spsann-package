@@ -7,14 +7,11 @@
 \title{Optimization of sample configurations for variogram identification and
 estimation}
 \usage{
-optimPPL(points, candi, iterations = 100, lags = 7,
-  lags.type = "exponential", lags.base = 2, cutoff,
-  criterion = "distribution", distri, pairs = FALSE, x.max, x.min, y.max,
-  y.min, acceptance = list(initial = 0.9, cooling = iterations/10, by =
-  "iterations", temperature = 5, calibrate = TRUE, temperature.decrease = 0.95),
-  stopping = list(max.count = iterations/10), plotit = FALSE,
+optimPPL(points, candi, lags = 7, lags.type = "exponential",
+  lags.base = 2, cutoff, criterion = "distribution", distri,
+  pairs = FALSE, schedule = scheduleSPSANN(), plotit = FALSE,
   track = FALSE, boundary, progress = TRUE, verbose = FALSE,
-  greedy = FALSE, weights = NULL, nadir = NULL, utopia = NULL)
+  weights = NULL, nadir = NULL, utopia = NULL)
 
 objPPL(points, candi, lags = 7, lags.type = "exponential", lags.base = 2,
   cutoff, distri, criterion = "distribution", pairs = FALSE, x.max, x.min,
@@ -36,83 +33,64 @@ the projected x-coordinates, and \code{[, "y"]} the projected y-coordinates.
 Note that in the later case, \code{points} must be a subset of \code{candi}.}
 
 \item{candi}{Data frame or matrix with the candidate locations for the
-perturbed points. \code{candi} must have two columns in the following
+jittered points. \code{candi} must have two columns in the following
 order: \code{[, "x"]} the projected x-coordinates, and \code{[, "y"]} the
 projected y-coordinates.}
 
-\item{iterations}{Integer. The maximum number of iterations that should be
-used for the optimization. Defaults to \code{iterations = 100}.}
+\item{lags}{Integer value; the number of lag-distance classes. Alternatively,
+a vector of numeric values with the lower and upper bounds of each
+lag-distance class, the lowest value being larger than zero (e.g. 0.0001).
+Defaults to \code{lags = 7}.}
 
-\item{lags}{Integer value. The number of lag-distance classes. Alternatively,
-a vector of numeric values with the lower and upper limits of each
-lag-distance class. The lowest value must be larger than zero. Defaults to
-\code{lags = 7}.}
-
-\item{lags.type}{Character value. The type of lag-distance classes, with
+\item{lags.type}{Character value; the type of lag-distance classes, with
 options \code{"equidistant"} and \code{"exponential"}. Defaults to
 \code{lags.type = "exponential"}.}
 
-\item{lags.base}{Numeric value. Base of the exponential expression used to
+\item{lags.base}{Numeric value; base of the exponential expression used to
 create exponentially spaced lag-distance classes. Used only when
 \code{lags.type = "exponential"}. Defaults to \code{lags.base = 2}.}
 
-\item{cutoff}{Numeric value. The maximum distance up to which lag-distance
-classes are created. Used only when \code{lags} is an integer value.}
+\item{cutoff}{Numeric value; the maximum distance up to which lag-distance
+classes are created. Used only when \code{lags} is an integer value. If
+missing, it is set to be equal to the length of the diagonal of the rectagle
+with sides \code{x.max} and \code{y.max} as defined in
+\code{\link[spsann]{scheduleSPSANN}}.}
 
-\item{criterion}{Character value. The feature used to describe the
+\item{criterion}{Character value; the feature used to describe the
 energy state of the system configuration, with options \code{"minimum"} and
 \code{"distribution"}. Defaults to \code{objective = "distribution"}.}
 
-\item{distri}{Numeric vector. The distribution of points or point-pairs per
+\item{distri}{Numeric vector; the distribution of points or point-pairs per
 lag-distance class that should be attained at the end of the optimization.
 Used only when \code{criterion = "distribution"}. Defaults to a uniform
 distribution.}
 
-\item{pairs}{Logical value. Should the sample configuration be optimized
+\item{pairs}{Logical value; should the sample configuration be optimized
 regarding the number of point-pairs per lag-distance class? Defaults to
 \code{pairs = FALSE}.}
 
-\item{x.max,x.min,y.max,y.min}{Numeric value. The minimum and maximum
-quantity of random noise to be added to the projected x- and y-coordinates.
-The minimum quantity should be equal to, at least, the minimum distance
-between two neighbouring candidate locations. The units are the same as of
-the projected x- and y-coordinates. If missing, they are estimated from
+\item{schedule}{List with 11 named sub-arguments defining the control
+parameters of the cooling schedule. See \code{\link[spsann]{scheduleSPSANN}}.}
+
+\item{plotit}{Logical for plotting the optimization results, including
+a) the progress of the objective function, and b) the starting (gray) and
+current system configuration (black), and the maximum jitter in the
+x- and y-coordinates. The plots are updated at each 10 jitters. Defaults to
+\code{plotit = FALSE}.}
+
+\item{track}{Logical value. Should the evolution of the energy state be
+recorded and returned with the result? If \code{track = FALSE} (the default),
+only the starting and ending energy states are returned with the results.}
+
+\item{boundary}{SpatialPolygon defining the boundary of the spatial domain.
+If missing and \code{plotit = TRUE}, \code{boundary} is estimated from
 \code{candi}.}
-
-\item{acceptance}{List with two named sub-arguments: \code{initial} --
-numeric value between 0 and 1 defining the initial acceptance probability,
-and \code{cooling} -- a numeric value defining the exponential factor by
-which the acceptance probability decreases at each iteration. Defaults to
-\code{acceptance = list(initial = 0.99, cooling = iterations / 10)}.}
-
-\item{stopping}{List with one named sub-argument: \code{max.count} --
-integer value defining the maximum allowable number of iterations without
-improvement of the objective function value. Defaults to
-\code{stopping = list(max.count = iterations / 10)}.}
-
-\item{plotit}{Logical for plotting the optimization results. This includes
-a) the progress of the objective function values and acceptance
-probabilities, and b) the original points, the perturbed points and the
-progress of the maximum perturbation in the x- and y-coordinates. The plots
-are updated at each 10 iterations. Defaults to \code{plotit = FALSE}.}
-
-\item{track}{Logical value. Should the evolution of the energy state and
-acceptance probability be recorded and returned with the result? If
-\code{track = FALSE} (the default), only the starting and ending energy state
-values are returned with the result.}
-
-\item{boundary}{SpatialPolygon. The boundary of the spatial domain.
-If missing, it is estimated from \code{candi}.}
 
 \item{progress}{Logical for printing a progress bar. Defaults to
 \code{progress = TRUE}.}
 
 \item{verbose}{Logical for printing messages about the progress of the
 optimization. Defaults to \code{verbose = FALSE}.}
-
-\item{greedy}{Logical value. Should the optimization be done using a greedy
-algorithm, that is, accepting only better system configurations? Defaults
-to \code{greedy = FALSE}. (experimental)}
 
 \item{weights}{List with named sub-arguments. The weights assigned to each
 one of the objective functions that form the multi-objective optimization
@@ -124,13 +102,41 @@ to 1. The default option gives equal weights to all objective functions.}
 1) \code{sim} -- the number of simulations that should be used to estimate
 the nadir point, and \code{seeds} -- vector defining the random seeds for
 each simulation; 2) \code{user} -- a list of user-defined nadir values named
-after the respective objective function to which they apply; 3) \code{abs}
+after the respective objective functions to which they apply; 3) \code{abs}
 -- logical for calculating the nadir point internally (experimental).}
 
 \item{utopia}{List with named sub-arguments. Two options are available: 1)
 \code{user} -- a list of user-defined values named after the respective
-objective function to which they apply; 2) \code{abs} -- logical for
+objective functions to which they apply; 2) \code{abs} -- logical for
 calculating the utopia point internally (experimental).}
+
+\item{x.max}{Numeric value defining the minimum and
+maximum quantity of random noise to be added to the projected x- and
+y-coordinates. The minimum quantity should be equal to, at least, the
+minimum distance between two neighbouring candidate locations. The units
+are the same as of the projected x- and y-coordinates. If missing, they
+are estimated from \code{candi}.}
+
+\item{x.min}{Numeric value defining the minimum and
+maximum quantity of random noise to be added to the projected x- and
+y-coordinates. The minimum quantity should be equal to, at least, the
+minimum distance between two neighbouring candidate locations. The units
+are the same as of the projected x- and y-coordinates. If missing, they
+are estimated from \code{candi}.}
+
+\item{y.max}{Numeric value defining the minimum and
+maximum quantity of random noise to be added to the projected x- and
+y-coordinates. The minimum quantity should be equal to, at least, the
+minimum distance between two neighbouring candidate locations. The units
+are the same as of the projected x- and y-coordinates. If missing, they
+are estimated from \code{candi}.}
+
+\item{y.min}{Numeric value defining the minimum and
+maximum quantity of random noise to be added to the projected x- and
+y-coordinates. The minimum quantity should be equal to, at least, the
+minimum distance between two neighbouring candidate locations. The units
+are the same as of the projected x- and y-coordinates. If missing, they
+are estimated from \code{candi}.}
 }
 \value{
 \code{optimPPL} returns a matrix: the optimized sample configuration.
@@ -152,42 +158,45 @@ class (\bold{PPL}).
 
 There are two ways of jittering the coordinates. They differ on how the
 set of candidate locations is defined. The first method uses an
-\emph{infinite} set of candidate locations, that is, any point in the spatial
-domain can be selected as the new location of a perturbed point. All that
-this method needs is a polygon indicating the boundary of the spatial domain.
-This method is not implemented in the \pkg{spsann} package (yet) because it
-is computationally demanding: every time a point is jittered, it is necessary
-to check if it is inside the spatial domain.
+\emph{infinite} set of candidate locations, that is, any locations in the
+spatial domain can be selected as the new location of a jittered point. All
+that this method needs is a polygon indicating the boundary of the spatial
+domain. This method is not implemented in the \pkg{spsann}-package because
+it is computationally demanding: every time a point is jittered, it is
+necessary to check if the point is inside the spatial domain.
 
 The second method consists of using a \emph{finite} set of candidate
-locations for the perturbed points. A finite set of candidate locations is
+locations for the jittered points. A finite set of candidate locations is
 created by discretizing the spatial domain, that is, creating a fine grid of
-points that serve as candidate locations for the perturbed points. This is
-the only method currently implemented in the \pkg{spsann} package because it
-is one of the least computationally demanding.
+points that serve as candidate locations for the jittered points. This is
+the least computationally demanding jittering method because, by definition,
+the jittered point will always be inside the spatial domain. However, not
+all locations in the spatial domain can be selected as the new location for
+a jittered point.
 
-Using a finite set of candidate locations has one important inconvenience.
-When a point is selected to be jittered, it may be that the new location
-already is occupied by another point. If this happens, another location is
-iteratively sought for as many times as there are points in \code{points}.
-Because the more points there are in \code{points}, the more likely it is
-that the new location already is occupied by another point. If a solution is
-not found, the point selected to be jittered point is kept in its original
-location.
+Using a finite set of candidate locations has another important
+inconvenience. When a point is jittered, it may be that the new location
+already is occupied by another point. If this happens, another location has
+to be iteratively sought for, say, as many times as the number of points in
+the system. In general, the more points there are in the system, the more
+likely it is that the new location already is occupied by another point. If
+a solution is not found in a reasonable time, the point selected to be
+jittered is kept in its original location. Such a proceedure is clearly
+suboptimal.
 
-A more elegant method can be defined using a finite set of candidate
-locations coupled with a form of \emph{two-stage random sampling} as
-implemented in \code{\link[spcosa]{spsample}}. Because the candidate
-locations are placed on a finite regular grid, they can be seen as being the
-centre nodes of a finite set of grid cells (or pixels of a raster image). In
-the first stage, one of the \dQuote{grid cells} is selected with replacement,
-i.e. independently of already being occupied by another sample point. The new
-location for the point chosen to be jittered is selected within that
-\dQuote{grid cell} by simple random sampling. This method guarantees that
-any location in the spatial domain can be a candidate location. It also
-discards the need to check if the new location already is occupied by
-another point. This method is not implemented (yet) in the \pkg{spsann}
-package.
+The \pkg{spsann}-package uses a more elegant method which is based on using
+a finite set of candidate locations coupled with a form of \emph{two-stage
+random sampling} as implemented in \code{\link[spcosa]{spsample}}. Because
+the candidate locations are placed on a finite regular grid, they can be
+seen as being the centre nodes of a finite set of grid cells (or pixels of
+a raster image). In the first stage, one of the \dQuote{grid cells} is
+selected with replacement, i.e. independently of already being occupied by
+another sample point. The new location for the point chosen to be jittered
+is selected within that \dQuote{grid cell} by simple random sampling. This
+method guarantees that \emph{almost} any location in the spatial domain can
+be a candidate location. It also discards the need to check if the new
+location already is occupied by another point, simplifying the code and
+(possibly) speeding up the computations.
 }
 
 \section{Distance between two points}{
@@ -204,13 +213,13 @@ the user is responsible for making sure that this requirement is attained.
 
 A method of solving a multi-objective optimization problem is to aggregate
 the objective functions into a single \emph{utility function}. In the
-\pkg{spsann} package, the aggregation is performed using the \emph{weighted
+\pkg{spsann}-package, the aggregation is performed using the \emph{weighted
 sum method}, which incorporates in the weights the preferences of the user
 regarding the relative importance of each objective function.
 
 The weighted sum method is affected by the relative magnitude of the
 different function values. The objective functions implemented in the
-\pkg{spsann} package have different units and orders of magnitude. The
+\pkg{spsann}-package have different units and orders of magnitude. The
 consequence is that the objective function with the largest values will have
 a numerical dominance in the optimization. In other words, the weights will
 not express the true preferences of the user, and the meaning of the utility
@@ -219,10 +228,10 @@ function becomes unclear.
 A solution to avoid the numerical dominance is to transform the objective
 functions so that they are constrained to the same approximate range of
 values. Several function-transformation methods can be used and the
-\pkg{spsann} offers a few of them. The \emph{upper-lower-bound approach}
-requires the user to inform the maximum (nadir point) and minimum (utopia
-point) absolute function values. The resulting function values will always
-range between 0 and 1.
+\pkg{spsann}-package offers a few of them. The \emph{upper-lower-bound
+approach} requires the user to inform the maximum (nadir point) and minimum
+(utopia point) absolute function values. The resulting function values will
+always range between 0 and 1.
 
 Using the \emph{upper-bound approach} requires the user to inform only the
 nadir point, while the utopia point is set to zero. The upper-bound approach
@@ -232,9 +241,9 @@ to 1.
 
 Sometimes, the absolute maximum and minimum values of an objective function
 can be calculated exactly. This seems not to be the case of the objective
-functions implemented in the \pkg{spsann} package. If the user is
+functions implemented in the \pkg{spsann}-package. If the user is
 uncomfortable with informing the nadir and utopia points, there is the option
-for using \emph{numerical simulations}. It consists in computing the
+for using \emph{numerical simulations}. It consists of computing the
 function value for many random sample configurations. The mean function
 value is used to set the nadir point, while the the utopia point is set to
 zero. This approach is similar to the upper-bound approach, but the function
@@ -251,14 +260,15 @@ functions. However, it is the most time consuming. It works as follows:
 \enumerate{
   \item Optimize a sample configuration with respect to each objective
   function that composes the MOOP;
-  \item Compute the function value of every objective function for every
-  optimized sample configuration;
+  \item Compute the function value of every objective function that composes
+  the MOOP for every optimized sample configuration;
   \item Record the maximum and minimum absolute function values computed for
-  each objective function--these are the Pareto maximum and minimum.
+  each objective function that composes the MOOP -- these are the Pareto
+  maximum and minimum.
 }
 
-For example, consider that a MOOP is composed of two objective functions (A
-and B). The minimum absolute value for function A is obtained when the sample
+For example, consider that a MOOP is composed of two objective functions: A
+and B. The minimum absolute value for function A is obtained when the sample
 configuration is optimized with respect to function A. This is the Pareto
 minimum of function A. Consequently, the maximum absolute value for function
 A is obtained when the sample configuration is optimized regarding function
@@ -276,7 +286,8 @@ point does not form a pair with itself. The second type of lags is defined by
 exponential spacings (\code{lags.type = "exponential"}). The spacings are
 defined by the base \eqn{b} of the exponential expression \eqn{b^n}, where
 \eqn{n} is the required number of lags. The base is defined using the
-argument \code{lags.base}.
+argument \code{lags.base}. See \code{\link[pedometrics]{vgmLags}} for other
+details.
 
 Using the default uniform distribution means that the
 number of point-pairs per lag-distance class (\code{pairs = TRUE}) is equal
@@ -301,10 +312,10 @@ lag-distance classes.
 require(sp)
 data(meuse.grid)
 candi <- meuse.grid[, 1:2]
+schedule <- scheduleSPSANN(chains = 1, initial.temperature = 30)
 set.seed(2001)
-res <- optimPPL(points = 100, candi = candi)
-objSPSANN(res) # 160
-objPPL(points = res, candi = candi)
+res <- optimPPL(points = 100, candi = candi, schedule = schedule)
+objSPSANN(res) - objPPL(points = res, candi = candi)
 countPPL(points = res, candi = candi)
 }
 }
@@ -320,6 +331,10 @@ package version 1.1-10.
 
 van Groenigen, J.-W. \emph{Constrained optimization of spatial sampling:
 a geostatistical approach.} Wageningen: Wageningen University, p. 148, 1999.
+
+Walvoort, D. J. J.; Brus, D. J. & de Gruijter, J. J. An R package for
+spatial coverage sampling and random sampling from compact geographical
+strata by k-means. \emph{Computers & Geosciences}. v. 36, p. 1261-1267, 2010.
 
 Arora, J. \emph{Introduction to optimum design}. Waltham: Academic Press, p.
 896, 2011.
@@ -340,7 +355,7 @@ Bresler, E.; Green, R. E. \emph{Soil parameters and sampling scheme for
 characterizing soil hydraulic properties of a watershed}. Honolulu:
 University of Hawaii at Manoa, p. 42, 1982.
 
-Pettitt, A. N. & McBratney, A. B. Sampling designs for estimating spatial
+Pettitt, A. N.; McBratney, A. B. Sampling designs for estimating spatial
 variance components. \emph{Applied Statistics}. v. 42, p. 185, 1993.
 
 Russo, D. Design of an optimal sampling network for estimating the variogram.

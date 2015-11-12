@@ -6,12 +6,10 @@
 \title{Optimization of sample configurations for spatial trend identification
 and estimation (IV)}
 \usage{
-optimCLHS(points, candi, iterations = 50000, covars, use.coords = FALSE,
-  x.max, x.min, y.max, y.min, acceptance = list(initial = 0.8, cooling =
-  iterations/10), stopping = list(max.count = iterations/10),
-  plotit = FALSE, track = FALSE, boundary, progress = TRUE,
-  verbose = FALSE, greedy = FALSE, weights = list(O1 = 1/3, O2 = 1/3, O3 =
-  1/3))
+optimCLHS(points, candi, covars, use.coords = FALSE,
+  schedule = scheduleSPSANN(), plotit = FALSE, track = FALSE, boundary,
+  progress = TRUE, verbose = FALSE, weights = list(O1 = 1/3, O2 = 1/3, O3
+  = 1/3))
 
 objCLHS(points, candi, covars, use.coords = FALSE, weights = list(O1 = 1/3,
   O2 = 1/3, O3 = 1/3))
@@ -29,59 +27,37 @@ the projected x-coordinates, and \code{[, "y"]} the projected y-coordinates.
 Note that in the later case, \code{points} must be a subset of \code{candi}.}
 
 \item{candi}{Data frame or matrix with the candidate locations for the
-perturbed points. \code{candi} must have two columns in the following
+jittered points. \code{candi} must have two columns in the following
 order: \code{[, "x"]} the projected x-coordinates, and \code{[, "y"]} the
 projected y-coordinates.}
-
-\item{iterations}{Integer. The maximum number of iterations that should be
-used for the optimization. Defaults to \code{iterations = 100}.}
 
 \item{covars}{Data frame or matrix with the covariates in the columns.}
 
 \item{use.coords}{Logical value. Should the geographic coordinates be used
 as covariates? Defaults to \code{use.coords = FALSE}.}
 
-\item{x.max,x.min,y.max,y.min}{Numeric value. The minimum and maximum
-quantity of random noise to be added to the projected x- and y-coordinates.
-The minimum quantity should be equal to, at least, the minimum distance
-between two neighbouring candidate locations. The units are the same as of
-the projected x- and y-coordinates. If missing, they are estimated from
+\item{schedule}{List with 11 named sub-arguments defining the control
+parameters of the cooling schedule. See \code{\link[spsann]{scheduleSPSANN}}.}
+
+\item{plotit}{Logical for plotting the optimization results, including
+a) the progress of the objective function, and b) the starting (gray) and
+current system configuration (black), and the maximum jitter in the
+x- and y-coordinates. The plots are updated at each 10 jitters. Defaults to
+\code{plotit = FALSE}.}
+
+\item{track}{Logical value. Should the evolution of the energy state be
+recorded and returned with the result? If \code{track = FALSE} (the default),
+only the starting and ending energy states are returned with the results.}
+
+\item{boundary}{SpatialPolygon defining the boundary of the spatial domain.
+If missing and \code{plotit = TRUE}, \code{boundary} is estimated from
 \code{candi}.}
-
-\item{acceptance}{List with two named sub-arguments: \code{initial} --
-numeric value between 0 and 1 defining the initial acceptance probability,
-and \code{cooling} -- a numeric value defining the exponential factor by
-which the acceptance probability decreases at each iteration. Defaults to
-\code{acceptance = list(initial = 0.99, cooling = iterations / 10)}.}
-
-\item{stopping}{List with one named sub-argument: \code{max.count} --
-integer value defining the maximum allowable number of iterations without
-improvement of the objective function value. Defaults to
-\code{stopping = list(max.count = iterations / 10)}.}
-
-\item{plotit}{Logical for plotting the optimization results. This includes
-a) the progress of the objective function values and acceptance
-probabilities, and b) the original points, the perturbed points and the
-progress of the maximum perturbation in the x- and y-coordinates. The plots
-are updated at each 10 iterations. Defaults to \code{plotit = FALSE}.}
-
-\item{track}{Logical value. Should the evolution of the energy state and
-acceptance probability be recorded and returned with the result? If
-\code{track = FALSE} (the default), only the starting and ending energy state
-values are returned with the result.}
-
-\item{boundary}{SpatialPolygon. The boundary of the spatial domain.
-If missing, it is estimated from \code{candi}.}
 
 \item{progress}{Logical for printing a progress bar. Defaults to
 \code{progress = TRUE}.}
 
 \item{verbose}{Logical for printing messages about the progress of the
 optimization. Defaults to \code{verbose = FALSE}.}
-
-\item{greedy}{Logical value. Should the optimization be done using a greedy
-algorithm, that is, accepting only better system configurations? Defaults
-to \code{greedy = FALSE}. (experimental)}
 
 \item{weights}{List with named sub-arguments. The weights assigned to each
 one of the objective functions that form the multi-objective optimization
@@ -114,42 +90,45 @@ Pierre Roudier, is in the annealing schedule.
 
 There are two ways of jittering the coordinates. They differ on how the
 set of candidate locations is defined. The first method uses an
-\emph{infinite} set of candidate locations, that is, any point in the spatial
-domain can be selected as the new location of a perturbed point. All that
-this method needs is a polygon indicating the boundary of the spatial domain.
-This method is not implemented in the \pkg{spsann} package (yet) because it
-is computationally demanding: every time a point is jittered, it is necessary
-to check if it is inside the spatial domain.
+\emph{infinite} set of candidate locations, that is, any locations in the
+spatial domain can be selected as the new location of a jittered point. All
+that this method needs is a polygon indicating the boundary of the spatial
+domain. This method is not implemented in the \pkg{spsann}-package because
+it is computationally demanding: every time a point is jittered, it is
+necessary to check if the point is inside the spatial domain.
 
 The second method consists of using a \emph{finite} set of candidate
-locations for the perturbed points. A finite set of candidate locations is
+locations for the jittered points. A finite set of candidate locations is
 created by discretizing the spatial domain, that is, creating a fine grid of
-points that serve as candidate locations for the perturbed points. This is
-the only method currently implemented in the \pkg{spsann} package because it
-is one of the least computationally demanding.
+points that serve as candidate locations for the jittered points. This is
+the least computationally demanding jittering method because, by definition,
+the jittered point will always be inside the spatial domain. However, not
+all locations in the spatial domain can be selected as the new location for
+a jittered point.
 
-Using a finite set of candidate locations has one important inconvenience.
-When a point is selected to be jittered, it may be that the new location
-already is occupied by another point. If this happens, another location is
-iteratively sought for as many times as there are points in \code{points}.
-Because the more points there are in \code{points}, the more likely it is
-that the new location already is occupied by another point. If a solution is
-not found, the point selected to be jittered point is kept in its original
-location.
+Using a finite set of candidate locations has another important
+inconvenience. When a point is jittered, it may be that the new location
+already is occupied by another point. If this happens, another location has
+to be iteratively sought for, say, as many times as the number of points in
+the system. In general, the more points there are in the system, the more
+likely it is that the new location already is occupied by another point. If
+a solution is not found in a reasonable time, the point selected to be
+jittered is kept in its original location. Such a proceedure is clearly
+suboptimal.
 
-A more elegant method can be defined using a finite set of candidate
-locations coupled with a form of \emph{two-stage random sampling} as
-implemented in \code{\link[spcosa]{spsample}}. Because the candidate
-locations are placed on a finite regular grid, they can be seen as being the
-centre nodes of a finite set of grid cells (or pixels of a raster image). In
-the first stage, one of the \dQuote{grid cells} is selected with replacement,
-i.e. independently of already being occupied by another sample point. The new
-location for the point chosen to be jittered is selected within that
-\dQuote{grid cell} by simple random sampling. This method guarantees that
-any location in the spatial domain can be a candidate location. It also
-discards the need to check if the new location already is occupied by
-another point. This method is not implemented (yet) in the \pkg{spsann}
-package.
+The \pkg{spsann}-package uses a more elegant method which is based on using
+a finite set of candidate locations coupled with a form of \emph{two-stage
+random sampling} as implemented in \code{\link[spcosa]{spsample}}. Because
+the candidate locations are placed on a finite regular grid, they can be
+seen as being the centre nodes of a finite set of grid cells (or pixels of
+a raster image). In the first stage, one of the \dQuote{grid cells} is
+selected with replacement, i.e. independently of already being occupied by
+another sample point. The new location for the point chosen to be jittered
+is selected within that \dQuote{grid cell} by simple random sampling. This
+method guarantees that \emph{almost} any location in the spatial domain can
+be a candidate location. It also discards the need to check if the new
+location already is occupied by another point, simplifying the code and
+(possibly) speeding up the computations.
 }
 
 \section{Distance between two points}{
@@ -216,42 +195,19 @@ of magnitude. The same aggregation procedure is implemented in the
 \pkg{clhs} package.
 }
 \examples{
-\dontrun{
 require(sp)
 data(meuse.grid)
 candi <- meuse.grid[, 1:2]
 covars <- meuse.grid[, 5]
 weights <- list(O1 = 0.5, O3 = 0.5)
+schedule <- scheduleSPSANN(chains = 1, initial.temperature = 20)
+\dontrun{
 set.seed(2001)
 res <- optimCLHS(points = 100, candi = candi, covars = covars,
-                 use.coords = TRUE, weights = weights, iterations = 100)
-objSPSANN(res) - # 106.0691
-objCLHS(points = res, candi = candi, covars = covars, use.coords = TRUE,
-        weights = weights)
-
-# MARGINAL DISTRIBUTION
-par(mfrow = c(3, 3))
-# Covariates
-i <- sample(1:nrow(candi), 100)
-hist(candi[, 1], breaks = 10)
-hist(candi[, 2], breaks = 10)
-hist(covars, breaks = 10)
-# Optimized sample
-hist(candi[res[, 1], 1], breaks = 10)
-hist(candi[res[, 1], 2], breaks = 10)
-hist(covars[res[, 1]], breaks = 10)
-# Random sample
-hist(candi[i, 1], breaks = 10)
-hist(candi[i, 2], breaks = 10)
-hist(covars[i], breaks = 10)
-
-# LINEAR CORRELATION
-# Covariates
-cor(cbind(candi[, 1], candi[, 2], covars))
-# Optimized sample
-cor(cbind(candi[res[, 1], 1], candi[res[, 1], 2], covars[res[, 1]]))
-# Random sample
-cor(cbind(candi[i, 1], candi[i, 2], covars[i]))
+                 use.coords = TRUE, weights = weights, schedule = schedule)
+objSPSANN(res) -
+  objCLHS(points = res, candi = candi, covars = covars, use.coords = TRUE,
+          weights = weights)
 }
 }
 \author{
@@ -266,6 +222,10 @@ package version 1.1-10.
 
 van Groenigen, J.-W. \emph{Constrained optimization of spatial sampling:
 a geostatistical approach.} Wageningen: Wageningen University, p. 148, 1999.
+
+Walvoort, D. J. J.; Brus, D. J. & de Gruijter, J. J. An R package for
+spatial coverage sampling and random sampling from compact geographical
+strata by k-means. \emph{Computers & Geosciences}. v. 36, p. 1261-1267, 2010.
 
 Minasny, B.; McBratney, A. B. A conditioned Latin hypercube method for
 sampling in the presence of ancillary information. \emph{Computers &

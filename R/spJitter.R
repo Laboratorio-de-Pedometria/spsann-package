@@ -1,6 +1,6 @@
 #' Random perturbation of spatial points
 #' 
-#' Perturb the coordinates of spatial points (\sQuote{jittering}).
+#' Randomly perturb (\sQuote{jitter}) the coordinates of spatial points.
 #' 
 #' @template spJitter_doc
 #' 
