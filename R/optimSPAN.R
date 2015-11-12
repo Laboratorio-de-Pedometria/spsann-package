@@ -333,7 +333,10 @@ objSPAN <-
     eval(.prepare_points())
     
     # Prepare for jittering
-    eval(.prepare_jittering())
+    if (missing(cutoff)) {
+      schedule <- scheduleSPSANN()
+      eval(.prepare_jittering())
+    }
     
     # Prepare 'covars' and create the starting sample matrix 'sm'
     eval(.prepare_acdc_covars())
