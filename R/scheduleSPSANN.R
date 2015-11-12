@@ -4,7 +4,7 @@
 #' functions.
 #' 
 #' @inheritParams spJitter
-#' @template schedule_doc
+# @template schedule_doc
 #' 
 #' @param x.max,x.min,y.max,y.min Numeric value defining the minimum and 
 #' maximum quantity of random noise to be added to the projected x- and 

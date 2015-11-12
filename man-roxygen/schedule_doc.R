@@ -1,6 +1,8 @@
 #  Template documentation for the cooling schedule
 ################################################################################
-#' @section Cooling schedule:
+#' @section Annealing schedule:
+#' 
+#' The \emph{annealing schedule} 
 #' 
 #' \subsection{Search graph}{
 #' The \emph{search graph} corresponds to the set of effective candidate 
