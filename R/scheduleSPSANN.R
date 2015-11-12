@@ -4,26 +4,34 @@
 #' functions.
 #' 
 #' @inheritParams spJitter
+#' @template schedule_doc
 #' 
 #' @param x.max,x.min,y.max,y.min Numeric value defining the minimum and 
 #' maximum quantity of random noise to be added to the projected x- and 
-#' y-coordinates. The minimum quantity should be equal to, at least, the 
-#' minimum distance between two neighbouring candidate locations. The units 
-#' are the same as of the projected x- and y-coordinates. If missing, they 
-#' are estimated from \code{candi}.
+#' y-coordinates. The units are the same as of the projected x- and 
+#' y-coordinates. If missing, they are estimated from \code{candi}, \code{x.min}
+#' and \code{y.min} being set to zero, and \code{x.max} and \code{y.max} being
+#' set to half the maximum distance in the x- and y-coordinates, respectively.
 #' 
 #' @param initial.acceptance Numeric value between 0 and 1 defining the initial
-#' acceptance probability. Defaults to \code{initial.acceptance = 0.95}.
+#' acceptance probability, i.e. the proportion of proposed system configurations
+#' that should be accepted in the first Markov chain. The optimization is 
+#' stopped and a warning is issued if this value is not attained. Defaults to 
+#' \code{initial.acceptance = 0.95}.
 #' 
 #' @param initial.temperature Numeric value larger than 0 defining the initial
-#' temperature of the system. Defaults to \code{initial.temperature = 0.001}.
+#' temperature of the system. A low \code{initial.temperature}, combined with a 
+#' low \code{initial.acceptance} result in the algorithm to behave as a greedy
+#' algorighm, i.e. only better system configurations are accepted. Defaults to 
+#' \code{initial.temperature = 0.001}.
 #' 
-#' @param temperature.decrease Numeric value between 0 and 1 defining the factor
-#' by which the temperature is decreased at the end of each Markov chain. 
-#' Defaults to \code{temperature.decrease = 0.95}.
+#' @param temperature.decrease Numeric value between 0 and 1 used as a
+#' multiplying factor to decrease the temperature at the end of each Markov 
+#' chain. Defaults to \code{temperature.decrease = 0.95}.
 #' 
-#' @param chains Integer value defining the maximum number of Markov chains.
-#' Defaults to \code{chains = 500}.
+#' @param chains Integer value defining the maximum number of Markov chains,
+#' i.e. the number of cycles of jitters at which the temperature and the size 
+#' of the search graph should be kept constant. Defaults to \code{chains = 500}.
 #' 
 #' @param chain.length Integer value defining the length of each Markov chain
 #' relative to the number of points. Defaults to \code{chain.length = 1}, i.e.
