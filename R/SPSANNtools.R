@@ -49,7 +49,7 @@ objSPSANN <-
       col <- c("red", rep("black", n - 1))
       graphics::plot(1, type = 'n', xlim = c(0, k), 
                      ylim = c(0, max(a)), #ylim = c(min(a), max(a)), 
-                     xlab = "iteration", ylab = "energy state")
+                     xlab = "jitter", ylab = "energy state")
       graphics::legend("topright", legend = l, lwd = 1, lty = 1:n, col = col)
       
       for(i in 1:ncol(a)) {
@@ -64,7 +64,7 @@ objSPSANN <-
       # Single-objective optimization problem
     } else {
       a <- c(energy0, energies[1:k])
-      graphics::plot(a ~ c(0:k), type = "l", xlab = "iteration", 
+      graphics::plot(a ~ c(0:k), type = "l", xlab = "jitter", 
                      ylab = "energy state")
       graphics::lines(x = c(-k, 0), y = rep(energy0, 2), col = "red")
       graphics::lines(x = rep(best.k, 2), y = c(-5, best.energy), col = "green") 
