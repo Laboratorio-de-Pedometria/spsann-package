@@ -239,13 +239,21 @@ optimMKV <-
 .objMKV <-
   function (eqn, sm, covars, vgm, krige.stat, k, ...) {
     
-    res <- gstat::krige(formula = eqn, locations = ~ x + y, data = sm,
-                        newdata = covars, model = vgm,
-                        set = list(cn_max = 1e10),
-                        ...)$var1.var
     # We use 'set = list(cn_max = 1e10)' to avoid the LDFfactor error,
     # but do not accept the new system configuration.
     # https://stat.ethz.ch/pipermail/r-sig-geo/2009-November/006919.html
+    # res <- gstat::krige(formula = eqn, locations = ~ x + y, data = sm,
+                        # newdata = covars, model = vgm,
+                        # set = list(cn_max = 1e10),
+                        # ...)$var1.var
+    # Error in predict.gstat(g, newdata = newdata, block = block, nsim = nsim, 
+    # : gstat: value not allowed for: QRfactor not yet implemented 
+    # I do not know the reason for this error, but it comes from using 
+    # 'set = list(cn_max = 1e10)' above. I try to solve with 'tryCatch'!
+    res <- 
+      tryCatch(gstat::krige(formula = eqn, locations = ~ x + y, data = sm,
+                            newdata = covars, model = vgm, ...)$var1.var,
+               finally = NA)
     
     # Calculate the energy state value
     if (krige.stat == "mean") { # Mean kriging variance
