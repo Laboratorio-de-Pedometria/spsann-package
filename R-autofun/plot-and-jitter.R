@@ -30,10 +30,10 @@ if (plotit && pedometrics::isNumint(k / 10)) {
               best.k = best_k, MOOP = MOOP)
 }
 new_conf <- spJitter(points = old_conf, candi = candi, x.max = x.max, 
-                           x.min = x.min, y.max = y.max, y.min = y.min,
-                           cellsize = cellsize, 
-                           #finite = finite,
-                           which.point = wp)
+                     x.min = x.min, y.max = y.max, y.min = y.min,
+                     cellsize = cellsize, 
+                     #finite = finite,
+                     which.point = wp)
 # if (acceptance$by == "iterations") {
 #   x.max <- x_max0 - (k / iterations) * (x_max0 - x.min)
 #   y.max <- y_max0 - (k / iterations) * (y_max0 - y.min)

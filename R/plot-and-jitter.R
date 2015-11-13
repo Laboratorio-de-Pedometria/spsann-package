@@ -10,9 +10,9 @@ expression(if (plotit && pedometrics::isNumint(k / 10)) {
               #wp = wp,
               best.k = best_k, MOOP = MOOP)
 }, new_conf <- spJitter(points = old_conf, candi = candi, x.max = x.max, 
-                           x.min = x.min, y.max = y.max, y.min = y.min,
-                           cellsize = cellsize, 
-                           #finite = finite,
-                           which.point = wp))
+                     x.min = x.min, y.max = y.max, y.min = y.min,
+                     cellsize = cellsize, 
+                     #finite = finite,
+                     which.point = wp))
 }
 
