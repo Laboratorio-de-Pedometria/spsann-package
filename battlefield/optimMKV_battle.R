@@ -16,7 +16,7 @@ data(meuse.grid)
 candi <- meuse.grid[, 1:2]
 covars <- as.data.frame(meuse.grid)
 vgm <- vgm(psill = 10, model = "Exp", range = 500, nugget = 8)
-schedule <- scheduleSPSANN(initial.temperature = 10, chains = 1)
+schedule <- scheduleSPSANN(initial.temperature = 10, chains = 1, cellsize = 40)
 set.seed(2001)
 res <- optimMKV(points = 100, candi = candi, covars = covars, 
                 eqn = z ~ dist, vgm = vgm, schedule = schedule,
@@ -54,11 +54,11 @@ data(meuse.grid)
 candi <- meuse.grid[, 1:2]
 covars <- as.data.frame(meuse.grid)
 vgm <- vgm(psill = 10, model = "Exp", range = 500, nugget = 8)
-schedule <- scheduleSPSANN(initial.temperature = 10, chains = 1)
+schedule <- scheduleSPSANN(initial.temperature = 10, chains = 10)
 set.seed(2001)
 res <- optimMKV(points = 100, candi = candi, covars = covars, vgm = vgm,
                 eqn = z ~ dist + soil + ffreq, plotit = TRUE, 
-                schedule = schedule)
+                schedule = schedule, nmax = 50)
 objSPSANN(res) -
   objMKV(points = res, candi = candi, covars = covars, 
-         eqn = z ~ dist + soil + ffreq, vgm = vgm)
+         eqn = z ~ dist + soil + ffreq, vgm = vgm, nmax = 50)

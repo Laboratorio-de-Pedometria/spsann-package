@@ -110,7 +110,7 @@ optimMKV <-
     # Initial energy state
     energy0 <- .objMKV(eqn = eqn, sm = sm, covars = covars, vgm = vgm, 
                        krige.stat = krige.stat, k = 0, ...)
-      
+    
     # Other settings for the simulated annealing algorithm
     old_sm <- sm
     new_sm <- sm
@@ -124,7 +124,7 @@ optimMKV <-
       pb <- utils::txtProgressBar(min = 1, max = max, style = 3)
     }
     time0 <- proc.time()
-    
+
     # Initiate the annealing schedule
     for (i in 1:schedule$chains) {
       n_accept <- 0
@@ -133,12 +133,14 @@ optimMKV <-
         
         for (wp in 1:n_pts) { # Initiate loop through points
           k <- k + 1
-          
+
           # Plotting and jittering
           eval(.plot_and_jitter())
           
           # Update sample matrix and energy state
-          new_sm[wp, ] <- cbind(1, covars[new_conf[wp, 1], ])
+          # new_sm[wp, ] <- cbind(z = 1, covars[new_conf[wp, 1], ])#finite
+          new_sm[wp, ] <- c(1, new_conf[wp, 2:3], 
+                            covars[new_conf[wp, 1], all.vars(eqn)[-1]])
           new_energy <- .objMKV(eqn = eqn, sm = new_sm, covars = covars, 
                                 vgm = vgm, krige.stat = krige.stat, 
                                 debug.level = 0, k = k, ...)
@@ -151,7 +153,7 @@ optimMKV <-
             new_sm <- old_sm
             message("skipped 'LDLfactor' error in 'krige' function")
           }
-          
+
           # Evaluate the new system configuration
           accept <- min(1, exp((old_energy - new_energy) / actual_temp))
           accept <- floor(rbinom(n = 1, size = 1, prob = accept))
@@ -180,10 +182,11 @@ optimMKV <-
           
           
           if (progress) utils::setTxtProgressBar(pb, k)
+
         } # End loop through points
-        
+
       } # End the chain
-      
+
       # Check the proportion of accepted swaps in the first chain
       if (i == 1) {
         x <- round(n_accept / c(n_pts * schedule$chain.length), 2)
