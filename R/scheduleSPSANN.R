@@ -1,6 +1,6 @@
-#' \pkg{spsann} cooling schedule
+#' \pkg{spsann} annealing schedule
 #' 
-#' Set the control parameters for the cooling schedule of \pkg{spsann} 
+#' Set the control parameters for the annealing schedule of \pkg{spsann} 
 #' functions.
 #' 
 #' @inheritParams spJitter
@@ -15,8 +15,8 @@
 #' 
 #' @param initial.acceptance Numeric value between 0 and 1 defining the initial
 #' acceptance probability, i.e. the proportion of proposed system configurations
-#' that should be accepted in the first Markov chain. The optimization is 
-#' stopped and a warning is issued if this value is not attained. Defaults to 
+#' that should be accepted in the first chain. The optimization is stopped and 
+#' a warning is issued if this value is not attained. Defaults to 
 #' \code{initial.acceptance = 0.95}.
 #' 
 #' @param initial.temperature Numeric value larger than 0 defining the initial
@@ -29,9 +29,9 @@
 #' multiplying factor to decrease the temperature at the end of each Markov 
 #' chain. Defaults to \code{temperature.decrease = 0.95}.
 #' 
-#' @param chains Integer value defining the maximum number of Markov chains,
+#' @param chains Integer value defining the maximum number of chains,
 #' i.e. the number of cycles of jitters at which the temperature and the size 
-#' of the search graph should be kept constant. Defaults to \code{chains = 500}.
+#' of the neighbourhood should be kept constant. Defaults to \code{chains = 500}.
 #' 
 #' @param chain.length Integer value defining the length of each Markov chain
 #' relative to the number of points. Defaults to \code{chain.length = 1}, i.e.
@@ -42,7 +42,7 @@
 #' to \code{stopping = 10}.
 #' 
 #' @return
-#' A list with a set of control parameters of the cooling schedule.
+#' A list with a set of control parameters of the annealing schedule.
 #' 
 #' @references 
 #' Aarts, E. H. L. & Korst, J. H. M. Boltzmann machines for travelling salesman 

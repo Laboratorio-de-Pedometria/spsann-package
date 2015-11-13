@@ -1,8 +1,32 @@
+# Version 1.0-2.9001 (2015-11-13)
+* A completelly new annealing schedule was implemented. The reason for this
+  modification is that the former annealing schedule, which was based on the
+  ***intamapInteractive***-package, showed to be ineficient during
+  our tests. The new annealing schedule is the very simple and most-used
+  schedule proposed by Kirkpatrick et al. (1983). We have also replaced the 
+  acceptance criterion used in the ***intamapInteractive***-package with the
+  well-known Metropolis criterion. This new implementation showed to be more
+  efficient in our tests than our early implementation.
+* Implementing a new annealing schedule and a new acceptance criterion required
+  a moderate modification of the source code. Despite our efforts, it was not 
+  possible to guarantee the compatibility with previous versions.
+* A new function was created to set up the annealing schedule: 
+  `scheduleSPSANN()`.
+* We are now using a more elegant solution to jitter the sample points. It 
+  consists of using a finite set of candidate locations that are seen by the
+  algorithm as the centre of grid cells. In the first stage, we select a grid
+  cell with replacement. In the second stage, we select a location within that
+  grid cell using simple random sampling. This is the sampling method 
+  implemented in the ***spcosa***-package.
+* The documentation of all functions has been fine tuned.
+* A trick was included in the `optimMKV()`-function to avoid errors due to
+  the LDLfactor error of the ***gstat***-package.
+
 # Version 1.0-2.9000 (2015-10-27)
-* Now `x.max` and `y.max` are, by default, set to half of the length of the x
-  and y axis of the bounding box of `candi`. In the same manner, the argument 
-  `cutoff` of the `optimPPL()` function is set, by default, to half the diagonal
-  of the bounding box of `candi`.
+* Now `x.max` and `y.max` are, by default, set to half of the maximum distance
+  in the x- and y-coordinates of `candi`, respectively. In the same manner, the
+  argument `cutoff` of `optimPPL()` is set, by default, to half of the diagonal
+  of the rectangle of sides `x.max` and `y.max`.
 
 # Version 1.0-2 (2015-10-25)
 * Corrected a bug in `optimCORR()` that was causing the following error: Error
