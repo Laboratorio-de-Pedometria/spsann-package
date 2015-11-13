@@ -99,117 +99,41 @@ obtained aggregating two objective functions: \bold{CORR} and
 \bold{DIST}.
 }
 \note{
+The distance between two points is computed as the Euclidean distance between
+them. This computation assumes that the optimization is operating in the
+two-dimensional Euclidean space, i.e. the coordinates of the sample points
+and candidate locations should not be provided as latitude/longitude.
+The \pkg{spsann}-package has no mechanism to check if the coordinates are
+projected: the user is responsible for making sure that this requirement
+is attained.
+
 This function was derived with modifications from the method known as the
 \emph{conditioned Latin Hypercube sampling} originally proposed by Minasny
 and McBratney (2006), and implemented in the R-package
 \pkg{\link[clhs]{clhs}} by Pierre Roudier.
 }
-\section{Jittering methods}{
-
-There are two ways of jittering the coordinates. They differ on how the
-set of candidate locations is defined. The first method uses an
-\emph{infinite} set of candidate locations, that is, any locations in the
-spatial domain can be selected as the new location of a jittered point. All
-that this method needs is a polygon indicating the boundary of the spatial
-domain. This method is not implemented in the \pkg{spsann}-package because
-it is computationally demanding: every time a point is jittered, it is
-necessary to check if the point is inside the spatial domain.
-
-The second method consists of using a \emph{finite} set of candidate
-locations for the jittered points. A finite set of candidate locations is
-created by discretizing the spatial domain, that is, creating a fine grid of
-points that serve as candidate locations for the jittered points. This is
-the least computationally demanding jittering method because, by definition,
-the jittered point will always be inside the spatial domain. However, not
-all locations in the spatial domain can be selected as the new location for
-a jittered point.
-
-Using a finite set of candidate locations has another important
-inconvenience. When a point is jittered, it may be that the new location
-already is occupied by another point. If this happens, another location has
-to be iteratively sought for, say, as many times as the number of points in
-the system. In general, the more points there are in the system, the more
-likely it is that the new location already is occupied by another point. If
-a solution is not found in a reasonable time, the point selected to be
-jittered is kept in its original location. Such a proceedure is clearly
-suboptimal.
-
-The \pkg{spsann}-package uses a more elegant method which is based on using
-a finite set of candidate locations coupled with a form of \emph{two-stage
-random sampling} as implemented in \code{\link[spcosa]{spsample}}. Because
-the candidate locations are placed on a finite regular grid, they can be
-seen as being the centre nodes of a finite set of grid cells (or pixels of
-a raster image). In the first stage, one of the \dQuote{grid cells} is
-selected with replacement, i.e. independently of already being occupied by
-another sample point. The new location for the point chosen to be jittered
-is selected within that \dQuote{grid cell} by simple random sampling. This
-method guarantees that \emph{almost} any location in the spatial domain can
-be a candidate location. It also discards the need to check if the new
-location already is occupied by another point, simplifying the code and
-(possibly) speeding up the computations.
-}
-
-\section{Distance between two points}{
-
-The distance between two points is computed as the Euclidean distance between
-them. This computation assumes that the optimization is operating in the
-two-dimensional Euclidean space, i.e. the coordinates of the sample points
-and candidate locations should not be provided as latitude/longitude. Package
-\pkg{spsann} has no mechanism to check if the coordinates are projected, and
-the user is responsible for making sure that this requirement is attained.
-}
-
 \section{Multi-objective optimization}{
 
-A method of solving a multi-objective optimization problem is to aggregate
-the objective functions into a single \emph{utility function}. In the
-\pkg{spsann}-package, the aggregation is performed using the \emph{weighted
-sum method}, which incorporates in the weights the preferences of the user
-regarding the relative importance of each objective function.
+The multi-objective optimization problem is solved aggregating the objective
+functions into a single \emph{utility function} using the \emph{weighted
+sum method}. Because the \emph{weighted sum method} is affected by the
+relative magnitude of the different function values, each objective function
+is transformed before the aggregation. Four transformation methods are
+available.
 
-The weighted sum method is affected by the relative magnitude of the
-different function values. The objective functions implemented in the
-\pkg{spsann}-package have different units and orders of magnitude. The
-consequence is that the objective function with the largest values will have
-a numerical dominance in the optimization. In other words, the weights will
-not express the true preferences of the user, and the meaning of the utility
-function becomes unclear.
-
-A solution to avoid the numerical dominance is to transform the objective
-functions so that they are constrained to the same approximate range of
-values. Several function-transformation methods can be used and the
-\pkg{spsann}-package offers a few of them. The \emph{upper-lower-bound
-approach} requires the user to inform the maximum (nadir point) and minimum
-(utopia point) absolute function values. The resulting function values will
-always range between 0 and 1.
-
-Using the \emph{upper-bound approach} requires the user to inform only the
-nadir point, while the utopia point is set to zero. The upper-bound approach
-for transformation aims at equalizing only the upper bounds of the objective
-functions. The resulting function values will always be smaller than or equal
-to 1.
-
-Sometimes, the absolute maximum and minimum values of an objective function
-can be calculated exactly. This seems not to be the case of the objective
-functions implemented in the \pkg{spsann}-package. If the user is
-uncomfortable with informing the nadir and utopia points, there is the option
-for using \emph{numerical simulations}. It consists of computing the
-function value for many random sample configurations. The mean function
-value is used to set the nadir point, while the the utopia point is set to
-zero. This approach is similar to the upper-bound approach, but the function
-values will have the same orders of magnitude only at the starting point of
-the optimization. Function values larger than one are likely to occur during
-the optimization. We recommend the user to avoid this approach whenever
-possible because the effect of the starting point on the optimization as a
-whole usually is insignificant or arbitrary.
-
-The \emph{upper-lower-bound approach} with the \emph{Pareto maximum and
-minimum values} is the most elegant solution to transform the objective
-functions. However, it is the most time consuming. It works as follows:
+The \emph{upper-lower-bound approach} results in function values constrained
+between 0 and 1. The user has to inform the maximum (nadir point) and
+minimum (utopia point) absolute function values. With the \emph{upper-bound
+approach}, the function values will always be smaller than or equal to 1.
+The user has to inform only the nadir point, the utopia point being set to
+zero. An option is to use \emph{numerical simulations} to approximate the
+nadir point, but this should be avoided. We recoment using the
+\emph{upper-lower-bound approach} with the \emph{Pareto maximum and minimum
+values}. It works as follows:
 
 \enumerate{
   \item Optimize a sample configuration with respect to each objective
-  function that composes the MOOP;
+ function that composes the MOOP;
   \item Compute the function value of every objective function that composes
   the MOOP for every optimized sample configuration;
   \item Record the maximum and minimum absolute function values computed for
@@ -230,66 +154,21 @@ function B.
 
 The \emph{correlation} between two numeric covariates is measured using the
 Pearson's \emph{r}, a descriptive statistic that ranges from $-1$ to $+1$.
-This statistic is also known as the linear correlation coefficient.
-
-When the set of covariates includes factor covariates, all numeric covariates
-are transformed into factor covariates. The factor levels are defined
-using the marginal sampling strata created from one of the two methods
-available (equal-area or equal-range strata).
-
 The \emph{association} between two factor covariates is measured using the
-Cramér's \emph{v}, a descriptive statistic that ranges from $0$ to $+1$. The
-closer to $+1$ the Cramér's \emph{v} is, the stronger the association between
-two factor covariates. The main weakness of using the Cramér's \emph{v} is
-that, while the Pearson's \emph{r} shows the degree and direction of the
-association between two covariates (negative or positive), the Cramér's
-\emph{v} only measures the degree of association (weak or strong).
+Cramér's \emph{v}, a descriptive statistic that ranges from $0$ to $+1$.
 }
 
 \section{Marginal distribution of covariates}{
 
-Reproducing the marginal distribution of the numeric covariates depends upon
-the definition of marginal sampling strata. These marginal sampling strata
-are also used to define the factor levels of all numeric covariates that
-are passed together with factor covariates. Two types of marginal sampling
-strata can be used: \emph{equal-area} and \emph{equal-range}.
 
-\subsection{Equal-area}{
-\emph{Equal-area} marginal sampling strata are defined using the sample
-quantiles estimated with \code{\link[stats]{quantile}} using a discontinuous
-function (\code{type = 3}). This is to avoid creating breakpoints that do
-not occur in the population of existing covariate values.
+\emph{Equal-area} marginal sampling strata are defined using the unique
+sample quantiles estimated with \code{\link[stats]{quantile}} using a
+discontinuous function (\code{type = 3}). This is to avoid creating empty
+marginal sampling strata.
 
-Depending on the level of discretization of the covariate values,
-\code{\link[stats]{quantile}} produces repeated breakpoints. A breakpoint
-will be repeated if that value has a relatively high frequency in the
-population of covariate values. The number of repeated breakpoints increases
-with the number of marginal sampling strata. Repeated breakpoints result in
-empty marginal sampling strata. To avoid this, only the unique breakpoints
-are used.
-}
-\subsection{Equal-range}{
 \emph{Equal-range} marginal sampling strata are defined by breaking the range
-of covariate values into pieces of equal size. Depending on the level of
-discretization of the covariate values, this method creates breakpoints that
-do not occur in the population of existing covariate values. Such breakpoints
-are replaced by the nearest existing covariate value identified using
-Euclidean distances.
-
-Like the equal-area method, the equal-range method can produce empty marginal
-sampling strata. The solution used here is to merge any empty marginal
-sampling strata with the closest non-empty marginal sampling strata. This is
-identified using Euclidean distances as well.
-}
-
-The approaches used to define the marginal sampling strata result in each
-numeric covariate having a different number of marginal sampling strata,
-some of them with different area/size. Because the goal is to have a sample
-that reproduces the marginal distribution of the covariate, each marginal
-sampling strata will have a different number of sample points. The wanted
-distribution of the number of sample points per marginal strata is estimated
-empirically as the proportion of points in the population of existing
-covariate values that fall in each marginal sampling strata.
+of covariate values into pieces of equal size. Any empty marginal sampling
+strata is merged with the closest non-empty marginal sampling strata.
 }
 \examples{
 require(sp)

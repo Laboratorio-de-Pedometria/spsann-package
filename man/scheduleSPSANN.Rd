@@ -2,7 +2,7 @@
 % Please edit documentation in R/scheduleSPSANN.R
 \name{scheduleSPSANN}
 \alias{scheduleSPSANN}
-\title{\pkg{spsann} cooling schedule}
+\title{\pkg{spsann} annealing schedule}
 \usage{
 scheduleSPSANN(initial.acceptance = 0.95, initial.temperature = 0.001,
   temperature.decrease = 0.95, chains = 500, chain.length = 1,
@@ -11,8 +11,8 @@ scheduleSPSANN(initial.acceptance = 0.95, initial.temperature = 0.001,
 \arguments{
 \item{initial.acceptance}{Numeric value between 0 and 1 defining the initial
 acceptance probability, i.e. the proportion of proposed system configurations
-that should be accepted in the first Markov chain. The optimization is
-stopped and a warning is issued if this value is not attained. Defaults to
+that should be accepted in the first chain. The optimization is stopped and
+a warning is issued if this value is not attained. Defaults to
 \code{initial.acceptance = 0.95}.}
 
 \item{initial.temperature}{Numeric value larger than 0 defining the initial
@@ -25,9 +25,9 @@ algorighm, i.e. only better system configurations are accepted. Defaults to
 multiplying factor to decrease the temperature at the end of each Markov
 chain. Defaults to \code{temperature.decrease = 0.95}.}
 
-\item{chains}{Integer value defining the maximum number of Markov chains,
+\item{chains}{Integer value defining the maximum number of chains,
 i.e. the number of cycles of jitters at which the temperature and the size
-of the search graph should be kept constant. Defaults to \code{chains = 500}.}
+of the neighbourhood should be kept constant. Defaults to \code{chains = 500}.}
 
 \item{chain.length}{Integer value defining the length of each Markov chain
 relative to the number of points. Defaults to \code{chain.length = 1}, i.e.
@@ -50,33 +50,11 @@ single value can be used if the spacing in the x- and y-coordinates is the
 same.}
 }
 \value{
-A list with a set of control parameters of the cooling schedule.
+A list with a set of control parameters of the annealing schedule.
 }
 \description{
-Set the control parameters for the cooling schedule of \pkg{spsann}
+Set the control parameters for the annealing schedule of \pkg{spsann}
 functions.
-}
-\section{Cooling schedule}{
-
-
-\subsection{Search graph}{
-The \emph{search graph} corresponds to the set of effective candidate
-locations for a point selected to be jittered. The size of the search graph,
-i.e. area within which a point can be moved around, is correlated with the
-concept of \emph{temperature}. A larger search graph is equivalent to higher
-temperatures, which potentially result in more movement or \sQuote{agitation}
-of the set of points or \sQuote{particles}.
-
-The current version of the \pkg{spsann}-package uses a linear cooling
-schedule which depends upon the number of jitters to control the size of the
-search graph. The equations are as follows:
-
-$$
-x.max.b <- x.max.a - k / iterations * (x.max.a - x.min)
-
-y.max.b <- y.max.a - k / iterations * (y.max.a - y.min)
-$$
-}
 }
 \examples{
 schedule <- scheduleSPSANN()

@@ -21,6 +21,9 @@
 * The documentation of all functions has been fine tuned.
 * A trick was included in the `optimMKV()`-function to avoid errors due to
   the LDLfactor error of the ***gstat***-package.
+* There also is a new function to compute the Pareto maximum and minimum values
+  of the objective functions that compose a multi-objective optimization 
+  problem (MOOP): `minmaxPareto()`.
 
 # Version 1.0-2.9000 (2015-10-27)
 * Now `x.max` and `y.max` are, by default, set to half of the maximum distance

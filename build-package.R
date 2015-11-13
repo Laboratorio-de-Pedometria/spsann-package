@@ -39,7 +39,7 @@ lapply(1:length(fun.name), function (i)
 
 # check examples and documentation
 devtools::check_doc()
-devtools::run_examples(run = FALSE)
+devtools::run_examples(start = "optimMKV", run = FALSE)
 
 # check the package for Linux and Windows
 devtools::check()
