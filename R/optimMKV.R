@@ -153,7 +153,7 @@ optimMKV <-
             new_energy <- old_energy
             new_conf <- old_conf
             new_sm <- old_sm
-            message("skipped 'LDLfactor' error in 'krige' function")
+            message("skipped 'singular matrix' error in 'krige'-function")
           }
 
           # Evaluate the new system configuration
@@ -254,10 +254,10 @@ optimMKV <-
     # : gstat: value not allowed for: QRfactor not yet implemented 
     # I do not know the reason for this error, but it comes from using 
     # 'set = list(cn_max = 1e10)' above. I try to solve with 'tryCatch'!
-    res <- 
-      tryCatch(gstat::krige(formula = eqn, locations = ~ x + y, data = sm,
-                            newdata = covars, model = vgm, ...)$var1.var,
-               finally = NA)
+    res <- NA
+    try(res <- gstat::krige(formula = eqn, locations = ~ x + y, data = sm,
+                            newdata = covars, model = vgm, ...)$var1.var, 
+        silent = TRUE)
     
     # Calculate the energy state value
     if (krige.stat == "mean") { # Mean kriging variance
