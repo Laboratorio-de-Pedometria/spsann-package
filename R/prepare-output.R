@@ -2,11 +2,8 @@
 # Please edit source code in R-autofun/prepare-output.R
 .prepare_output<-function(...){
 expression(if (progress) close(pb), res <- new_conf, a <- attributes(res), 
-    if (!track) energies <- new_energy, if (MOOP) {
-      criterion <- rbind(energy0, energies)
-    } else {
-      criterion <- c(energy0, energies)
-    }, a$energy.state <- criterion, a$iterations <- k, rt <- as.numeric(c(proc.time() - time0)[3]), 
+    if (!track) energies <- new_energy, criterion <- rbind(energy0, energies), 
+    a$energy.state <- criterion, a$iterations <- k, rt <- as.numeric(c(proc.time() - time0)[3]), 
     if (rt > 3600) {
       rt <- list(time = round(rt / 3600, 2), unit = "hours")
     } else {
@@ -17,8 +14,10 @@ expression(if (progress) close(pb), res <- new_conf, a <- attributes(res),
       }
     }, a$running.time <- rt, if (MOOP) {
       a$weights <- weights
-      a$nadir <- nadir
-      a$utopia <- utopia
+      if (objective != "CLHS") {
+        a$nadir <- nadir
+        a$utopia <- utopia 
+      }
     }, attributes(res) <- a, cat("iterations = ", a$iterations, "\n", sep = ""), 
     cat("running time = ", rt$time, " ", rt$unit, sep = ""), 
     return (res))

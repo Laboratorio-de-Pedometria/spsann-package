@@ -21,11 +21,12 @@ a <- attributes(res)
 
 # Energy states
 if (!track) energies <- new_energy
-if (MOOP) {
-  criterion <- rbind(energy0, energies)
-} else {
-  criterion <- c(energy0, energies)
-}
+criterion <- rbind(energy0, energies)
+# if (MOOP) {
+#   criterion <- rbind(energy0, energies)
+# } else {
+#   criterion <- c(energy0, energies)
+# }
 a$energy.state <- criterion
 
 # Other attributes
@@ -47,8 +48,10 @@ a$running.time <- rt
 # MOOP
 if (MOOP) {
   a$weights <- weights
-  a$nadir <- nadir
-  a$utopia <- utopia
+  if (objective != "CLHS") {
+    a$nadir <- nadir
+    a$utopia <- utopia 
+  }
 }
 
 # Add attributes

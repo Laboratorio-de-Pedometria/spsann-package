@@ -91,7 +91,6 @@ optimPPL <-
     old_dm <- dm
     best_dm <- dm
     old_energy <- energy0
-    # best_energy <- Inf
     best_energy <- data.frame(obj = Inf)
     actual_temp <- schedule$initial.temperature
     k <- 0 # count the number of jitters
@@ -134,9 +133,7 @@ optimPPL <-
                       criterion = criterion, distri = distri, ppl = ppl))
                             
       # Evaluate the new system configuration
-      accept <- .acceptSPSANN()
-      # accept <- min(1, exp((old_energy - new_energy) / actual_temp))
-      # accept <- floor(rbinom(n = 1, size = 1, prob = accept))
+      accept <- .acceptSPSANN(old_energy[[1]], new_energy[[1]], actual_temp)
       if (accept) {
         old_conf <- new_conf
         old_energy <- new_energy

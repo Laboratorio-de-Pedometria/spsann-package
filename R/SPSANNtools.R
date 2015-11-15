@@ -27,6 +27,13 @@ objSPSANN <-
     # Energy state at the end
     if (at == "end") return(utils::tail(attr(OSC, "energy.state"), n))
   }
+# INTERNAL FUNCTION - COMPUTE ACCEPTANCE PROBABILITY ###########################
+.acceptSPSANN <- 
+  function (old.energy, new.energy, actual.temp) {
+    accept <- min(1, exp((old.energy[[1]] - new.energy[[1]]) / actual.temp))
+    accept <- floor(rbinom(n = 1, size = 1, prob = accept))
+    return (accept)
+  }
 # INTERNAL FUNCTION - PLOTTING #################################################
 .spSANNplot <-
   function (energy0, energies, k, 
@@ -42,7 +49,7 @@ objSPSANN <-
     graphics::par(mar = c(5, 4, 4, 4) + 0.1)
     
     # Multi-objective optimization problem
-    if (MOOP) {
+    # if (MOOP) {
       n <- ncol(energy0)
       l <- colnames(energy0)
       a <- rbind(energy0, energies)
@@ -62,13 +69,13 @@ objSPSANN <-
                       col = "green")
       
       # Single-objective optimization problem
-    } else {
-      a <- c(energy0, energies[1:k])
-      graphics::plot(a ~ c(0:k), type = "l", xlab = "jitter", 
-                     ylab = "energy state")
-      graphics::lines(x = c(-k, 0), y = rep(energy0, 2), col = "red")
-      graphics::lines(x = rep(best.k, 2), y = c(-5, best.energy), col = "green") 
-    }
+#     } else {
+#       a <- c(energy0, energies[1:k])
+#       graphics::plot(a ~ c(0:k), type = "l", xlab = "jitter", 
+#                      ylab = "energy state")
+#       graphics::lines(x = c(-k, 0), y = rep(energy0, 2), col = "red")
+#       graphics::lines(x = rep(best.k, 2), y = c(-5, best.energy), col = "green") 
+#     }
     
     # PLOT SAMPLE CONFIGURATION
     grDevices::dev.set(grDevices::dev.next())

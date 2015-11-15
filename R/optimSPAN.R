@@ -138,8 +138,8 @@ optimSPAN <-
     best_dm_mssd <- dm_mssd
     # other
     old_energy <- energy0
-    best_energy <- data.frame(obj = Inf, CORR = Inf, DIST = Inf, PPL = Inf, 
-                              MSSD = Inf)
+    best_energy <- 
+      data.frame(obj = Inf, CORR = Inf, DIST = Inf, PPL = Inf, MSSD = Inf)
     actual_temp <- schedule$initial.temperature
     k <- 0 # count the number of jitters
     if (progress) {
@@ -165,7 +165,8 @@ optimSPAN <-
           new_sm[wp, ] <- covars[new_conf[wp, 1], ]
           new_scm <- .corCORR(obj = new_sm, covars.type = covars.type)
           # PPL
-          new_dm_ppl <- .updatePPLCpp(x = new_conf[, 2:3], dm = old_dm_ppl, idx = wp)
+          new_dm_ppl <- 
+            .updatePPLCpp(x = new_conf[, 2:3], dm = old_dm_ppl, idx = wp)
           ppl <- .getPPL(lags = lags, n.lags = n_lags, dist.mat = new_dm_ppl, 
                          pairs = pairs)
           # MSSD
@@ -173,12 +174,13 @@ optimSPAN <-
           new_dm_mssd <- .updateMSSDCpp(x1 = candi[, 2:3], x2 = x2, 
                                         dm = old_dm_mssd, idx = wp)
           # Energy state
-          new_energy <- .objSPAN(sm = new_sm, n.cov = n_cov, nadir = nadir, 
-                                 weights = weights, n.pts = n_pts, utopia = utopia, 
-                                 pcm = pcm, scm = new_scm, covars.type = covars.type, 
-                                 pop.prop = pop_prop, ppl = ppl, n.lags = n_lags,
-                                 criterion = criterion, distri = distri, 
-                                 pairs = pairs, dm.mssd = new_dm_mssd)
+          new_energy <- 
+            .objSPAN(sm = new_sm, n.cov = n_cov, nadir = nadir, 
+                     weights = weights, n.pts = n_pts, utopia = utopia, 
+                     pcm = pcm, scm = new_scm, covars.type = covars.type, 
+                     pop.prop = pop_prop, ppl = ppl, n.lags = n_lags,
+                     criterion = criterion, distri = distri, 
+                     pairs = pairs, dm.mssd = new_dm_mssd)
           
           # Avoid the following error:
           # Error in if (new_energy[1] <= old_energy[1]) { : 
@@ -198,9 +200,7 @@ optimSPAN <-
           }
           
           # Evaluate the new system configuration
-          accept <- 
-            min(1, exp((old_energy[[1]] - new_energy[[1]]) / actual_temp))
-          accept <- floor(rbinom(n = 1, size = 1, prob = accept))
+          accept <- .acceptSPSANN(old_energy[[1]], new_energy[[1]], actual_temp)
           if (accept) {
             old_conf <- new_conf
             old_energy <- new_energy
@@ -311,17 +311,17 @@ optimSPAN <-
 #' @export
 objSPAN <-
   function(points, candi, 
-    # DIST and CORR
-    covars, strata.type = "area", use.coords = FALSE,
-    # PPL
-    lags = 7, lags.type = "exponential", lags.base = 2, cutoff, 
-    criterion = "distribution", distri, pairs = FALSE,
-    # SPSANN
-    x.max, x.min, y.max, y.min,
-    # MOOP
-    weights = list(CORR = 1/6, DIST = 1/6, PPL = 1/3, MSSD = 1/3),
-    nadir = list(sim = NULL, seeds = NULL, user = NULL, abs = NULL),
-    utopia = list(user = NULL, abs = NULL)) {
+           # DIST and CORR
+           covars, strata.type = "area", use.coords = FALSE,
+           # PPL
+           lags = 7, lags.type = "exponential", lags.base = 2, cutoff, 
+           criterion = "distribution", distri, pairs = FALSE,
+           # SPSANN
+           x.max, x.min, y.max, y.min,
+           # MOOP
+           weights = list(CORR = 1/6, DIST = 1/6, PPL = 1/3, MSSD = 1/3),
+           nadir = list(sim = NULL, seeds = NULL, user = NULL, abs = NULL),
+           utopia = list(user = NULL, abs = NULL)) {
     
     # Check other arguments
     check <- .checkPPL(lags = lags, lags.type = lags.type, pairs = pairs,
@@ -331,7 +331,7 @@ objSPAN <-
     check <- .optimACDCcheck(candi = candi, covars = covars, 
                              use.coords = use.coords, strata.type = strata.type)
     if (!is.null(check)) stop(check, call. = FALSE)
-
+    
     # Prepare points and candi
     eval(.prepare_points())
     
@@ -389,7 +389,7 @@ objSPAN <-
 # Aggregation is done using the weighted sum method.
 .objSPAN <-
   function(sm, n.cov, nadir, weights, n.pts, utopia, pcm, scm, covars.type,
-            pop.prop, ppl, n.lags, criterion, distri, pairs, dm.mssd) {
+           pop.prop, ppl, n.lags, criterion, distri, pairs, dm.mssd) {
     
     # DIST
     obj_dist <- .objDIST(sm = sm, n.pts = n.pts, n.cov = n.cov, 
@@ -422,7 +422,7 @@ objSPAN <-
 # INTERNAL FUNCTION - COMPUTE THE NADIR VALUE ##################################
 .nadirSPAN <-
   function(n.pts, n.cov, n.candi, nadir, candi, covars, pcm, pop.prop, 
-            covars.type, lags, n.lags, pairs, distri, criterion) {
+           covars.type, lags, n.lags, pairs, distri, criterion) {
     
     # Simulate the nadir point
     if (!is.null(nadir$sim) && !is.null(nadir$seeds)) { 

@@ -122,9 +122,6 @@ optimCLHS <-
     objective <- "CLHS"
     
     # Check spsann arguments
-    # ASR: The next two lines are needed to pass the argument check for MOOP
-    utopia <- list(utopia = NA)
-    nadir <- list(nadir = NA)
     eval(.check_spsann_arguments())
     
     # Check other arguments
@@ -183,8 +180,7 @@ optimCLHS <-
                      weights = weights, covars_type = covars_type)
           
           # Evaluate the new system configuration
-          accept <- min(1, exp((old_energy[[1]] - new_energy[[1]]) / actual_temp))
-          accept <- floor(rbinom(n = 1, size = 1, prob = accept))
+          accept <- .acceptSPSANN(old_energy[[1]], new_energy[[1]], actual_temp)
           if (accept) {
             old_conf <- new_conf
             old_energy <- new_energy

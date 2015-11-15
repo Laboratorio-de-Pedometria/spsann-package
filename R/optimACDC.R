@@ -149,8 +149,7 @@ optimACDC <-
       }
       
       # Evaluate the new system configuration
-      accept <- min(1, exp((old_energy[[1]] - new_energy[[1]]) / actual_temp))
-      accept <- floor(rbinom(n = 1, size = 1, prob = accept))
+      accept <- .acceptSPSANN(old_energy[[1]], new_energy[[1]], actual_temp)
       if (accept) {
         old_conf <- new_conf
         old_energy <- new_energy

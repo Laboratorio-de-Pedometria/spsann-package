@@ -20,21 +20,20 @@ expression(res <- NULL, aa <- c("points", "candi"), bb <- c(missing(points), mis
           res <- c("'schedule' must be a list with 11 sub-arguments")
         }
       }
-    }, aa <- all(c(!is.null(weights), !is.null(utopia), !is.null(nadir))), 
-    MOOP <- ifelse(aa, TRUE, FALSE), if (MOOP) {
-      # Argument 'weights'
+    }, aa <- objective %in% c("ACDC", "CLHS", "SPAN"), MOOP <- ifelse(aa, TRUE, FALSE), 
+    if (MOOP) {
       aa <- !is.list(weights)
       bb <- is.null(names(weights))
       cc <- length(weights) < 2
       if (aa || bb || cc) {
-        res <- c("'weights' must be a list with two or more named components")
+        res <- c("'weights' must be a list with named components")
       } else {
         aa <- sum(unlist(weights)) != 1
         if (aa) {
           res <- c("'weights' must sum to 1")
         }
       }
-    }, if (MOOP) {
+    }, if (MOOP && objective != "CLHS") {
       aa <- !is.list(utopia)
       bb <- !length(utopia) == 1
       cc <- is.null(names(utopia))
@@ -42,7 +41,6 @@ expression(res <- NULL, aa <- c("points", "candi"), bb <- c(missing(points), mis
         res <- c("'utopia' must be a list with one named component")
       } else {
         
-        # Argument 'nadir'
         aa <- !is.list(nadir)
         if (aa) {
           res <- c("'nadir' must be a list with named components")
@@ -64,10 +62,12 @@ expression(res <- NULL, aa <- c("points", "candi"), bb <- c(missing(points), mis
     }, if (track || plotit) {
       if (plotit) { track <- TRUE }
       if (MOOP) {
-        energies <- as.data.frame(matrix(NA, nrow = 1, ncol = length(weights) + 1))
+        energies <- as.data.frame(
+          matrix(NA_real_, nrow = 1, ncol = length(weights) + 1))
         colnames(energies) <- c("obj", names(weights))
       } else {
-        energies <- vector()
+        energies <- data.frame(obj = NA_real_)
+        # energies <- vector()
       }
     }, if (!is.null(res)) stop (res, call. = FALSE), rm(aa, bb, cc, res))
 }
