@@ -99,12 +99,15 @@ if (MOOP && objective != "CLHS") {
 if (track || plotit) {
   if (plotit) { track <- TRUE }
   if (MOOP) {
-    energies <- as.data.frame(matrix(NA, nrow = 1, ncol = length(weights) + 1))
+    energies <- as.data.frame(
+      matrix(NA_real_, nrow = 1, ncol = length(weights) + 1))
     colnames(energies) <- c("obj", names(weights))
   } else {
-    energies <- vector()
+    energies <- data.frame(obj = NA_real_)
+    # energies <- vector()
   }
 }
+
 # Output and cleanup
 if (!is.null(res)) stop (res, call. = FALSE)
 # rm(aa, bb, cc, dd, res)
