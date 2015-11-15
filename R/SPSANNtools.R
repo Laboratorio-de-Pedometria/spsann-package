@@ -3,7 +3,7 @@
 #' Auxiliary tools used in the optimization of sample configurations using 
 #' spatial simulated annealing.
 #' 
-#' @param OSC Optimized Sample Configuration.
+#' @param osc Optimized Sample Configuration.
 #' 
 #' @param at Point of the optimization at which the energy state should be
 #' returned. Available options: \code{"start"}, for the start, and \code{"end"},
@@ -19,13 +19,15 @@
 #' @export
 #' @rdname SPSANNtools
 objSPSANN <- 
-  function (OSC, at = "end", n = 1) {
+  function (osc, at = "end", n = 1) {
     
     # Energy state at the start
-    if (at == "start") return (utils::head(attr(OSC, "energy.state"), n))
+    if (at == "start") return (utils::head(osc@objective$energy, n))
+    # if (at == "start") return (utils::head(attr(OSC, "energy.state"), n))
     
     # Energy state at the end
-    if (at == "end") return(utils::tail(attr(OSC, "energy.state"), n))
+    # if (at == "end") return(utils::tail(attr(OSC, "energy.state"), n))
+    if (at == "end") return(utils::tail(osc@objective$energy, n))
   }
 # INTERNAL FUNCTION - COMPUTE ACCEPTANCE PROBABILITY ###########################
 .acceptSPSANN <- 
