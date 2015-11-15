@@ -4,12 +4,19 @@
 \alias{minmaxPareto}
 \title{Pareto maximum and minimum values}
 \usage{
-minmaxPareto(osc, ...)
+minmaxPareto(osc, candi, covars)
 }
 \arguments{
 \item{osc}{A list with the optimized sample configurations (OSC). Each OSC
 must be named after the objective function with which it has been optimized.
 For example, \code{osc = list(CORR = osc_corr, DIST = osc_dist)}.}
+
+\item{candi}{Data frame or matrix with the candidate locations for the
+jittered points. \code{candi} must have two columns in the following
+order: \code{[, "x"]} the projected x-coordinates, and \code{[, "y"]} the
+projected y-coordinates.}
+
+\item{covars}{Data frame or matrix with the covariates in the columns.}
 
 \item{...}{Other arguments required to compute the objective function value.
 See the help pages of the respective objective functions to see which
@@ -31,15 +38,33 @@ require(sp)
 data(meuse.grid)
 candi <- meuse.grid[, 1:2]
 covars <- meuse.grid[, c(1, 2, 5)]
+
+# CORR
 schedule <- scheduleSPSANN(initial.temperature = 1, chains = 1)
 set.seed(2001)
 osc_corr <- optimCORR(points = 10, candi = candi, covars = covars,
                       schedule = schedule)
+
+# DIST
 set.seed(2001)
 osc_dist <- optimDIST(points = 10, candi = candi, covars = covars,
                       schedule = schedule)
-pareto <- minmaxPareto(osc = list(DIST = osc_dist, CORR = osc_corr),
+
+# PPL
+schedule <- scheduleSPSANN(chains = 1, initial.temperature = 30)
+set.seed(2001)
+osc_ppl <- optimPPL(points = 100, candi = candi, schedule = schedule)
+
+# MSSD
+schedule <- scheduleSPSANN(chains = 1, initial.temperature = 5000)
+set.seed(2001)
+osc_mssd <- optimMSSD(points = 100, candi = candi, schedule = schedule)
+
+# Pareto
+pareto <- minmaxPareto(osc = list(DIST = osc_dist, CORR = osc_corr,
+                                  PPL = osc_ppl, MSSD = osc_mssd),
                        candi = candi, covars = covars)
+pareto
 }
 \author{
 Alessandro Samuel-Rosa \email{alessandrosamuelrosa@gmail.com}

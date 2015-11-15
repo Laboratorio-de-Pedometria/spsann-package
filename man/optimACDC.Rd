@@ -185,8 +185,8 @@ res <- optimACDC(points = 100, candi = candi, covars = covars,
                  nadir = nadir, use.coords = TRUE, utopia = utopia,
                  schedule = schedule)
 objSPSANN(res) -
-  objACDC(points = res, candi = candi, covars = covars, use.coords = TRUE,
-          nadir = nadir, utopia = utopia)
+  objACDC(points = res@points, candi = candi, covars = covars,
+          use.coords = TRUE, nadir = nadir, utopia = utopia)
 }
 }
 \author{

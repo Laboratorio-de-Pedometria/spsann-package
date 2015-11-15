@@ -6,7 +6,7 @@
 \usage{
 optimUSER(points, candi, fun, ..., schedule = scheduleSPSANN(),
   plotit = FALSE, track = FALSE, boundary, progress = TRUE,
-  verbose = FALSE, weights = NULL, nadir = NULL, utopia = NULL)
+  verbose = FALSE)
 }
 \arguments{
 \item{points}{Integer value, integer vector, data frame or matrix. If
@@ -54,24 +54,6 @@ If missing and \code{plotit = TRUE}, \code{boundary} is estimated from
 
 \item{verbose}{Logical for printing messages about the progress of the
 optimization. Defaults to \code{verbose = FALSE}.}
-
-\item{weights}{List with named sub-arguments. The weights assigned to each
-one of the objective functions that form the multi-objective optimization
-problem (MOOP). They must be named after the respective objective function
-to which they apply. The weights must be equal to or larger than 0 and sum
-to 1. The default option gives equal weights to all objective functions.}
-
-\item{nadir}{List with named sub-arguments. Three options are available:
-1) \code{sim} -- the number of simulations that should be used to estimate
-the nadir point, and \code{seeds} -- vector defining the random seeds for
-each simulation; 2) \code{user} -- a list of user-defined nadir values named
-after the respective objective functions to which they apply; 3) \code{abs}
--- logical for calculating the nadir point internally (experimental).}
-
-\item{utopia}{List with named sub-arguments. Two options are available: 1)
-\code{user} -- a list of user-defined values named after the respective
-objective functions to which they apply; 2) \code{abs} -- logical for
-calculating the utopia point internally (experimental).}
 }
 \value{
 \code{optimUSER} returns a matrix: the optimized sample configuration.
@@ -97,43 +79,6 @@ and candidate locations should not be provided as latitude/longitude.
 The \pkg{spsann}-package has no mechanism to check if the coordinates are
 projected: the user is responsible for making sure that this requirement
 is attained.
-}
-\section{Multi-objective optimization}{
-
-The multi-objective optimization problem is solved aggregating the objective
-functions into a single \emph{utility function} using the \emph{weighted
-sum method}. Because the \emph{weighted sum method} is affected by the
-relative magnitude of the different function values, each objective function
-is transformed before the aggregation. Four transformation methods are
-available.
-
-The \emph{upper-lower-bound approach} results in function values constrained
-between 0 and 1. The user has to inform the maximum (nadir point) and
-minimum (utopia point) absolute function values. With the \emph{upper-bound
-approach}, the function values will always be smaller than or equal to 1.
-The user has to inform only the nadir point, the utopia point being set to
-zero. An option is to use \emph{numerical simulations} to approximate the
-nadir point, but this should be avoided. We recoment using the
-\emph{upper-lower-bound approach} with the \emph{Pareto maximum and minimum
-values}. It works as follows:
-
-\enumerate{
-  \item Optimize a sample configuration with respect to each objective
- function that composes the MOOP;
-  \item Compute the function value of every objective function that composes
-  the MOOP for every optimized sample configuration;
-  \item Record the maximum and minimum absolute function values computed for
-  each objective function that composes the MOOP -- these are the Pareto
-  maximum and minimum.
-}
-
-For example, consider that a MOOP is composed of two objective functions: A
-and B. The minimum absolute value for function A is obtained when the sample
-configuration is optimized with respect to function A. This is the Pareto
-minimum of function A. Consequently, the maximum absolute value for function
-A is obtained when the sample configuration is optimized regarding function
-B. This is the Pareto maximum of function A. The same logic applies for
-function B.
 }
 \examples{
 \dontrun{
@@ -175,7 +120,8 @@ timePPL <- Sys.time() - timePPL
 # Compare results
 timeUSER
 timePPL
-lapply(list(resUSER, resPPL), countPPL, candi = candi, lags = lags)
+lapply(list(resUSER@points, resPPL@points), countPPL, candi = candi,
+       lags = lags)
 objSPSANN(resUSER) # 92
 objSPSANN(resPPL) # 92
 }
@@ -196,21 +142,6 @@ a geostatistical approach.} Wageningen: Wageningen University, p. 148, 1999.
 Walvoort, D. J. J.; Brus, D. J. & de Gruijter, J. J. An R package for
 spatial coverage sampling and random sampling from compact geographical
 strata by k-means. \emph{Computers & Geosciences}. v. 36, p. 1261-1267, 2010.
-
-Arora, J. \emph{Introduction to optimum design}. Waltham: Academic Press, p.
-896, 2011.
-
-Marler, R. T.; Arora, J. S. Survey of multi-objective optimization methods
-for engineering. \emph{Structural and Multidisciplinary Optimization}, v. 26,
-p. 369-395, 2004.
-
-Marler, R. T.; Arora, J. S. Function-transformation methods for
-multi-objective optimization. \emph{Engineering Optimization}, v. 37, p.
-551-570, 2005.
-
-Marler, R. T.; Arora, J. S. The weighted sum method for multi-objective
-optimization: new insights. \emph{Structural and Multidisciplinary
-Optimization}, v. 41, p. 853-862, 2009.
 }
 \concept{
 simulated annealing

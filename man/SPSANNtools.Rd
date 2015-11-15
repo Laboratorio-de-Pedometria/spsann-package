@@ -5,10 +5,10 @@
 \alias{objSPSANN}
 \title{Auxiliary tools}
 \usage{
-objSPSANN(OSC, at = "end", n = 1)
+objSPSANN(osc, at = "end", n = 1)
 }
 \arguments{
-\item{OSC}{Optimized Sample Configuration.}
+\item{osc}{Optimized Sample Configuration.}
 
 \item{at}{Point of the optimization at which the energy state should be
 returned. Available options: \code{"start"}, for the start, and \code{"end"},
