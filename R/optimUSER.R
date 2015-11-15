@@ -103,11 +103,12 @@ optimUSER <-
     eval(.prepare_jittering())
     
     # Initial energy state
-    energy0 <- .energyUSER(fun = fun, points = old_conf, ...)
+    energy0 <- data.frame(obj = .energyUSER(fun = fun, points = old_conf, ...))
     
     # Other settings for the simulated annealing algorithm
     old_energy <- energy0
-    best_energy <- Inf
+    # best_energy <- Inf
+    best_energy <- data.frame(obj = Inf)
     actual_temp <- schedule$initial.temperature
     k <- 0 # count the number of jitters
     if (progress) {
@@ -129,11 +130,13 @@ optimUSER <-
       eval(.plot_and_jitter())
       
       # New energy state
-      new_energy <- .energyUSER(fun = fun, points = new_conf, ...)
+      new_energy <- data.frame(
+        obj = .energyUSER(fun = fun, points = new_conf, ...))
       
       # Evaluate the new system configuration
-      accept <- min(1, exp((old_energy - new_energy) / actual_temp))
-      accept <- floor(rbinom(n = 1, size = 1, prob = accept))
+      accept <- .acceptSPSANN()
+      # accept <- min(1, exp((old_energy - new_energy) / actual_temp))
+      # accept <- floor(rbinom(n = 1, size = 1, prob = accept))
       if (accept) {
         old_conf <- new_conf
         old_energy <- new_energy
@@ -142,10 +145,10 @@ optimUSER <-
         new_energy <- old_energy
         new_conf <- old_conf
       }
-      if (track) energies[k] <- new_energy
+      if (track) energies[k, ] <- new_energy
       
       # Record best energy state
-      if (new_energy < best_energy / 1.0000001) {
+      if (new_energy[[1]] < best_energy[[1]] / 1.0000001) {
         best_k <- k
         best_conf <- new_conf
         best_energy <- new_energy
@@ -174,7 +177,7 @@ optimUSER <-
       if (n_accept == 0) {
         no_change <- no_change + 1
         if (no_change > schedule$stopping) {
-          if (new_energy > best_energy * 1.000001) {
+          if (new_energy[[1]] > best_energy[[1]] * 1.000001) {
             old_conf <- old_conf
             new_conf <- best_conf
             old_energy <- best_old_energy

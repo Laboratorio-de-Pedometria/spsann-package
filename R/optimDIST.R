@@ -78,15 +78,18 @@ optimDIST <-
     # Base data and initial energy state (energy)
     pop_prop <- .strataACDC(n.pts = n_pts, strata.type = strata.type,
                             covars.type = covars.type, covars = covars)
-    energy0 <- .objDIST(sm = sm, pop.prop = pop_prop, n.pts = n_pts,
-                        n.cov = n_cov, covars.type = covars.type)
+    energy0 <- data.frame(
+      obj = .objDIST(sm = sm, pop.prop = pop_prop, n.pts = n_pts,
+                     n.cov = n_cov, covars.type = covars.type))
+    
     
     # Other settings for the simulated annealing algorithm
     old_sm <- sm
     new_sm <- sm
     best_sm <- sm
     old_energy <- energy0
-    best_energy <- Inf
+    # best_energy <- Inf
+    best_energy <- data.frame(obj = Inf)
     actual_temp <- schedule$initial.temperature
     k <- 0 # count the number of jitters
     if (progress) {
@@ -109,13 +112,15 @@ optimDIST <-
           
           # Update sample and correlation matrices, and energy state
           new_sm[wp, ] <- covars[new_conf[wp, 1], ]
-          new_energy <- 
-            .objDIST(sm = new_sm, pop.prop = pop_prop, n.pts = n_pts, 
-                     n.cov = n_cov, covars.type = covars.type)
+          new_energy <- data.frame(
+            obj = .objDIST(sm = new_sm, pop.prop = pop_prop, n.pts = n_pts, 
+                           n.cov = n_cov, covars.type = covars.type))
+            
           
           # Evaluate the new system configuration
-          accept <- min(1, exp((old_energy - new_energy) / actual_temp))
-          accept <- floor(rbinom(n = 1, size = 1, prob = accept))
+          accept <- .acceptSPSANN()
+          # accept <- min(1, exp((old_energy - new_energy) / actual_temp))
+          # accept <- floor(rbinom(n = 1, size = 1, prob = accept))
           if (accept) {
             old_conf <- new_conf
             old_energy <- new_energy
@@ -126,10 +131,10 @@ optimDIST <-
             new_conf <- old_conf
             new_sm <- old_sm
           }
-          if (track) energies[k] <- new_energy
+          if (track) energies[k, ] <- new_energy
           
           # Record best energy state
-          if (new_energy < best_energy / 1.0000001) {
+          if (new_energy[[1]] < best_energy[[1]] / 1.0000001) {
             best_k <- k
             best_conf <- new_conf
             best_energy <- new_energy
@@ -159,7 +164,7 @@ optimDIST <-
       if (n_accept == 0) {
         no_change <- no_change + 1
         if (no_change > schedule$stopping) {
-          if (new_energy > best_energy * 1.000001) {
+          if (new_energy[[1]] > best_energy[[1]] * 1.000001) {
             old_conf <- old_conf
             new_conf <- best_conf
             old_energy <- best_old_energy

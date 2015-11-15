@@ -77,7 +77,7 @@ optimCORR <-
     # Base data and initial energy state
     pcm <- .corCORR(obj = covars, covars.type = covars.type)
     scm <- .corCORR(obj = sm, covars.type = covars.type)
-    energy0 <- .objCORR(scm = scm, pcm = pcm)
+    energy0 <- data.frame(obj = .objCORR(scm = scm, pcm = pcm))
 
     # Other settings for the simulated annealing algorithm
     old_sm <- sm
@@ -86,7 +86,8 @@ optimCORR <-
     old_scm <- scm
     best_scm <- scm
     old_energy <- energy0
-    best_energy <- Inf
+    # best_energy <- Inf
+    best_energy <- data.frame(obj = Inf)
     actual_temp <- schedule$initial.temperature
     k <- 0 # count the number of jitters
     if (progress) {
@@ -110,14 +111,14 @@ optimCORR <-
       # Update sample and correlation matrices, and energy state
       new_sm[wp, ] <- covars[new_conf[wp, 1], ]
       new_scm <- .corCORR(obj = new_sm, covars.type = covars.type)
-      new_energy <- .objCORR(scm = new_scm, pcm = pcm)
+      new_energy <- data.frame(obj = .objCORR(scm = new_scm, pcm = pcm))
       
       # Avoid the following error:
       # Error in if (new_energy <= old_energy) { : 
       #   missing value where TRUE/FALSE needed
       # Source: http://stackoverflow.com/a/7355280/3365410
       # ASR: The reason for the error is unknown to me.
-      if (is.na(new_energy)) {
+      if (is.na(new_energy[1])) {
         new_energy <- old_energy
         new_conf <- old_conf
         new_sm <- old_sm
@@ -125,8 +126,9 @@ optimCORR <-
       }
       
       # Evaluate the new system configuration
-      accept <- min(1, exp((old_energy - new_energy) / actual_temp))
-      accept <- floor(rbinom(n = 1, size = 1, prob = accept))
+      accept <- .acceptSPSANN()
+      # accept <- min(1, exp((old_energy[[1]] - new_energy[[1]]) / actual_temp))
+      # accept <- floor(rbinom(n = 1, size = 1, prob = accept))
       if (accept) {
         old_conf <- new_conf
         old_energy <- new_energy
@@ -139,10 +141,10 @@ optimCORR <-
         new_sm <- old_sm
         new_scm <- old_scm
       }
-      if (track) energies[k] <- new_energy
+      if (track) energies[k, ] <- new_energy
       
       # Record best energy state
-      if (new_energy < best_energy / 1.0000001) {
+      if (new_energy[[1]] < best_energy[[1]] / 1.0000001) {
         best_k <- k
         best_conf <- new_conf
         best_energy <- new_energy
@@ -175,7 +177,7 @@ optimCORR <-
       if (n_accept == 0) {
         no_change <- no_change + 1
         if (no_change > schedule$stopping) {
-          if (new_energy > best_energy * 1.000001) {
+          if (new_energy[[1]] > best_energy[[1]] * 1.000001) {
             old_conf <- old_conf
             new_conf <- best_conf
             old_energy <- best_old_energy

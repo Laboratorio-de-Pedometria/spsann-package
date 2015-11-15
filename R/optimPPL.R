@@ -83,14 +83,16 @@ optimPPL <-
     ppl <- .getPPL(lags = lags, n.lags = n_lags, dist.mat = dm, pairs = pairs)
     distri <- .distriPPL(n.lags = n_lags, n.pts = n_pts, criterion = criterion,
                          distri = distri, pairs = pairs)
-    energy0 <- .objPPL(ppl = ppl, n.lags = n_lags, n.pts = n_pts,
-                       criterion = criterion, distri = distri, pairs = pairs)
+    energy0 <- data.frame(
+      obj = .objPPL(ppl = ppl, n.lags = n_lags, n.pts = n_pts,
+                    criterion = criterion, distri = distri, pairs = pairs))
     
     # Other settings for the simulated annealing algorithm
     old_dm <- dm
     best_dm <- dm
     old_energy <- energy0
-    best_energy <- Inf
+    # best_energy <- Inf
+    best_energy <- data.frame(obj = Inf)
     actual_temp <- schedule$initial.temperature
     k <- 0 # count the number of jitters
     if (progress) { 
@@ -127,12 +129,14 @@ optimPPL <-
       # Update the energy state: points or point-pairs?
       ppl <- .getPPL(lags = lags, n.lags = n_lags, dist.mat = new_dm, 
                      pairs = pairs)
-      new_energy <- .objPPL(n.lags = n_lags, n.pts = n_pts, pairs = pairs,
-                            criterion = criterion, distri = distri, ppl = ppl)
+      new_energy <- data.frame(
+        obj = .objPPL(n.lags = n_lags, n.pts = n_pts, pairs = pairs,
+                      criterion = criterion, distri = distri, ppl = ppl))
                             
       # Evaluate the new system configuration
-      accept <- min(1, exp((old_energy - new_energy) / actual_temp))
-      accept <- floor(rbinom(n = 1, size = 1, prob = accept))
+      accept <- .acceptSPSANN()
+      # accept <- min(1, exp((old_energy - new_energy) / actual_temp))
+      # accept <- floor(rbinom(n = 1, size = 1, prob = accept))
       if (accept) {
         old_conf <- new_conf
         old_energy <- new_energy
@@ -143,10 +147,10 @@ optimPPL <-
         new_conf <- old_conf
         # new_dm <- old_dm
       }
-      if (track) energies[k] <- new_energy
+      if (track) energies[k, ] <- new_energy
       
       # Record best energy state
-      if (new_energy < best_energy / 1.0000001) {
+      if (new_energy[[1]] < best_energy[[1]] / 1.0000001) {
         best_k <- k
         best_conf <- new_conf
         best_energy <- new_energy
@@ -177,7 +181,7 @@ optimPPL <-
       if (n_accept == 0) {
         no_change <- no_change + 1
         if (no_change > schedule$stopping) {
-          if (new_energy > best_energy * 1.000001) {
+          if (new_energy[[1]] > best_energy[[1]] * 1.000001) {
             old_conf <- old_conf
             new_conf <- best_conf
             old_energy <- best_old_energy

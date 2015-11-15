@@ -111,15 +111,17 @@ optimMKV <-
     sm <- .smMKV(n_pts = n_pts, eqn = eqn, pts = points, covars = covars)
     
     # Initial energy state
-    energy0 <- .objMKV(eqn = eqn, sm = sm, covars = covars, vgm = vgm, 
-                       krige.stat = krige.stat, k = 0, ...)
+    energy0 <- data.frame(
+      obj = .objMKV(eqn = eqn, sm = sm, covars = covars, vgm = vgm, 
+                    krige.stat = krige.stat, k = 0, ...))
     
     # Other settings for the simulated annealing algorithm
     old_sm <- sm
     new_sm <- sm
     best_sm <- sm
     old_energy <- energy0
-    best_energy <- Inf
+    # best_energy <- Inf
+    best_energy <- data.frame(obj = Inf)
     actual_temp <- schedule$initial.temperature
     k <- 0 # count the number of jitters
     if (progress) {
@@ -144,13 +146,14 @@ optimMKV <-
           # new_sm[wp, ] <- cbind(z = 1, covars[new_conf[wp, 1], ])#finite
           new_sm[wp, ] <- c(1, new_conf[wp, 2:3], 
                             covars[new_conf[wp, 1], all.vars(eqn)[-1]])
-          new_energy <- .objMKV(eqn = eqn, sm = new_sm, covars = covars, 
-                                vgm = vgm, krige.stat = krige.stat, 
-                                debug.level = 0, k = k, ...)
+          new_energy <- data.frame(
+            obj = .objMKV(eqn = eqn, sm = new_sm, covars = covars, 
+                          vgm = vgm, krige.stat = krige.stat, 
+                          debug.level = 0, k = k, ...))
           
           # Avoid 'LDLfactor' error in 'krige' function
           # https://stat.ethz.ch/pipermail/r-sig-geo/2009-November/006919.html
-          if (is.na(new_energy)) {
+          if (is.na(new_energy[1])) {
             new_energy <- old_energy
             new_conf <- old_conf
             new_sm <- old_sm
@@ -158,8 +161,9 @@ optimMKV <-
           }
 
           # Evaluate the new system configuration
-          accept <- min(1, exp((old_energy - new_energy) / actual_temp))
-          accept <- floor(rbinom(n = 1, size = 1, prob = accept))
+          accept <- .acceptSPSANN()
+          # accept <- min(1, exp((old_energy - new_energy) / actual_temp))
+          # accept <- floor(rbinom(n = 1, size = 1, prob = accept))
           if (accept) {
             old_conf <- new_conf
             old_energy <- new_energy
@@ -170,10 +174,10 @@ optimMKV <-
             new_conf <- old_conf
             new_sm <- old_sm
           }
-          if (track) energies[k] <- new_energy
+          if (track) energies[k, ] <- new_energy
           
           # Record best energy state
-          if (new_energy < best_energy / 1.0000001) {
+          if (new_energy[[1]] < best_energy[[1]] / 1.0000001) {
             best_k <- k
             best_conf <- new_conf
             best_energy <- new_energy

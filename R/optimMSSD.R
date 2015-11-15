@@ -84,13 +84,14 @@ optimMSSD <-
     # using the SpatialTools::dist2(). The function .objMSSD() does the
     # squaring internaly.
     dm <- SpatialTools::dist2(candi[, 2:3], conf0[, 2:3])
-    energy0 <- .objMSSD(x = dm)
+    energy0 <- data.frame(obj = .objMSSD(x = dm))
     
     # Other settings for the simulated annealing algorithm
     old_dm <- dm
     best_dm <- dm
     old_energy <- energy0
-    best_energy <- Inf
+    # best_energy <- Inf
+    best_energy <- data.frame(obj = Inf)
     actual_temp <- schedule$initial.temperature
     k <- 0 # count the number of jitters
     if (progress) {
@@ -115,7 +116,7 @@ optimMSSD <-
       x2 <- matrix(new_conf[wp, 2:3], nrow = 1)
       new_dm <- .updateMSSDCpp(x1 = candi[, 2:3], x2 = x2, dm = old_dm, 
                                idx = wp)
-      new_energy <- .objMSSD(new_dm)
+      new_energy <- data.frame(obj = .objMSSD(new_dm))
       
       # Update the matrix of distances and calculate the new energy state (R)
       # x2 <- SpatialTools::dist2(coords = candi[, 2:3], coords2 = x2)
@@ -124,8 +125,9 @@ optimMSSD <-
       # new_energy <- mean(apply(new_dm, 1, min) ^ 2)
       
       # Evaluate the new system configuration
-      accept <- min(1, exp((old_energy - new_energy) / actual_temp))
-      accept <- floor(rbinom(n = 1, size = 1, prob = accept))
+      accept <- .acceptSPSANN()
+      # accept <- min(1, exp((old_energy - new_energy) / actual_temp))
+      # accept <- floor(rbinom(n = 1, size = 1, prob = accept))
       if (accept) {
         old_conf <- new_conf
         old_energy <- new_energy
@@ -136,10 +138,10 @@ optimMSSD <-
         new_conf <- old_conf
         # new_dm <- old_dm
       }
-      if (track) energies[k] <- new_energy
+      if (track) energies[k, ] <- new_energy
       
       # Record best energy state
-      if (new_energy < best_energy / 1.0000001) {
+      if (new_energy[[1]] < best_energy[[1]] / 1.0000001) {
         best_k <- k
         best_conf <- new_conf
         best_energy <- new_energy
@@ -170,7 +172,7 @@ optimMSSD <-
       if (n_accept == 0) {
         no_change <- no_change + 1
         if (no_change > schedule$stopping) {
-          if (new_energy > best_energy * 1.000001) {
+          if (new_energy[[1]] > best_energy[[1]] * 1.000001) {
             old_conf <- old_conf
             new_conf <- best_conf
             old_energy <- best_old_energy
