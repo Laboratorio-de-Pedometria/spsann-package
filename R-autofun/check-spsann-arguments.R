@@ -66,8 +66,8 @@ if (MOOP) {
   }
 }
 
-# Argument 'utopia'
-if (MOOP) {
+# Arguments 'nadir' and 'utopia'
+if (MOOP && objective != "CLHS") {
   aa <- !is.list(utopia)
   bb <- !length(utopia) == 1
   cc <- is.null(names(utopia))
@@ -75,7 +75,6 @@ if (MOOP) {
     res <- c("'utopia' must be a list with one named component")
   } else {
     
-    # Argument 'nadir'
     aa <- !is.list(nadir)
     if (aa) {
       res <- c("'nadir' must be a list with named components")
@@ -95,6 +94,7 @@ if (MOOP) {
     }  
   }
 }
+
 # Argument 'track'
 if (track || plotit) {
   if (plotit) { track <- TRUE }
