@@ -47,39 +47,25 @@ objSPSANN <-
     # PLOT ENERGY STATES
     grDevices::dev.set(grDevices::dev.prev())
     graphics::par(mar = c(5, 4, 4, 4) + 0.1)
-    
-    # Multi-objective optimization problem
-    # if (MOOP) {
-      n <- ncol(energy0)
-      l <- colnames(energy0)
-      a <- rbind(energy0, energies)
-      col <- c("red", rep("black", n - 1))
-      graphics::plot(1, type = 'n', xlim = c(0, k), 
-                     ylim = c(0, max(a)), #ylim = c(min(a), max(a)), 
-                     xlab = "jitter", ylab = "energy state")
-      graphics::legend("topright", legend = l, lwd = 1, lty = 1:n, col = col)
-      
-      for(i in 1:ncol(a)) {
-        # graphics::lines(a[, i] ~ c(0:k), type = "l", lty = i)
-        # col <- ifelse(i == 1, "red", "black")
-        graphics::lines(a[, i] ~ c(1:k), type = "l", lty = i, col = col[i])
-      }
-      graphics::lines(x = c(-k, 0), y = rep(energy0[1], 2), col = "red")
-      graphics::lines(x = rep(best.k, 2), y = c(-5, best.energy[1]), 
-                      col = "green")
-      
-      # Single-objective optimization problem
-#     } else {
-#       a <- c(energy0, energies[1:k])
-#       graphics::plot(a ~ c(0:k), type = "l", xlab = "jitter", 
-#                      ylab = "energy state")
-#       graphics::lines(x = c(-k, 0), y = rep(energy0, 2), col = "red")
-#       graphics::lines(x = rep(best.k, 2), y = c(-5, best.energy), col = "green") 
-#     }
+
+    n <- ncol(energy0)
+    l <- colnames(energy0)
+    a <- rbind(energy0, energies)
+    col <- c("red", rep("black", n - 1))
+    graphics::plot(1, type = 'n', xlim = c(0, k), 
+                   # ylim = c(0, max(a)), 
+                   ylim = c(min(a), max(a)), 
+                   xlab = "jitter", ylab = "energy state")
+    graphics::legend("topright", legend = l, lwd = 1, lty = 1:n, col = col)
+    for(i in 1:ncol(a)) {
+      graphics::lines(a[, i] ~ c(1:k), type = "l", lty = i, col = col[i])
+    }
+    graphics::lines(x = c(-k, 0), y = rep(energy0[1], 2), col = "red")
+    graphics::lines(x = rep(best.k, 2), y = c(-5, best.energy[1]), 
+                    col = "green")
     
     # PLOT SAMPLE CONFIGURATION
     grDevices::dev.set(grDevices::dev.next())
-    
     bb <- sp::bbox(boundary)
     if (class(boundary) == "SpatialPoints") {
       sp::plot(boundary, pch = 20, cex = 0.1)
