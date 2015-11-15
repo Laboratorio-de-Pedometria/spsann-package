@@ -34,8 +34,8 @@
 #' schedule <- scheduleSPSANN(chains = 1, initial.temperature = 30)
 #' set.seed(2001)
 #' res <- optimPPL(points = 100, candi = candi, schedule = schedule)
-#' objSPSANN(res) - objPPL(points = res, candi = candi)
-#' countPPL(points = res, candi = candi)
+#' objSPSANN(res) - objPPL(points = res@@points, candi = candi)
+#' countPPL(points = res@@points, candi = candi)
 #' }
 # FUNCTION - MAIN ##############################################################
 optimPPL <-

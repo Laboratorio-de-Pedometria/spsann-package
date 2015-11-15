@@ -46,8 +46,8 @@
 #'                  nadir = nadir, use.coords = TRUE, utopia = utopia, 
 #'                  schedule = schedule)
 #' objSPSANN(res) -
-#'   objACDC(points = res, candi = candi, covars = covars, use.coords = TRUE, 
-#'           nadir = nadir, utopia = utopia)
+#'   objACDC(points = res@@points, candi = candi, covars = covars, 
+#'           use.coords = TRUE, nadir = nadir, utopia = utopia)
 #' }
 # MAIN FUNCTION ################################################################
 optimACDC <-
@@ -256,8 +256,8 @@ optimACDC <-
     }
     
     # strata.type
-    aa <- match(strata.type, c("area", "range"))
-    if (is.na(aa)) {
+    # aa <- match(strata.type, c("area", "range"))
+    if (!strata.type %in% c("area", "range")) {
       res <- paste("'strata.type = ", strata.type, "' is not supported",
                    sep = "")
       return (res)

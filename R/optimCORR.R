@@ -33,7 +33,8 @@
 #' res <- optimCORR(points = 100, candi = candi, covars = covars, 
 #'                  use.coords = TRUE, schedule = schedule)
 #' objSPSANN(res) -
-#'   objCORR(points = res, candi = candi, covars = covars, use.coords = TRUE)
+#'   objCORR(points = res@@points, candi = candi, covars = covars, 
+#'           use.coords = TRUE)
 #' }
 #' # Random sample
 #' pts <- sample(1:nrow(candi), 5)

@@ -71,7 +71,8 @@
 #' # Compare results
 #' timeUSER
 #' timePPL
-#' lapply(list(resUSER, resPPL), countPPL, candi = candi, lags = lags)
+#' lapply(list(resUSER@@points, resPPL@@points), countPPL, candi = candi, 
+#'        lags = lags)
 #' objSPSANN(resUSER) # 92
 #' objSPSANN(resPPL) # 92
 #' }

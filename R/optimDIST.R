@@ -34,7 +34,8 @@
 #' res <- optimDIST(points = 100, candi = candi, covars = covars,
 #'                  use.coords = TRUE, schedule = schedule)
 #' objSPSANN(res) -
-#'   objDIST(points = res, candi = candi, covars = covars, use.coords = TRUE)
+#'   objDIST(points = res@@points, candi = candi, covars = covars, 
+#'           use.coords = TRUE)
 #' }
 #' # Random sample
 #' pts <- sample(1:nrow(candi), 5)

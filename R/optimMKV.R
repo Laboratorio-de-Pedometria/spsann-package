@@ -67,7 +67,7 @@
 #' res <- optimMKV(points = 100, candi = candi, covars = covars, maxdist = 600,
 #'                 eqn = z ~ dist, vgm = vgm, schedule = schedule)
 #' objSPSANN(res) -
-#'   objMKV(points = res, candi = candi, covars = covars, eqn = z ~ dist, 
+#'   objMKV(points = res@@points, candi = candi, covars = covars, eqn = z ~ dist, 
 #'          vgm = vgm, maxdist = 600)
 #' }
 # FUNCTION - MAIN ##############################################################

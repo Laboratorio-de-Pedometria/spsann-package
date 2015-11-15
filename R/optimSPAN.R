@@ -42,7 +42,7 @@
 #'                  nadir = nadir, use.coords = TRUE, utopia = utopia, 
 #'                  schedule = schedule)
 #' objSPSANN(res) -
-#'   objSPAN(points = res, candi = candi, covars = covars, nadir = nadir,
+#'   objSPAN(points = res@@points, candi = candi, covars = covars, nadir = nadir,
 #'           use.coords = TRUE, utopia = utopia)
 #' }
 # MAIN FUNCTION ################################################################

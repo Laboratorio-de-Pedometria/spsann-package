@@ -49,7 +49,7 @@
 #' \dontrun{
 #' # This example takes more than 5 seconds to run!
 #' res <- optimMSSD(points = 100, candi = candi, schedule = schedule)
-#' objSPSANN(res) - objMSSD(candi = candi, points = res)
+#' objSPSANN(res) - objMSSD(candi = candi, points = res@@points)
 #' }
 #' # Random sample
 #' pts <- sample(1:nrow(candi), 5)
@@ -198,6 +198,7 @@ optimMSSD <-
     
     # Prepare output
     eval(.prepare_output())
+    return (res)
   }
 # FUNCTION - CALCULATE THE CRITERION VALUE #####################################
 #' @rdname optimMSSD

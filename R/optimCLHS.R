@@ -104,8 +104,8 @@
 #' res <- optimCLHS(points = 100, candi = candi, covars = covars, 
 #'                  use.coords = TRUE, weights = weights, schedule = schedule)
 #' objSPSANN(res) -
-#'   objCLHS(points = res, candi = candi, covars = covars, use.coords = TRUE, 
-#'           weights = weights)
+#'   objCLHS(points = res@@points, candi = candi, covars = covars, 
+#'           use.coords = TRUE, weights = weights)
 #' }
 # MAIN FUNCTION ################################################################
 optimCLHS <-
