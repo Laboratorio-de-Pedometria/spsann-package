@@ -1,3 +1,11 @@
+#' An S4 class
+#' 
+#' @slot points
+#' 
+#' @slot spsann
+#' 
+#' @slot objective
+#' 
 OptimizedSampleConfiguration <-
   setClass(Class = "OptimizedSampleConfiguration", 
            slots = c(points = "data.frame", 
@@ -23,9 +31,9 @@ OptimizedSampleConfiguration <-
              
              # Information about the objective function
              objective = list(
+               name = NA_character_,
                energy = data.frame(NA_real_),
-               name = NA_character_)
-             ))
-# tmp <- new("OptimizedSampleConfiguration")
-# slot(tmp, "objective") <- list(energy = data.frame(NA_real_), name = "DIST")
-# str(tmp, 3)
+               nadir = data.frame(NA_real_),
+               utopia = data.frame(NA_real_),
+               weights = data.frame(NA_real_))
+           ))
