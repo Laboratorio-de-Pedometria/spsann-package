@@ -50,13 +50,14 @@ MOOP <- ifelse(aa, TRUE, FALSE)
 #   MOOP <- ifelse(MOOP > 1, TRUE, FALSE)
 #   #COST <- ifelse(weights$COST == 0, FALSE, TRUE)
 # }
+
+# Argument 'weights'
 if (MOOP) {
-  # Argument 'weights'
   aa <- !is.list(weights)
   bb <- is.null(names(weights))
   cc <- length(weights) < 2
   if (aa || bb || cc) {
-    res <- c("'weights' must be a list with two or more named components")
+    res <- c("'weights' must be a list with named components")
   } else {
     aa <- sum(unlist(weights)) != 1
     if (aa) {
@@ -64,6 +65,7 @@ if (MOOP) {
     }
   }
 }
+
 # Argument 'utopia'
 if (MOOP) {
   aa <- !is.list(utopia)
