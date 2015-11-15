@@ -62,3 +62,17 @@ res <- optimMKV(points = 100, candi = candi, covars = covars, vgm = vgm,
 objSPSANN(res) -
   objMKV(points = res, candi = candi, covars = covars, 
          eqn = z ~ dist + soil + ffreq, vgm = vgm, nmax = 50)
+
+# 3) ORDINARY KRIGING ##########################################################
+rm(list = ls())
+gc()
+sapply(list.files("R", full.names = TRUE, pattern = ".R$"), source)
+sapply(list.files("src", full.names = TRUE, pattern = ".cpp$"), Rcpp::sourceCpp)
+data(meuse.grid)
+candi <- meuse.grid[, 1:2]
+vgm <- vgm(psill = 10, model = "Exp", range = 500, nugget = 8)
+schedule <- scheduleSPSANN(chains = 500, initial.temperature = 5)
+set.seed(2001)
+res <- optimMKV(points = 10, candi = candi, vgm = vgm,
+                plotit = TRUE, schedule = schedule)
+objSPSANN(res) - objMKV(points = res, candi = candi, vgm = vgm, nmax = 50)
