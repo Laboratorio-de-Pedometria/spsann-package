@@ -18,7 +18,8 @@ set.seed(2001)
 res <- optimDIST(points = 100, candi = candi, covars = covars,
                  use.coords = TRUE, schedule = schedule)
 objSPSANN(res) -
-  objDIST(points = res, candi = candi, covars = covars, use.coords = TRUE)
+  objDIST(points = res@points, candi = candi, covars = covars, 
+          use.coords = TRUE)
 # }
 # Random sample
 pts <- sample(1:nrow(candi), 5)
@@ -38,7 +39,7 @@ set.seed(2001)
 res <- optimDIST(points = 100, candi = candi, covars = covars,
                  use.coords = TRUE, schedule = schedule, plotit = TRUE)
 objSPSANN(res) # 1.492452
-objDIST(points = res, candi = candi, covars = covars, use.coords = TRUE)
+objDIST(points = res@points, candi = candi, covars = covars, use.coords = TRUE)
 
 # 2) FACTOR COVARIATES WITH THE COORDINATES ####################################
 rm(list = ls())
@@ -53,7 +54,7 @@ set.seed(2001)
 res <- optimDIST(points = 100, candi = candi, covars = covars, 
                  use.coords = TRUE, schedule = schedule, plotit = TRUE)
 objSPSANN(res) # 1.570828
-objDIST(points = res, candi = candi, covars = covars, use.coords = TRUE)
+objDIST(points = res@points, candi = candi, covars = covars, use.coords = TRUE)
 
 # 3) FACTOR AND NUMERIC COVARIATES WITH THE COORDINATES ########################
 rm(list = ls())
@@ -68,4 +69,4 @@ set.seed(2001)
 resA <- optimDIST(points = 100, candi = candi, covars = covars, 
                   use.coords = TRUE, plotit = TRUE, schedule = schedule)
 objSPSANN(resA) # 3.313735
-objDIST(points = resA, candi = candi, covars = covars, use.coords = TRUE)
+objDIST(points = resA@points, candi = candi, covars = covars, use.coords = TRUE)

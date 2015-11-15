@@ -22,7 +22,7 @@ res <- optimMKV(points = 100, candi = candi, covars = covars,
                 eqn = z ~ dist, vgm = vgm, schedule = schedule,
                 maxdist = 500)
 objSPSANN(res) -
-  objMKV(points = res, candi = candi, covars = covars, eqn = z ~ dist, 
+  objMKV(points = res@points, candi = candi, covars = covars, eqn = z ~ dist, 
          vgm = vgm, maxdist = 500)
 # }
 

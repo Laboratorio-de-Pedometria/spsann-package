@@ -15,8 +15,8 @@ candi <- meuse.grid[, 1:2]
 schedule <- scheduleSPSANN(chains = 1, initial.temperature = 30)
 set.seed(2001)
 res <- optimPPL(points = 100, candi = candi, schedule = schedule)
-objSPSANN(res) - objPPL(points = res, candi = candi)
-countPPL(points = res, candi = candi)
+objSPSANN(res) - objPPL(points = res@points, candi = candi)
+countPPL(points = res@points, candi = candi)
 # }
 
 # 1) Point pairs with many chains ##############################################
@@ -30,8 +30,8 @@ schedule <- scheduleSPSANN(chains = 500, initial.temperature = 500)
 set.seed(2001)
 res <- optimPPL(points = 100, candi = candi, pairs = TRUE, schedule = schedule,
                 plotit = TRUE)
-objSPSANN(res) - objPPL(points = res, pairs = TRUE, candi = candi)
-countPPL(points = res, candi = candi, pairs = TRUE)
+objSPSANN(res) - objPPL(points = res@points, pairs = TRUE, candi = candi)
+countPPL(points = res@points, candi = candi, pairs = TRUE)
 
 # 2) Points per lag - select sample points from candi ##########################
 rm(list = ls())

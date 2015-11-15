@@ -17,8 +17,8 @@ set.seed(2001)
 res <- optimCLHS(points = 100, candi = candi, covars = covars, 
                  use.coords = TRUE, weights = weights, schedule = schedule)
 objSPSANN(res) -
-  objCLHS(points = res, candi = candi, covars = covars, use.coords = TRUE, 
-          weights = weights)
+  objCLHS(points = res@points, candi = candi, covars = covars, 
+          use.coords = TRUE, weights = weights)
 
 # 1) FACTOR COVARIATES USING THE COORDINATES AND MANY CHAINS ####################
 rm(list = ls())
@@ -33,7 +33,7 @@ set.seed(2001)
 res <- optimCLHS(points = 100, candi = candi, covars = covars, 
                  use.coords = TRUE, schedule = schedule, plotit = TRUE)
 objSPSANN(res) -
-  objCLHS(points = res, candi = candi, covars = covars, use.coords = TRUE)
+  objCLHS(points = res@points, candi = candi, covars = covars, use.coords = TRUE)
 
 # 2) FACTOR COVARIATES USING THE COORDINATES WITH A FEW POINTS #################
 rm(list = ls())
@@ -48,7 +48,7 @@ set.seed(2001)
 res <-  optimCLHS(points = 10, candi = candi, covars = covars, 
                   use.coords = TRUE, schedule = schedule, plotit = TRUE)
 objSPSANN(res) -
-  objCLHS(points = res, candi = candi, covars = covars, use.coords = TRUE)
+  objCLHS(points = res@points, candi = candi, covars = covars, use.coords = TRUE)
 
 # 3) CATEGORICAL COVARIATES WITH MANY COVARIATES AND MANY POINTS ###############
 rm(list = ls())
@@ -63,4 +63,4 @@ set.seed(2001)
 res <- optimCLHS(points = 500, candi = candi, covars = covars, use.coords = T,
                  schedule = schedule, plotit = TRUE)
 objSPSANN(res) -
-  objCLHS(points = res, candi = candi, covars = covars, use.coords = TRUE)
+  objCLHS(points = res@points, candi = candi, covars = covars, use.coords = TRUE)

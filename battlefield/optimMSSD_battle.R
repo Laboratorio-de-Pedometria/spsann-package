@@ -16,7 +16,7 @@ set.seed(2001)
 # \dontrun{
 # This example takes more than 5 seconds to run!
 res <- optimMSSD(points = 100, candi = candi, schedule = schedule)
-objSPSANN(res) - objMSSD(candi = candi, points = res)
+objSPSANN(res) - objMSSD(candi = candi, points = res@points)
 # }
 # Random sample
 pts <- sample(1:nrow(candi), 5)
@@ -34,4 +34,4 @@ schedule <- scheduleSPSANN(chains = 500, initial.acceptance = 0,
 set.seed(2001)
 res <- optimMSSD(points = 100, candi = candi, schedule = schedule, 
                  plotit = TRUE)
-objSPSANN(res) - objMSSD(candi = candi, points = res)
+objSPSANN(res) - objMSSD(candi = candi, points = res@points)
