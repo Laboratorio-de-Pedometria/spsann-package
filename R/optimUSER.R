@@ -5,7 +5,6 @@
 #' @inheritParams spJitter
 #' @template spJitter_doc
 #' @template spSANN_doc
-#' @template MOOP_doc
 #' 
 #' @param fun A function defining the objective function that should be
 #' used to evaluate the energy state of the system configuration at each 
@@ -83,9 +82,7 @@ optimUSER <-
     fun, ...,
     # SPSANN
     schedule = scheduleSPSANN(), plotit = FALSE, track = FALSE,
-    boundary, progress = TRUE, verbose = FALSE,
-    # MOOP
-    weights = NULL, nadir = NULL, utopia = NULL) {
+    boundary, progress = TRUE, verbose = FALSE) {
     
     # Objective function name
     objective <- "USER"

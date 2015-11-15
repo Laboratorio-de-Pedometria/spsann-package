@@ -6,7 +6,6 @@
 #' @inheritParams spJitter
 #' @template spJitter_doc
 #' @template spSANN_doc
-#' @template MOOP_doc
 #'
 #' @return
 #' \code{optimMSSD} returns a matrix: the optimized sample configuration.
@@ -61,9 +60,7 @@ optimMSSD <-
   function (points, candi,
             # SPSANN
             schedule = scheduleSPSANN(), plotit = FALSE, track = FALSE, 
-            boundary, progress = TRUE, verbose = FALSE, 
-            # MOOP
-            weights = NULL, nadir = NULL, utopia = NULL) {
+            boundary, progress = TRUE, verbose = FALSE) {
     
     # Objective function name
     objective <- "MSSD"

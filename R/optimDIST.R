@@ -9,7 +9,6 @@
 #' @template spJitter_doc
 #' @template spSANN_doc
 #' @template ACDC_doc
-#' @template MOOP_doc
 #' @template DIST_doc
 #' 
 #' @return
@@ -48,9 +47,7 @@ optimDIST <-
             covars, strata.type = "area", use.coords = FALSE,
             # SPSANN
             schedule = scheduleSPSANN(), plotit = FALSE, track = FALSE,
-            boundary, progress = TRUE, verbose = FALSE,
-            # MOOP
-            weights = NULL, nadir = NULL, utopia = NULL) {
+            boundary, progress = TRUE, verbose = FALSE) {
     
     # Objective function name
     objective <- "DIST"

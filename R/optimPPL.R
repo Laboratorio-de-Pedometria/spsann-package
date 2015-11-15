@@ -9,7 +9,6 @@
 #' @inheritParams spJitter
 #' @template spJitter_doc
 #' @template spSANN_doc
-#' @template MOOP_doc
 #' @template PPL_doc
 #' 
 #' @return
@@ -46,9 +45,7 @@ optimPPL <-
     criterion = "distribution", distri, pairs = FALSE,
     # SPSANN
     schedule = scheduleSPSANN(), plotit = FALSE, track = FALSE,
-    boundary, progress = TRUE, verbose = FALSE,
-    # MOOP
-    weights = NULL, nadir = NULL, utopia = NULL) {
+    boundary, progress = TRUE, verbose = FALSE) {
     
     # Objective function name
     objective <- "PPL"
