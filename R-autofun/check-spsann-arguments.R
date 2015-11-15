@@ -42,7 +42,8 @@ if (any(bb)) {
 }
 
 # Multi-objective optimization
-aa <- all(c(!is.null(weights), !is.null(utopia), !is.null(nadir)))
+aa <- objective %in% c("ACDC", "CLHS", "SPAN")
+# aa <- all(c(!is.null(weights), !is.null(utopia), !is.null(nadir)))
 MOOP <- ifelse(aa, TRUE, FALSE)
 # if (aa) {
 #   MOOP <- length(which(weights != 0))
