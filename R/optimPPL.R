@@ -50,6 +50,9 @@ optimPPL <-
     # MOOP
     weights = NULL, nadir = NULL, utopia = NULL) {
     
+    # Objective function name
+    objective <- "PPL"
+    
     # Check spsann arguments
     eval(.check_spsann_arguments())
     

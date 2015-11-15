@@ -118,6 +118,9 @@ optimCLHS <-
             # MOOP
             weights = list(O1 = 1/3, O2 = 1/3, O3 = 1/3)) {
     
+    # Objective function name
+    objective <- "CLHS"
+    
     # Check spsann arguments
     # ASR: The next two lines are needed to pass the argument check for MOOP
     utopia <- list(utopia = NA)

@@ -51,6 +51,9 @@ optimCORR <-
     # MOOP
     weights = NULL, nadir = NULL, utopia = NULL) {
     
+    # Objective function name
+    objective <- "CORR"
+    
     # Check spsann arguments
     eval(.check_spsann_arguments())
     

@@ -62,6 +62,9 @@ optimACDC <-
     nadir = list(sim = NULL, seeds = NULL, user = NULL, abs = NULL),
     utopia = list(user = NULL, abs = NULL)) {
     
+    # Objective function name
+    objective <- "ACDC"
+    
     # Check spsann arguments
     eval(.check_spsann_arguments())
     

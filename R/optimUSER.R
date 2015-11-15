@@ -87,6 +87,9 @@ optimUSER <-
     # MOOP
     weights = NULL, nadir = NULL, utopia = NULL) {
     
+    # Objective function name
+    objective <- "USER"
+    
     # Check spsann arguments
     eval(.check_spsann_arguments())
     

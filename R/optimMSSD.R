@@ -65,6 +65,9 @@ optimMSSD <-
             # MOOP
             weights = NULL, nadir = NULL, utopia = NULL) {
     
+    # Objective function name
+    objective <- "MSSD"
+    
     # Check spsann arguments
     eval(.check_spsann_arguments())
     

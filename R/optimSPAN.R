@@ -61,6 +61,9 @@ optimSPAN <-
            nadir = list(sim = NULL, seeds = NULL, user = NULL, abs = NULL),
            utopia = list(user = NULL, abs = NULL)) {
     
+    # Objective function name
+    objective <- "SPAN"
+    
     # Check spsann arguments
     eval(.check_spsann_arguments())
     

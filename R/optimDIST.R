@@ -52,6 +52,9 @@ optimDIST <-
             # MOOP
             weights = NULL, nadir = NULL, utopia = NULL) {
     
+    # Objective function name
+    objective <- "DIST"
+    
     # Check spsann arguments
     eval(.check_spsann_arguments())
     

@@ -82,6 +82,9 @@ optimMKV <-
             # MOOP
             weights = NULL, nadir = NULL, utopia = NULL) {
     
+    # Objective function name
+    objective <- "MKV"
+    
     # Check suggests
     pkg <- c("gstat")
     eval(.check_suggests())
