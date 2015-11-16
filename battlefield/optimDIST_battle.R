@@ -11,20 +11,14 @@ require(sp)
 data(meuse.grid)
 candi <- meuse.grid[, 1:2]
 covars <- meuse.grid[, 5]
-schedule <- scheduleSPSANN(initial.temperature = 0.5, chains = 1)
+schedule <- scheduleSPSANN(initial.temperature = 1, chains = 1,
+                           x.max = 1540, y.max = 2060, x.min = 0, 
+                           y.min = 0, cellsize = 40)
 set.seed(2001)
-# \dontrun{
-# This example takes more than 5 seconds to run!
-res <- optimDIST(points = 100, candi = candi, covars = covars,
+res <- optimDIST(points = 10, candi = candi, covars = covars,
                  use.coords = TRUE, schedule = schedule)
 objSPSANN(res) -
-  objDIST(points = res@points, candi = candi, covars = covars, 
-          use.coords = TRUE)
-# }
-# Random sample
-pts <- sample(1:nrow(candi), 5)
-pts <- cbind(pts, candi[pts, ])
-objDIST(points = pts, candi = candi, covars = covars, use.coords = TRUE)
+  objDIST(points = res, candi = candi, covars = covars, use.coords = TRUE)
 
 # 1) GREEDY ALGORITHM ##########################################################
 rm(list = ls())

@@ -175,17 +175,16 @@ to maximizing the minimum number of points or point-pairs observed over all
 lag-distance classes.
 }
 \examples{
-\dontrun{
-# This example takes more than 5 seconds to run!
 require(sp)
 data(meuse.grid)
 candi <- meuse.grid[, 1:2]
-schedule <- scheduleSPSANN(chains = 1, initial.temperature = 30)
+schedule <- scheduleSPSANN(chains = 1, initial.temperature = 30,
+                           x.max = 1540, y.max = 2060, x.min = 0,
+                           y.min = 0, cellsize = 40)
 set.seed(2001)
-res <- optimPPL(points = 100, candi = candi, schedule = schedule)
-objSPSANN(res) - objPPL(points = res@points, candi = candi)
-countPPL(points = res@points, candi = candi)
-}
+res <- optimPPL(points = 10, candi = candi, schedule = schedule)
+objSPSANN(res) - objPPL(points = res, candi = candi)
+countPPL(points = res, candi = candi)
 }
 \author{
 Alessandro Samuel-Rosa \email{alessandrosamuelrosa@gmail.com}
