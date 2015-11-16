@@ -95,8 +95,6 @@ and de Gruijter (2006) and implemented in the R-package
 \pkg{intamapInteractive} by Edzer Pebesma and Jon Skoien.
 }
 \examples{
-\dontrun{
-# This example takes more than 5 seconds to run!
 require(sp)
 require(gstat)
 data(meuse.grid)
@@ -112,7 +110,6 @@ res <- optimMKV(points = 10, candi = candi, covars = covars,
 objSPSANN(res) -
   objMKV(points = res, candi = candi, covars = covars,
          eqn = z ~ dist, vgm = vgm)
-}
 }
 \author{
 Alessandro Samuel-Rosa \email{alessandrosamuelrosa@gmail.com}

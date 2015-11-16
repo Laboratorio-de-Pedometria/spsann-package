@@ -1,3 +1,19 @@
+# Version 1.0-2.9004 (2015-11-16)
+* Created a function to plot the optimized sample configuration (`plotOSC()`),
+  with options to display the evolution of the energy state and/or the
+  optimized sample configuration.
+* The function used to compute the Pareto maximum and minimum values
+  (`minmaxPareto()`) was optimized to be used with both ACDC and SPAN.
+
+# Version 1.0-2.9003 (2015-11-15)
+* Create a class (`OptimizedSampleConfiguration`) to store the output of
+  `optim` functions.
+  
+# Version 1.0-2.9002 (2015-11-14)
+* The trick included in the `optimMKV()`-function to avoid errors due to
+  the LDLfactor error of the ***gstat***-package had to be reformulated. We are
+  now using `try()` with a default value which is returned in case of error.
+
 # Version 1.0-2.9001 (2015-11-13)
 * A completelly new annealing schedule was implemented. The reason for this
   modification is that the former annealing schedule, which was based on the
