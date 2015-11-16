@@ -32,6 +32,7 @@ Description: Methods to optimize sample configurations using spatial simulated
     enables the user to define his/her own objective function.
 License: GPL (>= 2)
 Imports: 
+    methods,
     pedometrics,
     Rcpp (>= 0.11.3),
     sp,
