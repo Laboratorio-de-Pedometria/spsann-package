@@ -38,17 +38,16 @@
 #' nadir <- list(sim = 10, seeds = 1:10)
 #' utopia <- list(user = list(DIST = 0, CORR = 0))
 #' covars <- meuse.grid[, 5]
-#' schedule <- scheduleSPSANN(chains = 1, initial.temperature = 1)
-#' \dontrun{
-#' # This example takes more than 5 seconds to run!
+#' schedule <- scheduleSPSANN(chains = 1, initial.temperature = 5,
+#'                            x.max = 1540, y.max = 2060, x.min = 0, 
+#'                            y.min = 0, cellsize = 40)
 #' set.seed(2001)
-#' res <- optimACDC(points = 100, candi = candi, covars = covars, 
-#'                  nadir = nadir, use.coords = TRUE, utopia = utopia, 
-#'                  schedule = schedule)
+#' res <- optimACDC(points = 10, candi = candi, covars = covars, nadir = nadir,
+#'                  use.coords = TRUE, utopia = utopia, schedule = schedule,
+#'                  plotit = TRUE)
 #' objSPSANN(res) -
-#'   objACDC(points = res@@points, candi = candi, covars = covars, 
+#'   objACDC(points = res, candi = candi, covars = covars, 
 #'           use.coords = TRUE, nadir = nadir, utopia = utopia)
-#' }
 # MAIN FUNCTION ################################################################
 optimACDC <-
   function (points, candi, 

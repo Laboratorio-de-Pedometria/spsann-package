@@ -26,17 +26,16 @@
 #' @aliases optimPPL countPPL objPPL
 #' @export
 #' @examples
-#' \dontrun{
-#' # This example takes more than 5 seconds to run!
 #' require(sp)
 #' data(meuse.grid)
 #' candi <- meuse.grid[, 1:2]
-#' schedule <- scheduleSPSANN(chains = 1, initial.temperature = 30)
+#' schedule <- scheduleSPSANN(chains = 1, initial.temperature = 30,
+#'                            x.max = 1540, y.max = 2060, x.min = 0, 
+#'                            y.min = 0, cellsize = 40)
 #' set.seed(2001)
-#' res <- optimPPL(points = 100, candi = candi, schedule = schedule)
-#' objSPSANN(res) - objPPL(points = res@@points, candi = candi)
-#' countPPL(points = res@@points, candi = candi)
-#' }
+#' res <- optimPPL(points = 10, candi = candi, schedule = schedule)
+#' objSPSANN(res) - objPPL(points = res, candi = candi)
+#' countPPL(points = res, candi = candi)
 # FUNCTION - MAIN ##############################################################
 optimPPL <-
   function (points, candi,
@@ -227,13 +226,13 @@ objPPL <-
     eval(.prepare_points())
     
     # Prepare cutoff and lags
-    if (missing(cutoff)) {
+    if (missing(cutoff) && length(lags) == 1) {
       schedule <- scheduleSPSANN()
       eval(.prepare_jittering())
+      cutoff <- .cutoffPPL(cutoff = cutoff, x.max = x.max, y.max = y.max)
+      lags <- .lagsPPL(lags = lags, lags.type = lags.type, cutoff = cutoff, 
+                       lags.base = lags.base)
     }
-    cutoff <- .cutoffPPL(cutoff = cutoff, x.max = x.max, y.max = y.max)
-    lags <- .lagsPPL(lags = lags, lags.type = lags.type, cutoff = cutoff, 
-                     lags.base = lags.base)
     n_lags <- length(lags) - 1
     
     # Initial energy state: points or point-pairs

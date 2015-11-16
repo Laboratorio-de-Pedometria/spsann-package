@@ -23,16 +23,18 @@
 #' 
 #' @author
 #' Alessandro Samuel-Rosa \email{alessandrosamuelrosa@@gmail.com}
-#' @seealso \code{\link[spsann]{optimACDC}}, \code{\link[spsann]{SPAN}}
+#' @seealso \code{\link[spsann]{optimACDC}}, \code{SPAN}
 #' @export
 #' @examples 
 #' require(sp)
 #' data(meuse.grid)
 #' candi <- meuse.grid[, 1:2]
-#' covars <- meuse.grid[, c(1, 2, 5)]
+#' covars <- meuse.grid[, c(1, 2)]
 #' 
 #' # CORR
-#' schedule <- scheduleSPSANN(initial.temperature = 1, chains = 1)
+#' schedule <- scheduleSPSANN(initial.acceptance = 0.1, chains = 1, 
+#'                            x.max = 1540, y.max = 2060, x.min = 0,
+#'                            y.min = 0, cellsize = 40)
 #' set.seed(2001)
 #' osc_corr <- optimCORR(points = 10, candi = candi, covars = covars, 
 #'                       schedule = schedule)
@@ -43,31 +45,33 @@
 #'                       schedule = schedule)
 #' 
 #' # PPL
-#' schedule <- scheduleSPSANN(chains = 1, initial.temperature = 30)
 #' set.seed(2001)
-#' osc_ppl <- optimPPL(points = 100, candi = candi, schedule = schedule)
+#' osc_ppl <- optimPPL(points = 10, candi = candi, schedule = schedule)
 #' 
 #' # MSSD
-#' schedule <- scheduleSPSANN(chains = 1, initial.temperature = 5000)
 #' set.seed(2001)
-#' osc_mssd <- optimMSSD(points = 100, candi = candi, schedule = schedule)
+#' osc_mssd <- optimMSSD(points = 10, candi = candi, schedule = schedule)
 #' 
 #' # Pareto
 #' pareto <- minmaxPareto(osc = list(DIST = osc_dist, CORR = osc_corr,
 #'                                   PPL = osc_ppl, MSSD = osc_mssd),
 #'                        candi = candi, covars = covars)
 #' pareto
+#'
 # FUNCTION - MAIN ##############################################################
 minmaxPareto <-
   function (osc, candi, covars) {
     
-    if (!all(names(osc) %in% c("CORR", "DIST", "MSSD", "PPL") == TRUE)) {
-      idx <- which(names(osc) %in% c("CORR", "DIST", "MSSD", "PPL") == FALSE)
+    obj <- c("CORR", "DIST", "PPL", "MSSD")
+    if (!all(names(osc) %in% obj == TRUE)) {
+      idx <- which(names(osc) %in% obj == FALSE)
       message(paste("'", names(osc)[idx], "'", 
                     " not recognized as a valid name\n", sep = ""))
+    } else {
+      idx <- match(names(osc), obj)
+      osc <- osc[idx]
     }
     
-    obj <- names(osc)
     # Convert numeric covariates into factor covariates
     if (pedometrics::anyFactor(covars) && !pedometrics::allFactor(covars)) {
       id <- which(!sapply(covars, is.factor))
@@ -78,34 +82,45 @@ minmaxPareto <-
         pedometrics::stratify(x = covars[, id], n = nrow(osc[[i]]))
     }
     
-    # Compute objective function values
-    obj_dist <- sapply(1:length(osc), function (i) 
-      objDIST(osc[[i]]@points, covars = covars, candi = candi, 
-              strata.type = osc[[i]]@objective$strata.type,
-              use.coords = osc[[i]]@objective$use.coords))
+    # Get objective function parameters
+    strata.type <- osc$CORR@objective$strata.type
+    use.coords <- osc$CORR@objective$use.coords
     
+    # Compute objective function values
     obj_corr <- sapply(1:length(osc), function (i) 
       objCORR(osc[[i]]@points, covars = covars, candi = candi, 
-              strata.type = osc[[i]]@objective$strata.type,
-              use.coords = osc[[i]]@objective$use.coords))
+              strata.type = strata.type, use.coords = use.coords))
+    obj_dist <- sapply(1:length(osc), function (i) 
+      objDIST(osc[[i]]@points, covars = covars, candi = candi, 
+              strata.type = strata.type, use.coords = use.coords))
     
-    if (any(c("PPL", "MSSD") %in% names(osc))) {
+    if (all(c("PPL", "MSSD") %in% names(osc))) {
+      
+      # Get objective function parameters
+      lags <- osc$PPL@objective$lags
+      criterion <- osc$PPL@objective$criterion
+      pairs <- osc$PPL@objective$pairs
+#       x.max <- osc$PPL@spsann$jitter$x[2]
+#       x.min <- osc$PPL@spsann$jitter$x[1]
+#       y.max <- osc$PPL@spsann$jitter$y[2]
+#       y.min <- osc$PPL@spsann$jitter$y[1]
+      
+      # Compute objective function values
       obj_ppl <- sapply(1:length(osc), function (i) 
         objPPL(osc[[i]]@points, candi = candi, 
-               lags = osc[[i]]@objective$lags,
-               criterion = osc[[i]]@objective$criterion, 
-               pairs = osc[[i]]@objective$pairs))
-      
+               lags = lags, criterion = criterion, pairs = pairs
+               # ,x.max = x.max, y.max = y.max, x.min = x.min, y.min = y.min
+               ))
       obj_mssd <- sapply(1:length(osc), function (i) 
         objMSSD(osc[[i]]@points, candi = candi))
       
       # Prepare output
       res <- data.frame(
-        DIST = obj_dist, CORR = obj_corr, PPL = obj_ppl, MSSD = obj_mssd, 
-        row.names = c("DIST", "CORR", "PPL", "MSSD"))
+        CORR = obj_corr, DIST = obj_dist, PPL = obj_ppl, MSSD = obj_mssd, 
+        row.names = c("CORR", "DIST", "PPL", "MSSD"))
     } else {
       res <- data.frame(CORR = obj_corr, DIST = obj_dist,
-                        row.names = c("DIST", "CORR"))
+                        row.names = c("CORR", "DIST"))
     }
     return (res)
   }

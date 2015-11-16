@@ -37,10 +37,12 @@ sum method}.
 require(sp)
 data(meuse.grid)
 candi <- meuse.grid[, 1:2]
-covars <- meuse.grid[, c(1, 2, 5)]
+covars <- meuse.grid[, c(1, 2)]
 
 # CORR
-schedule <- scheduleSPSANN(initial.temperature = 1, chains = 1)
+schedule <- scheduleSPSANN(initial.acceptance = 0.1, chains = 1,
+                           x.max = 1540, y.max = 2060, x.min = 0,
+                           y.min = 0, cellsize = 40)
 set.seed(2001)
 osc_corr <- optimCORR(points = 10, candi = candi, covars = covars,
                       schedule = schedule)
@@ -51,14 +53,12 @@ osc_dist <- optimDIST(points = 10, candi = candi, covars = covars,
                       schedule = schedule)
 
 # PPL
-schedule <- scheduleSPSANN(chains = 1, initial.temperature = 30)
 set.seed(2001)
-osc_ppl <- optimPPL(points = 100, candi = candi, schedule = schedule)
+osc_ppl <- optimPPL(points = 10, candi = candi, schedule = schedule)
 
 # MSSD
-schedule <- scheduleSPSANN(chains = 1, initial.temperature = 5000)
 set.seed(2001)
-osc_mssd <- optimMSSD(points = 100, candi = candi, schedule = schedule)
+osc_mssd <- optimMSSD(points = 10, candi = candi, schedule = schedule)
 
 # Pareto
 pareto <- minmaxPareto(osc = list(DIST = osc_dist, CORR = osc_corr,
@@ -70,6 +70,6 @@ pareto
 Alessandro Samuel-Rosa \email{alessandrosamuelrosa@gmail.com}
 }
 \seealso{
-\code{\link[spsann]{optimACDC}}, \code{\link[spsann]{SPAN}}
+\code{\link[spsann]{optimACDC}}, \code{SPAN}
 }
 

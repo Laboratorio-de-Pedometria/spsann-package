@@ -32,13 +32,13 @@
 #' @aliases optimUSER
 #' @export
 #' @examples
-#' \dontrun{
-#' # This example takes more than 5 seconds to run!
 #' require(sp)
 #' require(SpatialTools)
 #' data(meuse.grid)
 #' candi <- meuse.grid[, 1:2]
-#' schedule <- scheduleSPSANN(chains = 1, initial.temperature = 30)
+#' schedule <- scheduleSPSANN(chains = 1, initial.temperature = 30,
+#'                            x.max = 1540, y.max = 2060, x.min = 0, 
+#'                            y.min = 0, cellsize = 40)
 #' 
 #' # Define the objective function - number of points per lag distance class
 #' objUSER <-
@@ -57,25 +57,22 @@
 #' # Run the optimization using the user-defined objective function
 #' set.seed(2001)
 #' timeUSER <- Sys.time()
-#' resUSER <- optimUSER(points = 100, fun = objUSER, lags = lags, n_lags = 9,
-#'                      n_pts = 100, candi = candi, schedule = schedule)
+#' resUSER <- optimUSER(points = 10, fun = objUSER, lags = lags, n_lags = 9,
+#'                      n_pts = 10, candi = candi, schedule = schedule)
 #' timeUSER <- Sys.time() - timeUSER
 #' 
 #' # Run the optimization using the respective function implemented in spsann
 #' set.seed(2001)
 #' timePPL <- Sys.time()
-#' resPPL <- optimPPL(points = 100, candi = candi, lags = lags, 
+#' resPPL <- optimPPL(points = 10, candi = candi, lags = lags, 
 #'                    schedule = schedule)
 #' timePPL <- Sys.time() - timePPL
 #' 
 #' # Compare results
 #' timeUSER
 #' timePPL
-#' lapply(list(resUSER@@points, resPPL@@points), countPPL, candi = candi, 
-#'        lags = lags)
-#' objSPSANN(resUSER) # 92
-#' objSPSANN(resPPL) # 92
-#' }
+#' lapply(list(resUSER, resPPL), countPPL, candi = candi, lags = lags)
+#' objSPSANN(resUSER) - objSPSANN(resPPL)
 # FUNCTION - MAIN ##############################################################
 optimUSER <-
   function (points, candi,
