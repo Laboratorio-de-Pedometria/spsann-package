@@ -28,9 +28,10 @@ if (rt > 3600) {
 
 # Energy states
 if (!track) energies <- new_energy
-criterion <- rbind(energy0, energies)
+energies <- rbind(energy0, energies)
 
-res <- new("OptimizedSampleConfiguration", points = data.frame(new_conf))
+res <- methods::new("OptimizedSampleConfiguration", 
+                    points = data.frame(new_conf))
 slot(res, "spsann") <- 
   list(acceptance = data.frame(initial = schedule$initial.acceptance),
        cellsize = data.frame(x = cellsize[1], y = cellsize[2]),
@@ -44,7 +45,7 @@ slot(res, "spsann") <-
                                 final = actual_temp))
 slot(res, "objective") <-
   list(name = objective,
-       energy = criterion,
+       energy = energies,
        nadir = if (MOOP && objective != "CLHS") data.frame(nadir),
        utopia = if (MOOP && objective != "CLHS") data.frame(utopia),
        weights = if (MOOP) data.frame(weights))

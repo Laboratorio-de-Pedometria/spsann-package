@@ -10,9 +10,9 @@ expression(if (progress) close(pb), rt <- as.numeric(c(proc.time() - time0)[3]),
       } else {
         rt <- list(time = round(rt, 2), unit = "seconds")
       }
-    }, if (!track) energies <- new_energy, criterion <- rbind(energy0, energies), 
-    res <- new("OptimizedSampleConfiguration", points = data.frame(new_conf)), 
-    slot(res, "spsann") <- 
+    }, if (!track) energies <- new_energy, energies <- rbind(energy0, energies), 
+    res <- methods::new("OptimizedSampleConfiguration", 
+                        points = data.frame(new_conf)), slot(res, "spsann") <- 
       list(acceptance = data.frame(initial = schedule$initial.acceptance),
            cellsize = data.frame(x = cellsize[1], y = cellsize[2]),
            chains = data.frame(total = schedule$chains, used = i, 
@@ -24,7 +24,7 @@ expression(if (progress) close(pb), rt <- as.numeric(c(proc.time() - time0)[3]),
            temperature = data.frame(initial = schedule$initial.temperature,
                                     final = actual_temp)), slot(res, "objective") <-
       list(name = objective,
-           energy = criterion,
+           energy = energies,
            nadir = if (MOOP && objective != "CLHS") data.frame(nadir),
            utopia = if (MOOP && objective != "CLHS") data.frame(utopia),
            weights = if (MOOP) data.frame(weights)), if (objective %in% c("ACDC", "CLHS", "CORR", "DIST", "SPAN")) {
