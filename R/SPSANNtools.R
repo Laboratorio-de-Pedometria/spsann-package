@@ -69,10 +69,12 @@ objSPSANN <-
     # PLOT SAMPLE CONFIGURATION
     grDevices::dev.set(grDevices::dev.next())
     bb <- sp::bbox(boundary)
-    if (class(boundary) == "SpatialPoints") {
-      sp::plot(boundary, pch = 20, cex = 0.1)
+    if (is(boundary, "SpatialPoints")) {
+      # sp::plot(x = boundary, pch = 20, cex = 0.1)
+      plot(x = boundary, pch = 20, cex = 0.1)
+      # plot(boundary@coords, pch = 20, cex = 0.1)
     } else {
-      sp::plot(boundary)
+      sp::plot(x = boundary)
     }
     graphics::points(conf0[, 1], conf0[, 2], pch = 1, cex = 0.5, 
                      col = "lightgray")
