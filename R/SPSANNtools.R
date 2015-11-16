@@ -22,12 +22,12 @@ objSPSANN <-
   function (osc, at = "end", n = 1) {
     
     # Energy state at the start
-    if (at == "start") return (utils::head(osc@objective$energy, n))
-    # if (at == "start") return (utils::head(attr(OSC, "energy.state"), n))
+    if (at == "start") res <- utils::head(osc@objective$energy, n)
     
     # Energy state at the end
-    # if (at == "end") return(utils::tail(attr(OSC, "energy.state"), n))
-    if (at == "end") return(utils::tail(osc@objective$energy, n))
+    if (at == "end") res <- utils::tail(osc@objective$energy, n)
+    
+    return(data.frame(res, row.names = ""))
   }
 # INTERNAL FUNCTION - COMPUTE ACCEPTANCE PROBABILITY ###########################
 .acceptSPSANN <- 
