@@ -54,8 +54,6 @@
 #' @concept spatial interpolation
 #' @export
 #' @examples
-#' \dontrun{
-#' # This example takes more than 5 seconds to run!
 #' require(sp)
 #' require(gstat)
 #' data(meuse.grid)
@@ -71,7 +69,6 @@
 #' objSPSANN(res) -
 #'   objMKV(points = res, candi = candi, covars = covars, 
 #'          eqn = z ~ dist, vgm = vgm)
-#' }
 # FUNCTION - MAIN ##############################################################
 optimMKV <-
   function (points, candi,

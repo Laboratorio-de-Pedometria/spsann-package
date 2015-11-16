@@ -8,8 +8,6 @@ sapply(list.files("R", full.names = TRUE, pattern = ".R$"), source)
 sapply(list.files("src", full.names = TRUE, pattern = ".cpp$"), Rcpp::sourceCpp)
 
 # 0) DEFAULT EXAMPLE ###########################################################
-# \dontrun{
-# # This example takes more than 5 seconds to run!
 require(sp)
 require(gstat)
 data(meuse.grid)
@@ -25,7 +23,6 @@ res <- optimMKV(points = 10, candi = candi, covars = covars,
 objSPSANN(res) -
   objMKV(points = res, candi = candi, covars = covars, 
          eqn = z ~ dist, vgm = vgm)
-# }
 
 # 1) GREEDY ALGORITHM ##########################################################
 rm(list = ls())
