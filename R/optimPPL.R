@@ -226,7 +226,7 @@ objPPL <-
     eval(.prepare_points())
     
     # Prepare cutoff and lags
-    if (missing(cutoff) && length(lags) == 1) {
+    if (missing(cutoff) || length(lags) == 1) {
       schedule <- scheduleSPSANN()
       eval(.prepare_jittering())
       cutoff <- .cutoffPPL(cutoff = cutoff, x.max = x.max, y.max = y.max)
