@@ -36,6 +36,7 @@ write.file <- c("R/check-spsann-arguments.R",
                 "R/prepare-clhs-covars.R")
 lapply(1:length(fun.name), function (i) 
   autofun::autofun(fun.name[i], read.file[i], write.file[i]))
+rm(fun.name, read.file, write.file)
 
 # check examples and documentation
 devtools::check_doc()
