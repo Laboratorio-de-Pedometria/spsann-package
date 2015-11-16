@@ -29,8 +29,8 @@ schedule <- scheduleSPSANN(chains = 500, initial.temperature = 500)
 set.seed(2001)
 res <- optimPPL(points = 100, candi = candi, pairs = TRUE, schedule = schedule,
                 plotit = TRUE)
-objSPSANN(res) - objPPL(points = res@points, pairs = TRUE, candi = candi)
-countPPL(points = res@points, candi = candi, pairs = TRUE)
+objSPSANN(res) - objPPL(points = res, pairs = TRUE, candi = candi)
+countPPL(points = res, candi = candi, pairs = TRUE)
 
 # 2) Points per lag - select sample points from candi ##########################
 rm(list = ls())

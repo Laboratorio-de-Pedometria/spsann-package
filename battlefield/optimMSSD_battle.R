@@ -30,4 +30,4 @@ schedule <- scheduleSPSANN(chains = 500, initial.acceptance = 0,
 set.seed(2001)
 res <- optimMSSD(points = 100, candi = candi, schedule = schedule, 
                  plotit = TRUE)
-objSPSANN(res) - objMSSD(candi = candi, points = res@points)
+objSPSANN(res) - objMSSD(candi = candi, points = res)

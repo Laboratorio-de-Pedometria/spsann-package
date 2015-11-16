@@ -32,5 +32,5 @@ schedule <- scheduleSPSANN(initial.temperature = 0.5, chains = 10)
 set.seed(2001)
 res <- optimCORR(points = 100, candi = candi, covars = covars, 
                  use.coords = TRUE, schedule = schedule, plotit = TRUE)
-objSPSANN(res) # 3.744234
-objCORR(points = res@points, candi = candi, covars = covars, use.coords = TRUE)
+objSPSANN(res) -
+  objCORR(points = res, candi = candi, covars = covars, use.coords = TRUE)
