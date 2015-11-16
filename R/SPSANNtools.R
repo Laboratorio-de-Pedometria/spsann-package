@@ -63,8 +63,8 @@ objSPSANN <-
       graphics::lines(a[, i] ~ c(1:k), type = "l", lty = i, col = col[i])
     }
     graphics::lines(x = c(-k, 0), y = rep(energy0[1], 2), col = "red")
-    graphics::lines(x = rep(best.k, 2), y = c(-5, best.energy[1]), 
-                    col = "green")
+    graphics::lines(x = rep(best.k, 2), y = c(-500, best.energy[1]), 
+                    col = "blue")
     
     # PLOT SAMPLE CONFIGURATION
     grDevices::dev.set(grDevices::dev.next())
