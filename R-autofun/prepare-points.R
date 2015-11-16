@@ -19,6 +19,7 @@ if (!missing(candi)) {
 }
 
 # Points
+if (is(points, "OptimizedSampleConfiguration")) points <- points@points
 if (is.matrix(points) || is.data.frame(points)) { # Data frame of matrix
   points <- as.matrix(points)
 } else {

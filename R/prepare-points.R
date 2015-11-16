@@ -4,18 +4,19 @@
 expression(if (!missing(candi)) {
   n_candi <- nrow(candi)
   candi <- as.matrix(cbind(id = 1:n_candi, candi))
-}, if (is.matrix(points) || is.data.frame(points)) { # Data frame of matrix
-  points <- as.matrix(points)
-} else {
-  if (is.integer(points) || pedometrics::isNumint(points)) {
-    if (length(points) > 1) { # Integer vector
-      points <- candi[points, ]
-    }
-    if (length(points) == 1) { # Integer value
-      points <- sample(1:n_candi, points)
-      points <- candi[points, ] 
-    }
-  }
-}, n_pts <- nrow(points), conf0 <- points, old_conf <- conf0)
+}, if (is(points, "OptimizedSampleConfiguration")) points <- points@points, 
+    if (is.matrix(points) || is.data.frame(points)) { # Data frame of matrix
+      points <- as.matrix(points)
+    } else {
+      if (is.integer(points) || pedometrics::isNumint(points)) {
+        if (length(points) > 1) { # Integer vector
+          points <- candi[points, ]
+        }
+        if (length(points) == 1) { # Integer value
+          points <- sample(1:n_candi, points)
+          points <- candi[points, ] 
+        }
+      }
+    }, n_pts <- nrow(points), conf0 <- points, old_conf <- conf0)
 }
 
