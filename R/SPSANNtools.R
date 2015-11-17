@@ -53,7 +53,8 @@ objSPSANN <-
     n <- ncol(energy0)
     l <- colnames(energy0)
     a <- rbind(energy0, energies)
-    col <- c("red", rep("black", n - 1))
+    # col <- c("red", rep("black", n - 1))
+    col <- c("red", gray(seq(0, 0.5, length.out = n - 1)))
     graphics::plot(1, type = 'n', xlim = c(0, k), 
                    # ylim = c(0, max(a)), 
                    ylim = c(min(a), max(a)), 
