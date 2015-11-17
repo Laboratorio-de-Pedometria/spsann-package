@@ -1,5 +1,6 @@
 # Supress R CMD check note 'no visible binding for global variable ...' ########
 # Source: http://stackoverflow.com/a/12429344/3365410
+# These variables are generated within the functions created with 'autofun'
 if (getRversion() >= "2.15.1") {
   utils::globalVariables(
     names = c("covars.type", "sm", "n_pts", "n_cov", "n_candi", "wp", "conf0", 
@@ -11,7 +12,8 @@ if (getRversion() >= "2.15.1") {
 
 # Import functions from default packages other than `base` #####################
 # Source: http://stackoverflow.com/a/31314870/3365410
-#' @importFrom stats cor quantile runif terms
+#' @importFrom stats cor quantile runif terms rbinom
 #' @importFrom graphics axis hist legend lines mtext par plot points text
 #' @importFrom utils setTxtProgressBar txtProgressBar head tail
 #' @importFrom grDevices dev.set dev.prev dev.next dev.new
+#' @importFrom methods is new slot

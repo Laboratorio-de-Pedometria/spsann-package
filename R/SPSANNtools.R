@@ -33,7 +33,7 @@ objSPSANN <-
 .acceptSPSANN <- 
   function (old.energy, new.energy, actual.temp) {
     accept <- min(1, exp((old.energy[[1]] - new.energy[[1]]) / actual.temp))
-    accept <- floor(rbinom(n = 1, size = 1, prob = accept))
+    accept <- floor(stats::rbinom(n = 1, size = 1, prob = accept))
     return (accept)
   }
 # INTERNAL FUNCTION - PLOTTING #################################################
@@ -69,9 +69,9 @@ objSPSANN <-
     # PLOT SAMPLE CONFIGURATION
     grDevices::dev.set(grDevices::dev.next())
     bb <- sp::bbox(boundary)
-    if (is(boundary, "SpatialPoints")) {
-      # sp::plot(x = boundary, pch = 20, cex = 0.1)
-      plot(x = boundary, pch = 20, cex = 0.1)
+    if (methods::is(boundary, "SpatialPoints")) {
+      sp::plot(x = boundary, pch = 20, cex = 0.1)
+      # plot(x = boundary, pch = 20, cex = 0.1)
       # plot(boundary@coords, pch = 20, cex = 0.1)
     } else {
       sp::plot(x = boundary)

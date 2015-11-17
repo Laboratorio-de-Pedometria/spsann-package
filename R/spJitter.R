@@ -85,7 +85,7 @@ spJitter <-
     pt2 <- candi[sample(pt1, 1), ]
     
     # Compute the new x- and y-coordinates
-    pt3 <- runif(n = 2, min = -0.5, max = 0.5) * cellsize
+    pt3 <- stats::runif(n = 2, min = -0.5, max = 0.5) * cellsize
     pt2[-1] <- pt2[-1] + pt3
     
     # Output

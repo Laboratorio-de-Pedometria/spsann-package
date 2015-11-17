@@ -33,10 +33,10 @@ plotOSC <-
   function (osc, which = 1:2, boundary) {
     
     # Do not try to plot the energy states if they have not been traked
-    if (nrow(slot(osc, "objective")$energy) == 2) which <- 2
+    if (nrow(methods::slot(osc, "objective")$energy) == 2) which <- 2
     
-    par0 <- par()
-    on.exit(suppressWarnings(par(par0)))
+    par0 <- graphics::par()
+    on.exit(suppressWarnings(graphics::par(par0)))
     if (all(which == 1:2)) {
       graphics::par(mfrow = c(1, 2))
     }
@@ -64,7 +64,7 @@ plotOSC <-
     if (which == 1:2 || which == 2) {
       if (!missing(boundary)) {
         bb <- sp::bbox(boundary)
-        if (is(boundary, "SpatialPoints")) {
+        if (methods::is(boundary, "SpatialPoints")) {
           sp::plot(x = boundary, pch = 20, cex = 0.1)
         } else {
           sp::plot(x = boundary)
