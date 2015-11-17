@@ -28,6 +28,8 @@
 #' @aliases optimSPAN objSPAN
 #' @export
 #' @examples
+#' \dontrun{
+#' # This example takes more than 5 seconds to run!
 #' require(sp)
 #' data(meuse.grid)
 #' candi <- meuse.grid[, 1:2]
@@ -43,6 +45,7 @@
 #' objSPSANN(res) -
 #'   objSPAN(points = res, candi = candi, covars = covars, nadir = nadir,
 #'           use.coords = TRUE, utopia = utopia)
+#' }
 # MAIN FUNCTION ################################################################
 optimSPAN <-
   function(points, candi,

@@ -26,6 +26,8 @@
 #' @aliases optimPPL countPPL objPPL
 #' @export
 #' @examples
+#' \dontrun{
+#' # This example takes more than 5 seconds
 #' require(sp)
 #' data(meuse.grid)
 #' candi <- meuse.grid[, 1:2]
@@ -36,6 +38,7 @@
 #' res <- optimPPL(points = 10, candi = candi, schedule = schedule)
 #' objSPSANN(res) - objPPL(points = res, candi = candi)
 #' countPPL(points = res, candi = candi)
+#' }
 # FUNCTION - MAIN ##############################################################
 optimPPL <-
   function (points, candi,

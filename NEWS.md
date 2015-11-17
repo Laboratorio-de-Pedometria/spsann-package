@@ -1,3 +1,8 @@
+# Version 1.0-2.9005 (2015-11-17)
+* Solved NOTEs produced during CRAN check due to the use of functions from 
+  default packages other than `base`, and due to examples that take more than 5
+  seconds to run.
+
 # Version 1.0-2.9004 (2015-11-16)
 * Created a function to plot the optimized sample configuration (`plotOSC()`),
   with options to display the evolution of the energy state and/or the

@@ -26,6 +26,8 @@
 #' @seealso \code{\link[spsann]{optimACDC}}, \code{SPAN}
 #' @export
 #' @examples 
+#' \dontrun{
+#' # This example takes more than 5 seconds
 #' require(sp)
 #' data(meuse.grid)
 #' candi <- meuse.grid[, 1:2]
@@ -57,7 +59,7 @@
 #'                                   PPL = osc_ppl, MSSD = osc_mssd),
 #'                        candi = candi, covars = covars)
 #' pareto
-#'
+#' }
 # FUNCTION - MAIN ##############################################################
 minmaxPareto <-
   function (osc, candi, covars) {

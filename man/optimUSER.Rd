@@ -81,6 +81,8 @@ projected: the user is responsible for making sure that this requirement
 is attained.
 }
 \examples{
+\dontrun{
+# This example takes more than 5 seconds
 require(sp)
 require(SpatialTools)
 data(meuse.grid)
@@ -122,6 +124,7 @@ timeUSER
 timePPL
 lapply(list(resUSER, resPPL), countPPL, candi = candi, lags = lags)
 objSPSANN(resUSER) - objSPSANN(resPPL)
+}
 }
 \author{
 Alessandro Samuel-Rosa \email{alessandrosamuelrosa@gmail.com}

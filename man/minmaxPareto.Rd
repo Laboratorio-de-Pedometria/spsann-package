@@ -34,6 +34,8 @@ aggregated into a single \emph{utility function} using the \emph{weighted
 sum method}.
 }
 \examples{
+\dontrun{
+# This example takes more than 5 seconds
 require(sp)
 data(meuse.grid)
 candi <- meuse.grid[, 1:2]
@@ -65,6 +67,7 @@ pareto <- minmaxPareto(osc = list(DIST = osc_dist, CORR = osc_corr,
                                   PPL = osc_ppl, MSSD = osc_mssd),
                        candi = candi, covars = covars)
 pareto
+}
 }
 \author{
 Alessandro Samuel-Rosa \email{alessandrosamuelrosa@gmail.com}

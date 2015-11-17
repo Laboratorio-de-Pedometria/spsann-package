@@ -43,9 +43,9 @@ plotOSC <-
     
     # Plot the energy states
     if (all(which == 1:2)) {
-      k <- slot(osc, "spsann")$chains[2:3]
-      k <- as.numeric(k[1] * k[2] * nrow(slot(osc, "points")))
-      a <- slot(osc, "objective")$energy
+      k <- methods::slot(osc, "spsann")$chains[2:3]
+      k <- as.numeric(k[1] * k[2] * nrow(methods::slot(osc, "points")))
+      a <- methods::slot(osc, "objective")$energy
       l <- colnames(a)
       n <- ncol(a)
       col <- c("red", rep("black", n - 1))
@@ -69,10 +69,11 @@ plotOSC <-
         } else {
           sp::plot(x = boundary)
         }
-        graphics::points(slot(osc, "points")[, "x"], 
-                         slot(osc, "points")[, "y"], pch = 20, cex = 0.5)  
+        graphics::points(methods::slot(osc, "points")[, "x"], 
+                         methods::slot(osc, "points")[, "y"],
+                         pch = 20, cex = 0.5)  
       } else {
-        graphics::plot(slot(osc, "points")[, c("x", "y")], pch = 20,
+        graphics::plot(methods::slot(osc, "points")[, c("x", "y")], pch = 20,
                        cex = 0.5, asp = 1)
       }
     }

@@ -11,7 +11,6 @@
 #' @rdname osc-class
 #' @export
 #' @examples 
-#' osc <- methods::new("OptimizedSampleConfiguration")
 #' methods::getSlots("OptimizedSampleConfiguration")
 #' methods::is(osc, "OptimizedSampleConfiguration")
 # MAIN FUNCTION - OptimizedSampleConfiguration CLASS ###########################
