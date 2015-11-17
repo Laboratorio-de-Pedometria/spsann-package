@@ -13,8 +13,11 @@
 #' If missing and \code{plotit = TRUE}, \code{boundary} is estimated from
 #' \code{candi}.
 #' 
-#' @param progress Logical for printing a progress bar. Defaults to 
-#' \code{progress = TRUE}.
+#' @param progress Type of progress bar that should be used, with options 
+#' \code{"txt"}, for a text progress bar in the R console, \code{"tk"}, to put
+#' up a Tk progress bar widget, and \code{NULL} to omit the progress bar.
+#' A Tk progress bar widget is usefull when using parallel processors. Defaults
+#' to \code{progress = "txt"}.
 #' 
 #' @param verbose Logical for printing messages about the progress of the
 #' optimization. Defaults to \code{verbose = FALSE}.

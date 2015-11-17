@@ -17,9 +17,4 @@ An S4 class
 
 \item{\code{objective}}{}
 }}
-\examples{
-osc <- methods::new("OptimizedSampleConfiguration")
-methods::getSlots("OptimizedSampleConfiguration")
-methods::is(osc, "OptimizedSampleConfiguration")
-}
 

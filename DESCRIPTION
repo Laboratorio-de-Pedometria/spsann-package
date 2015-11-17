@@ -1,7 +1,7 @@
 Package: spsann
 Type: Package
 Title: Optimization of Sample Configurations using Spatial Simulated Annealing
-Version: 1.0-2.9005
+Version: 1.0-2.9006
 Date: 2015-11-17
 Authors@R: c(
     person("Alessandro", "Samuel-Rosa", role = c("aut", "cre"),
@@ -38,6 +38,7 @@ Imports:
     sp,
     SpatialTools
 Suggests: 
-    gstat
+    gstat,
+    tcltk
 LinkingTo: Rcpp
 Encoding: UTF-8

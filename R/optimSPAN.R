@@ -56,7 +56,7 @@ optimSPAN <-
            criterion = "distribution", distri, pairs = FALSE,
            # SPSANN
            schedule = scheduleSPSANN(), plotit = FALSE, track = FALSE,
-           boundary, progress = TRUE, verbose = FALSE,
+           boundary, progress = "txt", verbose = FALSE,
            # MOOP
            weights = list(CORR = 1/6, DIST = 1/6, PPL = 1/3, MSSD = 1/3),
            nadir = list(sim = NULL, seeds = NULL, user = NULL, abs = NULL),
@@ -143,11 +143,9 @@ optimSPAN <-
       data.frame(obj = Inf, CORR = Inf, DIST = Inf, PPL = Inf, MSSD = Inf)
     actual_temp <- schedule$initial.temperature
     k <- 0 # count the number of jitters
-    if (progress) {
-      max <- n_pts * schedule$chains * schedule$chain.length
-      pb <- utils::txtProgressBar(min = 1, max = max, style = 3)
-    }
-    time0 <- proc.time()
+    
+    # Set progress bar
+    eval(.set_progress())
     
     # Initiate the annealing schedule
     for (i in 1:schedule$chains) {
@@ -246,8 +244,9 @@ optimSPAN <-
             best_old_dm_mssd <- old_dm_mssd
           }
           
+          # Update progress bar
+          eval(.update_progress())
           
-          if (progress) utils::setTxtProgressBar(pb, k)
         } # End loop through points
         
       } # End the chain
@@ -256,7 +255,7 @@ optimSPAN <-
       if (i == 1) {
         x <- round(n_accept / c(n_pts * schedule$chain.length), 2)
         if (x < schedule$initial.acceptance) {
-          cat("\nlow temperature: only ", x," of acceptance in the 1st chain\n", 
+          cat("\nlow temperature: only ", x," of acceptance in the 1st chain\n",
               sep = "")
           break
         }

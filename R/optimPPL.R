@@ -42,12 +42,12 @@
 # FUNCTION - MAIN ##############################################################
 optimPPL <-
   function (points, candi,
-    # PPL
-    lags = 7, lags.type = "exponential", lags.base = 2, cutoff, 
-    criterion = "distribution", distri, pairs = FALSE,
-    # SPSANN
-    schedule = scheduleSPSANN(), plotit = FALSE, track = FALSE,
-    boundary, progress = TRUE, verbose = FALSE) {
+            # PPL
+            lags = 7, lags.type = "exponential", lags.base = 2, cutoff, 
+            criterion = "distribution", distri, pairs = FALSE,
+            # SPSANN
+            schedule = scheduleSPSANN(), plotit = FALSE, track = FALSE,
+            boundary, progress = "txt", verbose = FALSE) {
     
     # Objective function name
     objective <- "PPL"
@@ -93,11 +93,9 @@ optimPPL <-
     best_energy <- data.frame(obj = Inf)
     actual_temp <- schedule$initial.temperature
     k <- 0 # count the number of jitters
-    if (progress) { 
-      max <- n_pts * schedule$chains * schedule$chain.length
-      pb <- utils::txtProgressBar(min = 1, max = max, style = 3)
-    }
-    time0 <- proc.time()
+    
+    # Set progress bar
+    eval(.set_progress())
     
     # Initiate the annealing schedule
     for (i in 1:schedule$chains) {
@@ -107,57 +105,58 @@ optimPPL <-
         
         for (wp in 1:n_pts) { # Initiate loop through points
           k <- k + 1
-      
-      # Plotting and jittering
-      eval(.plot_and_jitter())
-      
-      # Update the distance matrix using a Cpp function
-      new_dm <- .updatePPLCpp(x = new_conf[, 2:3], dm = old_dm, idx = wp)
-      
-      # Recalculate the full distance matrix
-      #new_dm <- SpatialTools::dist1(coords = new_conf[, 2:3])
-      
-      # Update the distance matrix in R
-      #x2 <- matrix(new_conf[wp, 2:3], nrow = 1)
-      #x2 <- SpatialTools::dist2(coords = new_conf[, 2:3], coords2 = x2)
-      #new_dm <- old_dm
-      #new_dm[wp, ] <- x2
-      #new_dm[, wp] <- x2
-      
-      # Update the energy state: points or point-pairs?
-      ppl <- .getPPL(lags = lags, n.lags = n_lags, dist.mat = new_dm, 
-                     pairs = pairs)
-      new_energy <- data.frame(
-        obj = .objPPL(n.lags = n_lags, n.pts = n_pts, pairs = pairs,
-                      criterion = criterion, distri = distri, ppl = ppl))
-                            
-      # Evaluate the new system configuration
-      accept <- .acceptSPSANN(old_energy[[1]], new_energy[[1]], actual_temp)
-      if (accept) {
-        old_conf <- new_conf
-        old_energy <- new_energy
-        old_dm <- new_dm
-        n_accept <- n_accept + 1
-      } else {
-        new_energy <- old_energy
-        new_conf <- old_conf
-        # new_dm <- old_dm
-      }
-      if (track) energies[k, ] <- new_energy
-      
-      # Record best energy state
-      if (new_energy[[1]] < best_energy[[1]] / 1.0000001) {
-        best_k <- k
-        best_conf <- new_conf
-        best_energy <- new_energy
-        best_old_energy <- old_energy
-        old_conf <- old_conf
-        best_dm <- new_dm
-        best_old_dm <- old_dm
-      }
-
-      
-      if (progress) utils::setTxtProgressBar(pb, k)
+          
+          # Plotting and jittering
+          eval(.plot_and_jitter())
+          
+          # Update the distance matrix using a Cpp function
+          new_dm <- .updatePPLCpp(x = new_conf[, 2:3], dm = old_dm, idx = wp)
+          
+          # Recalculate the full distance matrix
+          #new_dm <- SpatialTools::dist1(coords = new_conf[, 2:3])
+          
+          # Update the distance matrix in R
+          #x2 <- matrix(new_conf[wp, 2:3], nrow = 1)
+          #x2 <- SpatialTools::dist2(coords = new_conf[, 2:3], coords2 = x2)
+          #new_dm <- old_dm
+          #new_dm[wp, ] <- x2
+          #new_dm[, wp] <- x2
+          
+          # Update the energy state: points or point-pairs?
+          ppl <- .getPPL(lags = lags, n.lags = n_lags, dist.mat = new_dm, 
+                         pairs = pairs)
+          new_energy <- data.frame(
+            obj = .objPPL(n.lags = n_lags, n.pts = n_pts, pairs = pairs,
+                          criterion = criterion, distri = distri, ppl = ppl))
+          
+          # Evaluate the new system configuration
+          accept <- .acceptSPSANN(old_energy[[1]], new_energy[[1]], actual_temp)
+          if (accept) {
+            old_conf <- new_conf
+            old_energy <- new_energy
+            old_dm <- new_dm
+            n_accept <- n_accept + 1
+          } else {
+            new_energy <- old_energy
+            new_conf <- old_conf
+            # new_dm <- old_dm
+          }
+          if (track) energies[k, ] <- new_energy
+          
+          # Record best energy state
+          if (new_energy[[1]] < best_energy[[1]] / 1.0000001) {
+            best_k <- k
+            best_conf <- new_conf
+            best_energy <- new_energy
+            best_old_energy <- old_energy
+            old_conf <- old_conf
+            best_dm <- new_dm
+            best_old_dm <- old_dm
+          }
+          
+          # Update progress bar
+          eval(.update_progress())
+          
         } # End loop through points
         
       } # End the chain
@@ -166,7 +165,7 @@ optimPPL <-
       if (i == 1) {
         x <- round(n_accept / c(n_pts * schedule$chain.length), 2)
         if (x < schedule$initial.acceptance) {
-          cat("\nlow temperature: only ", x," of acceptance in the 1st chain\n", 
+          cat("\nlow temperature: only ", x," of acceptance in the 1st chain\n",
               sep = "")
           break
         }
@@ -213,11 +212,11 @@ optimPPL <-
 #' @export
 objPPL <-
   function (points, candi, 
-    # PPL
-    lags = 7, lags.type = "exponential", lags.base = 2, cutoff, distri,
-    criterion = "distribution", pairs = FALSE,
-    # SPSANN
-    x.max, x.min, y.max, y.min) {
+            # PPL
+            lags = 7, lags.type = "exponential", lags.base = 2, cutoff, distri,
+            criterion = "distribution", pairs = FALSE,
+            # SPSANN
+            x.max, x.min, y.max, y.min) {
     
     # Check arguments
     check <- .checkPPL(lags = lags, lags.type = lags.type, pairs = pairs, 
@@ -245,7 +244,7 @@ objPPL <-
                          distri = distri, pairs = pairs)
     res <- .objPPL(ppl = ppl, n.lags = n_lags, n.pts = n_pts, pairs = pairs,
                    criterion = criterion, distri = distri)
-
+    
     # Output
     return (res)
   }
@@ -254,10 +253,10 @@ objPPL <-
 #' @export
 countPPL <-
   function (points, candi,
-    # PPL
-    lags = 7, lags.type = "exponential", lags.base = 2, cutoff, pairs = FALSE,
-    # SPSANN
-    x.max, x.min, y.max, y.min) {
+            # PPL
+            lags = 7, lags.type = "exponential", lags.base = 2, cutoff, pairs = FALSE,
+            # SPSANN
+            x.max, x.min, y.max, y.min) {
     
     # Check arguments
     check <- .checkPPL(lags = lags, lags.type = lags.type, pairs = pairs,
@@ -276,7 +275,7 @@ countPPL <-
     lags <- .lagsPPL(lags = lags, lags.type = lags.type, cutoff = cutoff, 
                      lags.base = lags.base)
     n_lags <- length(lags) - 1
-
+    
     # Distance matrix and counts
     dm <- SpatialTools::dist1(points[, 2:3])
     res <- .getPPL(lags = lags, n.lags = n_lags, dist.mat = dm, pairs = pairs)
@@ -296,12 +295,12 @@ countPPL <-
     
     # Arguments 'lags' and 'cutoff'
     if (length(lags) == 1) {
-#       if (fun != "optimPPL") {
-#         if (missing(cutoff)) {
-#           res <- c("'cutoff' is mandatory if the lag intervals are not set")
-#           return (res)
-#         }
-#       }
+      #       if (fun != "optimPPL") {
+      #         if (missing(cutoff)) {
+      #           res <- c("'cutoff' is mandatory if the lag intervals are not set")
+      #           return (res)
+      #         }
+      #       }
     } else {
       if (!missing(cutoff)) {
         res <- c("'cutoff' cannot be used when the lag intervals are set")
@@ -365,7 +364,7 @@ countPPL <-
   function (n.lags, n.pts, criterion, distri, pairs) {
     
     if (criterion == "distribution" && missing(distri)) {
-     
+      
       if (pairs) { # Point-pairs per lag
         distri <- rep(n.pts * (n.pts - 1) / (2 * n.lags), n.lags)
         

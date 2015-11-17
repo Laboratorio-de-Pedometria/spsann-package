@@ -56,7 +56,7 @@ optimMSSD <-
   function (points, candi,
             # SPSANN
             schedule = scheduleSPSANN(), plotit = FALSE, track = FALSE, 
-            boundary, progress = TRUE, verbose = FALSE) {
+            boundary, progress = "txt", verbose = FALSE) {
     
     # Objective function name
     objective <- "MSSD"
@@ -86,11 +86,9 @@ optimMSSD <-
     best_energy <- data.frame(obj = Inf)
     actual_temp <- schedule$initial.temperature
     k <- 0 # count the number of jitters
-    if (progress) {
-      max <- n_pts * schedule$chains * schedule$chain.length
-      pb <- utils::txtProgressBar(min = 1, max = max, style = 3)
-    }
-    time0 <- proc.time()
+    
+    # Set progress bar
+    eval(.set_progress())
     
     # Initiate the annealing schedule
     for (i in 1:schedule$chains) {
@@ -100,49 +98,50 @@ optimMSSD <-
         
         for (wp in 1:n_pts) { # Initiate loop through points
           k <- k + 1
-      
-      # Plotting and jittering
-      eval(.plot_and_jitter())
-      
-      # Update the matrix of distances and calculate the new energy state (Cpp)
-      x2 <- matrix(new_conf[wp, 2:3], nrow = 1)
-      new_dm <- .updateMSSDCpp(x1 = candi[, 2:3], x2 = x2, dm = old_dm, 
-                               idx = wp)
-      new_energy <- data.frame(obj = .objMSSD(new_dm))
-      
-      # Update the matrix of distances and calculate the new energy state (R)
-      # x2 <- SpatialTools::dist2(coords = candi[, 2:3], coords2 = x2)
-      # new_dm <- old_dm
-      # new_dm[, wp] <- x2
-      # new_energy <- mean(apply(new_dm, 1, min) ^ 2)
-      
-      # Evaluate the new system configuration
-      accept <- .acceptSPSANN(old_energy[[1]], new_energy[[1]], actual_temp)
-      if (accept) {
-        old_conf <- new_conf
-        old_energy <- new_energy
-        old_dm <- new_dm
-        n_accept <- n_accept + 1
-      } else {
-        new_energy <- old_energy
-        new_conf <- old_conf
-        # new_dm <- old_dm
-      }
-      if (track) energies[k, ] <- new_energy
-      
-      # Record best energy state
-      if (new_energy[[1]] < best_energy[[1]] / 1.0000001) {
-        best_k <- k
-        best_conf <- new_conf
-        best_energy <- new_energy
-        best_old_energy <- old_energy
-        old_conf <- old_conf
-        best_dm <- new_dm
-        best_old_dm <- old_dm
-      }
-
-      
-      if (progress) utils::setTxtProgressBar(pb, k)
+          
+          # Plotting and jittering
+          eval(.plot_and_jitter())
+          
+          # Update the matrix of distances and calculate the new energy state
+          x2 <- matrix(new_conf[wp, 2:3], nrow = 1)
+          new_dm <- .updateMSSDCpp(x1 = candi[, 2:3], x2 = x2, dm = old_dm, 
+                                   idx = wp)
+          new_energy <- data.frame(obj = .objMSSD(new_dm))
+          
+          # Update the matrix of distances and calculate the new energy state
+          # x2 <- SpatialTools::dist2(coords = candi[, 2:3], coords2 = x2)
+          # new_dm <- old_dm
+          # new_dm[, wp] <- x2
+          # new_energy <- mean(apply(new_dm, 1, min) ^ 2)
+          
+          # Evaluate the new system configuration
+          accept <- .acceptSPSANN(old_energy[[1]], new_energy[[1]], actual_temp)
+          if (accept) {
+            old_conf <- new_conf
+            old_energy <- new_energy
+            old_dm <- new_dm
+            n_accept <- n_accept + 1
+          } else {
+            new_energy <- old_energy
+            new_conf <- old_conf
+            # new_dm <- old_dm
+          }
+          if (track) energies[k, ] <- new_energy
+          
+          # Record best energy state
+          if (new_energy[[1]] < best_energy[[1]] / 1.0000001) {
+            best_k <- k
+            best_conf <- new_conf
+            best_energy <- new_energy
+            best_old_energy <- old_energy
+            old_conf <- old_conf
+            best_dm <- new_dm
+            best_old_dm <- old_dm
+          }
+          
+          # Update progress bar
+          eval(.update_progress())
+          
         } # End loop through points
         
       } # End the chain
@@ -151,7 +150,7 @@ optimMSSD <-
       if (i == 1) {
         x <- round(n_accept / c(n_pts * schedule$chain.length), 2)
         if (x < schedule$initial.acceptance) {
-          cat("\nlow temperature: only ", x," of acceptance in the 1st chain\n", 
+          cat("\nlow temperature: only ", x," of acceptance in the 1st chain\n",
               sep = "")
           break
         }

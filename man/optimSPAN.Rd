@@ -10,9 +10,9 @@ optimSPAN(points, candi, covars, strata.type = "area", use.coords = FALSE,
   lags = 7, lags.type = "exponential", lags.base = 2, cutoff,
   criterion = "distribution", distri, pairs = FALSE,
   schedule = scheduleSPSANN(), plotit = FALSE, track = FALSE, boundary,
-  progress = TRUE, verbose = FALSE, weights = list(CORR = 1/6, DIST = 1/6,
-  PPL = 1/3, MSSD = 1/3), nadir = list(sim = NULL, seeds = NULL, user = NULL,
-  abs = NULL), utopia = list(user = NULL, abs = NULL))
+  progress = "txt", verbose = FALSE, weights = list(CORR = 1/6, DIST =
+  1/6, PPL = 1/3, MSSD = 1/3), nadir = list(sim = NULL, seeds = NULL, user =
+  NULL, abs = NULL), utopia = list(user = NULL, abs = NULL))
 
 objSPAN(points, candi, covars, strata.type = "area", use.coords = FALSE,
   lags = 7, lags.type = "exponential", lags.base = 2, cutoff,
@@ -97,8 +97,11 @@ only the starting and ending energy states are returned with the results.}
 If missing and \code{plotit = TRUE}, \code{boundary} is estimated from
 \code{candi}.}
 
-\item{progress}{Logical for printing a progress bar. Defaults to
-\code{progress = TRUE}.}
+\item{progress}{Type of progress bar that should be used, with options
+\code{"txt"}, for a text progress bar in the R console, \code{"tk"}, to put
+up a Tk progress bar widget, and \code{NULL} to omit the progress bar.
+A Tk progress bar widget is usefull when using parallel processors. Defaults
+to \code{progress = "txt"}.}
 
 \item{verbose}{Logical for printing messages about the progress of the
 optimization. Defaults to \code{verbose = FALSE}.}

@@ -58,9 +58,9 @@ sapply(list.files("src", full.names = TRUE, pattern = ".cpp$"), Rcpp::sourceCpp)
 data(meuse.grid)
 candi <- meuse.grid[, 1:2]
 covars <- meuse.grid[, c(1, 2, 5:7)]
-schedule <- scheduleSPSANN(initial.temperature = 0.5, chains = 1)
+schedule <- scheduleSPSANN(initial.temperature = 0.5, chains = 5)
 set.seed(2001)
-resA <- optimDIST(points = 100, candi = candi, covars = covars, 
+resA <- optimDIST(points = 100, candi = candi, covars = covars, progress = "tk",
                   use.coords = TRUE, plotit = TRUE, schedule = schedule)
 objSPSANN(resA) -
   objDIST(points = resA, candi = candi, covars = covars, use.coords = TRUE)

@@ -51,15 +51,15 @@
 # MAIN FUNCTION ################################################################
 optimACDC <-
   function (points, candi, 
-    # DIST and CORR
-    covars, strata.type = "area", use.coords = FALSE, 
-    # SPSANN
-    schedule = scheduleSPSANN(), plotit = FALSE, track = FALSE,
-    boundary, progress = TRUE, verbose = FALSE,
-    # MOOP
-    weights = list(CORR = 0.5, DIST = 0.5),
-    nadir = list(sim = NULL, seeds = NULL, user = NULL, abs = NULL),
-    utopia = list(user = NULL, abs = NULL)) {
+            # DIST and CORR
+            covars, strata.type = "area", use.coords = FALSE, 
+            # SPSANN
+            schedule = scheduleSPSANN(), plotit = FALSE, track = FALSE,
+            boundary, progress = "txt", verbose = FALSE,
+            # MOOP
+            weights = list(CORR = 0.5, DIST = 0.5),
+            nadir = list(sim = NULL, seeds = NULL, user = NULL, abs = NULL),
+            utopia = list(user = NULL, abs = NULL)) {
     
     # Objective function name
     objective <- "ACDC"
@@ -97,7 +97,7 @@ optimACDC <-
                         scm = scm, nadir = nadir, weights = weights, 
                         n.pts = n_pts, utopia = utopia, 
                         covars.type = covars.type)
-
+    
     # Other settings for the simulated annealing algorithm
     old_sm <- sm
     new_sm <- sm
@@ -109,12 +109,10 @@ optimACDC <-
     best_energy <- data.frame(obj = Inf, CORR = Inf, DIST = Inf)
     actual_temp <- schedule$initial.temperature
     k <- 0 # count the number of jitters
-    if (progress) {
-      max <- n_pts * schedule$chains * schedule$chain.length
-      pb <- utils::txtProgressBar(min = 1, max = max, style = 3)
-    }
-    time0 <- proc.time()
-
+    
+    # Set progress bar
+    eval(.set_progress())
+    
     # Initiate the annealing schedule
     for (i in 1:schedule$chains) {
       n_accept <- 0
@@ -123,60 +121,62 @@ optimACDC <-
         
         for (wp in 1:n_pts) { # Initiate loop through points
           k <- k + 1
-      
-      # Plotting and jittering
-      eval(.plot_and_jitter())
-      
-      # Update sample and correlation matrices, and energy state
-      new_sm[wp, ] <- covars[new_conf[wp, 1], ]
-      new_scm <- .corCORR(obj = new_sm, covars.type = covars.type)
-      new_energy <- .objACDC(sm = new_sm, pop.prop = pop_prop, scm = new_scm,
-                             nadir = nadir, weights = weights, pcm = pcm, 
-                             n.pts = n_pts, n.cov = n_cov, utopia = utopia,
-                             covars.type = covars.type)
-      
-      # Avoid the following error:
-      # Error in if (new_energy[1] <= old_energy[1]) { : 
-      #   missing value where TRUE/FALSE needed
-      # Source: http://stackoverflow.com/a/7355280/3365410
-      # ASR: The reason for the error is unknown to me.
-      if (is.na(new_energy[1])) {
-        new_energy <- old_energy
-        new_conf <- old_conf
-        new_sm <- old_sm
-        new_scm <- old_scm
-      }
-      
-      # Evaluate the new system configuration
-      accept <- .acceptSPSANN(old_energy[[1]], new_energy[[1]], actual_temp)
-      if (accept) {
-        old_conf <- new_conf
-        old_energy <- new_energy
-        old_sm <- new_sm
-        old_scm <- new_scm
-        n_accept <- n_accept + 1
-      } else {
-        new_energy <- old_energy
-        new_conf <- old_conf
-        new_sm <- old_sm
-        new_scm <- old_scm
-      }
-      if (track) energies[k, ] <- new_energy
-      
-      # Record best energy state
-      if (new_energy[[1]] < best_energy[[1]] / 1.0000001) {
-        best_k <- k
-        best_conf <- new_conf
-        best_energy <- new_energy
-        best_old_energy <- old_energy
-        old_conf <- old_conf
-        best_sm <- new_sm
-        best_old_sm <- old_sm
-        best_scm <- new_scm
-        best_old_scm <- old_scm
-      }
-      
-      if (progress) utils::setTxtProgressBar(pb, k)
+          
+          # Plotting and jittering
+          eval(.plot_and_jitter())
+          
+          # Update sample and correlation matrices, and energy state
+          new_sm[wp, ] <- covars[new_conf[wp, 1], ]
+          new_scm <- .corCORR(obj = new_sm, covars.type = covars.type)
+          new_energy <- 
+            .objACDC(sm = new_sm, pop.prop = pop_prop, scm = new_scm,
+                     nadir = nadir, weights = weights, pcm = pcm, n.pts = n_pts,
+                     n.cov = n_cov, utopia = utopia, covars.type = covars.type)
+          
+          # Avoid the following error:
+          # Error in if (new_energy[1] <= old_energy[1]) { : 
+          #   missing value where TRUE/FALSE needed
+          # Source: http://stackoverflow.com/a/7355280/3365410
+          # ASR: The reason for the error is unknown to me.
+          if (is.na(new_energy[1])) {
+            new_energy <- old_energy
+            new_conf <- old_conf
+            new_sm <- old_sm
+            new_scm <- old_scm
+          }
+          
+          # Evaluate the new system configuration
+          accept <- .acceptSPSANN(old_energy[[1]], new_energy[[1]], actual_temp)
+          if (accept) {
+            old_conf <- new_conf
+            old_energy <- new_energy
+            old_sm <- new_sm
+            old_scm <- new_scm
+            n_accept <- n_accept + 1
+          } else {
+            new_energy <- old_energy
+            new_conf <- old_conf
+            new_sm <- old_sm
+            new_scm <- old_scm
+          }
+          if (track) energies[k, ] <- new_energy
+          
+          # Record best energy state
+          if (new_energy[[1]] < best_energy[[1]] / 1.0000001) {
+            best_k <- k
+            best_conf <- new_conf
+            best_energy <- new_energy
+            best_old_energy <- old_energy
+            old_conf <- old_conf
+            best_sm <- new_sm
+            best_old_sm <- old_sm
+            best_scm <- new_scm
+            best_old_scm <- old_scm
+          }
+          
+          # Update progress bar
+          eval(.update_progress())
+          
         } # End loop through points
         
       } # End the chain
@@ -185,7 +185,7 @@ optimACDC <-
       if (i == 1) {
         x <- round(n_accept / c(n_pts * schedule$chain.length), 2)
         if (x < schedule$initial.acceptance) {
-          cat("\nlow temperature: only ", x," of acceptance in the 1st chain\n", 
+          cat("\nlow temperature: only ", x," of acceptance in the 1st chain\n",
               sep = "")
           break
         }
@@ -340,7 +340,7 @@ optimACDC <-
       
       # Prepare output
       res <- list(DIST = mean(nadirDIST), CORR = mean(nadirCORR))
-            
+      
     } else {
       
       # User-defined nadir values
@@ -382,7 +382,7 @@ optimACDC <-
 # INTERNAL FUNCTION - PREPARE THE UTOPIA POINT #################################
 .utopiaACDC <-
   function (utopia) {
-
+    
     if (!is.null(unlist(utopia$user))) {
       list(CORR = utopia$user$CORR, DIST = utopia$user$DIST)
       
@@ -395,12 +395,12 @@ optimACDC <-
 #' @export
 objACDC <-
   function (points, candi,
-    # DIST and CORR
-    covars, strata.type = "area", use.coords = FALSE,
-    # MOOP
-    weights = list(CORR = 0.5, DIST = 0.5),
-    nadir = list(sim = NULL, seeds = NULL, user = NULL, abs = NULL),
-    utopia = list(user = NULL, abs = NULL)) {
+            # DIST and CORR
+            covars, strata.type = "area", use.coords = FALSE,
+            # MOOP
+            weights = list(CORR = 0.5, DIST = 0.5),
+            nadir = list(sim = NULL, seeds = NULL, user = NULL, abs = NULL),
+            utopia = list(user = NULL, abs = NULL)) {
     
     # Check arguments
     check <- .optimACDCcheck(candi = candi, covars = covars, 

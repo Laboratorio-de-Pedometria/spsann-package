@@ -79,11 +79,11 @@
 # FUNCTION - MAIN ##############################################################
 optimUSER <-
   function (points, candi,
-    # USER
-    fun, ...,
-    # SPSANN
-    schedule = scheduleSPSANN(), plotit = FALSE, track = FALSE,
-    boundary, progress = TRUE, verbose = FALSE) {
+            # USER
+            fun, ...,
+            # SPSANN
+            schedule = scheduleSPSANN(), plotit = FALSE, track = FALSE,
+            boundary, progress = "txt", verbose = FALSE) {
     
     # Objective function name
     objective <- "USER"
@@ -108,11 +108,9 @@ optimUSER <-
     best_energy <- data.frame(obj = Inf)
     actual_temp <- schedule$initial.temperature
     k <- 0 # count the number of jitters
-    if (progress) {
-      max <- n_pts * schedule$chains * schedule$chain.length
-      pb <- utils::txtProgressBar(min = 1, max = max, style = 3)
-    }
-    time0 <- proc.time()
+    
+    # Set progress bar
+    eval(.set_progress())
     
     # Initiate the annealing schedule
     for (i in 1:schedule$chains) {
@@ -122,37 +120,38 @@ optimUSER <-
         
         for (wp in 1:n_pts) { # Initiate loop through points
           k <- k + 1
-      
-      # Plotting and jittering
-      eval(.plot_and_jitter())
-      
-      # New energy state
-      new_energy <- data.frame(
-        obj = .energyUSER(fun = fun, points = new_conf, ...))
-      
-      # Evaluate the new system configuration
-      accept <- .acceptSPSANN(old_energy[[1]], new_energy[[1]], actual_temp)
-      if (accept) {
-        old_conf <- new_conf
-        old_energy <- new_energy
-        n_accept <- n_accept + 1
-      } else {
-        new_energy <- old_energy
-        new_conf <- old_conf
-      }
-      if (track) energies[k, ] <- new_energy
-      
-      # Record best energy state
-      if (new_energy[[1]] < best_energy[[1]] / 1.0000001) {
-        best_k <- k
-        best_conf <- new_conf
-        best_energy <- new_energy
-        best_old_energy <- old_energy
-        old_conf <- old_conf
-      }
-      
-      
-      if (progress) utils::setTxtProgressBar(pb, k)
+          
+          # Plotting and jittering
+          eval(.plot_and_jitter())
+          
+          # New energy state
+          new_energy <- data.frame(
+            obj = .energyUSER(fun = fun, points = new_conf, ...))
+          
+          # Evaluate the new system configuration
+          accept <- .acceptSPSANN(old_energy[[1]], new_energy[[1]], actual_temp)
+          if (accept) {
+            old_conf <- new_conf
+            old_energy <- new_energy
+            n_accept <- n_accept + 1
+          } else {
+            new_energy <- old_energy
+            new_conf <- old_conf
+          }
+          if (track) energies[k, ] <- new_energy
+          
+          # Record best energy state
+          if (new_energy[[1]] < best_energy[[1]] / 1.0000001) {
+            best_k <- k
+            best_conf <- new_conf
+            best_energy <- new_energy
+            best_old_energy <- old_energy
+            old_conf <- old_conf
+          }
+          
+          # Update progress bar
+          eval(.update_progress())
+          
         } # End loop through points
         
       } # End the chain
@@ -161,7 +160,7 @@ optimUSER <-
       if (i == 1) {
         x <- round(n_accept / c(n_pts * schedule$chain.length), 2)
         if (x < schedule$initial.acceptance) {
-          cat("\nlow temperature: only ", x," of acceptance in the 1st chain\n", 
+          cat("\nlow temperature: only ", x," of acceptance in the 1st chain\n",
               sep = "")
           break
         }

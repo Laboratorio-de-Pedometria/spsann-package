@@ -1,3 +1,11 @@
+# Version 1.0-2.9006 (2015-11-17)
+* The user can now chose the type of progress bar that should be used, with 
+  options `"txt"`, for a text progress bar in the R console, `"tk"`, to put
+  up a Tk progress bar widget, and `NULL` to omit the progress bar. A Tk 
+  progress bar widget is useful when running ***spsann*** in parallel
+  processors. The ***tcltk***-package is now a suggested package.
+* Now we use grey colours to in the plot with the energy states.
+
 # Version 1.0-2.9005 (2015-11-17)
 * Solved NOTEs produced during CRAN check due to the use of functions from 
   default packages other than `base`, and due to examples that take more than 5

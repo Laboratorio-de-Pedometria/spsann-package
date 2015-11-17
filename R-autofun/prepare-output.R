@@ -13,7 +13,8 @@
 # 2. 
 # 
 # Progress bar
-if (progress) close(pb)
+if (!is.null(progress)) close(pb)
+# if (progress) close(pb)
 
 rt <- as.numeric(c(proc.time() - time0)[3])
 if (rt > 3600) {
