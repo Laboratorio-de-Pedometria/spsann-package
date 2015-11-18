@@ -1,5 +1,8 @@
 # Prepare ACDC covariates and base data
 #
+# COMMAND
+# eval(.prepare_acdc_covars())
+# 
 # SUMMARY
 # 1. Check if the coordinates should be used;
 # 2. Identify the type of covariates (factor or numeric);
@@ -23,7 +26,7 @@ if (covars.type == "factor") {
   if (!pedometrics::allFactor(covars)) {
     i <- which(sapply(covars, is.factor) == FALSE)
     mes <- paste("converting ", length(i), 
-                 " numeric covariates to factor covariates", sep = "")
+                 " numeric covariates into factor covariates...", sep = "")
     message(mes)
     num_covars <- data.frame(covars[, i])
     breaks <- .strataACDC(n.pts = n_pts, strata.type = strata.type, 
@@ -34,7 +37,3 @@ if (covars.type == "factor") {
 }
 n_cov <- ncol(covars)
 sm <- covars[points[, 1], ]
-
-# COMMAND
-# # Prepare 'covars' and create the starting sample matrix 'sm'
-# eval(.prepare_acdc_covars())

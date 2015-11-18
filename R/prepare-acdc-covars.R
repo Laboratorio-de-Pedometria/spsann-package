@@ -8,7 +8,7 @@ expression(if (use.coords) {
       if (!pedometrics::allFactor(covars)) {
         i <- which(sapply(covars, is.factor) == FALSE)
         mes <- paste("converting ", length(i), 
-                     " numeric covariates to factor covariates", sep = "")
+                     " numeric covariates into factor covariates...", sep = "")
         message(mes)
         num_covars <- data.frame(covars[, i])
         breaks <- .strataACDC(n.pts = n_pts, strata.type = strata.type, 
