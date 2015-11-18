@@ -1,5 +1,10 @@
 # Version 1.0-2.9007 (2015-11-18)
-* Improved warning messages.
+* Improved the warning message printed when converting numeric covariates into
+  factor covariates.
+* Created a new `autofun` to check the number of accepted jitters in the first
+  chain. If the number of accepted jitters is superior to the value passed to
+  `schedule$initial.acceptance`, the process continues and a message is printed
+  informing the proportion of jitters that have been accepted.
 
 # Version 1.0-2.9006 (2015-11-17)
 * The user can now chose the type of progress bar that should be used, with 
