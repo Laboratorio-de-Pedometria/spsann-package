@@ -49,8 +49,10 @@ plotOSC <-
       l <- colnames(a)
       n <- ncol(a)
       col <- c("red", rep("black", n - 1))
+      ylim <- range(sapply(a, max)) * c(0.9, 1.1)
       graphics::plot(1, type = 'n', xlim = c(0, k), 
-                     ylim = c(0, max(sapply(a, max)) * 1.1), 
+                     # ylim = c(0, max(sapply(a, max)) * 1.1), 
+                     ylim = ylim, 
                      xlab = "jitter", ylab = "energy state")
       graphics::legend("topright", legend = l, lwd = 1, lty = 1:n,
                        col = col)
