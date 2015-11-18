@@ -1,3 +1,6 @@
+# Version 1.0-2.9007 (2015-11-18)
+* Improved warning messages.
+
 # Version 1.0-2.9006 (2015-11-17)
 * The user can now chose the type of progress bar that should be used, with 
   options `"txt"`, for a text progress bar in the R console, `"tk"`, to put

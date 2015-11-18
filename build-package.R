@@ -17,7 +17,8 @@ fun.name <- c(".check_spsann_arguments",
               ".check_suggests",
               ".prepare_clhs_covars",
               ".set_progress", 
-              ".update_progress")
+              ".update_progress",
+              ".check_first_chain")
 read.file <- c("R-autofun/check-spsann-arguments.R", 
                "R-autofun/plotting-options.R",
                "R-autofun/prepare-jittering.R",
@@ -28,7 +29,8 @@ read.file <- c("R-autofun/check-spsann-arguments.R",
                "R-autofun/check-suggests.R",
                "R-autofun/prepare-clhs-covars.R",
                "R-autofun/set-progress.R",
-               "R-autofun/update-progress.R")
+               "R-autofun/update-progress.R",
+               "R-autofun/check-first-chain.R")
 write.file <- c("R/check-spsann-arguments.R",
                 "R/plotting-options.R",
                 "R/prepare-jittering.R",
@@ -39,7 +41,8 @@ write.file <- c("R/check-spsann-arguments.R",
                 "R/check-suggests.R",
                 "R/prepare-clhs-covars.R",
                 "R/set-progress.R",
-                "R/update-progress.R")
+                "R/update-progress.R",
+                "R/check-first-chain.R")
 lapply(1:length(fun.name), function (i) 
   autofun::autofun(fun.name[i], read.file[i], write.file[i]))
 rm(fun.name, read.file, write.file)
