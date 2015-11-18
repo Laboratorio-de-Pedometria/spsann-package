@@ -1,5 +1,9 @@
 # Version 1.0-2.9007 (2015-11-18)
 * Improved warning messages.
+* Created autofun to check the proportion of accepted jitters in the first 
+  chain.
+* Included scaling factors in two of the objective functions of `optimCLHS()`
+  following the original Fortran code of Budiman Minasny.
 
 # Version 1.0-2.9006 (2015-11-17)
 * The user can now chose the type of progress bar that should be used, with 

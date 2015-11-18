@@ -138,15 +138,8 @@ optimDIST <-
         
       } # End the chain
       
-      # Check the proportion of accepted swaps in the first chain
-      if (i == 1) {
-        x <- round(n_accept / c(n_pts * schedule$chain.length), 2)
-        if (x < schedule$initial.acceptance) {
-          cat("\nlow temperature: only ", x," of acceptance in the 1st chain\n",
-              sep = "")
-          break
-        }
-      }
+      # Check the proportion of accepted jitters in the first chain
+      eval(.check_first_chain())
       
       # Count the number of chains without any change in the objective function.
       # Restart with the previously best configuration if it exists.
