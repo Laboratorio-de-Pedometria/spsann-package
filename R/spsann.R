@@ -30,8 +30,8 @@
 #' \tabular{ll}{
 #' Package: \tab spsann    \cr
 #' Type:    \tab Package   \cr
-#' Version: \tab 1.0-2.9007\cr
-#' Date:    \tab 2015-11-18\cr
+#' Version: \tab 1.0-2.9008\cr
+#' Date:    \tab 2015-11-19\cr
 #' License: \tab GPL (>= 2)\cr
 #' }
 #' 

@@ -1,3 +1,6 @@
+# Version 1.0-2.9008 (2015-11-19)
+* Fixed minor bugs.
+
 # Version 1.0-2.9007 (2015-11-18)
 * Improved the warning message printed when converting numeric covariates into
   factor covariates.

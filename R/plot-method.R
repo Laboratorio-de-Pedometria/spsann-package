@@ -48,7 +48,8 @@ plotOSC <-
       n <- ncol(a)
       # col <- c("red", rep("black", n - 1))
       col <- c("red", gray(seq(0, 0.5, length.out = n - 1)))
-      ylim <- range(sapply(a, max))
+      if (n > 2) { ylim <- range(sapply(a, max)) } else { ylim <- range(a) }
+      # ylim <- range(sapply(a, max))
       graphics::plot(
         1, type = 'n', xlim = c(0, k), # ylim = c(0, max(sapply(a, max)) * 1.1), 
         ylim = ylim, xlab = "jitter", ylab = "energy state")
