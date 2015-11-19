@@ -81,7 +81,7 @@ minmaxPareto <-
                     " numeric covariates into factor covariates...", 
                     sep = ""))
       covars[, id] <- 
-        pedometrics::stratify(x = covars[, id], n = nrow(osc[[i]]))
+        pedometrics::stratify(x = covars[, id], n = nrow(osc[[1]]@points))
     }
     
     # Get objective function parameters
