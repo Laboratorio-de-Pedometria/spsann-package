@@ -4,7 +4,7 @@
   chain.
 * Included scaling factors in two of the objective functions of `optimCLHS()`
   following the original Fortran code of Budiman Minasny.
-* Fine-tuned the `plotOSC()` function: more accurate definition of the ylim.
+* Fixed minor bugs.
 
 # Version 1.0-2.9006 (2015-11-17)
 * The user can now chose the type of progress bar that should be used, with 
