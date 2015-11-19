@@ -96,8 +96,8 @@ if (MOOP && objective != "CLHS") {
 }
 
 # Argument 'track'
-if (track || !is.null(plotit)) {
-  if (!is.null(plotit)) { track <- TRUE }
+if (track || plotit) {
+  if (plotit) { track <- TRUE }
   if (MOOP) {
     energies <- as.data.frame(
       matrix(NA_real_, nrow = 1, ncol = length(weights) + 1))
