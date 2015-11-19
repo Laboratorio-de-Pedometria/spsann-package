@@ -333,8 +333,11 @@ objCLHS <-
     sm_count <- sapply(1:length(id_num), function (i) 
       graphics::hist(sm[id_num][, i], breaks[[i]], plot = FALSE)$counts - 1)
     
+    # Scaling factor
+    n <- nrow(sm) * length(id_num)
+    
     # Output
-    return (sum(abs(sm_count)))
+    return (sum(abs(sm_count)) / n)
   }
 # INTERNAL FUNCTION - CALCULATE THE CRITERION VALUE (O2) #######################
 # sm: sample matrix
@@ -360,8 +363,16 @@ objCLHS <-
 # pcm: population correlation matrix
 .objO3 <-
   function (sm, id_num, pcm) {
+    
+    # Scaling factor
+    n <- length(id_num)
+    n <- n * n / 2 + n
+    
+    # Calculate sample correlation matrix
     scm <- stats::cor(x = sm[, id_num], use = "complete.obs")
-    return (sum(abs(pcm - scm)))
+    
+    # Output
+    return (sum(abs(pcm - scm)) / n)
   }
 # INTERNAL FUNCTION - PREPARE OBJECT TO STORE THE BEST ENERGY STATE ############
 .bestEnergyCLHS <-

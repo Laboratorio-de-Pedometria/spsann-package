@@ -32,14 +32,12 @@
 plotOSC <-
   function (osc, which = 1:2, boundary) {
     
-    # Do not try to plot the energy states if they have not been traked
-    if (nrow(methods::slot(osc, "objective")$energy) == 2) which <- 2
+    # Do not try to plot the energy states if they have not been tracked
+    if (nrow(methods::slot(osc, "objective")$energy) == 2) { which <- 2 }
     
     par0 <- graphics::par()
     on.exit(suppressWarnings(graphics::par(par0)))
-    if (all(which == 1:2)) {
-      graphics::par(mfrow = c(1, 2))
-    }
+    if (all(which == 1:2)) { graphics::par(mfrow = c(1, 2)) }
     
     # Plot the energy states
     if (all(which == 1:2)) {
@@ -48,15 +46,15 @@ plotOSC <-
       a <- methods::slot(osc, "objective")$energy
       l <- colnames(a)
       n <- ncol(a)
-      col <- c("red", rep("black", n - 1))
-      graphics::plot(1, type = 'n', xlim = c(0, k), 
-                     ylim = c(0, max(sapply(a, max)) * 1.1), 
-                     xlab = "jitter", ylab = "energy state")
-      graphics::legend("topright", legend = l, lwd = 1, lty = 1:n,
-                       col = col)
+      # col <- c("red", rep("black", n - 1))
+      col <- c("red", gray(seq(0, 0.5, length.out = n - 1)))
+      ylim <- range(sapply(a, max))
+      graphics::plot(
+        1, type = 'n', xlim = c(0, k), # ylim = c(0, max(sapply(a, max)) * 1.1), 
+        ylim = ylim, xlab = "jitter", ylab = "energy state")
+      graphics::legend("topright", legend = l, lwd = 1, lty = 1:n, col = col)
       for(i in 1:ncol(a)) {
-        graphics::lines(a[, i] ~ c(0:k), type = "l", lty = i, 
-                        col = col[i])
+        graphics::lines(a[, i] ~ c(0:k), type = "l", lty = i, col = col[i])
       }
     }
     
@@ -69,12 +67,13 @@ plotOSC <-
         } else {
           sp::plot(x = boundary)
         }
-        graphics::points(methods::slot(osc, "points")[, "x"], 
-                         methods::slot(osc, "points")[, "y"],
-                         pch = 20, cex = 0.5)  
+        graphics::points(
+          methods::slot(osc, "points")[, "x"], 
+          methods::slot(osc, "points")[, "y"], pch = 20, cex = 0.5)  
       } else {
-        graphics::plot(methods::slot(osc, "points")[, c("x", "y")], pch = 20,
-                       cex = 0.5, asp = 1)
+        graphics::plot(
+          methods::slot(osc, "points")[, c("x", "y")], pch = 20, cex = 0.5, 
+          asp = 1)
       }
     }
   }

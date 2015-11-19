@@ -5,6 +5,13 @@
   chain. If the number of accepted jitters is superior to the value passed to
   `schedule$initial.acceptance`, the process continues and a message is printed
   informing the proportion of jitters that have been accepted.
+* Included scaling factors in two of the objective functions of `optimCLHS()`
+  following the original Fortran code of Budiman Minasny.
+* Use grey colours in plot with energy states; using only different line types
+  was not enough to see the different lines -- using different colours makes it
+  easier to see the differences among lines that represent different objective
+  functions.
+* Fixed minor bugs.
 
 # Version 1.0-2.9006 (2015-11-17)
 * The user can now chose the type of progress bar that should be used, with 
