@@ -52,10 +52,8 @@ devtools::check_doc()
 devtools::run_examples(run = FALSE)
 
 # check the package for Linux and Windows
-devtools::check()
+devtools::check(check_version = TRUE, force_suggests = TRUE)
 devtools::build_win()
-
-# build package
 devtools::build()
 
 # upload to CRAN
