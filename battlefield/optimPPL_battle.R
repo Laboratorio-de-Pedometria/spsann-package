@@ -61,6 +61,7 @@ sapply(list.files("src", full.names = TRUE, pattern = ".cpp$"), Rcpp::sourceCpp)
 data(meuse.grid)
 candi <- meuse.grid[, 1:2]
 set.seed(2001)
-countPPL(points = 100, candi = candi, lags = 1, cutoff = Inf)
+countPPL(points = 100, candi = candi, lags = 1, cutoff = Inf)[3] - 100
 set.seed(2001)
-countPPL(points = 100, candi = candi, lags = 1, pairs = TRUE, cutoff = Inf)
+countPPL(points = 100, candi = candi, lags = 1, pairs = TRUE, cutoff = Inf)[3] - 
+  100 * 99 / 2

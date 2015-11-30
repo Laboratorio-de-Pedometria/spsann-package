@@ -79,7 +79,8 @@ optimPPL <-
     
     # Initial energy state: points or point-pairs
     dm <- SpatialTools::dist1(conf0[, 2:3])
-    ppl <- .getPPL(lags = lags, n.lags = n_lags, dist.mat = dm, pairs = pairs)
+    ppl <- .getPPL(
+      lags = lags, n.lags = n_lags, dist.mat = dm, pairs = pairs, n.pts = n_pts)
     distri <- .distriPPL(n.lags = n_lags, n.pts = n_pts, criterion = criterion,
                          distri = distri, pairs = pairs)
     energy0 <- data.frame(
@@ -123,8 +124,9 @@ optimPPL <-
           #new_dm[, wp] <- x2
           
           # Update the energy state: points or point-pairs?
-          ppl <- .getPPL(lags = lags, n.lags = n_lags, dist.mat = new_dm, 
-                         pairs = pairs)
+          ppl <- .getPPL(
+            lags = lags, n.lags = n_lags, dist.mat = new_dm, pairs = pairs, 
+            n.pts = n_pts)
           new_energy <- data.frame(
             obj = .objPPL(n.lags = n_lags, n.pts = n_pts, pairs = pairs,
                           criterion = criterion, distri = distri, ppl = ppl))
@@ -232,7 +234,8 @@ objPPL <-
     
     # Initial energy state: points or point-pairs
     dm <- SpatialTools::dist1(points[, 2:3])
-    ppl <- .getPPL(lags = lags, n.lags = n_lags, dist.mat = dm, pairs = pairs)
+    ppl <- .getPPL(
+      lags = lags, n.lags = n_lags, dist.mat = dm, pairs = pairs, n.pts = n_pts)
     distri <- .distriPPL(n.lags = n_lags, n.pts = n_pts, criterion = criterion,
                          distri = distri, pairs = pairs)
     res <- .objPPL(ppl = ppl, n.lags = n_lags, n.pts = n_pts, pairs = pairs,
@@ -271,7 +274,8 @@ countPPL <-
     
     # Distance matrix and counts
     dm <- SpatialTools::dist1(points[, 2:3])
-    res <- .getPPL(lags = lags, n.lags = n_lags, dist.mat = dm, pairs = pairs)
+    res <- .getPPL(
+      lags = lags, n.lags = n_lags, dist.mat = dm, pairs = pairs, n.pts = n_pts)
     res <- data.frame(lag.lower = lags[-length(lags)], lag.upper = lags[-1],
                       ppl = res)
     return (res)
@@ -402,21 +406,27 @@ countPPL <-
 # apply(X = dist.mat, 1, FUN = function (X) table(cut(X, breaks = lags)))
 # apply(X = ppl, 1, FUN = function (X) sum(X != 0))
 .getPPL <-
-  function (lags, n.lags, dist.mat, pairs) {
+  function (lags, n.lags, dist.mat, pairs, n.pts) {
     
-    ppl <- vector()
+    # ppl <- vector()
     
     if (pairs) { # Point-pairs per lag
-      for (i in 1:n.lags) {
-        n <- which(dist.mat > lags[i] & dist.mat <= lags[i + 1])
-        ppl[i] <- length(n)
-      }
-      
+      # for (i in 1:n.lags) {
+        # n <- which(dist.mat > lags[i] & dist.mat <= lags[i + 1])
+        # ppl[i] <- length(n)
+      # }
+      ppl <- diff(sapply(
+        1:length(lags), function (i) 
+          length(which(dist.mat <= lags[i]))) - n.pts) * 0.5
     } else { # Points per lag
-      for (i in 1:n.lags) {
-        n <- which(dist.mat > lags[i] & dist.mat <= lags[i + 1], arr.ind = TRUE)
-        ppl[i] <- length(unique(c(n)))
-      }
+      # for (i in 1:n.lags) {
+        # n <- which(
+          # dist.mat > lags[i] & dist.mat <= lags[i + 1], arr.ind = TRUE)
+        # ppl[i] <- length(unique(c(n)))
+      # }
+      ppl <- sapply(1:n.lags, function (i)
+        length(unique(c(
+          which(dist.mat > lags[i] & dist.mat <= lags[i + 1], arr.ind = TRUE)))))
     }
     
     return (ppl)

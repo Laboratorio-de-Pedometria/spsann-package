@@ -1,3 +1,12 @@
+# Version 1.0-2.9009 (2015-11-30)
+* FIX: the computation of the number of point-pairs per lag-distance class in
+  `optimPPL` was incorrect because it neglected the fact that, in a full 
+  distance matrix, two points *a* and *b* form two pairs, i.e. *ab* and *ba*. 
+  The mistake is due to the fact that we use `SpatialTools::dist1` to compute 
+  the distance matrix instead of `stats::dist`.
+* FEATURE: using a faster code to compute the number of points and point-pairs
+  per lag-distance class in `optimPPL`.
+
 # Version 1.0-2.9008 (2015-11-19)
 * Fixed minor bugs.
 
