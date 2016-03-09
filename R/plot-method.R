@@ -14,6 +14,10 @@
 #' @param boundary Object of class Spatial defining the boundary of the 
 #' sampling region.
 #' 
+#' @rdname plot-method
+#' @export
+#' @method plot OptimizedSampleConfiguration
+#' @aliases plot plot.OptimizedSampleConfiguration
 #' @examples 
 #' require(sp)
 #' data(meuse.grid)
@@ -27,16 +31,12 @@
 #'                  use.coords = TRUE, schedule = schedule)
 #' plot(res)
 # MAIN FUNCTION - PLOT OSC #####################################################
-#' @export
-#' @rdname plot-method
-plot <- function (osc, which = 1:2, boundary) UseMethod( "plot" )
-#' @rdname plot-method
-#' @export
 plot.OptimizedSampleConfiguration <-
   function (osc, which = 1:2, boundary) {
     
     # Do not try to plot the energy states if they have not been tracked
-    if (nrow(methods::slot(osc, "objective")$energy) == 2) { which <- 2 }
+    # if (nrow(methods::slot(osc, "objective")$energy) == 2) { which <- 2 }
+    if (nrow(osc$objective$energy) == 2) { which <- 2 }
     
     par0 <- graphics::par()
     on.exit(suppressWarnings(graphics::par(par0)))
@@ -83,8 +83,7 @@ plot.OptimizedSampleConfiguration <-
 
       } else {
         # graphics::plot(
-          # methods::slot(osc, "points")[, c("x", "y")], pch = 20, cex = 0.5, 
-          # asp = 1)
+          # methods::slot(osc, "points")[, c("x", "y")], pch = 20, cex = 0.5, asp = 1)
         graphics::plot(osc$points[, c("x", "y")], pch = 20, cex = 0.5, asp = 1)
       }
     }
