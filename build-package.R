@@ -49,7 +49,7 @@ rm(fun.name, read.file, write.file)
 
 # check examples and documentation
 devtools::check_man()
-devtools::run_examples(run = FALSE)
+devtools::run_examples(run = T)
 
 # check the package for Linux and Windows
 devtools::check(check_version = TRUE, force_suggests = TRUE)
