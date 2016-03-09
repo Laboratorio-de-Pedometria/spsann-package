@@ -81,22 +81,36 @@ res[["objective"]] <- list(
 )
 
 if (objective %in% c("ACDC", "CLHS", "CORR", "DIST", "SPAN")) {
-  if (objective != "CLHS") res@objective$strata.type <- strata.type
-  res@objective$use.coords <- use.coords
+  # if (objective != "CLHS") res@objective$strata.type <- strata.type
+  # res@objective$use.coords <- use.coords
+  if (objective != "CLHS") res[["objective"]]$strata.type <- strata.type
+  res[["objective"]]$use.coords <- use.coords
 }
 if (objective %in% c("PPL", "SPAN")) {
-  res@objective$lags <- lags
-  res@objective$lags.type <- lags.type
-  res@objective$lags.base <- lags.base
-  res@objective$cutoff <- cutoff
-  res@objective$criterion <- criterion
-  res@objective$distri <- distri
-  res@objective$pairs <- pairs
+  # res@objective$lags <- lags
+  # res@objective$lags.type <- lags.type
+  # res@objective$lags.base <- lags.base
+  # res@objective$cutoff <- cutoff
+  # res@objective$criterion <- criterion
+  # res@objective$distri <- distri
+  # res@objective$pairs <- pairs
+  
+  res[["objective"]]$lags <- lags
+  res[["objective"]]$lags.type <- lags.type
+  res[["objective"]]$lags.base <- lags.base
+  res[["objective"]]$cutoff <- cutoff
+  res[["objective"]]$criterion <- criterion
+  res[["objective"]]$distri <- distri
+  res[["objective"]]$pairs <- pairs
 }
 if (objective == "MKV") {
-  res@objective$eqn <- eqn
-  res@objective$vgm <- vgm
-  res@objective$krige.stat <- krige.stat
+  # res@objective$eqn <- eqn
+  # res@objective$vgm <- vgm
+  # res@objective$krige.stat <- krige.stat
+  
+  res[["objective"]]$eqn <- eqn
+  res[["objective"]]$vgm <- vgm
+  res[["objective"]]$krige.stat <- krige.stat
 }
 
 # Print the running time
