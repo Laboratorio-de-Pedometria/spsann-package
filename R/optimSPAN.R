@@ -302,8 +302,7 @@ optimSPAN <-
 # CALCULATE OBJECTIVE FUNCTION VALUE ###########################################
 #' @rdname optimSPAN
 #' @export
-objSPAN.OptimizedSampleConfiguration <-
-# objSPAN <-
+objSPAN <-
   function(points, candi, 
            # DIST and CORR
            covars, strata.type = "area", use.coords = FALSE,

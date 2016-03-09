@@ -48,7 +48,7 @@ lapply(1:length(fun.name), function (i)
 rm(fun.name, read.file, write.file)
 
 # check examples and documentation
-devtools::check_doc()
+devtools::check_man()
 devtools::run_examples(run = FALSE)
 
 # check the package for Linux and Windows

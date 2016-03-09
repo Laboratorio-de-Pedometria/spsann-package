@@ -219,8 +219,7 @@ optimDIST <-
 # CALCULATE OBJECTIVE FUNCTION VALUE ###########################################
 #' @rdname optimDIST
 #' @export
-objDIST.OptimizedSampleConfiguration <-
-# objDIST <-
+objDIST <-
   function (points, candi,
     # DIST
     covars, strata.type = "area", use.coords = FALSE) {
