@@ -191,7 +191,8 @@ optimMSSD <-
 # FUNCTION - CALCULATE THE CRITERION VALUE #####################################
 #' @rdname optimMSSD
 #' @export
-objMSSD <-
+objMSSD.OptimizedSampleConfiguration <-
+# objMSSD <-
   function (points, candi) {
     
     # Prepare points and candi

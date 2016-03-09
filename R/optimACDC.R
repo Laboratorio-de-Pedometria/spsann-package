@@ -386,7 +386,8 @@ optimACDC <-
 # CALCULATE OBJECTIVE FUNCTION VALUE ###########################################
 #' @rdname optimACDC
 #' @export
-objACDC <-
+objACDC.OptimizedSampleConfiguration <-
+# objACDC <-
   function (points, candi,
             # DIST and CORR
             covars, strata.type = "area", use.coords = FALSE,

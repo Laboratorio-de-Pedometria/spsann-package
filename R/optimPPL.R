@@ -205,7 +205,8 @@ optimPPL <-
 # FUNCTION - CALCULATE THE CRITERION VALUE #####################################
 #' @rdname optimPPL
 #' @export
-objPPL <-
+objPPL.OptimizedSampleConfiguration <-
+# objPPL <-
   function (points, candi, 
             # PPL
             lags = 7, lags.type = "exponential", lags.base = 2, cutoff, distri,

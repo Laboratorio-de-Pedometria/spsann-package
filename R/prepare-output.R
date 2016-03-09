@@ -11,23 +11,44 @@ expression(if (!is.null(progress)) close(pb), rt <- as.numeric(c(proc.time() - t
         rt <- list(time = round(rt, 2), unit = "seconds")
       }
     }, if (!track) energies <- new_energy, energies <- rbind(energy0, energies), 
-    res <- methods::new("OptimizedSampleConfiguration", 
-                        points = data.frame(new_conf)), slot(res, "spsann") <- 
-      list(acceptance = data.frame(initial = schedule$initial.acceptance),
-           cellsize = data.frame(x = cellsize[1], y = cellsize[2]),
-           chains = data.frame(total = schedule$chains, used = i, 
-                               length = schedule$chain.length),
-           jitter = data.frame(x = c(x.min, x_max0), y = c(y.min, y_max0), 
-                               row.names = c("min", "max")),
-           running = data.frame(time = rt[[1]], units = rt[[2]]),
-           stopping = schedule$stopping,
-           temperature = data.frame(initial = schedule$initial.temperature,
-                                    final = actual_temp)), slot(res, "objective") <-
-      list(name = objective,
-           energy = energies,
-           nadir = if (MOOP && objective != "CLHS") data.frame(nadir),
-           utopia = if (MOOP && objective != "CLHS") data.frame(utopia),
-           weights = if (MOOP) data.frame(weights)), if (objective %in% c("ACDC", "CLHS", "CORR", "DIST", "SPAN")) {
+    res <- list(
+      # The optimized sample configuration
+      points = data.frame(id = NA_integer_, x = NA_real_, y = NA_real_),
+      
+      # Information about the spatial simulated annealing
+      spsann = list(
+        acceptance = data.frame(initial = NA_real_),
+        cellsize = data.frame(x = NA_real_, y = NA_real_),
+        chains = data.frame(total = NA_integer_, used = NA_integer_, length = NA_integer_),
+        jitter = data.frame(x = rep(NA_real_, 2), y = rep(NA_real_, 2), row.names = c("min", "max")),
+        running = data.frame(time = NA_real_, units = NA_character_), 
+        stopping = NA_integer_,
+        temperature = data.frame(initial = NA_real_, final = NA_real_)),
+      
+      # Information about the objective function
+      objective = list(
+        name = NA_character_,
+        energy = data.frame(NA_real_),
+        nadir = data.frame(NA_real_),
+        utopia = data.frame(NA_real_),
+        weights = data.frame(NA_real_))
+    ), class(res) <- "OptimizedSampleConfiguration", res[["spsann"]] <- list(
+    # slot(res, "spsann") <- list (
+      acceptance = data.frame(initial = schedule$initial.acceptance),
+      cellsize = data.frame(x = cellsize[1], y = cellsize[2]),
+      chains = data.frame(total = schedule$chains, used = i, length = schedule$chain.length),
+      jitter = data.frame(x = c(x.min, x_max0), y = c(y.min, y_max0), row.names = c("min", "max")),
+      running = data.frame(time = rt[[1]], units = rt[[2]]),
+      stopping = schedule$stopping,
+      temperature = data.frame(initial = schedule$initial.temperature, final = actual_temp)
+    ), res[["objective"]] <- list(
+    # slot(res, "objective") <- list(
+      name = objective,
+      energy = energies,
+      nadir = if (MOOP && objective != "CLHS") data.frame(nadir),
+      utopia = if (MOOP && objective != "CLHS") data.frame(utopia),
+      weights = if (MOOP) data.frame(weights)
+    ), if (objective %in% c("ACDC", "CLHS", "CORR", "DIST", "SPAN")) {
       if (objective != "CLHS") res@objective$strata.type <- strata.type
       res@objective$use.coords <- use.coords
     }, if (objective %in% c("PPL", "SPAN")) {

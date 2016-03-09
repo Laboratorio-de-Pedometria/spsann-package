@@ -301,7 +301,8 @@ optimCLHS <-
 # CALCULATE OBJECTIVE FUNCTION VALUE ###########################################
 #' @rdname optimCLHS
 #' @export
-objCLHS <-
+objCLHS.OptimizedSampleConfiguration <-
+# objCLHS <-
   function (points, candi, covars, use.coords = FALSE, 
             weights = list(O1 = 1/3, O2 = 1/3, O3 = 1/3)) {
     

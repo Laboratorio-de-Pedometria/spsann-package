@@ -61,7 +61,8 @@
 #' pareto
 #' }
 # FUNCTION - MAIN ##############################################################
-minmaxPareto <-
+minmaxPareto.OptimizedSampleConfiguration <-
+# minmaxPareto <-
   function (osc, candi, covars) {
     
     obj <- c("CORR", "DIST", "PPL", "MSSD")

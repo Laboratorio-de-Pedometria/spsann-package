@@ -194,7 +194,8 @@ optimCORR <-
 # FUNCTION - CALCULATE ENERGY STATE ############################################
 #' @rdname optimCORR
 #' @export
-objCORR <-
+objCORR.OptimizedSampleConfiguration <-
+# objCORR <-
   function (points, candi,
             # CORR
             covars, strata.type = "area", use.coords = FALSE) {

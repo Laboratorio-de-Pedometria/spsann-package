@@ -349,7 +349,8 @@ optimMKV <-
 # FUNCTION - CANCLULATE THE OBJECTIVE FUNCTION VALUE ###########################
 #' @export
 #' @rdname optimMKV
-objMKV <-
+objMKV.OptimizedSampleConfiguration <-
+# objMKV <-
   function (points, candi,
             # MKV
             covars, eqn = z ~ 1, vgm, krige.stat = "mean", ...) {

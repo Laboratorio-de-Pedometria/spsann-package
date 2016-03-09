@@ -18,7 +18,8 @@
 # FUNCTION - RETRIEVE THE ENERGY STATE #########################################
 #' @export
 #' @rdname SPSANNtools
-objSPSANN <- 
+# objSPSANN <- 
+objSPSANN.OptimizedSampleConfiguration <- 
   function (osc, at = "end", n = 1) {
     
     # Energy state at the start
