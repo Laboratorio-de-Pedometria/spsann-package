@@ -18,15 +18,20 @@
 # FUNCTION - RETRIEVE THE ENERGY STATE #########################################
 #' @export
 #' @rdname SPSANNtools
+objSPSANN <- function (osc, at = "end", n = 1) UseMethod( "objSPSANN" )
+#' @export
+#' @rdname SPSANNtools
 # objSPSANN <- 
 objSPSANN.OptimizedSampleConfiguration <- 
   function (osc, at = "end", n = 1) {
     
     # Energy state at the start
-    if (at == "start") res <- utils::head(osc@objective$energy, n)
+    # if (at == "start") res <- utils::head(osc@objective$energy, n)
+    if (at == "start") res <- utils::head(osc[["objective"]]$energy, n)
     
     # Energy state at the end
-    if (at == "end") res <- utils::tail(osc@objective$energy, n)
+    # if (at == "end") res <- utils::tail(osc@objective$energy, n)
+    if (at == "end") res <- utils::tail(osc[["objective"]]$energy, n)
     
     return(data.frame(res, row.names = ""))
   }
