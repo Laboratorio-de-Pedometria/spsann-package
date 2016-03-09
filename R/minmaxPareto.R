@@ -67,8 +67,7 @@ minmaxPareto <-
     obj <- c("CORR", "DIST", "PPL", "MSSD")
     if (!all(names(osc) %in% obj == TRUE)) {
       idx <- which(names(osc) %in% obj == FALSE)
-      message(paste("'", names(osc)[idx], "'", 
-                    " not recognized as a valid name\n", sep = ""))
+      message(paste("'", names(osc)[idx], "'", " not recognized as a valid name\n", sep = ""))
     } else {
       idx <- match(names(osc), obj)
       osc <- osc[idx]
@@ -77,31 +76,28 @@ minmaxPareto <-
     # Convert numeric covariates into factor covariates
     if (pedometrics::anyFactor(covars) && !pedometrics::allFactor(covars)) {
       id <- which(!sapply(covars, is.factor))
-      message(paste("converting ", length(id), 
-                    " numeric covariates into factor covariates...", 
-                    sep = ""))
-      covars[, id] <- 
-        pedometrics::stratify(x = covars[, id], n = nrow(osc[[1]]@points))
+      message(paste("converting ", length(id), " numeric covariates into factor covariates...", sep = ""))
+      covars[, id] <- pedometrics::stratify(x = covars[, id], n = nrow(osc[[1]][["points"]]))
     }
     
     # Get objective function parameters
-    strata.type <- osc$CORR@objective$strata.type
-    use.coords <- osc$CORR@objective$use.coords
+    strata.type <- osc$CORR[["objective"]]$strata.type
+    use.coords <- osc$CORR[["objective"]]$use.coords
     
     # Compute objective function values
     obj_corr <- sapply(1:length(osc), function (i) 
-      objCORR(osc[[i]]@points, covars = covars, candi = candi, 
+      objCORR(osc[[i]][["points"]], covars = covars, candi = candi, 
               strata.type = strata.type, use.coords = use.coords))
     obj_dist <- sapply(1:length(osc), function (i) 
-      objDIST(osc[[i]]@points, covars = covars, candi = candi, 
+      objDIST(osc[[i]][["points"]], covars = covars, candi = candi, 
               strata.type = strata.type, use.coords = use.coords))
     
     if (all(c("PPL", "MSSD") %in% names(osc))) {
       
       # Get objective function parameters
-      lags <- osc$PPL@objective$lags
-      criterion <- osc$PPL@objective$criterion
-      pairs <- osc$PPL@objective$pairs
+      lags <- osc$PPL[["objective"]]$lags
+      criterion <- osc$PPL[["objective"]]$criterion
+      pairs <- osc$PPL[["objective"]]$pairs
 #       x.max <- osc$PPL@spsann$jitter$x[2]
 #       x.min <- osc$PPL@spsann$jitter$x[1]
 #       y.max <- osc$PPL@spsann$jitter$y[2]
@@ -109,20 +105,18 @@ minmaxPareto <-
       
       # Compute objective function values
       obj_ppl <- sapply(1:length(osc), function (i) 
-        objPPL(osc[[i]]@points, candi = candi, 
+        objPPL(osc[[i]][["points"]], candi = candi, 
                lags = lags, criterion = criterion, pairs = pairs
                # ,x.max = x.max, y.max = y.max, x.min = x.min, y.min = y.min
                ))
-      obj_mssd <- sapply(1:length(osc), function (i) 
-        objMSSD(osc[[i]]@points, candi = candi))
+      obj_mssd <- sapply(1:length(osc), function (i) objMSSD(osc[[i]][["points"]], candi = candi))
       
       # Prepare output
       res <- data.frame(
         CORR = obj_corr, DIST = obj_dist, PPL = obj_ppl, MSSD = obj_mssd, 
         row.names = c("CORR", "DIST", "PPL", "MSSD"))
     } else {
-      res <- data.frame(CORR = obj_corr, DIST = obj_dist,
-                        row.names = c("CORR", "DIST"))
+      res <- data.frame(CORR = obj_corr, DIST = obj_dist, row.names = c("CORR", "DIST"))
     }
     return (res)
   }
