@@ -14,8 +14,6 @@
 #' @param boundary Object of class Spatial defining the boundary of the 
 #' sampling region.
 #' 
-#' @rdname plot-method
-#' @export
 #' @examples 
 #' require(sp)
 #' data(meuse.grid)
@@ -27,9 +25,14 @@
 #' set.seed(2001)
 #' res <- optimCORR(points = 10, candi = candi, covars = covars, 
 #'                  use.coords = TRUE, schedule = schedule)
-#' plotOSC(res)
+#' plot(res)
 # MAIN FUNCTION - PLOT OSC #####################################################
-plotOSC <-
+#' @export
+#' @rdname plot-method
+plot <- function (osc, which = 1:2, boundary) UseMethod( "plot" )
+#' @rdname plot-method
+#' @export
+plot.OptimizedSampleConfiguration <-
   function (osc, which = 1:2, boundary) {
     
     # Do not try to plot the energy states if they have not been tracked
@@ -41,9 +44,14 @@ plotOSC <-
     
     # Plot the energy states
     if (all(which == 1:2)) {
-      k <- methods::slot(osc, "spsann")$chains[2:3]
-      k <- as.numeric(k[1] * k[2] * nrow(methods::slot(osc, "points")))
-      a <- methods::slot(osc, "objective")$energy
+      # k <- methods::slot(osc, "spsann")$chains[2:3]
+      # k <- as.numeric(k[1] * k[2] * nrow(methods::slot(osc, "points")))
+      # a <- methods::slot(osc, "objective")$energy
+      
+      k <- osc$spsann$chains[2:3]
+      k <- as.numeric(k[1] * k[2] * nrow(osc$points))
+      a <- osc$objective$energy
+      
       l <- colnames(a)
       n <- ncol(a)
       # col <- c("red", rep("black", n - 1))
@@ -68,13 +76,16 @@ plotOSC <-
         } else {
           sp::plot(x = boundary)
         }
-        graphics::points(
-          methods::slot(osc, "points")[, "x"], 
-          methods::slot(osc, "points")[, "y"], pch = 20, cex = 0.5)  
+        # graphics::points(
+          # methods::slot(osc, "points")[, "x"], 
+          # methods::slot(osc, "points")[, "y"], pch = 20, cex = 0.5)
+        graphics::points(osc$points[, "x"], osc$points[, "y"], pch = 20, cex = 0.5)
+
       } else {
-        graphics::plot(
-          methods::slot(osc, "points")[, c("x", "y")], pch = 20, cex = 0.5, 
-          asp = 1)
+        # graphics::plot(
+          # methods::slot(osc, "points")[, c("x", "y")], pch = 20, cex = 0.5, 
+          # asp = 1)
+        graphics::plot(osc$points[, c("x", "y")], pch = 20, cex = 0.5, asp = 1)
       }
     }
   }
