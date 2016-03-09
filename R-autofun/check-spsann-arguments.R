@@ -1,5 +1,8 @@
 # Check spsann arguments
 # 
+# COMMAND
+# eval(.check_spsann_arguments())
+#
 # SUMMARY
 # 1. Check the mandatory OPTIM arguments 'points' and 'candi';
 # 2. If all is fine, check the mandatory OPTIM argument 'iterations';
@@ -99,8 +102,7 @@ if (MOOP && objective != "CLHS") {
 if (track || plotit) {
   if (plotit) { track <- TRUE }
   if (MOOP) {
-    energies <- as.data.frame(
-      matrix(NA_real_, nrow = 1, ncol = length(weights) + 1))
+    energies <- as.data.frame(matrix(NA_real_, nrow = 1, ncol = length(weights) + 1))
     colnames(energies) <- c("obj", names(weights))
   } else {
     energies <- data.frame(obj = NA_real_)
@@ -112,8 +114,3 @@ if (track || plotit) {
 if (!is.null(res)) stop (res, call. = FALSE)
 # rm(aa, bb, cc, dd, res)
 rm(aa, bb, cc, res)
-#
-# COMMAND
-# # Check spsann arguments ###################################################
-# eval(.check_spsann_arguments())
-# ############################################################################

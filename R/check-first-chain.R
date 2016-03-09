@@ -4,8 +4,7 @@
 expression(if (i == 1) {
   x <- round(n_accept / c(n_pts * schedule$chain.length), 2)
   if (x < schedule$initial.acceptance) {
-    cat("\nlow temperature: ", round(x * 100, 2),
-        "% of acceptance in the 1st chain\n", sep = "")
+    cat("\nlow temperature: ", round(x * 100, 2), "% of acceptance in the 1st chain\n", sep = "")
     break
   } else {
     cat("\n", round(x * 100, 2), "% of acceptance in the 1st chain\n", sep = "")

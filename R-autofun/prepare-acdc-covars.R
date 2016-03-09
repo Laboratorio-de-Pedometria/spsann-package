@@ -25,12 +25,11 @@ covars.type <- ifelse(pedometrics::anyFactor(covars), "factor", "numeric")
 if (covars.type == "factor") {
   if (!pedometrics::allFactor(covars)) {
     i <- which(sapply(covars, is.factor) == FALSE)
-    mes <- paste("converting ", length(i), 
-                 " numeric covariates into factor covariates...", sep = "")
+    mes <- paste("converting ", length(i), " numeric covariates into factor covariates...", sep = "")
     message(mes)
     num_covars <- data.frame(covars[, i])
-    breaks <- .strataACDC(n.pts = n_pts, strata.type = strata.type, 
-                          covars = num_covars, covars.type = "numeric")[[1]]
+    breaks <- .strataACDC(
+      n.pts = n_pts, strata.type = strata.type, covars = num_covars, covars.type = "numeric")[[1]]
     num_covars <- pedometrics::cont2cat(x = num_covars, breaks = breaks)
     covars[, i] <- num_covars
   }

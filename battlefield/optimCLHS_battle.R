@@ -32,8 +32,8 @@ candi <- meuse.grid[, 1:2]
 covars <- meuse.grid[, 6:7]
 schedule <- scheduleSPSANN(chains = 100, initial.temperature = 10)
 set.seed(2001)
-res <- optimCLHS(points = 100, candi = candi, covars = covars, 
-                 use.coords = TRUE, schedule = schedule, plotit = TRUE)
+res <- optimCLHS(
+  points = 100, candi = candi, covars = covars,  use.coords = TRUE, schedule = schedule, plotit = TRUE)
 objSPSANN(res) -
   objCLHS(points = res, candi = candi, covars = covars, use.coords = TRUE)
 
@@ -47,8 +47,8 @@ candi <- meuse.grid[, 1:2]
 covars <- meuse.grid[, 6:7]
 schedule <- scheduleSPSANN(chains = 1, initial.temperature = 10)
 set.seed(2001)
-res <-  optimCLHS(points = 10, candi = candi, covars = covars, 
-                  use.coords = TRUE, schedule = schedule, plotit = TRUE)
+res <-  optimCLHS(
+  points = 10, candi = candi, covars = covars, use.coords = TRUE, schedule = schedule, plotit = TRUE)
 objSPSANN(res) -
   objCLHS(points = res, candi = candi, covars = covars, use.coords = TRUE)
 
@@ -62,7 +62,7 @@ candi <- meuse.grid[, 1:2]
 covars <- meuse.grid[, rep(c(6, 7), 10)]
 schedule <- scheduleSPSANN(chains = 1, initial.temperature = 10)
 set.seed(2001)
-res <- optimCLHS(points = 500, candi = candi, covars = covars, use.coords = T,
-                 schedule = schedule, plotit = TRUE)
+res <- optimCLHS(
+  points = 500, candi = candi, covars = covars, use.coords = T, schedule = schedule, plotit = TRUE)
 objSPSANN(res) -
   objCLHS(points = res, candi = candi, covars = covars, use.coords = TRUE)

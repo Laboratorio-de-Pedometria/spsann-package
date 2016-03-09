@@ -1,5 +1,8 @@
 # Check suggests
 # 
+# COMMAND
+# eval(.check_suggests())
+# 
 # SUMMARY
 # 1. Check if the suggested packages are installed;
 # 2. Compose a message with the suggested packages that are not installed;
@@ -14,10 +17,6 @@ id <- !sapply(pkg, requireNamespace, quietly = TRUE)
 res <- NULL
 if (any(id)) {
   pkg <- paste(pkg[which(id)], collapse = " ")
-  res <- paste("Package(s) needed for this function to work but not",
-               "installed: ", pkg, sep = "")
+  res <- paste("Package(s) needed for this function to work but not", "installed: ", pkg, sep = "")
 }
 if (!is.null(res)) stop (res, call. = FALSE)
-# COMMAND
-# # Check suggests
-# eval(.check_suggests())

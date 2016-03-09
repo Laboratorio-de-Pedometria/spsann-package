@@ -62,8 +62,7 @@ expression(res <- NULL, aa <- c("points", "candi"), bb <- c(missing(points), mis
     }, if (track || plotit) {
       if (plotit) { track <- TRUE }
       if (MOOP) {
-        energies <- as.data.frame(
-          matrix(NA_real_, nrow = 1, ncol = length(weights) + 1))
+        energies <- as.data.frame(matrix(NA_real_, nrow = 1, ncol = length(weights) + 1))
         colnames(energies) <- c("obj", names(weights))
       } else {
         energies <- data.frame(obj = NA_real_)

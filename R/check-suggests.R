@@ -4,8 +4,7 @@
 expression(id <- !sapply(pkg, requireNamespace, quietly = TRUE), 
     res <- NULL, if (any(id)) {
       pkg <- paste(pkg[which(id)], collapse = " ")
-      res <- paste("Package(s) needed for this function to work but not",
-                   "installed: ", pkg, sep = "")
+      res <- paste("Package(s) needed for this function to work but not", "installed: ", pkg, sep = "")
     }, if (!is.null(res)) stop (res, call. = FALSE))
 }
 
