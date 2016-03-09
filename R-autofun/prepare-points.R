@@ -1,5 +1,8 @@
 # Prepare points and candi
-#
+# 
+# COMMAND
+# eval(.prepare_points())
+# 
 # SUMMARY
 # 1. Compute 'n_candi', the number of finite candidate locations;
 # 2. Add the 'id' column to 'candi, and force 'candi' to be of class matrix;
@@ -19,8 +22,7 @@ if (!missing(candi)) {
 }
 
 # Points
-# if (is(points, "OptimizedSampleConfiguration")) points <- points@points
-if (is(points, "OptimizedSampleConfiguration")) points <- points[["points"]]
+if (is(points, "OptimizedSampleConfiguration")) points <- points$points
 if (is.matrix(points) || is.data.frame(points)) { # Data frame of matrix
   points <- as.matrix(points)
 } else {
@@ -38,7 +40,3 @@ n_pts <- nrow(points)
 conf0 <- points
 old_conf <- conf0
 #if (COST) cm <- cost[points[, 1]]
-#
-# COMMAND
-# # Prepare points and candi
-# eval(.prepare_points())

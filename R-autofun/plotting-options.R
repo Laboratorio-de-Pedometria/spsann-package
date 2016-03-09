@@ -1,5 +1,8 @@
 # Set plotting options
 #
+# COMMAND
+# eval(.plotting_options())
+# 
 # SUMMARY
 # 1. Check is plotting is required;
 # 2. If plotting is required, record the current plotting options;
@@ -47,14 +50,14 @@ if (plotit) {
     boundary <- unique(rbind(xy, yx))
     rownames(boundary) <- 1:nrow(boundary)
     boundary <- sp::SpatialPoints(boundary)
+    
+    rm(x, d, y, xy, yx)
   }
-  rm(x, d, y, xy, yx)
+  # I guess this was the reason for the warning message seen by Alexandre Wadoux.
+  # It seems that 'rm' should be inside 'if (missing(boundary)) {...}', not outside!!!
+  # rm(x, d, y, xy, yx)
   
   # Open two new plotting devices
   grDevices::dev.new()
   grDevices::dev.new()
 }
-#
-# COMMAND
-# # Set plotting options
-# eval(.plotting_options())

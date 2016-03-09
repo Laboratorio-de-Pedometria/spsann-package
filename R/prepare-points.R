@@ -4,7 +4,7 @@
 expression(if (!missing(candi)) {
   n_candi <- nrow(candi)
   candi <- as.matrix(cbind(id = 1:n_candi, candi))
-}, if (is(points, "OptimizedSampleConfiguration")) points <- points[["points"]], 
+}, if (is(points, "OptimizedSampleConfiguration")) points <- points$points, 
     if (is.matrix(points) || is.data.frame(points)) { # Data frame of matrix
       points <- as.matrix(points)
     } else {

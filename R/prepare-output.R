@@ -12,8 +12,8 @@ expression(if (!is.null(progress)) close(pb), rt <- as.numeric(c(proc.time() - t
       }
     }, if (!track) energies <- new_energy, energies <- rbind(energy0, energies), 
     res <- list(
+      
       # The optimized sample configuration
-      # points = data.frame(id = NA_integer_, x = NA_real_, y = NA_real_),
       points = data.frame(new_conf),
       
       # Information about the spatial simulated annealing
@@ -33,8 +33,7 @@ expression(if (!is.null(progress)) close(pb), rt <- as.numeric(c(proc.time() - t
         nadir = data.frame(NA_real_),
         utopia = data.frame(NA_real_),
         weights = data.frame(NA_real_))
-    ), class(res) <- "OptimizedSampleConfiguration", res[["spsann"]] <- list(
-    # slot(res, "spsann") <- list (
+    ), class(res) <- "OptimizedSampleConfiguration", res$spsann <- list(
       acceptance = data.frame(initial = schedule$initial.acceptance),
       cellsize = data.frame(x = cellsize[1], y = cellsize[2]),
       chains = data.frame(total = schedule$chains, used = i, length = schedule$chain.length),
@@ -42,42 +41,27 @@ expression(if (!is.null(progress)) close(pb), rt <- as.numeric(c(proc.time() - t
       running = data.frame(time = rt[[1]], units = rt[[2]]),
       stopping = schedule$stopping,
       temperature = data.frame(initial = schedule$initial.temperature, final = actual_temp)
-    ), res[["objective"]] <- list(
-    # slot(res, "objective") <- list(
+    ), res$objective <- list(
       name = objective,
       energy = energies,
       nadir = if (MOOP && objective != "CLHS") data.frame(nadir),
       utopia = if (MOOP && objective != "CLHS") data.frame(utopia),
       weights = if (MOOP) data.frame(weights)
     ), if (objective %in% c("ACDC", "CLHS", "CORR", "DIST", "SPAN")) {
-      # if (objective != "CLHS") res@objective$strata.type <- strata.type
-      # res@objective$use.coords <- use.coords
-      if (objective != "CLHS") res[["objective"]]$strata.type <- strata.type
-      res[["objective"]]$use.coords <- use.coords
+      if (objective != "CLHS") res$objective$strata.type <- strata.type
+      res$objective$use.coords <- use.coords
     }, if (objective %in% c("PPL", "SPAN")) {
-      # res@objective$lags <- lags
-      # res@objective$lags.type <- lags.type
-      # res@objective$lags.base <- lags.base
-      # res@objective$cutoff <- cutoff
-      # res@objective$criterion <- criterion
-      # res@objective$distri <- distri
-      # res@objective$pairs <- pairs
-      
-      res[["objective"]]$lags <- lags
-      res[["objective"]]$lags.type <- lags.type
-      res[["objective"]]$lags.base <- lags.base
-      res[["objective"]]$cutoff <- cutoff
-      res[["objective"]]$criterion <- criterion
-      res[["objective"]]$distri <- distri
-      res[["objective"]]$pairs <- pairs
+      res$objective$lags <- lags
+      res$objective$lags.type <- lags.type
+      res$objective$lags.base <- lags.base
+      res$objective$cutoff <- cutoff
+      res$objective$criterion <- criterion
+      res$objective$distri <- distri
+      res$objective$pairs <- pairs
     }, if (objective == "MKV") {
-      # res@objective$eqn <- eqn
-      # res@objective$vgm <- vgm
-      # res@objective$krige.stat <- krige.stat
-      
-      res[["objective"]]$eqn <- eqn
-      res[["objective"]]$vgm <- vgm
-      res[["objective"]]$krige.stat <- krige.stat
+      res$objective$eqn <- eqn
+      res$objective$vgm <- vgm
+      res$objective$krige.stat <- krige.stat
     }, cat("running time = ", rt$time, " ", rt$unit, sep = ""), 
     return (res))
 }
