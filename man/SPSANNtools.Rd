@@ -3,15 +3,12 @@
 \name{objSPSANN}
 \alias{SPSANNtools}
 \alias{objSPSANN}
-\alias{objSPSANN.OptimizedSampleConfiguration}
 \title{Auxiliary tools}
 \usage{
 objSPSANN(osc, at = "end", n = 1)
-
-\method{objSPSANN}{OptimizedSampleConfiguration}(osc, at = "end", n = 1)
 }
 \arguments{
-\item{osc}{Optimized Sample Configuration.}
+\item{osc}{Object of class \code{OptimizedSampleConfiguration}.}
 
 \item{at}{Point of the optimization at which the energy state should be
 returned. Available options: \code{"start"}, for the start, and \code{"end"},

@@ -3,7 +3,7 @@
 #' Auxiliary tools used in the optimization of sample configurations using 
 #' spatial simulated annealing.
 #' 
-#' @param osc Optimized Sample Configuration.
+#' @param osc Object of class \code{OptimizedSampleConfiguration}.
 #' 
 #' @param at Point of the optimization at which the energy state should be
 #' returned. Available options: \code{"start"}, for the start, and \code{"end"},
@@ -18,10 +18,10 @@
 # FUNCTION - RETRIEVE THE ENERGY STATE #########################################
 #' @export
 #' @rdname SPSANNtools
-objSPSANN <- function (osc, at = "end", n = 1) UseMethod( "objSPSANN" )
+objSPSANN <- function (osc, at = "end", n = 1) {
+  UseMethod( "objSPSANN" )
+}
 #' @export
-#' @rdname SPSANNtools
-# objSPSANN <- 
 objSPSANN.OptimizedSampleConfiguration <- 
   function (osc, at = "end", n = 1) {
     
