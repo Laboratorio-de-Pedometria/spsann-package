@@ -43,8 +43,7 @@ write.file <- c("R/check-spsann-arguments.R",
                 "R/set-progress.R",
                 "R/update-progress.R",
                 "R/check-first-chain.R")
-lapply(1:length(fun.name), function (i) 
-  autofun::autofun(fun.name[i], read.file[i], write.file[i]))
+lapply(1:length(fun.name), function (i) autofun::autofun(fun.name[i], read.file[i], write.file[i]))
 rm(fun.name, read.file, write.file)
 
 # check examples and documentation

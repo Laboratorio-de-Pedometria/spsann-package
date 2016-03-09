@@ -200,8 +200,8 @@ objCORR <-
             covars, strata.type = "area", use.coords = FALSE) {
     
     # Check other arguments
-    check <- .optimACDCcheck(candi = candi, covars = covars, 
-                             use.coords = use.coords, strata.type = strata.type)
+    check <- .optimACDCcheck(
+      candi = candi, covars = covars, use.coords = use.coords, strata.type = strata.type)
     if (!is.null(check)) stop (check, call. = FALSE)
     
     # Prepare points and candi
