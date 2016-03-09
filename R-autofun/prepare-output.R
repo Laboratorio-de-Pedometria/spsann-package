@@ -70,12 +70,15 @@ res[["spsann"]] <- list(
   temperature = data.frame(initial = schedule$initial.temperature, final = actual_temp)
 )
 
-slot(res, "objective") <-
-  list(name = objective,
-       energy = energies,
-       nadir = if (MOOP && objective != "CLHS") data.frame(nadir),
-       utopia = if (MOOP && objective != "CLHS") data.frame(utopia),
-       weights = if (MOOP) data.frame(weights))
+# Add info about the objective function to the output object
+res[["objective"]] <- list(
+# slot(res, "objective") <- list(
+  name = objective,
+  energy = energies,
+  nadir = if (MOOP && objective != "CLHS") data.frame(nadir),
+  utopia = if (MOOP && objective != "CLHS") data.frame(utopia),
+  weights = if (MOOP) data.frame(weights)
+)
 
 if (objective %in% c("ACDC", "CLHS", "CORR", "DIST", "SPAN")) {
   if (objective != "CLHS") res@objective$strata.type <- strata.type
