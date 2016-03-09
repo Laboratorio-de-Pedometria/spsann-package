@@ -13,7 +13,8 @@ expression(if (!is.null(progress)) close(pb), rt <- as.numeric(c(proc.time() - t
     }, if (!track) energies <- new_energy, energies <- rbind(energy0, energies), 
     res <- list(
       # The optimized sample configuration
-      points = data.frame(id = NA_integer_, x = NA_real_, y = NA_real_),
+      # points = data.frame(id = NA_integer_, x = NA_real_, y = NA_real_),
+      points = data.frame(new_conf),
       
       # Information about the spatial simulated annealing
       spsann = list(

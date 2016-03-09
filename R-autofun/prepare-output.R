@@ -36,7 +36,8 @@ energies <- rbind(energy0, energies)
 # res <- methods::new("OptimizedSampleConfiguration", points = data.frame(new_conf))
 res <- list(
   # The optimized sample configuration
-  points = data.frame(id = NA_integer_, x = NA_real_, y = NA_real_),
+  # points = data.frame(id = NA_integer_, x = NA_real_, y = NA_real_),
+  points = data.frame(new_conf),
   
   # Information about the spatial simulated annealing
   spsann = list(
