@@ -58,17 +58,18 @@ res <- list(
 )
 class(res) <- "OptimizedSampleConfiguration"
 
-slot(res, "spsann") <- 
-  list(acceptance = data.frame(initial = schedule$initial.acceptance),
-       cellsize = data.frame(x = cellsize[1], y = cellsize[2]),
-       chains = data.frame(total = schedule$chains, used = i, 
-                           length = schedule$chain.length),
-       jitter = data.frame(x = c(x.min, x_max0), y = c(y.min, y_max0), 
-                           row.names = c("min", "max")),
-       running = data.frame(time = rt[[1]], units = rt[[2]]),
-       stopping = schedule$stopping,
-       temperature = data.frame(initial = schedule$initial.temperature,
-                                final = actual_temp))
+# Add info about the annealing schedule to the output object
+res[["spsann"]] <- list(
+# slot(res, "spsann") <- list (
+  acceptance = data.frame(initial = schedule$initial.acceptance),
+  cellsize = data.frame(x = cellsize[1], y = cellsize[2]),
+  chains = data.frame(total = schedule$chains, used = i, length = schedule$chain.length),
+  jitter = data.frame(x = c(x.min, x_max0), y = c(y.min, y_max0), row.names = c("min", "max")),
+  running = data.frame(time = rt[[1]], units = rt[[2]]),
+  stopping = schedule$stopping,
+  temperature = data.frame(initial = schedule$initial.temperature, final = actual_temp)
+)
+
 slot(res, "objective") <-
   list(name = objective,
        energy = energies,
