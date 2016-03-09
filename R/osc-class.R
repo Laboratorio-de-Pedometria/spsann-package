@@ -1,15 +1,15 @@
-#' Class \sQuote{OptimizedSampleConfiguration}
-#' 
-#' An S4 class
-#' 
-#' @slot points
-#' 
-#' @slot spsann
-#' 
-#' @slot objective
-#' 
-#' @rdname osc-class
-#' @export
+# Class \sQuote{OptimizedSampleConfiguration}
+# 
+# An S4 class
+# 
+# @slot points
+# 
+# @slot spsann
+# 
+# @slot objective
+# 
+# @rdname osc-class
+# @export
 # MAIN FUNCTION - OptimizedSampleConfiguration CLASS ###########################
 OptimizedSampleConfiguration <-
   methods::setClass(Class = "OptimizedSampleConfiguration", 
