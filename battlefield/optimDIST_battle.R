@@ -20,7 +20,7 @@ res <- optimDIST(points = 10, candi = candi, covars = covars,
 objSPSANN(res) -
   objDIST(points = res, candi = candi, covars = covars, use.coords = TRUE)
 
-# 1) GREEDY ALGORITHM ##########################################################
+# 1) GREEDY ALGORITHM #########################################################################################
 rm(list = ls())
 gc()
 sapply(list.files("R", full.names = TRUE, pattern = ".R$"), source)
@@ -30,12 +30,11 @@ candi <- meuse.grid[, 1:2]
 covars <- meuse.grid[, 5]
 schedule <- scheduleSPSANN(initial.acceptance = 0.01)
 set.seed(2001)
-res <- optimDIST(points = 100, candi = candi, covars = covars,
-                 use.coords = TRUE, schedule = schedule, plotit = TRUE)
-objSPSANN(res) -
-  objDIST(points = res, candi = candi, covars = covars, use.coords = TRUE)
+res <- optimDIST(
+  points = 100, candi = candi, covars = covars, use.coords = TRUE, schedule = schedule, plotit = TRUE)
+objSPSANN(res) - objDIST(points = res, candi = candi, covars = covars, use.coords = TRUE)
 
-# 2) FACTOR COVARIATES WITH THE COORDINATES ####################################
+# 2) FACTOR COVARIATES WITH THE COORDINATES ###################################################################
 rm(list = ls())
 gc()
 sapply(list.files("R", full.names = TRUE, pattern = ".R$"), source)
@@ -45,12 +44,11 @@ candi <- meuse.grid[, 1:2]
 covars <- meuse.grid[, 6:7]
 schedule <- scheduleSPSANN(initial.temperature = 0.5, chains = 1)
 set.seed(2001)
-res <- optimDIST(points = 100, candi = candi, covars = covars, 
-                 use.coords = TRUE, schedule = schedule, plotit = TRUE)
-objSPSANN(res) - 
-  objDIST(points = res, candi = candi, covars = covars, use.coords = TRUE)
+res <- optimDIST(
+  points = 100, candi = candi, covars = covars, use.coords = TRUE, schedule = schedule, plotit = TRUE)
+objSPSANN(res) - objDIST(points = res, candi = candi, covars = covars, use.coords = TRUE)
 
-# 3) FACTOR AND NUMERIC COVARIATES WITH THE COORDINATES ########################
+# 3) FACTOR AND NUMERIC COVARIATES WITH THE COORDINATES #######################################################
 rm(list = ls())
 gc()
 sapply(list.files("R", full.names = TRUE, pattern = ".R$"), source)
@@ -60,7 +58,7 @@ candi <- meuse.grid[, 1:2]
 covars <- meuse.grid[, c(1, 2, 5:7)]
 schedule <- scheduleSPSANN(initial.temperature = 0.5, chains = 5)
 set.seed(2001)
-resA <- optimDIST(points = 100, candi = candi, covars = covars, progress = "tk",
-                  use.coords = TRUE, plotit = TRUE, schedule = schedule)
-objSPSANN(resA) -
-  objDIST(points = resA, candi = candi, covars = covars, use.coords = TRUE)
+resA <- optimDIST(
+  points = 100, candi = candi, covars = covars, progress = "tk", use.coords = TRUE, plotit = TRUE, 
+  schedule = schedule)
+objSPSANN(resA) - objDIST(points = resA, candi = candi, covars = covars, use.coords = TRUE)

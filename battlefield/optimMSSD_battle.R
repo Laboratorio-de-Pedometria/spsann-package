@@ -18,16 +18,14 @@ set.seed(2001)
 res <- optimMSSD(points = 10, candi = candi, schedule = schedule)
 objSPSANN(res) - objMSSD(candi = candi, points = res)
 
-# 1) GREEDY ALGORITHM WITH MANY CHAINS #########################################
+# 1) GREEDY ALGORITHM WITH MANY CHAINS ########################################################################
 rm(list = ls())
 gc()
 sapply(list.files("R", full.names = TRUE, pattern = ".R$"), source)
 sapply(list.files("src", full.names = TRUE, pattern = ".cpp$"), Rcpp::sourceCpp)
 data(meuse.grid)
 candi <- meuse.grid[, 1:2]
-schedule <- scheduleSPSANN(chains = 500, initial.acceptance = 0, 
-                           initial.temperature = 0.01)
+schedule <- scheduleSPSANN(chains = 500, initial.acceptance = 0, initial.temperature = 0.01)
 set.seed(2001)
-res <- optimMSSD(points = 100, candi = candi, schedule = schedule, 
-                 plotit = TRUE)
+res <- optimMSSD(points = 100, candi = candi, schedule = schedule, plotit = TRUE)
 objSPSANN(res) - objMSSD(candi = candi, points = res)

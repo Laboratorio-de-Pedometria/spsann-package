@@ -18,7 +18,7 @@ res <- optimPPL(points = 10, candi = candi, schedule = schedule)
 objSPSANN(res) - objPPL(points = res, candi = candi)
 countPPL(points = res, candi = candi)
 
-# 1) Point pairs with many chains ##############################################
+# 1) Point pairs with many chains #############################################################################
 rm(list = ls())
 gc()
 sapply(list.files("R", full.names = TRUE, pattern = ".R$"), source)
@@ -27,12 +27,11 @@ data(meuse.grid)
 candi <- meuse.grid[, 1:2]
 schedule <- scheduleSPSANN(chains = 500, initial.temperature = 500)
 set.seed(2001)
-res <- optimPPL(points = 100, candi = candi, pairs = TRUE, schedule = schedule,
-                plotit = TRUE)
+res <- optimPPL(points = 100, candi = candi, pairs = TRUE, schedule = schedule, plotit = TRUE)
 objSPSANN(res) - objPPL(points = res, pairs = TRUE, candi = candi)
 countPPL(points = res, candi = candi, pairs = TRUE)
 
-# 2) Points per lag - select sample points from candi ##########################
+# 2) Points per lag - select sample points from candi #########################################################
 rm(list = ls())
 gc()
 sapply(list.files("R", full.names = TRUE, pattern = ".R$"), source)
@@ -53,7 +52,7 @@ res <- countPPL(points = points, candi = candi, cutoff = 1000)
 objPPL(points = points, candi = candi, cutoff = 1000)
 sum(length(points) - res$ppl) # 266
 
-# 3) Unit test #################################################################
+# 3) Unit test ################################################################################################
 rm(list = ls())
 gc()
 sapply(list.files("R", full.names = TRUE, pattern = ".R$"), source)
@@ -63,5 +62,4 @@ candi <- meuse.grid[, 1:2]
 set.seed(2001)
 countPPL(points = 100, candi = candi, lags = 1, cutoff = Inf)[3] - 100
 set.seed(2001)
-countPPL(points = 100, candi = candi, lags = 1, pairs = TRUE, cutoff = Inf)[3] - 
-  100 * 99 / 2
+countPPL(points = 100, candi = candi, lags = 1, pairs = TRUE, cutoff = Inf)[3] - 100 * 99 / 2

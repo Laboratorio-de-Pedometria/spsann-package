@@ -30,7 +30,7 @@ plot(meuse.grid[, 2:3], asp = 1, pch = 15, col = "gray")
 points(pts2[, 2:3], col = "red", cex = 0.5)
 points(pts3[, 2:3], pch = 19, col = "blue", cex = 0.5)
 
-# TWO POINTS, SHORT DISTANCE ###################################################
+# TWO POINTS, SHORT DISTANCE ##################################################################################
 rm(list = ls())
 gc()
 require(pedometrics)
@@ -42,9 +42,9 @@ meuse.grid <- as.matrix(meuse.grid[1:96, 1:2])
 meuse.grid <- matrix(cbind(1:dim(meuse.grid)[1], meuse.grid), ncol = 3)
 pts1 <- sample(c(1:dim(meuse.grid)[1]), 2)
 pts2 <- meuse.grid[pts1, ]
-pts3 <- spJitter(points = pts2, candi = meuse.grid, x.min = 0,
-                 x.max = 40, y.min = 0, y.max = 40, 
-                 which.point = 1, cellsize = 40)
+pts3 <- spJitter(
+  points = pts2, candi = meuse.grid, x.min = 0, x.max = 40, y.min = 0, y.max = 40, which.point = 1, 
+  cellsize = 40)
 plot(meuse.grid[, 2:3], asp = 1, pch = 15, col = "gray")
 points(pts2[, 2:3], col = "red")
 points(pts3[, 2:3], pch = 19, col = "blue", cex = 0.5)
