@@ -1,3 +1,9 @@
+# Version 1.0-2.9010 (2015-03-10)
+* Created S3 methods for extracting the objective function value and plotting an object of class 
+  `OptimizedSampleConfiguration`.
+* The class `OptimizedSampleConfiguration` is no longer exported.
+* Documentation was expanded.
+
 # Version 1.0-2.9009 (2015-11-30)
 * FIX: the computation of the number of point-pairs per lag-distance class in
   `optimPPL` was incorrect because it neglected the fact that, in a full 

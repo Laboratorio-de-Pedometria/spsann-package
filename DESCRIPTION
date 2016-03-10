@@ -1,35 +1,24 @@
 Package: spsann
 Type: Package
 Title: Optimization of Sample Configurations using Spatial Simulated Annealing
-Version: 1.0-2.9009
-Date: 2015-11-30
+Version: 1.0-2.9010
+Date: 2015-03-10
 Authors@R: c(
-    person("Alessandro", "Samuel-Rosa", role = c("aut", "cre"),
-            email = "alessandrosamuelrosa@gmail.com"),
-    person("Lucia Helena Cunha dos", "Anjos", role = "ths",
-           email = "lanjos@ufrrj.br"),
-    person("Gustavo de Mattos", "Vasques", role = "ths",
-           email = "gustavo.vasques@embrapa.br"),
-    person("Gerard B M", "Heuvelink", role = "ths",
-           email = "gerard.heuvelink@wur.nl"),
-    person("Edzer", "Pebesma", role = "ctb", 
-           email = "edzer.pebesma@uni-muenster.de"),
-    person("Jon", "Skoien", role = "ctb", 
-           email = "jon.skoien@gmail.com"),
-    person("Joshua", "French", role = "ctb", 
-           email = "joshua.french@ucdenver.edu"),
-    person("Pierre", "Roudier", role = "ctb",
-           email = "roudierp@landcareresearch.co.nz"),
-    person("Dick", "Brus", role = "ctb",
-           email = "dick.brus@wur.nl"),
-    person("Murray", "Lark", role = "ctb",
-           email = "mlark@bgs.ac.uk")
+    person("Alessandro", "Samuel-Rosa", role = c("aut", "cre"), email = "alessandrosamuelrosa@gmail.com"),
+    person("Lucia Helena Cunha dos", "Anjos", role = "ths", email = "lanjos@ufrrj.br"),
+    person("Gustavo de Mattos", "Vasques", role = "ths", email = "gustavo.vasques@embrapa.br"),
+    person("Gerard B M", "Heuvelink", role = "ths", email = "gerard.heuvelink@wur.nl"),
+    person("Edzer", "Pebesma", role = "ctb",  email = "edzer.pebesma@uni-muenster.de"),
+    person("Jon", "Skoien", role = "ctb",  email = "jon.skoien@gmail.com"),
+    person("Joshua", "French", role = "ctb",  email = "joshua.french@ucdenver.edu"),
+    person("Pierre", "Roudier", role = "ctb", email = "roudierp@landcareresearch.co.nz"),
+    person("Dick", "Brus", role = "ctb", email = "dick.brus@wur.nl"),
+    person("Murray", "Lark", role = "ctb", email = "mlark@bgs.ac.uk")
     )
-Description: Methods to optimize sample configurations using spatial simulated
-    annealing. Multiple objective functions are implemented for various
-    purposes, such as variogram estimation, trend estimation, and spatial
-    interpolation. A general purpose spatial simulated annealing function
-    enables the user to define his/her own objective function.
+Description: Methods to optimize spatial sample configurations using spatial simulated annealing. Multiple 
+    objective functions are implemented for various purposes, such as variogram estimation, spatial trend 
+    estimation, and spatial interpolation. A general purpose spatial simulated annealing function enables the 
+    user to define his/her own objective function.
 License: GPL (>= 2)
 Imports:
     methods,
