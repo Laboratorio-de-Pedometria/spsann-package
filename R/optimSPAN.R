@@ -259,27 +259,27 @@ optimSPAN <-
       if (n_accept == 0) {
         no_change <- no_change + 1
         if (no_change > schedule$stopping) {
-          if (new_energy[[1]] > best_energy[[1]] * 1.000001) {
-            old_conf <- old_conf
-            new_conf <- best_conf
-            old_energy <- best_old_energy
-            new_energy <- best_energy
+          # if (new_energy[[1]] > best_energy[[1]] * 1.000001) {
+            # old_conf <- old_conf
+            # new_conf <- best_conf
+            # old_energy <- best_old_energy
+            # new_energy <- best_energy
             # DIST and CORR
-            new_sm <- best_sm
-            new_scm <- best_scm
-            old_sm <- best_old_sm
-            old_scm <- best_old_scm
+            # new_sm <- best_sm
+            # new_scm <- best_scm
+            # old_sm <- best_old_sm
+            # old_scm <- best_old_scm
             # PPL
-            new_dm_ppl <- best_dm_ppl
-            old_dm_ppl <- best_old_dm_ppl
+            # new_dm_ppl <- best_dm_ppl
+            # old_dm_ppl <- best_old_dm_ppl
             # MSSD
-            new_dm_mssd <- best_dm_mssd
-            old_dm_mssd <- best_old_dm_mssd
-            no_change <- 0
-            cat("\nrestarting with previously best configuration\n")
-          } else { 
+            # new_dm_mssd <- best_dm_mssd
+            # old_dm_mssd <- best_old_dm_mssd
+            # no_change <- 0
+            # cat("\nrestarting with previously best configuration\n")
+          # } else { 
             break 
-          }
+          # }
         }
         if (verbose) {
           cat("\n", no_change, "chain(s) with no improvement... stops at",

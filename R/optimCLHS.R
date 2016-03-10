@@ -217,18 +217,18 @@ optimCLHS <-
       if (n_accept == 0) {
         no_change <- no_change + 1
         if (no_change > schedule$stopping) {
-          if (new_energy[[1]] > best_energy[[1]] * 1.000001) {
-            old_conf <- old_conf
-            new_conf <- best_conf
-            old_energy <- best_old_energy
-            new_energy <- best_energy
-            new_sm <- best_sm
-            old_sm <- best_old_sm
-            no_change <- 0
-            cat("\nrestarting with previously best configuration\n")
-          } else { 
+          # if (new_energy[[1]] > best_energy[[1]] * 1.000001) {
+            # old_conf <- old_conf
+            # new_conf <- best_conf
+            # old_energy <- best_old_energy
+            # new_energy <- best_energy
+            # new_sm <- best_sm
+            # old_sm <- best_old_sm
+            # no_change <- 0
+            # cat("\nrestarting with previously best configuration\n")
+          # } else { 
             break 
-          }
+          # }
         }
         if (verbose) {
           cat("\n", no_change, "chain(s) with no improvement... stops at",

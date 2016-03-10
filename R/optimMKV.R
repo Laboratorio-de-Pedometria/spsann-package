@@ -89,8 +89,7 @@ optimMKV <-
     eval(.check_spsann_arguments())
     
     # Check other arguments
-    check <- .checkMKV(covars = covars, eqn = eqn, vgm = vgm, 
-                       krige.stat = krige.stat, candi = candi)
+    check <- .checkMKV(covars = covars, eqn = eqn, vgm = vgm, krige.stat = krige.stat, candi = candi)
     if (!is.null(check)) stop (check, call. = FALSE)
     
     # Set plotting options
@@ -108,8 +107,7 @@ optimMKV <-
     
     # Initial energy state
     energy0 <- data.frame(
-      obj = .objMKV(eqn = eqn, sm = sm, covars = covars, vgm = vgm, 
-                    krige.stat = krige.stat, k = 0, ...))
+      obj = .objMKV(eqn = eqn, sm = sm, covars = covars, vgm = vgm, krige.stat = krige.stat, k = 0, ...))
     
     # Other settings for the simulated annealing algorithm
     old_sm <- sm
@@ -136,13 +134,11 @@ optimMKV <-
           eval(.plot_and_jitter())
           
           # Update sample matrix and energy state
-          # new_sm[wp, ] <- cbind(z = 1, covars[new_conf[wp, 1], ])#finite
-          new_sm[wp, ] <- c(1, new_conf[wp, 2:3], 
-                            covars[new_conf[wp, 1], all.vars(eqn)[-1]])
-          new_energy <- data.frame(
-            obj = .objMKV(eqn = eqn, sm = new_sm, covars = covars, 
-                          vgm = vgm, krige.stat = krige.stat, 
-                          debug.level = 0, k = k, ...))
+          # new_sm[wp, ] <- cbind(z = 1, covars[new_conf[wp, 1], ])# finite
+          new_sm[wp, ] <- c(1, new_conf[wp, 2:3], covars[new_conf[wp, 1], all.vars(eqn)[-1]])
+          new_energy <- data.frame(obj = .objMKV(
+            eqn = eqn, sm = new_sm, covars = covars, vgm = vgm, krige.stat = krige.stat, debug.level = 0, 
+            k = k, ...))
           
           # Avoid 'LDLfactor' error in 'krige' function
           # https://stat.ethz.ch/pipermail/r-sig-geo/2009-November/006919.html
@@ -193,22 +189,21 @@ optimMKV <-
       if (n_accept == 0) {
         no_change <- no_change + 1
         if (no_change > schedule$stopping) {
-          if (new_energy > best_energy * 1.000001) {
-            old_conf <- old_conf
-            new_conf <- best_conf
-            old_energy <- best_old_energy
-            new_energy <- best_energy
-            new_sm <- best_sm
-            old_sm <- best_old_sm
-            no_change <- 0
-            cat("\nrestarting with previously best configuration\n")
-          } else { 
+          # if (new_energy > best_energy * 1.000001) {
+            # old_conf <- old_conf
+            # new_conf <- best_conf
+            # old_energy <- best_old_energy
+            # new_energy <- best_energy
+            # new_sm <- best_sm
+            # old_sm <- best_old_sm
+            # no_change <- 0
+            # cat("\nrestarting with previously best configuration\n")
+          # } else { 
             break 
-          }
+          # }
         }
         if (verbose) {
-          cat("\n", no_change, "chain(s) with no improvement... stops at",
-              schedule$stopping, "\n")
+          cat("\n", no_change, "chain(s) with no improvement... stops at", schedule$stopping, "\n")
         }
       } else {
         no_change <-  0
@@ -245,9 +240,9 @@ optimMKV <-
     # I do not know the reason for this error, but it comes from using 
     # 'set = list(cn_max = 1e10)' above. I try to solve with 'tryCatch'!
     res <- NA
-    try(res <- gstat::krige(formula = eqn, locations = ~ x + y, data = sm,
-                            newdata = covars, model = vgm, ...)$var1.var, 
-        silent = TRUE)
+    try(res <- gstat::krige(
+      formula = eqn, locations = ~ x + y, data = sm, newdata = covars, model = vgm, ...)$var1.var, 
+      silent = TRUE)
     
     # Calculate the energy state value
     if (krige.stat == "mean") { # Mean kriging variance
@@ -275,8 +270,7 @@ optimMKV <-
       
     } else { # Universal kriging
       # sm <- data.frame(z, pts[, 2:3], covars[pts[, 1], all.vars(eqn)[-1]])
-      sm <- data.frame(z, pts[, c("x", "y")], 
-                       covars[pts[, 1], all.vars(eqn)[-1]])
+      sm <- data.frame(z, pts[, c("x", "y")], covars[pts[, 1], all.vars(eqn)[-1]])
       colnames(sm) <- c("z", "x", "y", all.vars(eqn)[-1])
     }
     
@@ -366,8 +360,7 @@ objMKV <-
     sm <- .smMKV(n_pts = n_pts, eqn = eqn, pts = points, covars = covars)
     
     # Energy state
-    res <- .objMKV(eqn = eqn, sm = sm, covars = covars, vgm = vgm, 
-                   krige.stat = krige.stat, k = 0, ...)
+    res <- .objMKV(eqn = eqn, sm = sm, covars = covars, vgm = vgm, krige.stat = krige.stat, k = 0, ...)
     
     # Output
     return (res)
