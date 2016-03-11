@@ -44,24 +44,20 @@
 # (possibly) speeding up the computations.
 # 
 #' @note
-#' The distance between two points is computed as the Euclidean distance between
-#' them. This computation assumes that the optimization is operating in the 
-#' two-dimensional Euclidean space, i.e. the coordinates of the sample points 
-#' and candidate locations should not be provided as latitude/longitude. 
-#' The \pkg{spsann}-package has no mechanism to check if the coordinates are
-#' projected: the user is responsible for making sure that this requirement
-#' is attained.
+#' The distance between two points is computed as the Euclidean distance between them. This computation 
+#' assumes that the optimization is operating in the two-dimensional Euclidean space, i.e. the coordinates of
+#' the sample points and candidate locations should not be provided as latitude/longitude. \pkg{spsann} has no
+#' mechanism to check if the coordinates are projected: the user is responsible for making sure that this
+#' requirement is attained.
 #'
 #' @references
-#' Edzer Pebesma, Jon Skoien with contributions from Olivier Baume, A. Chorti, 
-#' D.T. Hristopulos, S.J. Melles and G. Spiliopoulos (2013). 
-#' \emph{intamapInteractive: procedures for automated interpolation - methods 
-#' only to be used interactively, not included in \code{intamap} package.} R 
-#' package version 1.1-10.
+#' Edzer Pebesma, Jon Skoien with contributions from Olivier Baume, A. Chorti, D.T. Hristopulos, S.J. Melles 
+#' and G. Spiliopoulos (2013). \emph{intamapInteractive: procedures for automated interpolation - methods 
+#' only to be used interactively, not included in \code{intamap} package.} R package version 1.1-10.
 #' 
-#' van Groenigen, J.-W. \emph{Constrained optimization of spatial sampling: 
-#' a geostatistical approach.} Wageningen: Wageningen University, p. 148, 1999.
+#' van Groenigen, J.-W. \emph{Constrained optimization of spatial sampling: a geostatistical approach.}
+#' Wageningen: Wageningen University, p. 148, 1999.
 #' 
-#' Walvoort, D. J. J.; Brus, D. J. & de Gruijter, J. J. An R package for 
-#' spatial coverage sampling and random sampling from compact geographical 
-#' strata by k-means. \emph{Computers & Geosciences}. v. 36, p. 1261-1267, 2010.
+#' Walvoort, D. J. J.; Brus, D. J. & de Gruijter, J. J. An R package for spatial coverage sampling and random 
+#' sampling from compact geographical strata by k-means. \emph{Computers & Geosciences}. v. 36, p. 1261-1267,
+#' 2010.

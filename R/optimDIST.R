@@ -1,9 +1,7 @@
-#' Optimization of sample configurations for spatial trend identification
-#' and estimation (II)
+#' Optimization of sample configurations for spatial trend identification and estimation (II)
 #'
-#' Optimize a sample configuration for spatial trend identification and 
-#' estimation. A criterion is defined so that the sample reproduces the 
-#' marginal distribution of the covariates (\bold{DIST}).
+#' Optimize a sample configuration for spatial trend identification and  estimation. A criterion is defined 
+#' so that the sample reproduces the marginal distribution of the covariates (\bold{DIST}).
 #'
 #' @inheritParams spJitter
 #' @template spJitter_doc
@@ -12,14 +10,15 @@
 #' @template DIST_doc
 #' 
 #' @return
-#' \code{optimDIST} returns a matrix: the optimized sample configuration.
+#' \code{optimDIST} returns an object of class \code{OptimizedSampleConfiguration}: the optimized sample
+#' configuration with details about the optimization.
 #'  
-#' \code{objDIST} returns a numeric value: the energy state of the sample
-#' configuration - the objective function value.
+#' \code{objDIST} returns a numeric value: the energy state of the sample configuration -- the objective
+#' function value.
 #'
 #' @author Alessandro Samuel-Rosa \email{alessandrosamuelrosa@@gmail.com}
-#' @seealso \code{\link[clhs]{clhs}}
-#' @aliases optimDIST objDIST
+#' @seealso \code{\link[clhs]{clhs}}, \code{\link[spsann]{optimACDC}}
+#' @aliases optimDIST objDIST DIST
 #' @import Rcpp
 #' @export
 #' @examples

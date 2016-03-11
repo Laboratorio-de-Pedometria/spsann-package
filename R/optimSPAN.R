@@ -1,12 +1,10 @@
-#' Optimization of sample configurations for variogram and spatial trend 
-#' identification and estimation, and for spatial interpolation
+#' Optimization of sample configurations for variogram and spatial trend identification and estimation, and 
+#' for spatial interpolation
 #' 
-#' Optimize a sample configuration for variogram and spatial trend 
-#' identification and estimation, and for spatial interpolation. An utility
-#' function \emph{U} is defined so that the sample points cover, extend over,
-#' spread over, \bold{SPAN} the feature, variogram and geographic spaces. The
-#' utility function is obtained aggregating four single objective functions:
-#' \bold{CORR}, \bold{DIST}, \bold{PPL}, and \bold{MSSD}.
+#' Optimize a sample configuration for variogram and spatial trend identification and estimation, and for 
+#' spatial interpolation. An utility function \emph{U} is defined so that the sample points cover, extend 
+#' over, spread over, \bold{SPAN} the feature, variogram and geographic spaces. The utility function is 
+#' obtained aggregating four objective functions: \bold{CORR}, \bold{DIST}, \bold{PPL}, and \bold{MSSD}.
 #' 
 #' @inheritParams spJitter
 #' @template spJitter_doc
@@ -19,13 +17,16 @@
 #' @template MSSD_doc
 #' 
 #' @return
-#' \code{optimSPAN()} returns a matrix: the optimized sample configuration.
+#' \code{optimSPAN} returns an object of class \code{OptimizedSampleConfiguration}: the optimized sample
+#' configuration with details about the optimization.
 #' 
-#' \code{objSPAN} returns a numeric value: the energy state of the sample
-#' configuration - the objective function value.
+#' \code{objSPAN} returns a numeric value: the energy state of the sample configuration -- the objective
+#' function value.
 #' 
 #' @author Alessandro Samuel-Rosa \email{alessandrosamuelrosa@@gmail.com}
-#' @aliases optimSPAN objSPAN
+#' @seealso \code{\link[spsann]{optimCORR}}, \code{\link[spsann]{optimDIST}}, \code{\link[spsann]{optimPPL}},
+#' \code{\link[spsann]{optimMSSD}}
+#' @aliases optimSPAN objSPAN SPAN
 #' @export
 #' @examples
 #' \dontrun{

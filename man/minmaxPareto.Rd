@@ -2,36 +2,37 @@
 % Please edit documentation in R/minmaxPareto.R
 \name{minmaxPareto}
 \alias{minmaxPareto}
-\title{Pareto maximum and minimum values}
+\title{Pareto minimum and maximum values}
 \usage{
 minmaxPareto(osc, candi, covars)
 }
 \arguments{
-\item{osc}{A list with the optimized sample configurations (OSC). Each OSC
-must be named after the objective function with which it has been optimized.
-For example, \code{osc = list(CORR = osc_corr, DIST = osc_dist)}.}
+\item{osc}{A list of objects of class \code{OptimizedSampleConfiguration} (OSC). Each OSC of the list must
+be named after the objective function with which it has been optimized. For example, 
+\code{osc = list(CORR = osc_corr, DIST = osc_dist)}.}
 
-\item{candi}{Data frame or matrix with the candidate locations for the
-jittered points. \code{candi} must have two columns in the following 
-order: \code{[, "x"]} the projected x-coordinates, and \code{[, "y"]} the 
+\item{candi}{Data frame or matrix with the candidate locations for the jittered points. \code{candi} must 
+have two columns in the following order: \code{[, "x"]} the projected x-coordinates, and \code{[, "y"]} the 
 projected y-coordinates.}
 
 \item{covars}{Data frame or matrix with the covariates in the columns.}
-
-\item{...}{Other arguments required to compute the objective function value.
-See the help pages of the respective objective functions to see which 
-arguments are needed.}
 }
 \value{
-A data frame with the Pareto maximum and minimum values.
+A data frame with the Pareto minimum and maximum values.
 }
 \description{
-Compute the Pareto maximum and minimum values of the objective functions 
-that compose a multi-objective optimization problem (MOOP). The Pareto 
-maximum and minimum values are then used to transform the objective 
-functions using the \emph{upper-lower-bound approach} so that they can be 
-aggregated into a single \emph{utility function} using the \emph{weighted 
-sum method}.
+Compute the minimum and maximum attainable values of the objective functions that compose a multi-objective 
+combinatorial optimization problem.
+}
+\details{
+The minimum and maximum attainable values of the objective functions that compose a multi-objective 
+combinatorial optimization problem (MOCOP) are also known as the Pareto minimum and maximum values. 
+The Pareto minimum and maximum values are used to scale the objective functions to the same approximate 
+range of values using the \emph{upper-lower-bound approach} so that they can be correctly aggregated into a 
+single \emph{utility function} using the \emph{weighted sum method}. Scalling the objective functions to 
+the same approximate range of values is necessary to avoid the numerical dominance of those objective 
+functions whose values have the largest magnitude among all objective functions. Eliminating the chance of
+numerical dominance guarantees that the weights will play the wanted role during the optimization.
 }
 \examples{
 \dontrun{
@@ -73,6 +74,6 @@ pareto
 Alessandro Samuel-Rosa \email{alessandrosamuelrosa@gmail.com}
 }
 \seealso{
-\code{\link[spsann]{optimACDC}}, \code{SPAN}
+\code{\link[spsann]{optimACDC}}, \code{\link[spsann]{SPAN}}
 }
 

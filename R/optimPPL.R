@@ -1,10 +1,8 @@
-#' Optimization of sample configurations for variogram identification and 
-#' estimation
+#' Optimization of sample configurations for variogram identification and estimation
 #'
-#' Optimize a sample configuration for variogram identification and estimation. 
-#' A criterion is defined so that the optimized sample configuration has a 
-#' given number of points or point-pairs contributing to each lag-distance 
-#' class (\bold{PPL}).
+#' Optimize a sample configuration for variogram identification and estimation. A criterion is defined so that 
+#' the optimized sample configuration has a given number of points or point-pairs contributing to each 
+#' lag-distance class (\bold{PPL}).
 #' 
 #' @inheritParams spJitter
 #' @template spJitter_doc
@@ -12,18 +10,18 @@
 #' @template PPL_doc
 #' 
 #' @return
-#' \code{optimPPL} returns a matrix: the optimized sample configuration.
+#' \code{optimPPL} returns an object of class \code{OptimizedSampleConfiguration}: the optimized sample
+#' configuration with details about the optimization.
 #'
-#' \code{objPPL} returns a numeric value: the energy state of the sample 
-#' configuration - the objective function value.
+#' \code{objPPL} returns a numeric value: the energy state of the sample configuration -- the objective 
+#' function value.
 #'
-#' \code{countPPL} returns a data.frame with three columns: a) the lower and b)
-#' upper limits of each lag-distance class, and c) the number of points or 
-#' point-pairs per lag-distance class.
+#' \code{countPPL} returns a data.frame with three columns: a) the lower and b) upper limits of each 
+#' lag-distance class, and c) the number of points or point-pairs per lag-distance class.
 #'
 #' @author
 #' Alessandro Samuel-Rosa \email{alessandrosamuelrosa@@gmail.com}
-#' @aliases optimPPL countPPL objPPL
+#' @aliases optimPPL countPPL objPPL PPL
 #' @export
 #' @examples
 #' \dontrun{

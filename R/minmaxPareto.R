@@ -1,29 +1,34 @@
-#' Pareto maximum and minimum values
+#' Pareto minimum and maximum values
 #' 
-#' Compute the Pareto maximum and minimum values of the objective functions 
-#' that compose a multi-objective optimization problem (MOOP). The Pareto 
-#' maximum and minimum values are then used to transform the objective 
-#' functions using the \emph{upper-lower-bound approach} so that they can be 
-#' aggregated into a single \emph{utility function} using the \emph{weighted 
-#' sum method}.
+#' Compute the minimum and maximum attainable values of the objective functions that compose a multi-objective 
+#' combinatorial optimization problem.
 #' 
 #' @inheritParams optimACDC
 #' @inheritParams spJitter
 #' 
-#' @param osc A list with the optimized sample configurations (OSC). Each OSC
-#' must be named after the objective function with which it has been optimized.
-#' For example, \code{osc = list(CORR = osc_corr, DIST = osc_dist)}.
+#' @param osc A list of objects of class \code{OptimizedSampleConfiguration} (OSC). Each OSC of the list must
+#' be named after the objective function with which it has been optimized. For example, 
+#' \code{osc = list(CORR = osc_corr, DIST = osc_dist)}.
 #' 
-#' @param ... Other arguments required to compute the objective function value.
-#' See the help pages of the respective objective functions to see which 
-#' arguments are needed.
+# @param ... Other arguments required to compute the objective function value. See the help pages of the 
+# respective objective functions to see which arguments are needed.
+#' 
+#' @details 
+#' The minimum and maximum attainable values of the objective functions that compose a multi-objective 
+#' combinatorial optimization problem (MOCOP) are also known as the Pareto minimum and maximum values. 
+#' The Pareto minimum and maximum values are used to scale the objective functions to the same approximate 
+#' range of values using the \emph{upper-lower-bound approach} so that they can be correctly aggregated into a 
+#' single \emph{utility function} using the \emph{weighted sum method}. Scalling the objective functions to 
+#' the same approximate range of values is necessary to avoid the numerical dominance of those objective 
+#' functions whose values have the largest magnitude among all objective functions. Eliminating the chance of
+#' numerical dominance guarantees that the weights will play the wanted role during the optimization.
 #' 
 #' @return 
-#' A data frame with the Pareto maximum and minimum values.
+#' A data frame with the Pareto minimum and maximum values.
 #' 
 #' @author
 #' Alessandro Samuel-Rosa \email{alessandrosamuelrosa@@gmail.com}
-#' @seealso \code{\link[spsann]{optimACDC}}, \code{SPAN}
+#' @seealso \code{\link[spsann]{optimACDC}}, \code{\link[spsann]{SPAN}}
 #' @export
 #' @examples 
 #' \dontrun{
@@ -81,35 +86,31 @@ minmaxPareto <-
     }
     
     # Get objective function parameters
-    strata.type <- osc$CORR[["objective"]]$strata.type
-    use.coords <- osc$CORR[["objective"]]$use.coords
+    strata.type <- osc$CORR$objective$strata.type
+    use.coords <- osc$CORR$objective$use.coords
     
     # Compute objective function values
-    obj_corr <- sapply(1:length(osc), function (i) 
-      objCORR(osc[[i]][["points"]], covars = covars, candi = candi, 
-              strata.type = strata.type, use.coords = use.coords))
-    obj_dist <- sapply(1:length(osc), function (i) 
-      objDIST(osc[[i]][["points"]], covars = covars, candi = candi, 
-              strata.type = strata.type, use.coords = use.coords))
+    obj_corr <- sapply(1:length(osc), function (i) objCORR(
+      osc[[i]]$points, covars = covars, candi = candi, strata.type = strata.type, use.coords = use.coords))
+    obj_dist <- sapply(1:length(osc), function (i) objDIST(
+      osc[[i]]$points, covars = covars, candi = candi, strata.type = strata.type, use.coords = use.coords))
     
     if (all(c("PPL", "MSSD") %in% names(osc))) {
       
       # Get objective function parameters
-      lags <- osc$PPL[["objective"]]$lags
-      criterion <- osc$PPL[["objective"]]$criterion
-      pairs <- osc$PPL[["objective"]]$pairs
-#       x.max <- osc$PPL@spsann$jitter$x[2]
-#       x.min <- osc$PPL@spsann$jitter$x[1]
-#       y.max <- osc$PPL@spsann$jitter$y[2]
-#       y.min <- osc$PPL@spsann$jitter$y[1]
+      lags <- osc$PPL$objective$lags
+      criterion <- osc$PPL$objective$criterion
+      pairs <- osc$PPL$objective$pairs
+      # x.max <- osc$PPL@spsann$jitter$x[2]
+      # x.min <- osc$PPL@spsann$jitter$x[1]
+      # y.max <- osc$PPL@spsann$jitter$y[2]
+      # y.min <- osc$PPL@spsann$jitter$y[1]
       
       # Compute objective function values
       obj_ppl <- sapply(1:length(osc), function (i) 
-        objPPL(osc[[i]][["points"]], candi = candi, 
-               lags = lags, criterion = criterion, pairs = pairs
+        objPPL(osc[[i]]$points, candi = candi, lags = lags, criterion = criterion, pairs = pairs))
                # ,x.max = x.max, y.max = y.max, x.min = x.min, y.min = y.min
-               ))
-      obj_mssd <- sapply(1:length(osc), function (i) objMSSD(osc[[i]][["points"]], candi = candi))
+      obj_mssd <- sapply(1:length(osc), function (i) objMSSD(osc[[i]]$points, candi = candi))
       
       # Prepare output
       res <- data.frame(

@@ -1,9 +1,7 @@
-#' Optimization of sample configurations for spatial trend identification
-#' and estimation (I)
+#' Optimization of sample configurations for spatial trend identification and estimation (I)
 #'
-#' Optimize a sample configuration for spatial trend identification and 
-#' estimation. A criterion is defined so that the sample reproduces the 
-#' bivariate association/correlation between the covariates (\bold{CORR}).
+#' Optimize a sample configuration for spatial trend identification and estimation. A criterion is defined so
+#' that the sample reproduces the bivariate association/correlation between the covariates (\bold{CORR}).
 #'
 #' @inheritParams spJitter
 #' @template spJitter_doc
@@ -12,14 +10,15 @@
 #' @template CORR_doc
 #' 
 #' @return
-#' \code{optimCORR} returns a matrix: the optimized sample configuration.
+#' \code{optimCORR} returns an object of class \code{OptimizedSampleConfiguration}: the optimized sample
+#' configuration with details about the optimization.
 #' 
-#' \code{objCORR} returns a numeric value: the energy state of the sample
-#' configuration - the objective function value.
+#' \code{objCORR} returns a numeric value: the energy state of the sample configuration -- the objective
+#' function value.
 #'
 #' @author Alessandro Samuel-Rosa \email{alessandrosamuelrosa@@gmail.com}
-#' @seealso \code{\link[clhs]{clhs}}, \code{\link[pedometrics]{cramer}}
-#' @aliases optimCORR objCORR
+#' @seealso \code{\link[clhs]{clhs}}, \code{\link[pedometrics]{cramer}}, \code{\link[spsann]{optimACDC}}
+#' @aliases optimCORR objCORR CORR
 #' @export
 #' @examples
 #' require(sp)
