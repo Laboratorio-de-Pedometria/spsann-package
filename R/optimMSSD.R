@@ -1,43 +1,49 @@
-#' Optimization of sample configurations for spatial interpolation
+#' Optimization of sample configurations for spatial interpolation (I)
 #'
-#' Optimize a sample configuration for spatial interpolation. The criterion 
-#' used is the mean squared shortest distance (\bold{MSSD}).
+#' Optimize a sample configuration for spatial interpolation. The criterion used is the mean squared shortest 
+#' distance (\bold{MSSD}) between sample points and prediction points.
 #'
 #' @inheritParams spJitter
-#' @template spJitter_doc
 #' @template spSANN_doc
+#' @template spJitter_doc
+#' 
+#' @details 
+#' \subsection{Spatial coverage sampling}{
+#' Spatial coverage sampling is based on the knowledge that the kriging variance depends upon the distance 
+#' between sample points. As such, the better the spread of the sample points in the spatial domain, the 
+#' smaller the kriging variance. This is similar to using a regular grid of sample points. However, 
+#' a regular grid usually is suboptimal for irregularly shaped areas.
+#' }
 #'
 #' @return
-#' \code{optimMSSD} returns a matrix: the optimized sample configuration.
+#' \code{optimMSSD} returns an object of class \code{OptimizedSampleConfiguration}: the optimized sample
+#' configuration with details about the optimization.
 #'
-#' \code{objMSSD} returns a numeric value: the energy state of the sample
-#' configuration - the objective function value.
+#' \code{objMSSD} returns a numeric value: the energy state of the sample configuration -- the objective
+#' function value.
 #' 
 #' @note
-#' This function was derived with modifications from the method known as the 
-#' \emph{spatial coverage sampling} originally proposed by Brus, de Gruijter and
-#' van Groenigen (2006), and implemented in the R-package 
-#' \pkg{\link[spcosa]{spcosa}} by Dennis Walvoort, Dick Brus and Jaap de 
-#' Gruijter.
+#' This function was derived with modifications from the method known as \emph{spatial coverage sampling} 
+#' originally proposed by Brus, de Gruijter and van Groenigen (2006), and implemented in the R-package 
+#' \pkg{\link[spcosa]{spcosa}} by Dennis Walvoort, Dick Brus and Jaap de Gruijter.
 #' 
 #' @references
-#' Brus, D. J.; de Gruijter, J. J.; van Groenigen, J. W. Designing spatial
-#' coverage samples using the k-means clustering algorithm. In: P. Lagacherie,
-#' A. M.; Voltz, M. (Eds.) \emph{Digital soil mapping - an introductory
-#' perspective}. Elsevier, v. 31, p. 183-192, 2006.
+#' Brus, D. J.; de Gruijter, J. J.; van Groenigen, J. W. Designing spatial coverage samples using the k-means
+#' clustering algorithm. In: P. Lagacherie,A. M.; Voltz, M. (Eds.) \emph{Digital soil mapping -- an 
+#' introductory perspective}. Elsevier, v. 31, p. 183-192, 2006.
 #'
-#' de Gruijter, J. J.; Brus, D.; Bierkens, M.; Knotters, M. \emph{Sampling for
-#' natural resource monitoring}. Berlin: Springer, p. 332, 2006.
+#' de Gruijter, J. J.; Brus, D.; Bierkens, M.; Knotters, M. \emph{Sampling for natural resource monitoring}.
+#' Berlin: Springer, p. 332, 2006.
 #'
-#' Walvoort, D. J. J.; Brus, D. J.; de Gruijter, J. J. An R package for spatial
-#' coverage sampling and random sampling from compact geographical strata by
-#' k-means. \emph{Computers and Geosciences}. v. 36, p. 1261-1267, 2010.
+#' Walvoort, D. J. J.; Brus, D. J.; de Gruijter, J. J. An R package for spatial coverage sampling and random 
+#' sampling from compact geographical strata by k-means. \emph{Computers and Geosciences}. v. 36, p. 
+#' 1261-1267, 2010.
 #'
 #' @author
 #' Alessandro Samuel-Rosa \email{alessandrosamuelrosa@@gmail.com}
 #' @seealso
 #' \code{\link[raster]{distanceFromPoints}}, \code{\link[spcosa]{stratify}}.
-#' @aliases optimMSSD objMSSD
+#' @aliases optimMSSD objMSSD MSSD
 #' @concept spatial interpolation
 #' @export
 #' @examples

@@ -1,16 +1,14 @@
 #' Auxiliary tools
 #' 
-#' Auxiliary tools used in the optimization of sample configurations using 
-#' spatial simulated annealing.
+#' Auxiliary tools used in the optimization of sample configurations using spatial simulated annealing.
 #' 
 #' @param osc Object of class \code{OptimizedSampleConfiguration}.
 #' 
-#' @param at Point of the optimization at which the energy state should be
-#' returned. Available options: \code{"start"}, for the start, and \code{"end"},
-#' for the end of the optimization. Defaults to \code{at = "end"}.
+#' @param at Point of the optimization at which the energy state should be returned. Available options: 
+#' \code{"start"}, for the start, and \code{"end"}, for the end of the optimization. Defaults to 
+#' \code{at = "end"}.
 #' 
-#' @param n Number of instances that should be returned. Defaults to 
-#' \code{n = 1}.
+#' @param n Number of instances that should be returned. Defaults to \code{n = 1}.
 #' 
 #' @aliases SPSANNtools objSPSANN
 #' @author Alessandro Samuel-Rosa \email{alessandrosamuelrosa@@gmail.com}

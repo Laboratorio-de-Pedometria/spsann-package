@@ -3,33 +3,28 @@
 #' Optimize a sample configuration using a user-defined objective function.
 #' 
 #' @inheritParams spJitter
-#' @template spJitter_doc
 #' @template spSANN_doc
 #' 
-#' @param fun A function defining the objective function that should be
-#' used to evaluate the energy state of the system configuration at each 
-#' iteration. See \sQuote{Details} for more information.
+#' @param fun A function defining the objective function that should be used to evaluate the energy state of 
+#' the system configuration at each random perturbation of a candidate sample point. See \sQuote{Details} for 
+#' more information.
 #' 
-#' @param ... Other arguments passed to the objective function. See 
-#' \sQuote{Details} for more information.
+#' @param ... Other arguments passed to the objective function. See \sQuote{Details} for more information.
 #'
 #' @details
-#'
-#' The user-defined objective function \code{fun} must be an object of class 
-#' \code{\link[base]{function}} and include the argument \code{points}. The
-#' argument \code{points} is defined in \code{optimUSER} as a matrix with three 
-#' columns: \code{[, 1]} the identification of each sample point given by the
-#' respective row indexes of \code{candi}, \code{[, 2]} the x-coordinates, and 
-#' \code{[, 3]} the y-coordinates. The identification is useful to retrieve 
-#' information from any data matrix used by the objective function defined by 
-#' the user.
+#' The user-defined objective function \code{fun} must be an object of class \code{\link[base]{function}} and 
+#' include the argument \code{points}. The argument \code{points} is defined in \code{optimUSER} as a matrix 
+#' with three columns: \code{[, 1]} the identification of each sample point given by the respective row 
+#' indexes of \code{candi}, \code{[, 2]} the x-coordinates, and \code{[, 3]} the y-coordinates. The 
+#' identification is useful to retrieve information from any data matrix used by the objective function 
+#' defined by the user.
 #' 
 #' @return
 #' \code{optimUSER} returns a matrix: the optimized sample configuration.
 #'
 #' @author
 #' Alessandro Samuel-Rosa \email{alessandrosamuelrosa@@gmail.com}
-#' @aliases optimUSER
+#' @aliases optimUSER USER
 #' @export
 #' @examples
 #' \dontrun{

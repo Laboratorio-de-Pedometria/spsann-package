@@ -2,46 +2,92 @@
 #' 
 #' Randomly perturb (\sQuote{jitter}) the coordinates of spatial points.
 #' 
-#' @template spJitter_doc
-#' 
-#' @param points Integer value, integer vector, data frame or matrix. If 
-#' \code{points} is an integer value, it defines the number of points that 
-#' should be randomly sampled from \code{candi} to form the starting system
-#' configuration. If \code{points} is a vector of integer values, it contains 
-#' the row indexes of \code{candi} that correspond to the points that form the
-#' starting system configuration. If \code{points} is a data frame or matrix, 
-#' it must have three columns in the following order: \code{[, "id"]} the 
-#' row indexes of \code{candi} that correspond to each point, \code{[, "x"]} 
-#' the projected x-coordinates, and \code{[, "y"]} the projected y-coordinates.
-#' Note that in the later case, \code{points} must be a subset of \code{candi}.
+#' @param points Integer value, integer vector, data frame or matrix. If \code{points} is an integer value, 
+#' it defines the number of points that should be randomly sampled from \code{candi} to form the starting 
+#' system configuration. If \code{points} is a vector of integer values, it contains the row indexes of 
+#' \code{candi} that correspond to the points that form the starting system configuration. If \code{points} 
+#' is a data frame or matrix, it must have three columns in the following order: \code{[, "id"]} the row 
+#' indexes of \code{candi} that correspond to each point, \code{[, "x"]} the projected x-coordinates, and 
+#' \code{[, "y"]} the projected y-coordinates. Note that in the later case, \code{points} must be a subset 
+#' of \code{candi}.
 #'
-#' @param candi Data frame or matrix with the candidate locations for the
-#' jittered points. \code{candi} must have two columns in the following 
-#' order: \code{[, "x"]} the projected x-coordinates, and \code{[, "y"]} the 
+#' @param candi Data frame or matrix with the candidate locations for the jittered points. \code{candi} must 
+#' have two columns in the following order: \code{[, "x"]} the projected x-coordinates, and \code{[, "y"]} the 
 #' projected y-coordinates.
 #'
-#' @param x.max,x.min,y.max,y.min Numeric value defining the minimum and 
-#' maximum quantity of random noise to be added to the projected x- and 
-#' y-coordinates. The minimum quantity should be equal to, at least, the 
-#' minimum distance between two neighbouring candidate locations. The units 
-#' are the same as of the projected x- and y-coordinates. If missing, they 
-#' are estimated from \code{candi}.
+#' @param x.max,x.min,y.max,y.min Numeric value defining the minimum and maximum quantity of random noise to 
+#' be added to the projected x- and y-coordinates. The minimum quantity should be equal to, at least, the 
+#' minimum distance between two neighbouring candidate locations. The units are the same as of the projected 
+#' x- and y-coordinates. If missing, they are estimated from \code{candi}.
 #' 
-#' @param cellsize Vector with two numeric values defining the horizontal (x) 
-#' and vertical (y) spacing between the candidate locations in \code{candi}. A 
-#' single value can be used if the spacing in the x- and y-coordinates is the
-#' same.
+#' @param cellsize Vector with two numeric values defining the horizontal (x) and vertical (y) spacing 
+#' between the candidate locations in \code{candi}. A single value can be used if the spacing in the x- and 
+#' y-coordinates is the same.
 #' 
 #' @param which.point Integer values defining which point should be perturbed. 
+#' 
+#' @details 
+#' \subsection{Jittering methods}{
+#' There are multiple mechanism to generate a new sample configuration out of the current sample configuration.
+#' The main step consists of randomly perturbing the coordinates of a sample point, a process known as 
+#' \sQuote{jittering}. These mechanisms can be classified based on how the set of candidate locations is 
+#' defined. For example, one could use an \emph{infinite} set of candidate locations, that is, any location 
+#' in the sampling region can be selected as the new location of a jittered point. All that is needed is 
+#' a polygon indicating the boundary of the sampling region. This method is the most computationally demanding
+#' because every time a point is jittered, it is necessary to check if the point falls in sampling region.
+#' 
+#' Another approach consists of using a \emph{finite} set of candidate locations for the jittered points. A
+#' finite set of candidate locations is created by discretizing the sampling region, that is, creating a fine 
+#' grid of points that serve as candidate locations for the jittered point. This is the least computationally
+#' demanding jittering method because, by definition, the jittered point will always fall in the sampling
+#' region.
+#' 
+#' Using a finite set of candidate locations has two important inconveniences. First, not all locations in 
+#' the sampling region can be selected as the new location for a jittered point. Second, when a point is 
+#' jittered, it may be that the new location already is occupied by another point. If this happens, another 
+#' location has to be iteratively sought for, say, as many times as the number of points in the sample. In 
+#' general, the more points there are in the sample, the more likely it is that the new location already is 
+#' occupied by another point. If a solution is not found in a reasonable time, the point selected to be 
+#' jittered is kept in its original location. Such a proceedure clearly is suboptimal.
+#' 
+#' \pkg{spsann} uses a more elegant method which is based on using a finite set of candidate locations coupled
+#' with a form of \emph{two-stage random sampling} as implemented in \code{\link[spcosa]{spsample}}. Because 
+#' the candidate locations are placed on a finite regular grid, they can be seen as the centre nodes of 
+#' a finite set of grid cells (or pixels of a raster image). In the first stage, one of the \dQuote{grid 
+#' cells} is selected with replacement, i.e. independently of already being occupied by another sample point. 
+#' The new location for the point chosen to be jittered is selected within that \dQuote{grid cell} by simple
+#' random sampling. This method guarantees that virtually any location in the sampling region can be selected. 
+#' It also discards the need to check if the new location already is occupied by another point, speeding up 
+#' the computations when compared to the first two approaches.
+#' }
+#' 
+#' @note 
+#' The distance between two points is computed as the Euclidean distance between them. This computation 
+#' assumes that the optimization is operating in the two-dimensional Euclidean space, i.e. the coordinates of
+#' the sample points and candidate locations should not be provided as latitude/longitude. \pkg{spsann} has no
+#' mechanism to check if the coordinates are projected: the user is responsible for making sure that this
+#' requirement is attained.
 #' 
 #' @return
 #' A matrix with the jittered projected coordinates of the points.
 #' 
+#' @references
+#' Edzer Pebesma, Jon Skoien with contributions from Olivier Baume, A. Chorti, D.T. Hristopulos, S.J. Melles 
+#' and G. Spiliopoulos (2013). \emph{intamapInteractive: procedures for automated interpolation - methods 
+#' only to be used interactively, not included in \code{intamap} package.} R package version 1.1-10.
+#' 
+#' van Groenigen, J.-W. \emph{Constrained optimization of spatial sampling: a geostatistical approach.}
+#' Wageningen: Wageningen University, p. 148, 1999.
+#' 
+#' Walvoort, D. J. J.; Brus, D. J. & de Gruijter, J. J. An R package for spatial coverage sampling and random 
+#' sampling from compact geographical strata by k-means. \emph{Computers & Geosciences}. v. 36, p. 1261-1267,
+#' 2010.
+#' 
 #' @author 
 #' Alessandro Samuel-Rosa \email{alessandrosamuelrosa@@gmail.com}
 #' 
-#' @seealso \code{ssaOptim}, \code{\link[sp]{zerodist}}, 
-#' \code{\link[base]{jitter}}, \code{\link[geoR]{jitter2d}}.
+#' @seealso \code{ssaOptim}, \code{\link[sp]{zerodist}}, \code{\link[base]{jitter}}, 
+#' \code{\link[geoR]{jitter2d}}.
 #' @concept jitter perturb
 #' @export
 #' @examples

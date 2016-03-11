@@ -1,56 +1,49 @@
-#' Optimization of sample configurations for spatial interpolation
+#' Optimization of sample configurations for spatial interpolation (II)
 #'
-#' Optimize a sample configuration for spatial interpolation with a known linear
-#' model. A criterion is defined so that the sample configuration minimizes the
-#' mean/maximum kriging variance (\bold{MKV}).
+#' Optimize a sample configuration for spatial interpolation with a known linear model. A criterion is defined 
+#' so that the sample configuration minimizes the mean or maximum kriging variance (\bold{MKV}).
 #'
 #' @inheritParams spJitter
-#' @template spJitter_doc
 #' @template spSANN_doc
+#' @template spJitter_doc
 #' 
 #' @param covars Data frame or matrix with the covariates in the columns.
 #' 
-#' @param eqn Formula string that defines the dependent variable \code{z}
-#' as a linear model of the independent variables contained in \code{covars}. 
-#' Defaults to \code{eqn = z ~ 1}, that is, ordinary kriging. See the 
-#' argument \code{formula} in the function \code{\link[gstat]{krige}} for 
-#' more information.
+#' @param eqn Formula string that defines the dependent variable \code{z} as a linear model of the independent 
+#' variables contained in \code{covars}. Defaults to \code{eqn = z ~ 1}, that is, ordinary kriging. See the 
+#' argument \code{formula} in the function \code{\link[gstat]{krige}} for more information.
 #'
-#' @param vgm Object of class "variogramModel". See the argument 
-#' \code{model} in the function \code{\link[gstat]{krige}} for more 
-#' information.
+#' @param vgm Object of class \code{variogramModel}. See the argument \code{model} in the function 
+#' \code{\link[gstat]{krige}} for more information.
 #'
-#' @param krige.stat Character value defining the statistic that should be used
-#' to summarize the kriging variance. Available options are \code{"mean"} and
-#' \code{"max"} for the mean and maximum kriging variance, respectively.
-#' Defaults to \code{krige.stat = "mean"}.
+#' @param krige.stat Character value defining the statistic that should be used to summarize the kriging 
+#' variance. Available options are \code{"mean"} and \code{"max"} for the mean and maximum kriging variance, 
+#' respectively. Defaults to \code{krige.stat = "mean"}.
 #' 
 #' @param ... further arguments passed to \code{\link[gstat]{krige}}.
 #'
 #' @return
-#' \code{optimMKV} returns a matrix: the optimized sample configuration.
+#' \code{optimMKV} returns an object of class \code{OptimizedSampleConfiguration}: the optimized sample
+#' configuration with details about the optimization.
 #'
-#' \code{objMKV} returns a numeric value: the energy state of the sample
-#' configuration - the objective function value.
+#' \code{objMKV} returns a numeric value: the energy state of the sample configuration -- the objective
+#' function value.
 #'
 #' @note
-#' This function is based on the method originally proposed by Heuvelink, Brus 
-#' and de Gruijter (2006) and implemented in the R-package 
-#' \pkg{intamapInteractive} by Edzer Pebesma and Jon Skoien.
+#' This function is based on the method originally proposed by Heuvelink, Brus and de Gruijter (2006) and 
+#' implemented in the R-package \pkg{intamapInteractive} by Edzer Pebesma and Jon Skoien.
 #'
 #' @references
-#' Brus, D. J. & Heuvelink, G. B. M. Optimization of sample patterns for
-#' universal kriging of environmental variables. \emph{Geoderma}. v. 138, 
-#' p. 86-95, 2007.
+#' Brus, D. J. & Heuvelink, G. B. M. Optimization of sample patterns for universal kriging of environmental 
+#' variables. \emph{Geoderma}. v. 138, p. 86-95, 2007.
 #' 
-#' Heuvelink, G. B. M.; Brus, D. J. & de Gruijter, J. J. Optimization of sample
-#' configurations for digital mapping of soil properties with universal kriging.
-#' In: Lagacherie, P.; McBratney, A. & Voltz, M. (Eds.) \emph{Digital soil
-#' mapping - an introductory perspective}. Elsevier, v. 31, p. 137-151, 2006.
+#' Heuvelink, G. B. M.; Brus, D. J. & de Gruijter, J. J. Optimization of sample configurations for digital 
+#' mapping of soil properties with universal kriging. In: Lagacherie, P.; McBratney, A. & Voltz, M. (Eds.)
+#' \emph{Digital soil mapping - an introductory perspective}. Elsevier, v. 31, p. 137-151, 2006.
 #' 
 #' @author
 #' Alessandro Samuel-Rosa \email{alessandrosamuelrosa@@gmail.com}
-#' @aliases optimMKV objMKV
+#' @aliases optimMKV objMKV MKV
 #' @concept spatial interpolation
 #' @export
 #' @examples
