@@ -107,22 +107,7 @@ internally (experimental).}
 user-defined values named after the respective objective functions to which they apply; 2) \code{abs} --
 logical for calculating the utopia point internally (experimental).}
 
-\item{x.max}{Numeric value defining the minimum and maximum quantity of random noise to 
-be added to the projected x- and y-coordinates. The minimum quantity should be equal to, at least, the 
-minimum distance between two neighbouring candidate locations. The units are the same as of the projected 
-x- and y-coordinates. If missing, they are estimated from \code{candi}.}
-
-\item{x.min}{Numeric value defining the minimum and maximum quantity of random noise to 
-be added to the projected x- and y-coordinates. The minimum quantity should be equal to, at least, the 
-minimum distance between two neighbouring candidate locations. The units are the same as of the projected 
-x- and y-coordinates. If missing, they are estimated from \code{candi}.}
-
-\item{y.max}{Numeric value defining the minimum and maximum quantity of random noise to 
-be added to the projected x- and y-coordinates. The minimum quantity should be equal to, at least, the 
-minimum distance between two neighbouring candidate locations. The units are the same as of the projected 
-x- and y-coordinates. If missing, they are estimated from \code{candi}.}
-
-\item{y.min}{Numeric value defining the minimum and maximum quantity of random noise to 
+\item{x.max, x.min, y.max, y.min}{Numeric value defining the minimum and maximum quantity of random noise to 
 be added to the projected x- and y-coordinates. The minimum quantity should be equal to, at least, the 
 minimum distance between two neighbouring candidate locations. The units are the same as of the projected 
 x- and y-coordinates. If missing, they are estimated from \code{candi}.}

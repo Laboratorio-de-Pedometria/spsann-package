@@ -1,4 +1,7 @@
-# Version 1.0-2.9010 (2015-03-10)
+# Version 1.0-2.9011 (2016-03-11)
+* Documentation was expanded.
+
+# Version 1.0-2.9010 (2016-03-10)
 * Created S3 methods for extracting the objective function value and plotting an object of class 
   `OptimizedSampleConfiguration`.
 * The class `OptimizedSampleConfiguration` is no longer exported.

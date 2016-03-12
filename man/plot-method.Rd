@@ -5,18 +5,18 @@
 \alias{plot.OptimizedSampleConfiguration}
 \title{Plot an optimized sample configuration}
 \usage{
-\method{plot}{OptimizedSampleConfiguration}(osc, which = 1:2, boundary)
+\method{plot}{OptimizedSampleConfiguration}(x, which = 1:2, boundary, ...)
 }
 \arguments{
-\item{osc}{Object of class \code{'OptimizedSampleConfiguration'} returned by
-one of the \code{optim}-functions.}
+\item{x}{Object of class \code{OptimizedSampleConfiguration} returned by one of the 
+\code{optim}-functions.}
 
-\item{which}{Which plot should be produced: evolution of the energy state 
-(1), optimized sample configuration (2), or both (1:2)? Defaults to
-\code{which = 1:2}.}
+\item{which}{Which plot should be produced: evolution of the energy state (1), optimized sample 
+configuration (2), or both (1:2)? Defaults to \code{which = 1:2}.}
 
-\item{boundary}{Object of class Spatial defining the boundary of the 
-sampling region.}
+\item{boundary}{Object of class \code{Spatial} defining the boundary of the sampling region.}
+
+\item{...}{Other options passed to \code{plot}.}
 }
 \description{
 Plot the evolution of the energy state and the optimized sample configuration

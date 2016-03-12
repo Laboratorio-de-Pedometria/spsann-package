@@ -52,7 +52,8 @@ bar. A Tk progress bar widget is usefull when using parallel processors. Default
 \code{verbose = FALSE}.}
 }
 \value{
-\code{optimUSER} returns a matrix: the optimized sample configuration.
+\code{optimUSER} returns an object of class \code{OptimizedSampleConfiguration}: the optimized sample
+configuration with details about the optimization.
 }
 \description{
 Optimize a sample configuration using a user-defined objective function.

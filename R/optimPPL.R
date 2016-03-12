@@ -85,7 +85,7 @@ optimPPL <-
             lags = 7, lags.type = "exponential", lags.base = 2, cutoff, 
             criterion = "distribution", distri, pairs = FALSE,
             # SPSANN
-            schedule = scheduleSPSANN(), plotit = FALSE, track = FALSE,
+            schedule = scheduleSPSANN(), plotit = FALSE, track = FALSE, 
             boundary, progress = "txt", verbose = FALSE) {
     
     # Objective function name
@@ -95,10 +95,9 @@ optimPPL <-
     eval(.check_spsann_arguments())
     
     # Check other arguments
-    check <- 
-      .checkPPL(lags = lags, lags.type = lags.type, pairs = pairs,
-                lags.base = lags.base, cutoff = cutoff, criterion = criterion,
-                distri = distri, fun = "optimPPL")
+    check <- .checkPPL(
+      lags = lags, lags.type = lags.type, pairs = pairs, lags.base = lags.base, cutoff = cutoff, 
+      criterion = criterion, distri = distri, fun = "optimPPL")
     if (!is.null(check)) stop (check, call. = FALSE)
     
     # Set plotting options
@@ -112,8 +111,7 @@ optimPPL <-
     
     # Prepare cutoff and lags
     cutoff <- .cutoffPPL(cutoff = cutoff, x.max = x.max, y.max = y.max)
-    lags <- .lagsPPL(lags = lags, lags.type = lags.type, cutoff = cutoff, 
-                     lags.base = lags.base)
+    lags <- .lagsPPL(lags = lags, lags.type = lags.type, cutoff = cutoff, lags.base = lags.base)
     n_lags <- length(lags) - 1
     
     # Initial energy state: points or point-pairs
@@ -454,9 +452,7 @@ countPPL <-
         # n <- which(dist.mat > lags[i] & dist.mat <= lags[i + 1])
         # ppl[i] <- length(n)
       # }
-      ppl <- diff(sapply(
-        1:length(lags), function (i) 
-          length(which(dist.mat <= lags[i]))) - n.pts) * 0.5
+      ppl <- diff(sapply(1:length(lags), function (i) length(which(dist.mat <= lags[i]))) - n.pts) * 0.5
     } else { # Points per lag
       # for (i in 1:n.lags) {
         # n <- which(
@@ -464,8 +460,7 @@ countPPL <-
         # ppl[i] <- length(unique(c(n)))
       # }
       ppl <- sapply(1:n.lags, function (i)
-        length(unique(c(
-          which(dist.mat > lags[i] & dist.mat <= lags[i + 1], arr.ind = TRUE)))))
+        length(unique(c(which(dist.mat > lags[i] & dist.mat <= lags[i + 1], arr.ind = TRUE)))))
     }
     
     return (ppl)

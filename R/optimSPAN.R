@@ -6,6 +6,11 @@
 #' over, spread over, \bold{SPAN} the feature, variogram and geographic spaces. The utility function is 
 #' obtained aggregating four objective functions: \bold{CORR}, \bold{DIST}, \bold{PPL}, and \bold{MSSD}.
 #' 
+#' @param x.max,x.min,y.max,y.min Numeric value defining the minimum and maximum quantity of random noise to 
+#' be added to the projected x- and y-coordinates. The minimum quantity should be equal to, at least, the 
+#' minimum distance between two neighbouring candidate locations. The units are the same as of the projected 
+#' x- and y-coordinates. If missing, they are estimated from \code{candi}.
+#' 
 #' @inheritParams spJitter
 #' @template spSANN_doc
 #' @template ACDC_doc
@@ -320,12 +325,12 @@ objSPAN <-
            utopia = list(user = NULL, abs = NULL)) {
     
     # Check other arguments
-    check <- .checkPPL(lags = lags, lags.type = lags.type, pairs = pairs,
-                       lags.base = lags.base, cutoff = cutoff, 
-                       criterion = criterion, distri = distri, fun = "optimPPL")
+    check <- .checkPPL(
+      lags = lags, lags.type = lags.type, pairs = pairs, lags.base = lags.base, cutoff = cutoff, 
+      criterion = criterion, distri = distri, fun = "optimPPL")
     if (!is.null(check)) stop(check, call. = FALSE)
-    check <- .optimACDCcheck(candi = candi, covars = covars, 
-                             use.coords = use.coords, strata.type = strata.type)
+    check <- .optimACDCcheck(
+      candi = candi, covars = covars, use.coords = use.coords, strata.type = strata.type)
     if (!is.null(check)) stop(check, call. = FALSE)
     
     # Prepare points and candi
@@ -345,35 +350,31 @@ objSPAN <-
     pcm <- .corCORR(obj = covars, covars.type = covars.type)
     scm <- .corCORR(obj = sm, covars.type = covars.type)
     # DIST
-    pop_prop <- .strataACDC(n.pts = n_pts, strata.type = strata.type, 
-                            covars = covars, covars.type = covars.type)
+    pop_prop <- .strataACDC(
+      n.pts = n_pts, strata.type = strata.type, covars = covars, covars.type = covars.type)
     # PPL
     cutoff <- .cutoffPPL(cutoff = cutoff, x.max = x.max, y.max = y.max)
-    lags <- .lagsPPL(lags = lags, lags.type = lags.type, cutoff = cutoff, 
-                     lags.base = lags.base)
+    lags <- .lagsPPL(lags = lags, lags.type = lags.type, cutoff = cutoff, lags.base = lags.base)
     n_lags <- length(lags) - 1
     dm_ppl <- SpatialTools::dist1(conf0[, 2:3])
-    ppl <- .getPPL(lags = lags, n.lags = n_lags, dist.mat = dm_ppl, 
-                   pairs = pairs)
-    distri <- .distriPPL(n.lags = n_lags, n.pts = n_pts, criterion = criterion,
-                         distri = distri, pairs = pairs)
+    ppl <- .getPPL(lags = lags, n.lags = n_lags, dist.mat = dm_ppl, pairs = pairs)
+    distri <- .distriPPL(
+      n.lags = n_lags, n.pts = n_pts, criterion = criterion, distri = distri, pairs = pairs)
     # MSSD
     dm_mssd <- SpatialTools::dist2(candi[, 2:3], conf0[, 2:3])
     
     # Nadir and utopia points
-    nadir <- .nadirSPAN(n.pts = n_pts, n.cov = n_cov, n.candi = n_candi, 
-                        nadir = nadir, candi = candi, covars = covars, 
-                        pcm = pcm, pop.prop = pop_prop, lags = lags,
-                        covars.type = covars.type, n.lags = n_lags, 
-                        pairs = pairs, distri = distri, criterion = criterion)
+    nadir <- .nadirSPAN(
+      n.pts = n_pts, n.cov = n_cov, n.candi = n_candi, nadir = nadir, candi = candi, covars = covars, 
+      pcm = pcm, pop.prop = pop_prop, lags = lags, covars.type = covars.type, n.lags = n_lags, pairs = pairs,
+      distri = distri, criterion = criterion)
     utopia <- .utopiaSPAN(utopia = utopia)
     
     # Energy state
-    res <- .objSPAN(sm = sm, n.cov = n_cov, nadir = nadir, utopia = utopia,
-                    weights = weights, n.pts = n_pts, pcm = pcm, scm = scm,
-                    covars.type = covars.type, pop.prop = pop_prop, ppl = ppl, 
-                    n.lags = n_lags, criterion = criterion, distri = distri, 
-                    pairs = pairs, dm.mssd = dm_mssd)
+    res <- .objSPAN(
+      sm = sm, n.cov = n_cov, nadir = nadir, utopia = utopia, weights = weights, n.pts = n_pts, pcm = pcm, 
+      scm = scm, covars.type = covars.type, pop.prop = pop_prop, ppl = ppl, n.lags = n_lags, 
+      criterion = criterion, distri = distri, pairs = pairs, dm.mssd = dm_mssd)
     
     # Output
     return(res)

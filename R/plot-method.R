@@ -4,15 +4,15 @@
 #' 
 #' @inheritParams optimACDC
 #' 
-#' @param osc Object of class \code{'OptimizedSampleConfiguration'} returned by
-#' one of the \code{optim}-functions.
+#' @param x Object of class \code{OptimizedSampleConfiguration} returned by one of the 
+#' \code{optim}-functions.
 #' 
-#' @param which Which plot should be produced: evolution of the energy state 
-#' (1), optimized sample configuration (2), or both (1:2)? Defaults to
-#' \code{which = 1:2}.
+#' @param which Which plot should be produced: evolution of the energy state (1), optimized sample 
+#' configuration (2), or both (1:2)? Defaults to \code{which = 1:2}.
 #' 
-#' @param boundary Object of class Spatial defining the boundary of the 
-#' sampling region.
+#' @param boundary Object of class \code{Spatial} defining the boundary of the sampling region.
+#' 
+#' @param ... Other options passed to \code{plot}.
 #' 
 #' @rdname plot-method
 #' @export
@@ -32,11 +32,11 @@
 #' plot(res)
 # MAIN FUNCTION - PLOT OSC #####################################################
 plot.OptimizedSampleConfiguration <-
-  function (osc, which = 1:2, boundary) {
+  function (x, which = 1:2, boundary, ...) {
     
     # Do not try to plot the energy states if they have not been tracked
-    # if (nrow(methods::slot(osc, "objective")$energy) == 2) { which <- 2 }
-    if (nrow(osc$objective$energy) == 2) { which <- 2 }
+    # if (nrow(methods::slot(x, "objective")$energy) == 2) { which <- 2 }
+    if (nrow(x$objective$energy) == 2) { which <- 2 }
     
     par0 <- graphics::par()
     on.exit(suppressWarnings(graphics::par(par0)))
@@ -44,13 +44,13 @@ plot.OptimizedSampleConfiguration <-
     
     # Plot the energy states
     if (all(which == 1:2)) {
-      # k <- methods::slot(osc, "spsann")$chains[2:3]
-      # k <- as.numeric(k[1] * k[2] * nrow(methods::slot(osc, "points")))
-      # a <- methods::slot(osc, "objective")$energy
+      # k <- methods::slot(x, "spsann")$chains[2:3]
+      # k <- as.numeric(k[1] * k[2] * nrow(methods::slot(x, "points")))
+      # a <- methods::slot(x, "objective")$energy
       
-      k <- osc$spsann$chains[2:3]
-      k <- as.numeric(k[1] * k[2] * nrow(osc$points))
-      a <- osc$objective$energy
+      k <- x$spsann$chains[2:3]
+      k <- as.numeric(k[1] * k[2] * nrow(x$points))
+      a <- x$objective$energy
       
       l <- colnames(a)
       n <- ncol(a)
@@ -77,14 +77,14 @@ plot.OptimizedSampleConfiguration <-
           sp::plot(x = boundary)
         }
         # graphics::points(
-          # methods::slot(osc, "points")[, "x"], 
-          # methods::slot(osc, "points")[, "y"], pch = 20, cex = 0.5)
-        graphics::points(osc$points[, "x"], osc$points[, "y"], pch = 20, cex = 0.5)
+          # methods::slot(x, "points")[, "x"], 
+          # methods::slot(x, "points")[, "y"], pch = 20, cex = 0.5)
+        graphics::points(x$points[, "x"], x$points[, "y"], pch = 20, cex = 0.5)
 
       } else {
         # graphics::plot(
-          # methods::slot(osc, "points")[, c("x", "y")], pch = 20, cex = 0.5, asp = 1)
-        graphics::plot(osc$points[, c("x", "y")], pch = 20, cex = 0.5, asp = 1)
+          # methods::slot(x, "points")[, c("x", "y")], pch = 20, cex = 0.5, asp = 1)
+        graphics::plot(x$points[, c("x", "y")], pch = 20, cex = 0.5, asp = 1)
       }
     }
   }

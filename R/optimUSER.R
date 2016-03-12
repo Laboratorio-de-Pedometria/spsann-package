@@ -20,7 +20,8 @@
 #' defined by the user.
 #' 
 #' @return
-#' \code{optimUSER} returns a matrix: the optimized sample configuration.
+#' \code{optimUSER} returns an object of class \code{OptimizedSampleConfiguration}: the optimized sample
+#' configuration with details about the optimization.
 #'
 #' @author
 #' Alessandro Samuel-Rosa \email{alessandrosamuelrosa@@gmail.com}
