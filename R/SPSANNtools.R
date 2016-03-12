@@ -25,11 +25,11 @@ objSPSANN.OptimizedSampleConfiguration <-
     
     # Energy state at the start
     # if (at == "start") res <- utils::head(osc@objective$energy, n)
-    if (at == "start") res <- utils::head(osc[["objective"]]$energy, n)
+    if (at == "start") res <- utils::head(osc$objective$energy, n)
     
     # Energy state at the end
     # if (at == "end") res <- utils::tail(osc@objective$energy, n)
-    if (at == "end") res <- utils::tail(osc[["objective"]]$energy, n)
+    if (at == "end") res <- utils::tail(osc$objective$energy, n)
     
     return(data.frame(res, row.names = ""))
   }
@@ -44,9 +44,7 @@ objSPSANN.OptimizedSampleConfiguration <-
 .spSANNplot <-
   function (energy0, energies, k, 
             # acceptance, accept_probs, 
-            boundary, new_conf,
-            conf0, y_max0, y.max, x_max0, x.max, best.energy, best.k, MOOP, 
-            wp) {
+            boundary, new_conf, conf0, y_max0, y.max, x_max0, x.max, best.energy, best.k, MOOP, wp) {
     
     # graphics::par(mfrow = c(1, 2))
     
@@ -58,18 +56,15 @@ objSPSANN.OptimizedSampleConfiguration <-
     l <- colnames(energy0)
     a <- rbind(energy0, energies)
     # col <- c("red", rep("black", n - 1))
-    col <- c("red", gray(seq(0, 0.5, length.out = n - 1)))
-    graphics::plot(1, type = 'n', xlim = c(0, k), 
-                   # ylim = c(0, max(a)), 
-                   ylim = c(min(a), max(a)), 
-                   xlab = "jitter", ylab = "energy state")
+    col <- c("red", grDevices::gray(seq(0, 0.5, length.out = n - 1)))
+    graphics::plot(1, type = 'n', xlim = c(0, k), # ylim = c(0, max(a)), 
+                   ylim = c(min(a), max(a)), xlab = "jitter", ylab = "energy state")
     graphics::legend("topright", legend = l, lwd = 1, lty = 1:n, col = col)
     for(i in 1:ncol(a)) {
       graphics::lines(a[, i] ~ c(1:k), type = "l", lty = i, col = col[i])
     }
     graphics::lines(x = c(-k, 0), y = rep(energy0[1], 2), col = "red")
-    graphics::lines(x = rep(best.k, 2), y = c(-500, best.energy[1]), 
-                    col = "blue")
+    graphics::lines(x = rep(best.k, 2), y = c(-500, best.energy[1]), col = "blue")
     
     # PLOT SAMPLE CONFIGURATION
     grDevices::dev.set(grDevices::dev.next())
@@ -81,12 +76,10 @@ objSPSANN.OptimizedSampleConfiguration <-
     } else {
       sp::plot(x = boundary)
     }
-    graphics::points(conf0[, 1], conf0[, 2], pch = 1, cex = 0.5, 
-                     col = "lightgray")
+    graphics::points(conf0[, 1], conf0[, 2], pch = 1, cex = 0.5, col = "lightgray")
     graphics::points(new_conf[, 1], new_conf[, 2], pch = 20, cex = 0.5)
     if (!missing(wp)) {
-      graphics::points(new_conf[wp, 1], new_conf[wp, 2], pch = 20, cex = 1, 
-                       col = "red")
+      graphics::points(new_conf[wp, 1], new_conf[wp, 2], pch = 20, cex = 1, col = "red")
     }
     
     # plot maximum shift in the x and y coordinates
@@ -113,8 +106,7 @@ objSPSANN.OptimizedSampleConfiguration <-
     
     x <- bb[1, 1] - 0.02 * x_max0
     y <- bb[2, 1] + (bb[2, 2] - bb[2, 1]) / 2
-    graphics::text(y = y, x = x, srt = 90, 
-                   labels = "maximum shift in the Y axis")
+    graphics::text(y = y, x = x, srt = 90, labels = "maximum shift in the Y axis")
   }
 # THE ORIGINAL spSANN FUNCTION #################################################
 # .energyState <- 

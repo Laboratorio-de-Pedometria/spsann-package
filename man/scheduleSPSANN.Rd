@@ -56,7 +56,22 @@ Alessandro Samuel-Rosa \email{alessandrosamuelrosa@gmail.com}
 }
 \references{
 Aarts, E. H. L. & Korst, J. H. M. Boltzmann machines for travelling salesman problems. \emph{European 
-Journal of Operational Research}. v. 39, p. 79-95, 1989.
+Journal of Operational Research}, v. 39, p. 79-95, 1989.
+
+Černý, V. Thermodynamical approach to the traveling salesman problem: an efficient simulation algorithm.
+\emph{Journal of Optimization Theory and Applications}, v. 45, p. 41-51, 1985.
+
+Brus, D. J. & Heuvelink, G. B. M. Optimization of sample patterns for universal kriging of environmental 
+variables. \emph{Geoderma}, v. 138, p. 86-95, 2007.
+
+Kirkpatrick, S.; Gelatt, C. D. & Vecchi, M. P. Optimization by simulated annealing. \emph{Science}, v. 220,
+p. 671-680, 1983.
+
+Metropolis, N.; Rosenbluth, A. W.; Rosenbluth, M. N.; Teller, A. H. & Teller, E. Equation of state 
+calculations by fast computing machines. \emph{The Journal of Chemical Physics}, v. 21, p. 1087-1092, 1953.
+
+van Groenigen null, J. W. & Stein, A. Constrained optimization of spatial sampling using continuous 
+simulated annealing. \emph{Journal of Environmental Quality}. v. 27, p. 1078-1086, 1998.
 
 Webster, R. & Lark, R. M. \emph{Field sampling for environmental science and management}. London: 
 Routledge, p. 200, 2013.

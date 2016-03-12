@@ -37,7 +37,7 @@
 #' because every time a point is jittered, it is necessary to check if the point falls in sampling region.
 #' 
 #' Another approach consists of using a \emph{finite} set of candidate locations for the jittered points. A
-#' finite set of candidate locations is created by discretizing the sampling region, that is, creating a fine 
+#' finite set of candidate locations is created by discretising the sampling region, that is, creating a fine 
 #' grid of points that serve as candidate locations for the jittered point. This is the least computationally
 #' demanding jittering method because, by definition, the jittered point will always fall in the sampling
 #' region.
@@ -48,7 +48,7 @@
 #' location has to be iteratively sought for, say, as many times as the number of points in the sample. In 
 #' general, the more points there are in the sample, the more likely it is that the new location already is 
 #' occupied by another point. If a solution is not found in a reasonable time, the point selected to be 
-#' jittered is kept in its original location. Such a proceedure clearly is suboptimal.
+#' jittered is kept in its original location. Such a procedure clearly is suboptimal.
 #' 
 #' \pkg{spsann} uses a more elegant method which is based on using a finite set of candidate locations coupled
 #' with a form of \emph{two-stage random sampling} as implemented in \code{\link[spcosa]{spsample}}. Because 

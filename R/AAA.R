@@ -15,5 +15,5 @@ if (getRversion() >= "2.15.1") {
 #' @importFrom stats cor quantile runif terms rbinom
 #' @importFrom graphics axis hist legend lines mtext par plot points text
 #' @importFrom utils setTxtProgressBar txtProgressBar head tail
-#' @importFrom grDevices dev.set dev.prev dev.next dev.new
+#' @importFrom grDevices dev.set dev.prev dev.next dev.new gray
 #' @importFrom methods is new slot

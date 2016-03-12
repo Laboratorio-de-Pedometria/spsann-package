@@ -55,7 +55,7 @@ plot.OptimizedSampleConfiguration <-
       l <- colnames(a)
       n <- ncol(a)
       # col <- c("red", rep("black", n - 1))
-      col <- c("red", gray(seq(0, 0.5, length.out = n - 1)))
+      col <- c("red", grDevices::gray(seq(0, 0.5, length.out = n - 1)))
       if (n > 2) { ylim <- range(sapply(a, max)) } else { ylim <- range(a) }
       # ylim <- range(sapply(a, max))
       graphics::plot(
