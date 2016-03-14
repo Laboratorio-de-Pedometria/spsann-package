@@ -23,9 +23,18 @@ rm(list = ls())
 gc()
 sapply(list.files("R", full.names = TRUE, pattern = ".R$"), source)
 sapply(list.files("src", full.names = TRUE, pattern = ".cpp$"), Rcpp::sourceCpp)
-data(meuse.grid)
+data(meuse.grid, package = "sp")
+boundary <- meuse.grid
+sp::coordinates(boundary) <- c("x", "y")
+sp::gridded(boundary) <- TRUE
+boundary <- rgeos::gUnaryUnion(as(boundary, "SpatialPolygons"))
 candi <- meuse.grid[, 1:2]
-schedule <- scheduleSPSANN(chains = 500, initial.acceptance = 0, initial.temperature = 0.01)
+schedule <- scheduleSPSANN(
+  initial.acceptance = 0, initial.temperature = 0.01)
 set.seed(2001)
-res <- optimMSSD(points = 100, candi = candi, schedule = schedule, plotit = TRUE)
-objSPSANN(res) - objMSSD(candi = candi, points = res)
+res <- optimMSSD(
+  points = 30, candi = candi, schedule = schedule, plotit = TRUE,
+  boundary = boundary)
+objSPSANN(res)
+objMSSD(candi = candi, points = res)
+plot(res, boundary = boundary)

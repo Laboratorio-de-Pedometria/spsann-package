@@ -1,6 +1,6 @@
 #' Optimization of sample configurations for spatial trend identification and estimation (II)
 #'
-#' Optimize a sample configuration for spatial trend identification and  estimation. A criterion is defined 
+#' Optimize a sample configuration for spatial trend identification and estimation. A criterion is defined 
 #' so that the sample reproduces the marginal distribution of the covariates (\bold{DIST}).
 #'
 #' @inheritParams spJitter

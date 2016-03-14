@@ -16,7 +16,7 @@ optimization is stopped and a warning is issued if this value is not attained. D
 
 \item{initial.temperature}{Numeric value larger than 0 defining the initial temperature of the system. A 
 low \code{initial.temperature}, combined with a low \code{initial.acceptance} result in the algorithm to 
-behave as a greedy algorighm, i.e. only better system configurations are accepted. Defaults to 
+behave as a greedy algorithm, i.e. only better system configurations are accepted. Defaults to 
 \code{initial.temperature = 0.001}.}
 
 \item{temperature.decrease}{Numeric value between 0 and 1 used as a multiplying factor to decrease the 
@@ -58,7 +58,7 @@ Alessandro Samuel-Rosa \email{alessandrosamuelrosa@gmail.com}
 Aarts, E. H. L. & Korst, J. H. M. Boltzmann machines for travelling salesman problems. \emph{European 
 Journal of Operational Research}, v. 39, p. 79-95, 1989.
 
-Černý, V. Thermodynamical approach to the traveling salesman problem: an efficient simulation algorithm.
+Černý, V. Thermodynamical approach to the travelling salesman problem: an efficient simulation algorithm.
 \emph{Journal of Optimization Theory and Applications}, v. 45, p. 41-51, 1985.
 
 Brus, D. J. & Heuvelink, G. B. M. Optimization of sample patterns for universal kriging of environmental 
