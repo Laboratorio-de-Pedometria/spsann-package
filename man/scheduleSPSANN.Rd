@@ -70,7 +70,7 @@ p. 671-680, 1983.
 Metropolis, N.; Rosenbluth, A. W.; Rosenbluth, M. N.; Teller, A. H.; Teller, E. Equation of state 
 calculations by fast computing machines. \emph{The Journal of Chemical Physics}, v. 21, p. 1087-1092, 1953.
 
-van Groenigen null, J. W.; Stein, A. Constrained optimization of spatial sampling using continuous 
+van Groenigen, J.-W.; Stein, A. Constrained optimization of spatial sampling using continuous 
 simulated annealing. \emph{Journal of Environmental Quality}. v. 27, p. 1078-1086, 1998.
 
 Webster, R.; Lark, R. M. \emph{Field sampling for environmental science and management}. London: 

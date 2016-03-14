@@ -34,10 +34,10 @@
 #' implemented in the R-package \pkg{intamapInteractive} by Edzer Pebesma and Jon Skoien.
 #'
 #' @references
-#' Brus, D. J. & Heuvelink, G. B. M. Optimization of sample patterns for universal kriging of environmental 
+#' Brus, D. J.; Heuvelink, G. B. M. Optimization of sample patterns for universal kriging of environmental 
 #' variables. \emph{Geoderma}. v. 138, p. 86-95, 2007.
 #' 
-#' Heuvelink, G. B. M.; Brus, D. J. & de Gruijter, J. J. Optimization of sample configurations for digital 
+#' Heuvelink, G. B. M.; Brus, D. J.; de Gruijter, J. J. Optimization of sample configurations for digital 
 #' mapping of soil properties with universal kriging. In: Lagacherie, P.; McBratney, A. & Voltz, M. (Eds.)
 #' \emph{Digital soil mapping - an introductory perspective}. Elsevier, v. 31, p. 137-151, 2006.
 #' 

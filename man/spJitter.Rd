@@ -114,7 +114,7 @@ only to be used interactively, not included in \code{intamap} package.} R packag
 van Groenigen, J.-W. \emph{Constrained optimization of spatial sampling: a geostatistical approach.}
 Wageningen: Wageningen University, p. 148, 1999.
 
-Walvoort, D. J. J.; Brus, D. J. & de Gruijter, J. J. An R package for spatial coverage sampling and random 
+Walvoort, D. J. J.; Brus, D. J.; de Gruijter, J. J. An R package for spatial coverage sampling and random 
 sampling from compact geographical strata by k-means. \emph{Computers & Geosciences}. v. 36, p. 1261-1267,
 2010.
 }

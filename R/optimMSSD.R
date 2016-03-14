@@ -28,7 +28,7 @@
 #' \pkg{\link[spcosa]{spcosa}} by Dennis Walvoort, Dick Brus and Jaap de Gruijter.
 #' 
 #' @references
-#' Brus, D. J.; de Gruijter, J. J.; van Groenigen, J. W. Designing spatial coverage samples using the k-means
+#' Brus, D. J.; de Gruijter, J. J.; van Groenigen, J.-W. Designing spatial coverage samples using the k-means
 #' clustering algorithm. In: P. Lagacherie,A. M.; Voltz, M. (Eds.) \emph{Digital soil mapping -- an 
 #' introductory perspective}. Elsevier, v. 31, p. 183-192, 2006.
 #'

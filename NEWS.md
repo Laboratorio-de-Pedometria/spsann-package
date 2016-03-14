@@ -1,3 +1,40 @@
+# Version 2.0-0 (2016-03-14)
+This is a major release of package ***spsann*** that includes several conceptual changes. Despite our efforts, 
+it was not possible to guarantee the compatibility with previous versions. We have decided not to deprecate 
+functions and function arguments because (1) this would require deprecating a lot of code and (2) you should 
+first read the updated package documentation to understand the conceptual changes that we have made before you
+start using it. This is a summary of the changes:
+* A completely new annealing schedule was implemented. The reason for this modification is that the former
+  annealing schedule showed to be inefficient during our tests. The new annealing schedule is the very simple 
+  and most-used schedule proposed by Kirkpatrick et al. (1983). We have also replaced the acceptance criterion 
+  with the well-known Metropolis criterion. This new implementation showed to be more efficient in our tests 
+  than our early implementation. Setting up this new annealing schedule is done using the new function 
+  `scheduleSPSANN`.
+* A more elegant solution to jitter the sample points was implemented. It consists of using a finite set of
+  candidate locations that are seen by the algorithm as the centre of grid cells. In the first stage, we 
+  select a grid cell with replacement. In the second stage, we select a location within that grid cell using
+  simple random sampling. This guarantees that any location in the sampling region is a candidate location 
+  for the jittered sample point.
+* Solving multi-objective combinatorial optimization problems (MOCOP) has become easier with the creation of 
+  the new function `minmaxPareto()`. This function computes the Pareto maximum and minimum values of the 
+  objective functions that compose the MOCOP needed to scale the objective functions to the same approximate
+  range of values.
+* The user can now chose to follow the progress of the optimization using a text progress bar in the R console
+  or a Tk progress bar widget. A Tk progress bar widget is useful when running ***spsann*** in parallel
+  processors.
+* The output of the optimization is now stored in an object of class `OptimizedSampleConfiguration`. This 
+  object contains three slots. The first (`points`) holds the coordinates of the optimized sample 
+  configuration. The second, `spsann`, stores information about the settings used with the spatial simulated
+  annealing algorithm. The third, `objective`, holds the settings used with the chosen objective function. 
+  Methods were implemented to retrieve information from the new class, as well as producing plots of the 
+  optimized sample configuration.
+* Package documentation was expanded and adapted to cope with the conceptual changes that were made. It also 
+  includes a vignette that gives a short description of the package and its structure, as well as presents 
+  a few examples on how to use the package. It is strongly recommended to read the new package documentation 
+  and the accompanying vignette before you start using the package. 
+* Finally, bugs were fixed, warning messages were improved, and a faster code was implemented whenever 
+  possible.
+
 # Version 1.0-2.9013 (2016-03-14)
 * `devel` branch was merged into `master` branch. 
 
@@ -28,8 +65,7 @@
 * Fixed minor bugs.
 
 # Version 1.0-2.9007 (2015-11-18)
-* Improved the warning message printed when converting numeric covariates into
-  factor covariates.
+* Improved the warning message printed when converting numeric covariates into factor covariates.
 * Created a new `autofun` to check the number of accepted jitters in the first
   chain. If the number of accepted jitters is superior to the value passed to
   `schedule$initial.acceptance`, the process continues and a message is printed
@@ -59,22 +95,22 @@
 * Created a function to plot the optimized sample configuration (`plotOSC()`),
   with options to display the evolution of the energy state and/or the
   optimized sample configuration.
-* The function used to compute the Pareto maximum and minimum values
-  (`minmaxPareto()`) was optimized to be used with both ACDC and SPAN.
+* The function used to compute the Pareto maximum and minimum values (`minmaxPareto()`) was optimized to be
+  used with both ACDC and SPAN.
 
 # Version 1.0-2.9003 (2015-11-15)
 * Create a class (`OptimizedSampleConfiguration`) to store the output of
   `optim` functions.
-  
+
 # Version 1.0-2.9002 (2015-11-14)
 * The trick included in the `optimMKV()`-function to avoid errors due to
   the LDLfactor error of the ***gstat***-package had to be reformulated. We are
   now using `try()` with a default value which is returned in case of error.
 
 # Version 1.0-2.9001 (2015-11-13)
-* A completelly new annealing schedule was implemented. The reason for this
+* A completely new annealing schedule was implemented. The reason for this
   modification is that the former annealing schedule, which was based on the
-  ***intamapInteractive***-package, showed to be ineficient during
+  ***intamapInteractive***-package, showed to be inefficient during
   our tests. The new annealing schedule is the very simple and most-used
   schedule proposed by Kirkpatrick et al. (1983). We have also replaced the 
   acceptance criterion used in the ***intamapInteractive***-package with the
@@ -83,8 +119,7 @@
 * Implementing a new annealing schedule and a new acceptance criterion required
   a moderate modification of the source code. Despite our efforts, it was not 
   possible to guarantee the compatibility with previous versions.
-* A new function was created to set up the annealing schedule: 
-  `scheduleSPSANN()`.
+* A new function was created to set up the annealing schedule: `scheduleSPSANN()`.
 * We are now using a more elegant solution to jitter the sample points. It 
   consists of using a finite set of candidate locations that are seen by the
   algorithm as the centre of grid cells. In the first stage, we select a grid
@@ -94,9 +129,8 @@
 * The documentation of all functions has been fine tuned.
 * A trick was included in the `optimMKV()`-function to avoid errors due to
   the LDLfactor error of the ***gstat***-package.
-* There also is a new function to compute the Pareto maximum and minimum values
-  of the objective functions that compose a multi-objective optimization 
-  problem (MOOP): `minmaxPareto()`.
+* There also is a new function to compute the Pareto maximum and minimum values of the objective functions 
+  that compose a multi-objective optimization problem (MOOP): `minmaxPareto()`.
 
 # Version 1.0-2.9000 (2015-10-27)
 * Now `x.max` and `y.max` are, by default, set to half of the maximum distance
