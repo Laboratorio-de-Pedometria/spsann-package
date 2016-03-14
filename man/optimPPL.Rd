@@ -74,7 +74,7 @@ the results.}
 
 \item{progress}{Type of progress bar that should be used, with options \code{"txt"}, for a text progress 
 bar in the R console, \code{"tk"}, to put up a Tk progress bar widget, and \code{NULL} to omit the progress
-bar. A Tk progress bar widget is usefull when using parallel processors. Defaults to 
+bar. A Tk progress bar widget is useful when using parallel processors. Defaults to 
 \code{progress = "txt"}.}
 
 \item{verbose}{Logical for printing messages about the progress of the optimization. Defaults to 
@@ -111,7 +111,7 @@ function value.
 lag-distance class, and c) the number of points or point-pairs per lag-distance class.
 }
 \description{
-Optimize a sample configuration for variogram identification and estimation. A criterion is defined so that 
+Optimize a sample configuration for variogram identification and estimation. A criterion is defined so that
 the optimized sample configuration has a given number of points or point-pairs contributing to each 
 lag-distance class (\bold{PPL}).
 }

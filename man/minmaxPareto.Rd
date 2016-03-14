@@ -8,7 +8,7 @@ minmaxPareto(osc, candi, covars)
 }
 \arguments{
 \item{osc}{A list of objects of class \code{OptimizedSampleConfiguration} (OSC). Each OSC of the list must
-be named after the objective function with which it has been optimized. For example, 
+be named after the objective function with which it has been optimized. For example,
 \code{osc = list(CORR = osc_corr, DIST = osc_dist)}.}
 
 \item{candi}{Data frame or matrix with the candidate locations for the jittered points. \code{candi} must 
@@ -72,11 +72,11 @@ sample configuration;
 composes the MOCOP -- these are the Pareto minimum and maximum.
 }
 
-For example, consider \bold{ACDC}, a MOCOP composed of two objective functions: \bold{CORR} and \bold{DIST}. 
-The minimum absolute attainable value of \bold{CORR} is obtained when the sample configuration is 
-optimized with respect to only \bold{CORR}, i.e. when the evaluator and generator objective functions are 
-the same (see the intersection between the second line and second column in the table below). This is the 
-Pareto minimum of \bold{CORR}. It follows that the maximum absolute attainable value of \bold{CORR} is 
+For example, consider \bold{ACDC}, a MOCOP composed of two objective functions: \bold{CORR} and 
+\bold{DIST}. The minimum absolute attainable value of \bold{CORR} is obtained when the sample configuration 
+is optimized with respect to only \bold{CORR}, i.e. when the evaluator and generator objective functions 
+are the same (see the intersection between the second line and second column in the table below). This is 
+the Pareto minimum of \bold{CORR}. It follows that the maximum absolute attainable value of \bold{CORR} is 
 obtained when the sample configuration is optimized with regard to only \bold{DIST}, i.e. when the 
 evaluator function is difference from the generator function (see the intersection between the first row
 and the second column in the table below). This is the Pareto maximum of \bold{CORR}. The same logic 

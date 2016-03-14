@@ -24,11 +24,9 @@ objSPSANN.OptimizedSampleConfiguration <-
   function (osc, at = "end", n = 1) {
     
     # Energy state at the start
-    # if (at == "start") res <- utils::head(osc@objective$energy, n)
     if (at == "start") res <- utils::head(osc$objective$energy, n)
     
     # Energy state at the end
-    # if (at == "end") res <- utils::tail(osc@objective$energy, n)
     if (at == "end") res <- utils::tail(osc$objective$energy, n)
     
     return(data.frame(res, row.names = ""))
@@ -57,8 +55,9 @@ objSPSANN.OptimizedSampleConfiguration <-
     a <- rbind(energy0, energies)
     # col <- c("red", rep("black", n - 1))
     col <- c("red", grDevices::gray(seq(0, 0.5, length.out = n - 1)))
-    graphics::plot(1, type = 'n', xlim = c(0, k), # ylim = c(0, max(a)), 
-                   ylim = c(min(a), max(a)), xlab = "jitter", ylab = "energy state")
+    graphics::plot(
+      1, type = 'n', xlim = c(0, k), # ylim = c(0, max(a)), 
+      ylim = c(min(a), max(a)), xlab = "jitter", ylab = "energy state")
     graphics::legend("topright", legend = l, lwd = 1, lty = 1:n, col = col)
     for(i in 1:ncol(a)) {
       graphics::lines(a[, i] ~ c(1:k), type = "l", lty = i, col = col[i])

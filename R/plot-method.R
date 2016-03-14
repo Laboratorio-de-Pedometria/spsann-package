@@ -35,7 +35,6 @@ plot.OptimizedSampleConfiguration <-
   function (x, which = 1:2, boundary, ...) {
     
     # Do not try to plot the energy states if they have not been tracked
-    # if (nrow(methods::slot(x, "objective")$energy) == 2) { which <- 2 }
     if (nrow(x$objective$energy) == 2) { which <- 2 }
     
     par0 <- graphics::par()
@@ -44,10 +43,6 @@ plot.OptimizedSampleConfiguration <-
     
     # Plot the energy states
     if (all(which == 1:2)) {
-      # k <- methods::slot(x, "spsann")$chains[2:3]
-      # k <- as.numeric(k[1] * k[2] * nrow(methods::slot(x, "points")))
-      # a <- methods::slot(x, "objective")$energy
-      
       k <- x$spsann$chains[2:3]
       k <- as.numeric(k[1] * k[2] * nrow(x$points))
       a <- x$objective$energy
@@ -76,14 +71,9 @@ plot.OptimizedSampleConfiguration <-
         } else {
           sp::plot(x = boundary)
         }
-        # graphics::points(
-          # methods::slot(x, "points")[, "x"], 
-          # methods::slot(x, "points")[, "y"], pch = 20, cex = 0.5)
         graphics::points(x$points[, "x"], x$points[, "y"], pch = 20, cex = 0.5)
 
       } else {
-        # graphics::plot(
-          # methods::slot(x, "points")[, c("x", "y")], pch = 20, cex = 0.5, asp = 1)
         graphics::plot(x$points[, c("x", "y")], pch = 20, cex = 0.5, asp = 1)
       }
     }

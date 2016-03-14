@@ -1,6 +1,6 @@
 #' Optimization of sample configurations for variogram identification and estimation
 #'
-#' Optimize a sample configuration for variogram identification and estimation. A criterion is defined so that 
+#' Optimize a sample configuration for variogram identification and estimation. A criterion is defined so that
 #' the optimized sample configuration has a given number of points or point-pairs contributing to each 
 #' lag-distance class (\bold{PPL}).
 #' 

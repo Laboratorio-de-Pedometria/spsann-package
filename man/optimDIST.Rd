@@ -51,7 +51,7 @@ the results.}
 
 \item{progress}{Type of progress bar that should be used, with options \code{"txt"}, for a text progress 
 bar in the R console, \code{"tk"}, to put up a Tk progress bar widget, and \code{NULL} to omit the progress
-bar. A Tk progress bar widget is usefull when using parallel processors. Defaults to 
+bar. A Tk progress bar widget is useful when using parallel processors. Defaults to 
 \code{progress = "txt"}.}
 
 \item{verbose}{Logical for printing messages about the progress of the optimization. Defaults to 
@@ -65,7 +65,7 @@ configuration with details about the optimization.
 function value.
 }
 \description{
-Optimize a sample configuration for spatial trend identification and  estimation. A criterion is defined 
+Optimize a sample configuration for spatial trend identification and estimation. A criterion is defined 
 so that the sample reproduces the marginal distribution of the covariates (\bold{DIST}).
 }
 \details{

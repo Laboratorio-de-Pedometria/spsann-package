@@ -39,14 +39,22 @@ rm(list = ls())
 gc()
 sapply(list.files("R", full.names = TRUE, pattern = ".R$"), source)
 sapply(list.files("src", full.names = TRUE, pattern = ".cpp$"), Rcpp::sourceCpp)
-data(meuse.grid)
+data(meuse.grid, package = "sp")
+boundary <- meuse.grid
+sp::coordinates(boundary) <- c("x", "y")
+sp::gridded(boundary) <- TRUE
+boundary <- rgeos::gUnaryUnion(as(boundary, "SpatialPolygons"))
 candi <- meuse.grid[, 1:2]
 covars <- meuse.grid[, 6:7]
-schedule <- scheduleSPSANN(initial.temperature = 0.5, chains = 1)
+schedule <- scheduleSPSANN(initial.temperature = 0.5)
 set.seed(2001)
 res <- optimDIST(
-  points = 100, candi = candi, covars = covars, use.coords = TRUE, schedule = schedule, plotit = TRUE)
-objSPSANN(res) - objDIST(points = res, candi = candi, covars = covars, use.coords = TRUE)
+  points = 30, candi = candi, covars = covars, use.coords = TRUE, 
+  schedule = schedule, plotit = TRUE, boundary = boundary)
+objSPSANN(res)
+objDIST(
+  points = res, candi = candi, covars = covars, use.coords = TRUE)
+plot(res, boundary = boundary)
 
 # 3) FACTOR AND NUMERIC COVARIATES WITH THE COORDINATES #######################################################
 rm(list = ls())

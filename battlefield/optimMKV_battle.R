@@ -46,7 +46,7 @@ rm(list = ls())
 gc()
 sapply(list.files("R", full.names = TRUE, pattern = ".R$"), source)
 sapply(list.files("src", full.names = TRUE, pattern = ".cpp$"), Rcpp::sourceCpp)
-data(meuse.grid)
+data(meuse.grid, package = "sp")
 candi <- meuse.grid[, 1:2]
 covars <- as.data.frame(meuse.grid)
 vgm <- gstat::vgm(psill = 10, model = "Exp", range = 500, nugget = 8)
