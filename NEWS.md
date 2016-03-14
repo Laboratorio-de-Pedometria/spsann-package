@@ -1,3 +1,8 @@
+# Version 1.0-2.9012 (2016-03-14)
+* Package documentation was expanded. It now includes a vignette that gives a short description of the
+  package and its structure. The vignette also contains a few examples on how to use the package. `knitr` is
+  the engine used to produce the package vignette.
+
 # Version 1.0-2.9011 (2016-03-11)
 * Documentation was expanded.
 

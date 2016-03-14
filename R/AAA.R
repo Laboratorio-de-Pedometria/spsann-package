@@ -17,3 +17,4 @@ if (getRversion() >= "2.15.1") {
 #' @importFrom utils setTxtProgressBar txtProgressBar head tail
 #' @importFrom grDevices dev.set dev.prev dev.next dev.new gray
 #' @importFrom methods is new slot
+#' @importFrom rgeos gUnaryUnion
