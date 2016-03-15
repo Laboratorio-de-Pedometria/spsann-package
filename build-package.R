@@ -51,7 +51,7 @@ devtools::check_man()
 devtools::run_examples(run = FALSE)
 
 # check the package for Linux and Windows
-devtools::check(check_version = TRUE, force_suggests = TRUE)
+devtools::check(check_version = TRUE, force_suggests = TRUE, args = "--use-valgrind")
 devtools::build_win()
 devtools::build()
 

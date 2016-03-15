@@ -1,28 +1,24 @@
 # Initial settings
 rm(list = ls())
 gc()
-require(pedometrics)
-require(gstat)
-require(sp)
 sapply(list.files("R", full.names = TRUE, pattern = ".R$"), source)
 sapply(list.files("src", full.names = TRUE, pattern = ".cpp$"), Rcpp::sourceCpp)
 
 # 0) DEFAULT EXAMPLE ###########################################################
-require(sp)
-require(gstat)
-data(meuse.grid)
-candi <- meuse.grid[, 1:2]
-covars <- as.data.frame(meuse.grid)
-vgm <- vgm(psill = 10, model = "Exp", range = 500, nugget = 8)
-schedule <- scheduleSPSANN(initial.temperature = 10, chains = 1,
-                           x.max = 1540, y.max = 2060, x.min = 0, 
-                           y.min = 0, cellsize = 40)
+data(meuse.grid, package = "sp")
+candi <- meuse.grid[1:1000, 1:2]
+covars <- as.data.frame(meuse.grid)[1:1000, ]
+vgm <- gstat::vgm(psill = 10, model = "Exp", range = 500, nugget = 8)
+schedule <- scheduleSPSANN(
+  initial.temperature = 10, chains = 1, x.max = 1540, y.max = 2060, 
+  x.min = 0,  y.min = 0, cellsize = 40)
 set.seed(2001)
-res <- optimMKV(points = 10, candi = candi, covars = covars, 
-                eqn = z ~ dist, vgm = vgm, schedule = schedule)
-objSPSANN(res) -
-  objMKV(points = res, candi = candi, covars = covars, 
-         eqn = z ~ dist, vgm = vgm)
+res <- optimMKV(
+  points = 10, candi = candi, covars = covars, eqn = z ~ dist, 
+  vgm = vgm, schedule = schedule)
+objSPSANN(res) - objMKV(
+  points = res, candi = candi, covars = covars,  eqn = z ~ dist, 
+  vgm = vgm)
 
 # 1) GREEDY ALGORITHM #########################################################################################
 rm(list = ls())
