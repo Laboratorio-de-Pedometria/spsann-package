@@ -57,7 +57,3 @@ devtools::build()
 
 # upload to CRAN
 devtools::release(check = FALSE)
-
-
-
-

@@ -8,7 +8,7 @@ using it. This should not be a major problem because, as of now, the number of u
 be very limited -- all known users have been warned about this major release.
 
 ## Test environments
-* local x86_64-pc-linux-gnu (ubuntu 14.04), R 3.2.3
+* local x86_64-pc-linux-gnu (ubuntu 14.04), R 3.2.4
 * ubuntu 12.04.5 LTS (on travis-ci), R 3.2.3
 * win-builder (devel and release)
 
