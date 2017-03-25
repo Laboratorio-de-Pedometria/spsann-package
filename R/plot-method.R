@@ -43,15 +43,22 @@ plot.OptimizedSampleConfiguration <-
     
     # Plot the energy states
     if (all(which == 1:2)) {
-      k <- x$spsann$chains[2:3]
-      k <- as.numeric(k[1] * k[2] * nrow(x$points))
+      # k <- x$spsann$chains[2:3]
+      # k <- as.numeric(k[1] * k[2] * nrow(x$points))
       a <- x$objective$energy
+      # if (nrow(a) < k) {
+        k <- nrow(a) - 1
+      # }
       
       l <- colnames(a)
       n <- ncol(a)
       # col <- c("red", rep("black", n - 1))
       col <- c("red", grDevices::gray(seq(0, 0.5, length.out = n - 1)))
-      if (n > 2) { ylim <- range(sapply(a, max)) } else { ylim <- range(a) }
+      if (n > 2) { 
+        ylim <- range(sapply(a, max))
+      } else { 
+        ylim <- range(a) 
+      }
       # ylim <- range(sapply(a, max))
       graphics::plot(
         1, type = 'n', xlim = c(0, k), # ylim = c(0, max(sapply(a, max)) * 1.1), 
