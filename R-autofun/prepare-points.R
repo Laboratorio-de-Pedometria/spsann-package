@@ -40,8 +40,6 @@ if (is(points, "list") && length(points) == 2) {
       }
     }
   }
-  n_fixed_pts <- nrow(fixed_pts)
-  
   # Check if 'fixed_pts' has a colunm "id" with the row indexes of 'candi' that correspond to each point
   if (ncol(fixed_pts) != 3 || colnames(fixed_pts)[1] != "id") {
     # stop ("missing 'id' column in object 'poinst$fixed'")
@@ -66,10 +64,14 @@ if (is.matrix(points) || is.data.frame(points)) { # Data frame or matrix
   }
 }
 n_pts <- nrow(points)
-conf0 <- points
+conf0 <- points # used for plotting purposes, i.e. the starting system configuration
+
 # (Fixed) Points ####
 if (exists("fixed_pts")) {
-points <- rbind(points, fixed_pts)  
+  n_fixed_pts <- nrow(fixed_pts)
+  points <- rbind(points, fixed_pts)
+} else {
+  n_fixed_pts <- 0
 }
 old_conf <- points
 # old_conf <- conf0
