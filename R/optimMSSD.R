@@ -79,10 +79,11 @@ optimMSSD <-
     # Prepare for jittering
     eval(.prepare_jittering())
     
-    # Calculate the initial energy state. The distance matrix is calculated
-    # using the SpatialTools::dist2(). The function .objMSSD() does the
-    # squaring internaly.
-    dm <- SpatialTools::dist2(candi[, 2:3], conf0[, 2:3])
+    # Calculate the initial energy state. The distance matrix is calculated using the SpatialTools::dist2(). 
+    # The function .objMSSD() does the squaring internaly.
+    # 'old_conf' is used instead of 'conf0' because the former holds information on both fixed and free points.
+    # dm <- SpatialTools::dist2(candi[, 2:3], conf0[, 2:3])
+    dm <- SpatialTools::dist2(candi[, 2:3], old_conf[, 2:3])
     energy0 <- data.frame(obj = .objMSSD(x = dm))
     
     # Other settings for the simulated annealing algorithm
