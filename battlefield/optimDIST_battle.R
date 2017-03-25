@@ -88,7 +88,8 @@ covars <- meuse.grid[, 6:7]
 schedule <- scheduleSPSANN(initial.temperature = 5, stopping = 200)
 free <- 10
 set.seed(1984)
-fixed <- candi[sample(1:nrow(candi), 40), ]
+id <- sample(1:nrow(candi), 40)
+fixed <- cbind(id, candi[id, ])
 objDIST(
   points = fixed, candi = candi, covars = covars, use.coords = TRUE)
 set.seed(2001)
