@@ -32,8 +32,8 @@ schedule <- scheduleSPSANN(initial.acceptance = 0.01)
 set.seed(2001)
 res <- optimDIST(
   points = 100, candi = candi, covars = covars, use.coords = TRUE, schedule = schedule, plotit = TRUE)
-objSPSANN(res)
-objDIST(points = res, candi = candi, covars = covars, use.coords = TRUE)
+objSPSANN(res) -
+  objDIST(points = res, candi = candi, covars = covars, use.coords = TRUE)
 
 # 2) FACTOR COVARIATES WITH THE COORDINATES ###################################################################
 rm(list = ls())

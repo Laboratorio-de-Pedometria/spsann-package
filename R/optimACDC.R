@@ -98,14 +98,14 @@ optimACDC <-
     pcm <- .corCORR(obj = covars, covars.type = covars.type)
     scm <- .corCORR(obj = sm, covars.type = covars.type)
     pop_prop <- .strataACDC(
-      n.pts = n_pts, strata.type = strata.type, covars = covars, covars.type = covars.type)
+      n.pts = n_pts + n_fixed_pts, strata.type = strata.type, covars = covars, covars.type = covars.type)
     nadir <- .nadirACDC(
-      n.pts = n_pts, n.cov = n_cov, n.candi = n_candi, pcm = pcm, nadir = nadir, covars.type = covars.type,
-      covars = covars, pop.prop = pop_prop, candi = candi)
+      n.pts = n_pts + n_fixed_pts, n.cov = n_cov, n.candi = n_candi, pcm = pcm, nadir = nadir, 
+      covars.type = covars.type, covars = covars, pop.prop = pop_prop, candi = candi)
     utopia <- .utopiaACDC(utopia = utopia)
     energy0 <- .objACDC(
       sm = sm, n.cov = n_cov, pop.prop = pop_prop, pcm = pcm, scm = scm, nadir = nadir, weights = weights, 
-      n.pts = n_pts, utopia = utopia, covars.type = covars.type)
+      n.pts = n_pts + n_fixed_pts, utopia = utopia, covars.type = covars.type)
     
     # Other settings for the simulated annealing algorithm
     old_sm <- sm
@@ -139,7 +139,7 @@ optimACDC <-
           new_scm <- .corCORR(obj = new_sm, covars.type = covars.type)
           new_energy <- .objACDC(
             sm = new_sm, pop.prop = pop_prop, scm = new_scm, nadir = nadir, weights = weights, pcm = pcm, 
-            n.pts = n_pts, n.cov = n_cov, utopia = utopia, covars.type = covars.type)
+            n.pts = n_pts + n_fixed_pts, n.cov = n_cov, utopia = utopia, covars.type = covars.type)
           
           # Avoid the following error:
           # Error in if (new_energy[1] <= old_energy[1]) { : 
