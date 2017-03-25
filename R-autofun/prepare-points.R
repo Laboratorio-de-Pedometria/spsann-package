@@ -41,9 +41,12 @@ if (is(points, "list") && length(points) == 2) {
     }
   }
   n_fixed_pts <- nrow(fixed_pts)
+  
   # Check if 'fixed_pts' has a colunm "id" with the row indexes of 'candi' that correspond to each point
   if (ncol(fixed_pts) != 3 || colnames(fixed_pts)[1] != "id") {
-    stop ("missing 'id' column in object 'poinst$fixed'")
+    # stop ("missing 'id' column in object 'poinst$fixed'")
+    fixed_pts_id <- SpatialTools::dist2(candi[, 2:3], fixed_pts)
+    fixed_pts <- as.matrix(cbind(id = apply(fixed_pts_id, 2, which.min), fixed_pts))
   }
 }
 
