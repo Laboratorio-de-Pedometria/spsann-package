@@ -64,3 +64,4 @@ res$points[-(1:free), ]
 fixed
 objSPSANN(res)
 objMSSD(candi = candi, points = res)
+plot(res, boundary = boundary)
