@@ -21,9 +21,35 @@ if (!missing(candi)) {
   candi <- as.matrix(cbind(id = 1:n_candi, candi))
 }
 
-# Points
+# (Fixed) Points ####
+if (is(points, "list") && length(points) == 2) {
+  points <- points$free
+  fixed_pts <- points$fixed
+  if (is(fixed_pts, "OptimizedSampleConfiguration")) { # Optimized sample comfiguration
+    fixed_pts <- fixed_pts$points
+  } 
+  if (is.matrix(fixed_pts) || is.data.frame(fixed_pts)) { # Data frame or matrix
+    fixed_pts <- as.matrix(fixed_pts)
+  } else {
+    if (is.integer(fixed_pts) || pedometrics::isNumint(fixed_pts)) {
+      if (length(fixed_pts) > 1) { # Integer vector
+        fixed_pts <- candi[fixed_pts, ]
+      }
+      if (length(fixed_pts) == 1) { # Integer value
+        stop ("invalid value passed to argument 'points$fixed': integer value")
+      }
+    }
+  }
+  n_fixed_pts <- nrow(fixed_pts)
+  # Check if 'fixed_pts' has a colunm "id" with the row indexes of 'candi' that correspond to each point
+  if (ncol(fixed_pts) != 3 || colnames(fixed_pts)[1] != "id") {
+    stop ("missing 'id' column in object 'poinst$fixed'")
+  }
+}
+
+# (Free) Points ####
 if (is(points, "OptimizedSampleConfiguration")) points <- points$points
-if (is.matrix(points) || is.data.frame(points)) { # Data frame of matrix
+if (is.matrix(points) || is.data.frame(points)) { # Data frame or matrix
   points <- as.matrix(points)
 } else {
   if (is.integer(points) || pedometrics::isNumint(points)) {
@@ -38,5 +64,10 @@ if (is.matrix(points) || is.data.frame(points)) { # Data frame of matrix
 }
 n_pts <- nrow(points)
 conf0 <- points
-old_conf <- conf0
+# (Fixed) Points ####
+if (exists("fixed_pts")) {
+points <- rbind(points, fixed_pts)  
+}
+old_conf <- points
+# old_conf <- conf0
 #if (COST) cm <- cost[points[, 1]]
