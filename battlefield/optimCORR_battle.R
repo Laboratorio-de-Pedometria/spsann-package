@@ -4,7 +4,7 @@ gc()
 sapply(list.files("R", full.names = TRUE, pattern = ".R$"), source)
 sapply(list.files("src", full.names = TRUE, pattern = ".cpp$"), Rcpp::sourceCpp)
 
-# 0) DEFAULT EXAMPLE ###########################################################
+# 0) DEFAULT EXAMPLE ##########################################################################################
 data(meuse.grid, package = "sp")
 candi <- meuse.grid[1:1000, 1:2]
 covars <- meuse.grid[1:1000, 5]
@@ -18,7 +18,7 @@ res <- optimCORR(
 objSPSANN(res) - objCORR(
   points = res, candi = candi, covars = covars, use.coords = TRUE)
 
-# 1) FACTOR COVARIATES WITH THE COORDINATES ####################################
+# 1) FACTOR COVARIATES WITH THE COORDINATES ###################################################################
 rm(list = ls())
 gc()
 sapply(list.files("R", full.names = TRUE, pattern = ".R$"), source)
@@ -30,4 +30,27 @@ schedule <- scheduleSPSANN(initial.temperature = 0.5, chains = 10)
 set.seed(2001)
 res <- optimCORR(
   points = 100, candi = candi, covars = covars, use.coords = TRUE, schedule = schedule, plotit = TRUE)
-objSPSANN(res) - objCORR(points = res, candi = candi, covars = covars, use.coords = TRUE)
+objSPSANN(res)
+objCORR(points = res, candi = candi, covars = covars, use.coords = TRUE)
+
+# 2) ADD TEN POINTS TO AN EXISTING SAMPLE CONFIGURATION #######################################################
+rm(list = ls())
+gc()
+sapply(list.files("R", full.names = TRUE, pattern = ".R$"), source)
+sapply(list.files("src", full.names = TRUE, pattern = ".cpp$"), Rcpp::sourceCpp)
+data(meuse.grid)
+candi <- meuse.grid[, 1:2]
+covars <- meuse.grid[, 6:7]
+schedule <- scheduleSPSANN(initial.temperature = 0.5)
+free <- 10
+set.seed(1500)
+id <- sample(1:nrow(candi), 40)
+fixed <- cbind(id, candi[id, ])
+objCORR(points = fixed, candi = candi, covars = covars, use.coords = TRUE)
+set.seed(2001)
+res <- optimCORR(
+  points = list(free = free, fixed = fixed), candi = candi, covars = covars, use.coords = TRUE, 
+  schedule = schedule, plotit = TRUE)
+objSPSANN(res)
+objCORR(points = res, candi = candi, covars = covars, use.coords = TRUE)
+plot(res)
