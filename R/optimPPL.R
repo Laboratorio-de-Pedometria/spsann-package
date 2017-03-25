@@ -115,14 +115,23 @@ optimPPL <-
     n_lags <- length(lags) - 1
     
     # Initial energy state: points or point-pairs
-    dm <- SpatialTools::dist1(conf0[, 2:3])
-    ppl <- .getPPL(
-      lags = lags, n.lags = n_lags, dist.mat = dm, pairs = pairs, n.pts = n_pts)
-    distri <- .distriPPL(n.lags = n_lags, n.pts = n_pts, criterion = criterion,
-                         distri = distri, pairs = pairs)
+    # Use 'old_conf' instead of 'conf0' because the former has information on any existing fixed points.
+    # Use 'n_pts + n_fixed_pts' to account for existing fixed points.
+    # 
+    # dm <- SpatialTools::dist1(conf0[, 2:3])
+    # ppl <- .getPPL(lags = lags, n.lags = n_lags, dist.mat = dm, pairs = pairs, n.pts = n_pts)
+    # distri <- .distriPPL(
+      # n.lags = n_lags, n.pts = n_pts, criterion = criterion, distri = distri, pairs = pairs)
+    # energy0 <- data.frame(
+      # obj = .objPPL(
+        # ppl = ppl, n.lags = n_lags, n.pts = n_pts, criterion = criterion, distri = distri, pairs = pairs))
+    dm <- SpatialTools::dist1(old_conf[, 2:3])
+    ppl <- .getPPL(lags = lags, n.lags = n_lags, dist.mat = dm, pairs = pairs, n.pts = n_pts + n_fixed_pts)
+    distri <- .distriPPL(
+      n.lags = n_lags, n.pts = n_pts + n_fixed_pts, criterion = criterion, distri = distri, pairs = pairs)
     energy0 <- data.frame(
-      obj = .objPPL(ppl = ppl, n.lags = n_lags, n.pts = n_pts,
-                    criterion = criterion, distri = distri, pairs = pairs))
+      obj = .objPPL(ppl = ppl, n.lags = n_lags, n.pts = n_pts + n_fixed_pts, criterion = criterion, 
+                    distri = distri, pairs = pairs))
     
     # Other settings for the simulated annealing algorithm
     old_dm <- dm
@@ -161,12 +170,20 @@ optimPPL <-
           #new_dm[, wp] <- x2
           
           # Update the energy state: points or point-pairs?
+          # Use 'n_pts + n_fixed_pts' to account for existing fixed points.
+          # 
+          # ppl <- .getPPL(
+            # lags = lags, n.lags = n_lags, dist.mat = new_dm, pairs = pairs, n.pts = n_pts)
+          # new_energy <- data.frame(
+            # obj = .objPPL(
+              # n.lags = n_lags, n.pts = n_pts, pairs = pairs, criterion = criterion, distri = distri, 
+              # ppl = ppl))
           ppl <- .getPPL(
-            lags = lags, n.lags = n_lags, dist.mat = new_dm, pairs = pairs, 
-            n.pts = n_pts)
+            lags = lags, n.lags = n_lags, dist.mat = new_dm, pairs = pairs, n.pts = n_pts + n_fixed_pts)
           new_energy <- data.frame(
-            obj = .objPPL(n.lags = n_lags, n.pts = n_pts, pairs = pairs,
-                          criterion = criterion, distri = distri, ppl = ppl))
+            obj = .objPPL(
+              n.lags = n_lags, n.pts = n_pts + n_fixed_pts, pairs = pairs, criterion = criterion, 
+              distri = distri, ppl = ppl))
           
           # Evaluate the new system configuration
           accept <- .acceptSPSANN(old_energy[[1]], new_energy[[1]], actual_temp)
