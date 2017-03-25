@@ -32,7 +32,8 @@ schedule <- scheduleSPSANN(initial.acceptance = 0.01)
 set.seed(2001)
 res <- optimDIST(
   points = 100, candi = candi, covars = covars, use.coords = TRUE, schedule = schedule, plotit = TRUE)
-objSPSANN(res) - objDIST(points = res, candi = candi, covars = covars, use.coords = TRUE)
+objSPSANN(res)
+objDIST(points = res, candi = candi, covars = covars, use.coords = TRUE)
 
 # 2) FACTOR COVARIATES WITH THE COORDINATES ###################################################################
 rm(list = ls())
@@ -69,4 +70,32 @@ set.seed(2001)
 resA <- optimDIST(
   points = 100, candi = candi, covars = covars, progress = "tk", use.coords = TRUE, plotit = TRUE, 
   schedule = schedule)
-objSPSANN(resA) - objDIST(points = resA, candi = candi, covars = covars, use.coords = TRUE)
+objSPSANN(resA)
+objDIST(points = resA, candi = candi, covars = covars, use.coords = TRUE)
+
+# 4) ADD TEN POINTS TO AN EXISTIG FIXED SAMPLE CONFIGURATION ##################################################
+rm(list = ls())
+gc()
+sapply(list.files("R", full.names = TRUE, pattern = ".R$"), source)
+sapply(list.files("src", full.names = TRUE, pattern = ".cpp$"), Rcpp::sourceCpp)
+data(meuse.grid, package = "sp")
+boundary <- meuse.grid
+sp::coordinates(boundary) <- c("x", "y")
+sp::gridded(boundary) <- TRUE
+boundary <- rgeos::gUnaryUnion(as(boundary, "SpatialPolygons"))
+candi <- meuse.grid[, 1:2]
+covars <- meuse.grid[, 6:7]
+schedule <- scheduleSPSANN(initial.temperature = 5, stopping = 200)
+free <- 10
+set.seed(1984)
+fixed <- candi[sample(1:nrow(candi), 40), ]
+objDIST(
+  points = fixed, candi = candi, covars = covars, use.coords = TRUE)
+set.seed(2001)
+res <- optimDIST(
+  points = list(free = free, fixed = fixed), candi = candi, covars = covars, use.coords = TRUE, 
+  schedule = schedule, plotit = TRUE, boundary = boundary)
+objSPSANN(res)
+objDIST(
+  points = res, candi = candi, covars = covars, use.coords = TRUE)
+plot(res, boundary = boundary)
