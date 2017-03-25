@@ -75,15 +75,15 @@ objSPSANN.OptimizedSampleConfiguration <-
     } else {
       sp::plot(x = boundary)
     }
-    graphics::points(conf0[, 1], conf0[, 2], pch = 1, cex = 0.5, col = "lightgray")
+    graphics::points(conf0[, 1], conf0[, 2], pch = 1, cex = 0.75, col = "lightgray")
     # graphics::points(new_conf[, 1], new_conf[, 2], pch = 20, cex = 0.5)
-    pch <- rep(20, n_pts)
-    if (exists("fixed_pts")) {
-      pch <- c(pch, rep(4, n_fixed_pts))
+    pch <- rep(20, nrow(conf0))
+    if (nrow(conf0) < nrow(new_conf)) {
+      pch <- c(pch, rep(4, nrow(new_conf) - nrow(conf0)))
     }
-    graphics::points(new_conf[, 1], new_conf[, 2], pch = pch, cex = 0.5)
+    graphics::points(new_conf[, 1], new_conf[, 2], pch = pch, cex = 0.75)
     if (!missing(wp)) {
-      graphics::points(new_conf[wp, 1], new_conf[wp, 2], pch = 20, cex = 1, col = "red")
+      graphics::points(new_conf[wp, 1], new_conf[wp, 2], pch = pch, cex = 1, col = "red")
     }
     
     # plot maximum shift in the x and y coordinates
