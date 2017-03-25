@@ -132,7 +132,7 @@ optimCLHS <-
     
     # Compute initial energy state
     energy0 <- .objCLHS(
-      sm = sm, breaks = breaks, id_num = id_num, pcm = pcm, id_fac = id_fac, n_pts = n_pts, 
+      sm = sm, breaks = breaks, id_num = id_num, pcm = pcm, id_fac = id_fac, n_pts = n_pts + n_fixed_pts, 
       pop_prop = pop_prop, weights = weights, covars_type = covars_type)
     
     # Other settings for the simulated annealing algorithm
@@ -161,10 +161,9 @@ optimCLHS <-
           
           # Update sample matrix and compute the new energy state
           new_sm[wp, ] <- covars[new_conf[wp, 1], ]
-          new_energy <-
-            .objCLHS(sm = new_sm, breaks = breaks, id_num = id_num, pcm = pcm,
-                     id_fac = id_fac, n_pts = n_pts, pop_prop = pop_prop,
-                     weights = weights, covars_type = covars_type)
+          new_energy <- .objCLHS(
+            sm = new_sm, breaks = breaks, id_num = id_num, pcm = pcm, id_fac = id_fac, 
+            n_pts = n_pts + n_fixed_pts, pop_prop = pop_prop, weights = weights, covars_type = covars_type)
           
           # Evaluate the new system configuration
           accept <- .acceptSPSANN(old_energy[[1]], new_energy[[1]], actual_temp)

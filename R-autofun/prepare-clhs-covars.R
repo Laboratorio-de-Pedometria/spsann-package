@@ -43,7 +43,7 @@ sm <- covars[points[, 1], ]
 
 # Break points and population correlation matrix
 if (any(covars_type == c("numeric", "both"))) {
-  probs <- seq(0, 1, length.out = n_pts + 1)
+  probs <- seq(0, 1, length.out = n_pts + n_fixed_pts + 1)
   breaks <- lapply(covars[, id_num], stats::quantile, probs, na.rm = TRUE)
   pcm <- stats::cor(x = covars[, id_num], use = "complete.obs")
 }
