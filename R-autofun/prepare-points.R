@@ -23,8 +23,8 @@ if (!missing(candi)) {
 
 # (Fixed) Points ####
 if (is(points, "list") && length(points) == 2) {
-  points <- points$free
   fixed_pts <- points$fixed
+  points <- points$free
   if (is(fixed_pts, "OptimizedSampleConfiguration")) { # Optimized sample comfiguration
     fixed_pts <- fixed_pts$points
   } 
