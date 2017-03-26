@@ -1,3 +1,11 @@
+# Version 2.1-0 (2017-03-26)
+* Now ***spsann*** can be used to augment an existing sample configuration, that is, add new sampling points
+  to a spatial sample generated using ***spsann*** or any other means. To do so, the user must pass to 
+  the function argument `points` an object of class `list` containing two items: `fixed`, a matrix with the 
+  coordinates of the existing sample points and that should be held fixed during the optimization, and `free`
+  the number of sample points that should be added to the existing sample configuration and thus should be 
+  free to move around during the optimization.
+
 # Version 2.0-0 (2016-03-14)
 This is a major release of package ***spsann*** that includes several conceptual changes. Despite our efforts, 
 it was not possible to guarantee the compatibility with previous versions. We have decided not to deprecate 
