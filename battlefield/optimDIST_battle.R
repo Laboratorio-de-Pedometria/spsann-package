@@ -90,13 +90,11 @@ free <- 10
 set.seed(1984)
 id <- sample(1:nrow(candi), 40)
 fixed <- cbind(id, candi[id, ])
-objDIST(
-  points = fixed, candi = candi, covars = covars, use.coords = TRUE)
+objDIST(points = fixed, candi = candi, covars = covars, use.coords = TRUE)
 set.seed(2001)
 res <- optimDIST(
   points = list(free = free, fixed = fixed), candi = candi, covars = covars, use.coords = TRUE, 
   schedule = schedule, plotit = TRUE, boundary = boundary)
-objSPSANN(res)
-objDIST(
-  points = res, candi = candi, covars = covars, use.coords = TRUE)
+objSPSANN(res) -
+  objDIST(points = res, candi = candi, covars = covars, use.coords = TRUE)
 plot(res, boundary = boundary)
