@@ -102,35 +102,34 @@ optimSPAN <-
     pcm <- .corCORR(obj = covars, covars.type = covars.type)
     scm <- .corCORR(obj = sm, covars.type = covars.type)
     # DIST
-    pop_prop <- .strataACDC(n.pts = n_pts, strata.type = strata.type, 
-                            covars = covars, covars.type = covars.type)
+    pop_prop <- .strataACDC(
+      n.pts = n_pts + n_fixed_pts, strata.type = strata.type, covars = covars, covars.type = covars.type)
     # PPL
     cutoff <- .cutoffPPL(cutoff = cutoff, x.max = x.max, y.max = y.max)
-    lags <- .lagsPPL(lags = lags, lags.type = lags.type, cutoff = cutoff, 
-                     lags.base = lags.base)
+    lags <- .lagsPPL(
+      lags = lags, lags.type = lags.type, cutoff = cutoff, lags.base = lags.base)
     n_lags <- length(lags) - 1
-    dm_ppl <- SpatialTools::dist1(conf0[, 2:3])
-    ppl <- .getPPL(lags = lags, n.lags = n_lags, dist.mat = dm_ppl, 
-                   pairs = pairs)
-    distri <- .distriPPL(n.lags = n_lags, n.pts = n_pts, criterion = criterion,
-                         distri = distri, pairs = pairs)
+    dm_ppl <- SpatialTools::dist1(old_conf[, 2:3])
+    ppl <- .getPPL(
+      lags = lags, n.lags = n_lags, dist.mat = dm_ppl, pairs = pairs)
+    distri <- .distriPPL(
+      n.lags = n_lags, n.pts = n_pts + n_fixed_pts, criterion = criterion, distri = distri, pairs = pairs)
     # MSSD
-    dm_mssd <- SpatialTools::dist2(candi[, 2:3], conf0[, 2:3])
+    dm_mssd <- SpatialTools::dist2(candi[, 2:3], old_conf[, 2:3])
     
     # Nadir and utopia points
-    nadir <- .nadirSPAN(n.pts = n_pts, n.cov = n_cov, n.candi = n_candi, 
-                        nadir = nadir, candi = candi, covars = covars, 
-                        pcm = pcm, pop.prop = pop_prop, lags = lags,
-                        covars.type = covars.type, n.lags = n_lags, 
-                        pairs = pairs, distri = distri, criterion = criterion)
+    nadir <- .nadirSPAN(
+      n.pts = n_pts + n_fixed_pts, # The simulation algorithm does not accoun for existing fixed sample points.
+      n.cov = n_cov, n.candi = n_candi, nadir = nadir, candi = candi, covars = covars, pcm = pcm, 
+      pop.prop = pop_prop, lags = lags, covars.type = covars.type, n.lags = n_lags, pairs = pairs, 
+      distri = distri, criterion = criterion)
     utopia <- .utopiaSPAN(utopia = utopia)
     
     # Energy state
-    energy0 <- .objSPAN(sm = sm, n.cov = n_cov, nadir = nadir, utopia = utopia,
-                        weights = weights, n.pts = n_pts, pcm = pcm, scm = scm,
-                        covars.type = covars.type, pop.prop = pop_prop, 
-                        ppl = ppl, n.lags = n_lags, criterion = criterion, 
-                        distri = distri, pairs = pairs, dm.mssd = dm_mssd)
+    energy0 <- .objSPAN(
+      sm = sm, n.cov = n_cov, nadir = nadir, utopia = utopia, weights = weights, n.pts = n_pts + n_fixed_pts,
+      pcm = pcm, scm = scm, covars.type = covars.type, pop.prop = pop_prop, ppl = ppl, n.lags = n_lags, 
+      criterion = criterion, distri = distri, pairs = pairs, dm.mssd = dm_mssd)
     
     # Other settings for the simulated annealing algorithm
     # DIST and CORR
@@ -147,8 +146,7 @@ optimSPAN <-
     best_dm_mssd <- dm_mssd
     # other
     old_energy <- energy0
-    best_energy <- 
-      data.frame(obj = Inf, CORR = Inf, DIST = Inf, PPL = Inf, MSSD = Inf)
+    best_energy <- data.frame(obj = Inf, CORR = Inf, DIST = Inf, PPL = Inf, MSSD = Inf)
     actual_temp <- schedule$initial.temperature
     k <- 0 # count the number of jitters
     
@@ -174,20 +172,16 @@ optimSPAN <-
           # PPL
           new_dm_ppl <- 
             .updatePPLCpp(x = new_conf[, 2:3], dm = old_dm_ppl, idx = wp)
-          ppl <- .getPPL(lags = lags, n.lags = n_lags, dist.mat = new_dm_ppl, 
-                         pairs = pairs)
+          ppl <- .getPPL(lags = lags, n.lags = n_lags, dist.mat = new_dm_ppl, pairs = pairs)
           # MSSD
           x2 <- matrix(new_conf[wp, 2:3], nrow = 1)
-          new_dm_mssd <- .updateMSSDCpp(x1 = candi[, 2:3], x2 = x2, 
-                                        dm = old_dm_mssd, idx = wp)
+          new_dm_mssd <- .updateMSSDCpp(x1 = candi[, 2:3], x2 = x2, dm = old_dm_mssd, idx = wp)
           # Energy state
-          new_energy <- 
-            .objSPAN(sm = new_sm, n.cov = n_cov, nadir = nadir, 
-                     weights = weights, n.pts = n_pts, utopia = utopia, 
-                     pcm = pcm, scm = new_scm, covars.type = covars.type, 
-                     pop.prop = pop_prop, ppl = ppl, n.lags = n_lags,
-                     criterion = criterion, distri = distri, 
-                     pairs = pairs, dm.mssd = new_dm_mssd)
+          new_energy <- .objSPAN(
+            sm = new_sm, n.cov = n_cov, nadir = nadir, weights = weights, n.pts = n_pts + n_fixed_pts, 
+            utopia = utopia, pcm = pcm, scm = new_scm, covars.type = covars.type, pop.prop = pop_prop, 
+            ppl = ppl, n.lags = n_lags, criterion = criterion, distri = distri,  pairs = pairs, 
+            dm.mssd = new_dm_mssd)
           
           # Avoid the following error:
           # Error in if (new_energy[1] <= old_energy[1]) { : 
@@ -416,10 +410,10 @@ objSPAN <-
                       MSSD = obj_mssd)
     return(res)
   }
-# INTERNAL FUNCTION - COMPUTE THE NADIR VALUE ##################################
+# INTERNAL FUNCTION - COMPUTE THE NADIR VALUE #################################################################
 .nadirSPAN <-
-  function(n.pts, n.cov, n.candi, nadir, candi, covars, pcm, pop.prop, 
-           covars.type, lags, n.lags, pairs, distri, criterion) {
+  function(n.pts, n.cov, n.candi, nadir, candi, covars, pcm, pop.prop, covars.type, lags, n.lags, pairs, 
+           distri, criterion) {
     
     # Simulate the nadir point
     if (!is.null(nadir$sim) && !is.null(nadir$seeds)) { 
@@ -441,30 +435,28 @@ objSPAN <-
         scm <- .corCORR(obj = sm, covars.type = covars.type)
         nadirCORR[i] <- .objCORR(scm = scm, pcm = pcm)
         # DIST
-        nadirDIST[i] <- .objDIST(sm = sm, n.pts = n.pts, n.cov = n.cov, 
-                                 pop.prop = pop.prop, covars.type = covars.type)
+        nadirDIST[i] <- .objDIST(
+          sm = sm, n.pts = n.pts, n.cov = n.cov, pop.prop = pop.prop, covars.type = covars.type)
         # PPL
         dm <- SpatialTools::dist1(candi[pts, 2:3])
-        ppl <- .getPPL(lags = lags, n.lags = n.lags, dist.mat = dm, 
-                       pairs = pairs)
-        nadirPPL[i] <- .objPPL(ppl = ppl, n.lags = n.lags, n.pts = n.pts,
-                               criterion = criterion, distri = distri, 
-                               pairs = pairs)
+        ppl <- .getPPL(lags = lags, n.lags = n.lags, dist.mat = dm, pairs = pairs)
+        nadirPPL[i] <- .objPPL(
+          ppl = ppl, n.lags = n.lags, n.pts = n.pts, criterion = criterion, distri = distri, pairs = pairs)
         # MSSD
         dm <- SpatialTools::dist2(candi[, 2:3], candi[pts, 2:3])
         nadirMSSD[i] <- .objMSSD(x = dm)
       }
       
       # Prepare output
-      res <- list(DIST = mean(nadirDIST), CORR = mean(nadirCORR), 
-                  PPL = mean(nadirPPL), MSSD = mean(nadirMSSD))
+      res <- list(
+        DIST = mean(nadirDIST), CORR = mean(nadirCORR), PPL = mean(nadirPPL), MSSD = mean(nadirMSSD))
       
     } else {
       
       # User-defined nadir values
       if (!is.null(nadir$user)) { 
-        res <- list(DIST = nadir$user$DIST, CORR = nadir$user$CORR,
-                    PPL = nadir$user$PPL, MSSD = nadir$user$MSSD)
+        res <- list(
+          DIST = nadir$user$DIST, CORR = nadir$user$CORR, PPL = nadir$user$PPL, MSSD = nadir$user$MSSD)
         
       } else {
         if (!is.null(nadir$abs)) { 
@@ -479,8 +471,7 @@ objSPAN <-
   function(utopia) {
     
     if (!is.null(unlist(utopia$user))) {
-      list(CORR = utopia$user$CORR, DIST = utopia$user$DIST,
-           PPL = utopia$user$PPL, MSSD = utopia$user$MSSD)
+      list(CORR = utopia$user$CORR, DIST = utopia$user$DIST, PPL = utopia$user$PPL, MSSD = utopia$user$MSSD)
       
     } else {
       message("sorry but the utopia point cannot be calculated")

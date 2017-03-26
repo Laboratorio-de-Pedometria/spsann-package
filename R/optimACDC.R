@@ -100,8 +100,9 @@ optimACDC <-
     pop_prop <- .strataACDC(
       n.pts = n_pts + n_fixed_pts, strata.type = strata.type, covars = covars, covars.type = covars.type)
     nadir <- .nadirACDC(
-      n.pts = n_pts + n_fixed_pts, n.cov = n_cov, n.candi = n_candi, pcm = pcm, nadir = nadir, 
-      covars.type = covars.type, covars = covars, pop.prop = pop_prop, candi = candi)
+      n.pts = n_pts + n_fixed_pts, # The simulation algorithm does not accoun for existing fixed sample points.
+      n.cov = n_cov, n.candi = n_candi, pcm = pcm, nadir = nadir, covars.type = covars.type, covars = covars, 
+      pop.prop = pop_prop, candi = candi)
     utopia <- .utopiaACDC(utopia = utopia)
     energy0 <- .objACDC(
       sm = sm, n.cov = n_cov, pop.prop = pop_prop, pcm = pcm, scm = scm, nadir = nadir, weights = weights, 
