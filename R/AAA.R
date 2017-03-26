@@ -7,7 +7,7 @@ if (getRversion() >= "2.15.1") {
               "pre.distri", "pop.prop", "id_fac", "id_num", "probs", "breaks",
               "pcm", "pop_prop", "covars_type", "x_max0", "x.min", "cellsize",
               "y_max0", "y.min", "x_max0", "best_sm", "best_old_sm", "i", 
-              "res"))
+              "res", "n_fixed_pts"))
 }
 
 # Import functions from default packages other than `base` #####################
