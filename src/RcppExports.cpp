@@ -60,3 +60,16 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+
+static const R_CallMethodDef CallEntries[] = {
+    {"spsann_objMSSDCpp", (DL_FUNC) &spsann_objMSSDCpp, 1},
+    {"spsann_spJitterCpp", (DL_FUNC) &spsann_spJitterCpp, 7},
+    {"spsann_updateMSSDCpp", (DL_FUNC) &spsann_updateMSSDCpp, 4},
+    {"spsann_updatePPLCpp", (DL_FUNC) &spsann_updatePPLCpp, 3},
+    {NULL, NULL, 0}
+};
+
+RcppExport void R_init_spsann(DllInfo *dll) {
+    R_registerRoutines(dll, NULL, CallEntries, NULL, NULL);
+    R_useDynamicSymbols(dll, FALSE);
+}

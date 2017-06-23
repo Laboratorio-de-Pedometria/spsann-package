@@ -3,7 +3,7 @@
 #' Optimize a sample configuration for spatial trend identification and estimation. A criterion is defined so
 #' that the sample reproduces the bivariate association/correlation between the covariates (\bold{CORR}).
 #'
-#' @inheritParams spJitter
+# @inheritParams spJitter
 #' @template spSANN_doc
 #' @template ACDC_doc
 #' @template spJitter_doc

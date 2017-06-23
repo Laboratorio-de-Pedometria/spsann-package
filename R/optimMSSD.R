@@ -3,7 +3,7 @@
 #' Optimize a sample configuration for spatial interpolation. The criterion used is the mean squared shortest 
 #' distance (\bold{MSSD}) between sample points and prediction points.
 #'
-#' @inheritParams spJitter
+# @inheritParams spJitter
 #' @template spSANN_doc
 #' @template spJitter_doc
 #' 

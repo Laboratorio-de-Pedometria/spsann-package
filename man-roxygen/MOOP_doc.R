@@ -18,4 +18,4 @@
 #' @details 
 #' The help page of \code{\link[spsann]{minmaxPareto}} contains details on how \pkg{spsann} solves the
 #' multi-objective combinatorial optimization problem of finding a globally optimum sample configuration that
-#' meets multiple conflicting objectives.
+#' meets multiple, possibly conflicting, sampling objectives.

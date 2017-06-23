@@ -11,7 +11,7 @@
 #' minimum distance between two neighbouring candidate locations. The units are the same as of the projected 
 #' x- and y-coordinates. If missing, they are estimated from \code{candi}.
 #' 
-#' @inheritParams spJitter
+# @inheritParams spJitter
 #' @template spSANN_doc
 #' @template ACDC_doc
 #' @template MOOP_doc

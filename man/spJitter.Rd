@@ -7,14 +7,9 @@
 spJitter(points, candi, x.max, x.min, y.max, y.min, which.point, cellsize)
 }
 \arguments{
-\item{points}{Integer value, integer vector, data frame or matrix. If \code{points} is an integer value, 
-it defines the number of points that should be randomly sampled from \code{candi} to form the starting 
-system configuration. If \code{points} is a vector of integer values, it contains the row indexes of 
-\code{candi} that correspond to the points that form the starting system configuration. If \code{points} 
-is a data frame or matrix, it must have three columns in the following order: \code{[, "id"]} the row 
+\item{points}{Data frame or matrix with three columns in the following order: \code{[, "id"]} the row 
 indexes of \code{candi} that correspond to each point, \code{[, "x"]} the projected x-coordinates, and 
-\code{[, "y"]} the projected y-coordinates. Note that in the later case, \code{points} must be a subset 
-of \code{candi}.}
+\code{[, "y"]} the projected y-coordinates. Note that \code{points} must be a subset of \code{candi}.}
 
 \item{candi}{Data frame or matrix with the candidate locations for the jittered points. \code{candi} must 
 have two columns in the following order: \code{[, "x"]} the projected x-coordinates, and \code{[, "y"]} the 
@@ -103,9 +98,6 @@ plot(meuse.grid[, 2:3], asp = 1, pch = 15, col = "gray")
 points(pts2[, 2:3], col = "red", cex = 0.5)
 points(pts3[, 2:3], pch = 19, col = "blue", cex = 0.5)
 }
-\author{
-Alessandro Samuel-Rosa \email{alessandrosamuelrosa@gmail.com}
-}
 \references{
 Edzer Pebesma, Jon Skoien with contributions from Olivier Baume, A. Chorti, D.T. Hristopulos, S.J. Melles 
 and G. Spiliopoulos (2013). \emph{intamapInteractive: procedures for automated interpolation - methods 
@@ -122,7 +114,9 @@ sampling from compact geographical strata by k-means. \emph{Computers & Geoscien
 \code{ssaOptim}, \code{\link[sp]{zerodist}}, \code{\link[base]{jitter}}, 
 \code{\link[geoR]{jitter2d}}.
 }
+\author{
+Alessandro Samuel-Rosa \email{alessandrosamuelrosa@gmail.com}
+}
 \concept{
 jitter perturb
 }
-

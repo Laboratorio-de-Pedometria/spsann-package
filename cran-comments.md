@@ -1,16 +1,16 @@
 ## Changes
-This is a major release of package ***spsann*** that includes several conceptual changes. Despite our efforts, 
-it was not possible to guarantee the compatibility with previous versions. As such, the user will be warned 
-about the changes upon attaching the package to the workspace. We have decided not to deprecate functions 
-and function arguments because (1) this would require deprecating a lot of code, and (2) the user should 
-first read the updated package documentation to understand the conceptual changes that we have made before
-using it. This should not be a major problem because, as of now, the number of users of ***spsann*** appears to
-be very limited -- all known users have been warned about this major release.
+Now ***spsann*** can be used to augment an existing sample configuration, that is, add new sampling points
+to a spatial sample configuration generated using ***spsann*** or any other means. To do so, when using one 
+of the functions from the family of `optim...()` functions, the user must pass to the function argument 
+`points` an object of class `list` containing two named sub-arguments: `fixed`, a matrix with the 
+coordinates of the existing sample configuration -- kept fixed during the optimization --, and `free`,
+the number of sample points that should be added to the existing sample configuration -- free to move around
+during the optimization.
 
 ## Test environments
-* local x86_64-pc-linux-gnu (ubuntu 14.04), R 3.2.4
-* ubuntu 12.04.5 LTS (on travis-ci), R 3.2.3
-* win-builder (devel and release)
+* local x86_64-pc-linux-gnu (ubuntu 16.04), R 3.4.0
+* ubuntu 12.04.5 LTS (on travis-ci), R 3.4.0
+* win-builder -- R Under development (unstable) (2017-06-23 r72844)
 
 ## R CMD check results
 There were no ERRORs or WARNINGs.
@@ -22,7 +22,8 @@ There was one NOTE.
 Maintainer: 'Alessandro Samuel-Rosa <alessandrosamuelrosa@gmail.com>'
 
 Possibly mis-spelled words in DESCRIPTION:
-  variogram (20:71)
+  multi (23:5)
+  variogram (20:61)
 ```
 
 ## Downstream dependencies
