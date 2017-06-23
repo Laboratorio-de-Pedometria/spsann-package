@@ -1,4 +1,4 @@
-[![CRAN](http://www.r-pkg.org/badges/version/spsann)](http://cran.r-project.org/package=spsann)
+[![CRAN](https://www.r-pkg.org/badges/version/spsann)](https://cran.r-project.org/package=spsann)
 [![Build Status](https://travis-ci.org/samuel-rosa/spsann.svg?branch=master)](https://travis-ci.org/samuel-rosa/spsann)
 [![Downloads](http://cranlogs.r-pkg.org/badges/spsann?color=brightgreen)](http://www.r-pkg.org/pkg/spsann)
 

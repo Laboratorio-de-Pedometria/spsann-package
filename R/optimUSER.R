@@ -2,7 +2,7 @@
 #'
 #' Optimize a sample configuration using a user-defined objective function.
 #' 
-#' @inheritParams spJitter
+# @inheritParams spJitter
 #' @template spSANN_doc
 #' 
 #' @param fun A function defining the objective function that should be used to evaluate the energy state of 

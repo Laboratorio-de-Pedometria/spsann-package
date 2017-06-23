@@ -2,7 +2,7 @@ Package: spsann
 Type: Package
 Title: Optimization of Sample Configurations using Spatial Simulated Annealing
 Version: 2.1-0
-Date: 2017-03-26
+Date: 2017-06-23
 Authors@R: c(
     person("Alessandro", "Samuel-Rosa", role = c("aut", "cre"), email = "alessandrosamuelrosa@gmail.com"),
     person("Lucia Helena Cunha dos", "Anjos", role = "ths", email = "lanjos@ufrrj.br"),
@@ -15,15 +15,16 @@ Authors@R: c(
     person("Dick", "Brus", role = "ctb", email = "dick.brus@wur.nl"),
     person("Murray", "Lark", role = "ctb", email = "mlark@bgs.ac.uk")
     )
-Description: Methods to optimize spatial sample configurations using spatial simulated annealing. Multiple 
-    objective functions are implemented for various purposes, such as variogram estimation, spatial trend 
-    estimation, and spatial interpolation. A general purpose spatial simulated annealing function enables the 
-    user to define his/her own objective function.
+Description: Methods to optimize sample configurations using spatial simulated annealing. Multiple objective 
+    functions are implemented for various purposes, such as variogram estimation, spatial trend estimation 
+    and spatial interpolation. A general purpose spatial simulated annealing function enables the user to 
+    define his/her own objective function. Solutions for augmenting existing sample configurations and solving
+    multi-objective optimization problems are available as well.
 License: GPL (>= 2)
 Imports:
     methods,
     pedometrics,
-    Rcpp (>= 0.11.3),
+    Rcpp,
     sp,
     SpatialTools
 Suggests:
@@ -32,5 +33,5 @@ Suggests:
     knitr
 LinkingTo: Rcpp
 Encoding: UTF-8
-RoxygenNote: 5.0.1
+RoxygenNote: 6.0.1
 VignetteBuilder: knitr

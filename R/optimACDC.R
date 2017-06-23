@@ -5,7 +5,7 @@
 #' covariates, as well as their marginal distribution (\bold{ACDC}). The utility function is obtained 
 #' aggregating two objective functions: \bold{CORR} and \bold{DIST}.
 #'
-#' @inheritParams spJitter
+# @inheritParams spJitter
 #' @template spSANN_doc
 #' @template ACDC_doc
 #' @template MOOP_doc

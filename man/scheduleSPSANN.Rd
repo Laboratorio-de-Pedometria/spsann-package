@@ -51,9 +51,6 @@ Set the control parameters for the annealing schedule of \pkg{spsann} functions.
 \examples{
 schedule <- scheduleSPSANN()
 }
-\author{
-Alessandro Samuel-Rosa \email{alessandrosamuelrosa@gmail.com}
-}
 \references{
 Aarts, E. H. L.; Korst, J. H. M. Boltzmann machines for travelling salesman problems. \emph{European 
 Journal of Operational Research}, v. 39, p. 79-95, 1989.
@@ -82,4 +79,6 @@ Routledge, p. 200, 2013.
 \code{\link[spsann]{optimMSSD}}, \code{\link[spsann]{optimPPL}},
 \code{\link[spsann]{optimSPAN}}, \code{\link[spsann]{optimUSER}}.
 }
-
+\author{
+Alessandro Samuel-Rosa \email{alessandrosamuelrosa@gmail.com}
+}

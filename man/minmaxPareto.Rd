@@ -12,8 +12,8 @@ be named after the objective function with which it has been optimized. For exam
 \code{osc = list(CORR = osc_corr, DIST = osc_dist)}.}
 
 \item{candi}{Data frame or matrix with the candidate locations for the jittered points. \code{candi} must 
-have two columns in the following order: \code{[, "x"]} the projected x-coordinates, and \code{[, "y"]} the 
-projected y-coordinates.}
+have two columns in the following order: \code{[, "x"]}, the projected x-coordinates, and \code{[, "y"]}, 
+the projected y-coordinates.}
 
 \item{covars}{Data frame or matrix with the covariates in the columns.}
 }
@@ -127,9 +127,6 @@ pareto <- minmaxPareto(osc = list(DIST = osc_dist, CORR = osc_corr,
 pareto
 }
 }
-\author{
-Alessandro Samuel-Rosa \email{alessandrosamuelrosa@gmail.com}
-}
 \references{
 Arora, J. \emph{Introduction to optimum design}. Waltham: Academic Press, p. 896, 2011.
 
@@ -145,4 +142,6 @@ Marler, R. T.; Arora, J. S. The weighted sum method for multi-objective optimiza
 \seealso{
 \code{\link[spsann]{optimACDC}}, \code{\link[spsann]{SPAN}}
 }
-
+\author{
+Alessandro Samuel-Rosa \email{alessandrosamuelrosa@gmail.com}
+}
