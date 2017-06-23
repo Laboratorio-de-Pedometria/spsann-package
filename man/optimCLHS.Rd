@@ -94,7 +94,7 @@ sampling strata. \emph{Equal-area} marginal sampling strata are defined using th
 estimated with \code{\link[stats]{quantile}} using a continuous function (\code{type = 7}), that is, a 
 function that interpolates between existing covariate values to estimate the sample quantiles. This is 
 the procedure implemented in the method of Minasny and McBratney (2006), which creates breakpoints that do 
-not occur in the population of existing covariate values. Depending on the level of discretisation of the 
+not occur in the population of existing covariate values. Depending on the level of discretization of the 
 covariate values, that is, how many significant digits they have, this can create repeated breakpoints, 
 resulting in empty marginal sampling strata. The number of empty marginal sampling strata will ultimately
 depend on the frequency distribution of the covariate and on the number of sampling points. The effect of

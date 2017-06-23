@@ -64,7 +64,7 @@ lag-distance classes. Used only when \code{lags.type = "exponential"}. Defaults 
 
 \item{cutoff}{Numeric value, the maximum distance up to which lag-distance classes are created. Used only
 when \code{lags} is an integer value. If missing, it is set to be equal to the length of the diagonal of 
-the rectagle with sides \code{x.max} and \code{y.max} as defined in \code{\link[spsann]{scheduleSPSANN}}.}
+the rectangle with sides \code{x.max} and \code{y.max} as defined in \code{\link[spsann]{scheduleSPSANN}}.}
 
 \item{criterion}{Character value, the feature used to describe the energy state of the system 
 configuration, with options \code{"minimum"} and \code{"distribution"}. Defaults to 
