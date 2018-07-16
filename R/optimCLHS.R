@@ -5,11 +5,16 @@
 #' \emph{U} is defined so that the sample reproduces the marginal distribution and correlation matrix of the
 #' numeric covariates, and the class proportions of the factor covariates (\bold{CLHS}). The utility function 
 #' is obtained aggregating three objective functions: \bold{O1}, \bold{O2}, and \bold{O3}.
-#'
+#' 
 # @inheritParams spJitter
 #' @template spSANN_doc
 #' @inheritParams optimACDC
 #' @template spJitter_doc
+#' @param clhs.version (Optional) Character value setting the CLHS version that should be used when computing 
+#' objective function values. Available options are `"paper"`, for using the formulations of __O1__, __O2__,
+#' and __O3__ as presented in the original paper by Minasny and McBratney (2006), `"fortran"`, for using
+#' scaling factors for __O1__ and __O3__ as implemented in the late FORTRAN code by Budiman Minasny (ca. 2015),
+#' and `"update"`, to use the modifications proposed by Dick Brus in July 2018.
 #' 
 #' @details 
 #' \subsection{Marginal sampling strata}{
@@ -100,7 +105,7 @@
 optimCLHS <-
   function (points, candi,
             # O1, O2, and O3
-            covars, use.coords = FALSE, 
+            covars, use.coords = FALSE, clhs.version = c("paper", "fortran", "update"),
             # SPSANN
             schedule = scheduleSPSANN(), plotit = FALSE, track = FALSE,
             boundary, progress = "txt", verbose = FALSE,
@@ -132,7 +137,7 @@ optimCLHS <-
     # Compute initial energy state
     energy0 <- .objCLHS(
       sm = sm, breaks = breaks, id_num = id_num, pcm = pcm, id_fac = id_fac, n_pts = n_pts + n_fixed_pts, 
-      pop_prop = pop_prop, weights = weights, covars_type = covars_type)
+      pop_prop = pop_prop, weights = weights, covars_type = covars_type, clhs.version = clhs.version)
     
     # Other settings for the simulated annealing algorithm
     old_sm <- sm
@@ -259,15 +264,16 @@ optimCLHS <-
 # This function is used to calculate the criterion value of CLHS.
 # Aggregation is done using the weighted sum method.
 .objCLHS <-
-  function (sm, breaks, id_num, pcm, id_fac, n_pts, pop_prop, weights, covars_type) {
+  function (sm, breaks, id_num, pcm, id_fac, n_pts, pop_prop, weights, covars_type, clhs.version) {
     
     # Objective functions
     if (any(covars_type == c("numeric", "both"))) {
-      obj_O1 <- weights$O1 * .objO1(sm = sm, breaks = breaks, id_num = id_num)
-      obj_O3 <- weights$O3 * .objO3(sm = sm, id_num = id_num, pcm = pcm)
+      obj_O1 <- weights$O1 * .objO1(sm = sm, breaks = breaks, id_num = id_num, clhs.version = clhs.version)
+      obj_O3 <- weights$O3 * .objO3(sm = sm, id_num = id_num, pcm = pcm, clhs.version = clhs.version)
     }
     if (any(covars_type == c("factor", "both"))) {
-      obj_O2 <- weights$O2 * .objO2(sm = sm, id_fac = id_fac, n_pts = n_pts, pop_prop = pop_prop)
+      obj_O2 <- weights$O2 * 
+        .objO2(sm = sm, id_fac = id_fac, n_pts = n_pts, pop_prop = pop_prop, clhs.version = clhs.version)
     }
     
     # Output
@@ -286,7 +292,8 @@ optimCLHS <-
 #' @rdname optimCLHS
 #' @export
 objCLHS <-
-  function (points, candi, covars, use.coords = FALSE, weights = list(O1 = 1/3, O2 = 1/3, O3 = 1/3)) {
+  function (points, candi, covars, use.coords = FALSE, clhs.version = c("paper", "fortran", "update"), 
+            weights = list(O1 = 1/3, O2 = 1/3, O3 = 1/3)) {
     
     # Check arguments
     check <- .optimCLHScheck(candi = candi, covars = covars, use.coords = use.coords)
@@ -299,44 +306,95 @@ objCLHS <-
     eval(.prepare_clhs_covars())
     
     # Output energy state
-    return (.objCLHS(sm = sm, breaks = breaks, id_num = id_num, pcm = pcm, id_fac = id_fac, n_pts = n_pts,
-                     pop_prop = pop_prop, weights = weights, covars_type = covars_type))
+    out <- .objCLHS(
+      sm = sm, breaks = breaks, id_num = id_num, pcm = pcm, id_fac = id_fac, n_pts = n_pts,
+      pop_prop = pop_prop, weights = weights, covars_type = covars_type, clhs.version = clhs.version)
+    return(out)
   }
 # INTERNAL FUNCTION - CALCULATE THE CRITERION VALUE (O1) ######################################################
 # sm: sample matrix
 # breaks: break points of the marginal sampling strata
 # id_num: number of the column containing numeric covariates
+# clhs.version: CLHS version
 .objO1 <- 
-  function (sm, breaks, id_num) {
+  function (sm, breaks, id_num, clhs.version) {
     
-    # Count the number of points per marginal sampling strata and compare 
-    # with the expected count
+    # Compute objective function value based on CLHS version
+    clhs.version <- match.arg(clhs.version)
+    
+    # Count the number of points per marginal sampling strata
     sm_count <- sapply(1:length(id_num), function (i) 
-      graphics::hist(sm[id_num][, i], breaks[[i]], plot = FALSE)$counts - 1)
+      graphics::hist(sm[id_num][, i], breaks[[i]], plot = FALSE)$counts)
     
-    # Scaling factor
-    n <- nrow(sm) * length(id_num)
+    out <- switch (clhs.version,
+      paper = {
+        # Minasny and McBratney (2006)
+        sum(abs(sm_count - 1))
+      },
+      fortran = {
+        # The late FORTRAN code of Budiman Minasny -- ca. 2015 -- implements scaling factors so that values
+        # are "more" comparable among objective functions. For O1, the scaling factor is defined as the number
+        # of samples, nrow(sm), multiplied by the number of continuous variables, length(id_num), that is, the
+        # total number of marginal sampling strata among all continuous variables.
+        n <- nrow(sm) * length(id_num)
+        sum(abs(sm_count - 1)) / n
+      },
+      update = {
+        # Dick Brus (Jul 2018) proposes to compute O1 as the mean of the absolute deviations of marginal
+        # stratum sample sizes. This should be the same as implemented in the FORTRAN code.
+        mean(abs(sm_count - 1))
+      })
     
     # Output
-    return (sum(abs(sm_count)) / n)
+    # return (sum(abs(sm_count)) / n)
+    return (out)
   }
 # INTERNAL FUNCTION - CALCULATE THE CRITERION VALUE (O2) ######################################################
 # sm: sample matrix
 # n_pts: number of points
 # id_fac: columns of sm containing factor covariates
 # pop_prop: population class proportions
+# clhs.version: CLHS version
 .objO2 <-
-  function (sm, id_fac, n_pts, pop_prop) {
+  function (sm, id_fac, n_pts, pop_prop, clhs.version) {
     
-    # Compute the sample proportions
-    sm_prop <- lapply(sm[, id_fac], function(x) table(x) / n_pts)
+    # Count the number of points per marginal sampling strata
+    sm_count <- lapply(sm[, id_fac], function(x) table(x))
     
-    # Compare the sample and population proportions
-    sm_prop <- sapply(1:length(id_fac), function (i)
-      sum(abs(sm_prop[[i]] - pop_prop[[i]])))
+    # Compute the sample proportions (DEPRECATED)
+    # sm_prop <- lapply(sm[, id_fac], function(x) table(x) / n_pts)
+    
+    # Compare the sample and population proportions (DEPRECATED)
+    # sm_prop <- sapply(1:length(id_fac), function (i)
+      # sum(abs(sm_prop[[i]] - pop_prop[[i]])))
+    
+    out <- switch (clhs.version,
+      paper = {
+        # Minasny and McBratney (2006)
+        sm_prop <- lapply(sm_count, function (x) x / n_pts)
+        # pop_prop <- ...
+        sm_prop <- sapply(1:length(id_fac), function (i)
+          sum(abs(sm_prop[[i]] - pop_prop[[i]])))
+        sum(sm_prop)
+      },
+      fortran = {
+        # Minasny and McBratney (2006)
+        sm_prop <- lapply(sm_count, function (x) x / n_pts)
+        # pop_prop <- ...
+        sm_prop <- sapply(1:length(id_fac), function (i)
+          sum(abs(sm_prop[[i]] - pop_prop[[i]])))
+        sum(sm_prop)
+      }, 
+      update = {
+        # Dick Brus (Jul 2018) proposes to compute O2 as the mean of the absolute deviations of marginal
+        # stratum sample sizes, defined just like O1 in terms of sample sizes. Defined in this alternative 
+        # way O1 and O2 should be fully comparable.
+        # mean(abs(n_realized - n_populational)
+      })
     
     # Output
-    return (sum(sm_prop))
+    # return (sum(sm_prop))
+    return(out)
   }
 # INTERNAL FUNCTION - CALCULATE THE CRITERION VALUE (O3) ######################################################
 # sm: sample matrix
