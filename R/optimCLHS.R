@@ -96,7 +96,7 @@
 #' objSPSANN(res) - objCLHS(
 #'   points = res, candi = candi, covars = covars, use.coords = TRUE, 
 #'   weights = weights)
-# MAIN FUNCTION ################################################################
+# MAIN FUNCTION ###############################################################################################
 optimCLHS <-
   function (points, candi,
             # O1, O2, and O3
@@ -114,8 +114,7 @@ optimCLHS <-
     eval(.check_spsann_arguments())
     
     # Check other arguments
-    check <- 
-      .optimCLHScheck(candi = candi, covars = covars, use.coords = use.coords)
+    check <- .optimCLHScheck(candi = candi, covars = covars, use.coords = use.coords)
     if (!is.null(check)) { stop (check, call. = FALSE) }
     
     # Set plotting options
@@ -219,8 +218,7 @@ optimCLHS <-
           # }
         }
         if (verbose) {
-          cat("\n", no_change, "chain(s) with no improvement... stops at",
-              schedule$stopping, "\n")
+          cat("\n", no_change, "chain(s) with no improvement... stops at", schedule$stopping, "\n")
         }
       } else {
         no_change <-  0
@@ -236,7 +234,7 @@ optimCLHS <-
     # Prepare output
     eval(.prepare_output())
   }
-# INTERNAL FUNCTION - CHECK ARGUMENTS ##########################################
+# INTERNAL FUNCTION - CHECK ARGUMENTS #########################################################################
 # candi: candidate locations
 # covars: covariates
 # use.coords: should the coordinates be used
@@ -257,12 +255,11 @@ optimCLHS <-
       }
     }
   }
-# INTERNAL FUNCTION - CALCULATE THE CRITERION VALUE ############################
+# INTERNAL FUNCTION - CALCULATE THE CRITERION VALUE ###########################################################
 # This function is used to calculate the criterion value of CLHS.
 # Aggregation is done using the weighted sum method.
 .objCLHS <-
-  function (sm, breaks, id_num, pcm, id_fac, n_pts, pop_prop, weights,
-            covars_type) {
+  function (sm, breaks, id_num, pcm, id_fac, n_pts, pop_prop, weights, covars_type) {
     
     # Objective functions
     if (any(covars_type == c("numeric", "both"))) {
@@ -270,8 +267,7 @@ optimCLHS <-
       obj_O3 <- weights$O3 * .objO3(sm = sm, id_num = id_num, pcm = pcm)
     }
     if (any(covars_type == c("factor", "both"))) {
-      obj_O2 <- weights$O2 * 
-        .objO2(sm = sm, id_fac = id_fac, n_pts = n_pts, pop_prop = pop_prop)
+      obj_O2 <- weights$O2 * .objO2(sm = sm, id_fac = id_fac, n_pts = n_pts, pop_prop = pop_prop)
     }
     
     # Output
@@ -286,16 +282,14 @@ optimCLHS <-
       }
     }
   }
-# CALCULATE OBJECTIVE FUNCTION VALUE ###########################################
+# CALCULATE OBJECTIVE FUNCTION VALUE ##########################################################################
 #' @rdname optimCLHS
 #' @export
 objCLHS <-
-  function (points, candi, covars, use.coords = FALSE, 
-            weights = list(O1 = 1/3, O2 = 1/3, O3 = 1/3)) {
+  function (points, candi, covars, use.coords = FALSE, weights = list(O1 = 1/3, O2 = 1/3, O3 = 1/3)) {
     
     # Check arguments
-    check <- 
-      .optimCLHScheck(candi = candi, covars = covars, use.coords = use.coords)
+    check <- .optimCLHScheck(candi = candi, covars = covars, use.coords = use.coords)
     if (!is.null(check)) stop (check, call. = FALSE)
     
     # Prepare points and candi
@@ -305,11 +299,10 @@ objCLHS <-
     eval(.prepare_clhs_covars())
     
     # Output energy state
-    return (.objCLHS(sm = sm, breaks = breaks, id_num = id_num, pcm = pcm, 
-                     id_fac = id_fac, n_pts = n_pts, pop_prop = pop_prop, 
-                     weights = weights, covars_type = covars_type))
+    return (.objCLHS(sm = sm, breaks = breaks, id_num = id_num, pcm = pcm, id_fac = id_fac, n_pts = n_pts,
+                     pop_prop = pop_prop, weights = weights, covars_type = covars_type))
   }
-# INTERNAL FUNCTION - CALCULATE THE CRITERION VALUE (O1) #######################
+# INTERNAL FUNCTION - CALCULATE THE CRITERION VALUE (O1) ######################################################
 # sm: sample matrix
 # breaks: break points of the marginal sampling strata
 # id_num: number of the column containing numeric covariates
@@ -327,7 +320,7 @@ objCLHS <-
     # Output
     return (sum(abs(sm_count)) / n)
   }
-# INTERNAL FUNCTION - CALCULATE THE CRITERION VALUE (O2) #######################
+# INTERNAL FUNCTION - CALCULATE THE CRITERION VALUE (O2) ######################################################
 # sm: sample matrix
 # n_pts: number of points
 # id_fac: columns of sm containing factor covariates
@@ -345,7 +338,7 @@ objCLHS <-
     # Output
     return (sum(sm_prop))
   }
-# INTERNAL FUNCTION - CALCULATE THE CRITERION VALUE (O3) #######################
+# INTERNAL FUNCTION - CALCULATE THE CRITERION VALUE (O3) ######################################################
 # sm: sample matrix
 # id_num: columns of sm containing numeric covariates
 # pcm: population correlation matrix
@@ -362,7 +355,7 @@ objCLHS <-
     # Output
     return (sum(abs(pcm - scm)) / n)
   }
-# INTERNAL FUNCTION - PREPARE OBJECT TO STORE THE BEST ENERGY STATE ############
+# INTERNAL FUNCTION - PREPARE OBJECT TO STORE THE BEST ENERGY STATE ###########################################
 .bestEnergyCLHS <-
   function (covars_type) {
     if (covars_type == "both") {
