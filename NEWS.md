@@ -1,3 +1,6 @@
+# Version 2.1.0.9001 (2018-07-17)
+* Updates package documentation.
+
 # Version 2.1.0.9000 (2018-07-16)
 * Adds new badges to README.md: package version and project status.
 * Adds details and improves DESCRIPTION file; authors are reordered based on contributions.
