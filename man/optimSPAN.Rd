@@ -5,7 +5,7 @@
 \alias{objSPAN}
 \alias{SPAN}
 \alias{objSPAN}
-\title{Optimization of sample configurations for variogram and spatial trend identification and estimation, and 
+\title{Optimization of sample configurations for variogram and spatial trend identification and estimation, and
 for spatial interpolation}
 \usage{
 optimSPAN(points, candi, covars, strata.type = "area", use.coords = FALSE,
@@ -116,9 +116,9 @@ internally (experimental).}
 user-defined values named after the respective objective functions to which they apply; 2) \code{abs} --
 logical for calculating the utopia point internally (experimental).}
 
-\item{x.max, x.min, y.max, y.min}{Numeric value defining the minimum and maximum quantity of random noise to 
-be added to the projected x- and y-coordinates. The minimum quantity should be equal to, at least, the 
-minimum distance between two neighbouring candidate locations. The units are the same as of the projected 
+\item{x.max, x.min, y.max, y.min}{Numeric value defining the minimum and maximum quantity of random noise to
+be added to the projected x- and y-coordinates. The minimum quantity should be equal to, at least, the
+minimum distance between two neighbouring candidate locations. The units are the same as of the projected
 x- and y-coordinates. If missing, they are estimated from \code{candi}.}
 }
 \value{
@@ -129,9 +129,9 @@ configuration with details about the optimization.
 function value.
 }
 \description{
-Optimize a sample configuration for variogram and spatial trend identification and estimation, and for 
-spatial interpolation. An utility function \emph{U} is defined so that the sample points cover, extend 
-over, spread over, \bold{SPAN} the feature, variogram and geographic spaces. The utility function is 
+Optimize a sample configuration for variogram and spatial trend identification and estimation, and for
+spatial interpolation. An utility function \emph{U} is defined so that the sample points cover, extend
+over, spread over, \bold{SPAN} the feature, variogram and geographic spaces. The utility function is
 obtained aggregating four objective functions: \bold{CORR}, \bold{DIST}, \bold{PPL}, and \bold{MSSD}.
 }
 \details{

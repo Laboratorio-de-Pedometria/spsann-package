@@ -64,7 +64,7 @@ configuration with details about the optimization.
 function value.
 }
 \description{
-Optimize a sample configuration for spatial interpolation. The criterion used is the mean squared shortest 
+Optimize a sample configuration for spatial interpolation. The criterion used is the mean squared shortest
 distance (\bold{MSSD}) between sample points and prediction points.
 }
 \details{
@@ -73,9 +73,9 @@ configuration by randomly perturbing the coordinates of a sample point are avail
 \code{\link[spsann]{spJitter}}.
 
 \subsection{Spatial coverage sampling}{
-Spatial coverage sampling is based on the knowledge that the kriging variance depends upon the distance 
-between sample points. As such, the better the spread of the sample points in the spatial domain, the 
-smaller the kriging variance. This is similar to using a regular grid of sample points. However, 
+Spatial coverage sampling is based on the knowledge that the kriging variance depends upon the distance
+between sample points. As such, the better the spread of the sample points in the spatial domain, the
+smaller the kriging variance. This is similar to using a regular grid of sample points. However,
 a regular grid usually is suboptimal for irregularly shaped areas.
 }
 }
@@ -86,8 +86,8 @@ the sample points and candidate locations should not be provided as latitude/lon
 mechanism to check if the coordinates are projected: the user is responsible for making sure that this
 requirement is attained.
 
-This function was derived with modifications from the method known as \emph{spatial coverage sampling} 
-originally proposed by Brus, de Gruijter and van Groenigen (2006), and implemented in the R-package 
+This function was derived with modifications from the method known as \emph{spatial coverage sampling}
+originally proposed by Brus, de Gruijter and van Groenigen (2006), and implemented in the R-package
 \pkg{\link[spcosa]{spcosa}} by Dennis Walvoort, Dick Brus and Jaap de Gruijter.
 }
 \examples{
@@ -104,14 +104,14 @@ objSPSANN(res) - objMSSD(candi = candi, points = res)
 }
 \references{
 Brus, D. J.; de Gruijter, J. J.; van Groenigen, J.-W. Designing spatial coverage samples using the k-means
-clustering algorithm. In: P. Lagacherie,A. M.; Voltz, M. (Eds.) \emph{Digital soil mapping -- an 
+clustering algorithm. In: P. Lagacherie,A. M.; Voltz, M. (Eds.) \emph{Digital soil mapping -- an
 introductory perspective}. Elsevier, v. 31, p. 183-192, 2006.
 
 de Gruijter, J. J.; Brus, D.; Bierkens, M.; Knotters, M. \emph{Sampling for natural resource monitoring}.
 Berlin: Springer, p. 332, 2006.
 
-Walvoort, D. J. J.; Brus, D. J.; de Gruijter, J. J. An R package for spatial coverage sampling and random 
-sampling from compact geographical strata by k-means. \emph{Computers and Geosciences}. v. 36, p. 
+Walvoort, D. J. J.; Brus, D. J.; de Gruijter, J. J. An R package for spatial coverage sampling and random
+sampling from compact geographical strata by k-means. \emph{Computers and Geosciences}. v. 36, p.
 1261-1267, 2010.
 }
 \seealso{

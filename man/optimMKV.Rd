@@ -35,15 +35,15 @@ the projected y-coordinates.}
 
 \item{covars}{Data frame or matrix with the covariates in the columns.}
 
-\item{eqn}{Formula string that defines the dependent variable \code{z} as a linear model of the independent 
-variables contained in \code{covars}. Defaults to \code{eqn = z ~ 1}, that is, ordinary kriging. See the 
+\item{eqn}{Formula string that defines the dependent variable \code{z} as a linear model of the independent
+variables contained in \code{covars}. Defaults to \code{eqn = z ~ 1}, that is, ordinary kriging. See the
 argument \code{formula} in the function \code{\link[gstat]{krige}} for more information.}
 
-\item{vgm}{Object of class \code{variogramModel}. See the argument \code{model} in the function 
+\item{vgm}{Object of class \code{variogramModel}. See the argument \code{model} in the function
 \code{\link[gstat]{krige}} for more information.}
 
-\item{krige.stat}{Character value defining the statistic that should be used to summarize the kriging 
-variance. Available options are \code{"mean"} and \code{"max"} for the mean and maximum kriging variance, 
+\item{krige.stat}{Character value defining the statistic that should be used to summarize the kriging
+variance. Available options are \code{"mean"} and \code{"max"} for the mean and maximum kriging variance,
 respectively. Defaults to \code{krige.stat = "mean"}.}
 
 \item{...}{further arguments passed to \code{\link[gstat]{krige}}.}
@@ -80,7 +80,7 @@ configuration with details about the optimization.
 function value.
 }
 \description{
-Optimize a sample configuration for spatial interpolation with a known linear model. A criterion is defined 
+Optimize a sample configuration for spatial interpolation with a known linear model. A criterion is defined
 so that the sample configuration minimizes the mean or maximum kriging variance (\bold{MKV}).
 }
 \details{
@@ -95,7 +95,7 @@ the sample points and candidate locations should not be provided as latitude/lon
 mechanism to check if the coordinates are projected: the user is responsible for making sure that this
 requirement is attained.
 
-This function is based on the method originally proposed by Heuvelink, Brus and de Gruijter (2006) and 
+This function is based on the method originally proposed by Heuvelink, Brus and de Gruijter (2006) and
 implemented in the R-package \pkg{intamapInteractive} by Edzer Pebesma and Jon Skoien.
 }
 \examples{
@@ -117,10 +117,10 @@ objSPSANN(res) - objMKV(
 }
 }
 \references{
-Brus, D. J.; Heuvelink, G. B. M. Optimization of sample patterns for universal kriging of environmental 
+Brus, D. J.; Heuvelink, G. B. M. Optimization of sample patterns for universal kriging of environmental
 variables. \emph{Geoderma}. v. 138, p. 86-95, 2007.
 
-Heuvelink, G. B. M.; Brus, D. J.; de Gruijter, J. J. Optimization of sample configurations for digital 
+Heuvelink, G. B. M.; Brus, D. J.; de Gruijter, J. J. Optimization of sample configurations for digital
 mapping of soil properties with universal kriging. In: Lagacherie, P.; McBratney, A. & Voltz, M. (Eds.)
 \emph{Digital soil mapping - an introductory perspective}. Elsevier, v. 31, p. 137-151, 2006.
 }

@@ -10,8 +10,8 @@ objSPSANN(osc, at = "end", n = 1)
 \arguments{
 \item{osc}{Object of class \code{OptimizedSampleConfiguration}.}
 
-\item{at}{Point of the optimization at which the energy state should be returned. Available options: 
-\code{"start"}, for the start, and \code{"end"}, for the end of the optimization. Defaults to 
+\item{at}{Point of the optimization at which the energy state should be returned. Available options:
+\code{"start"}, for the start, and \code{"end"}, for the end of the optimization. Defaults to
 \code{at = "end"}.}
 
 \item{n}{Number of instances that should be returned. Defaults to \code{n = 1}.}

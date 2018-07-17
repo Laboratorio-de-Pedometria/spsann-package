@@ -9,37 +9,37 @@ scheduleSPSANN(initial.acceptance = 0.95, initial.temperature = 0.001,
   stopping = 10, x.max, x.min = 0, y.max, y.min = 0, cellsize)
 }
 \arguments{
-\item{initial.acceptance}{Numeric value between 0 and 1 defining the initial acceptance probability, i.e. 
-the proportion of proposed system configurations that should be accepted in the first chain. The 
-optimization is stopped and a warning is issued if this value is not attained. Defaults to 
+\item{initial.acceptance}{Numeric value between 0 and 1 defining the initial acceptance probability, i.e.
+the proportion of proposed system configurations that should be accepted in the first chain. The
+optimization is stopped and a warning is issued if this value is not attained. Defaults to
 \code{initial.acceptance = 0.95}.}
 
-\item{initial.temperature}{Numeric value larger than 0 defining the initial temperature of the system. A 
-low \code{initial.temperature}, combined with a low \code{initial.acceptance} result in the algorithm to 
-behave as a greedy algorithm, i.e. only better system configurations are accepted. Defaults to 
+\item{initial.temperature}{Numeric value larger than 0 defining the initial temperature of the system. A
+low \code{initial.temperature}, combined with a low \code{initial.acceptance} result in the algorithm to
+behave as a greedy algorithm, i.e. only better system configurations are accepted. Defaults to
 \code{initial.temperature = 0.001}.}
 
-\item{temperature.decrease}{Numeric value between 0 and 1 used as a multiplying factor to decrease the 
+\item{temperature.decrease}{Numeric value between 0 and 1 used as a multiplying factor to decrease the
 temperature at the end of each Markov chain. Defaults to \code{temperature.decrease = 0.95}.}
 
-\item{chains}{Integer value defining the maximum number of chains, i.e. the number of cycles of jitters at 
-which the temperature and the size of the neighbourhood should be kept constant. Defaults to 
+\item{chains}{Integer value defining the maximum number of chains, i.e. the number of cycles of jitters at
+which the temperature and the size of the neighbourhood should be kept constant. Defaults to
 \code{chains = 500}.}
 
-\item{chain.length}{Integer value defining the length of each Markov chain relative to the number of 
+\item{chain.length}{Integer value defining the length of each Markov chain relative to the number of
 sample points. Defaults to \code{chain.length = 1}, i.e. one time the number of sample points.}
 
-\item{stopping}{Integer value defining the maximum allowable number of Markov chains without improvement of 
+\item{stopping}{Integer value defining the maximum allowable number of Markov chains without improvement of
 the objective function value. Defaults to \code{stopping = 10}.}
 
-\item{x.max, x.min, y.max, y.min}{Numeric value defining the minimum and maximum quantity of random noise to 
-be added to the projected x- and y-coordinates. The units are the same as of the projected x- and 
-y-coordinates. If missing, they are estimated from \code{candi}, \code{x.min} and \code{y.min} being set 
-to zero, and \code{x.max} and \code{y.max} being set to half the maximum distance in the x- and 
+\item{x.max, x.min, y.max, y.min}{Numeric value defining the minimum and maximum quantity of random noise to
+be added to the projected x- and y-coordinates. The units are the same as of the projected x- and
+y-coordinates. If missing, they are estimated from \code{candi}, \code{x.min} and \code{y.min} being set
+to zero, and \code{x.max} and \code{y.max} being set to half the maximum distance in the x- and
 y-coordinates, respectively.}
 
-\item{cellsize}{Vector with two numeric values defining the horizontal (x) and vertical (y) spacing 
-between the candidate locations in \code{candi}. A single value can be used if the spacing in the x- and 
+\item{cellsize}{Vector with two numeric values defining the horizontal (x) and vertical (y) spacing
+between the candidate locations in \code{candi}. A single value can be used if the spacing in the x- and
 y-coordinates is the same.}
 }
 \value{
@@ -52,25 +52,25 @@ Set the control parameters for the annealing schedule of \pkg{spsann} functions.
 schedule <- scheduleSPSANN()
 }
 \references{
-Aarts, E. H. L.; Korst, J. H. M. Boltzmann machines for travelling salesman problems. \emph{European 
+Aarts, E. H. L.; Korst, J. H. M. Boltzmann machines for travelling salesman problems. \emph{European
 Journal of Operational Research}, v. 39, p. 79-95, 1989.
 
 Černý, V. Thermodynamical approach to the travelling salesman problem: an efficient simulation algorithm.
 \emph{Journal of Optimization Theory and Applications}, v. 45, p. 41-51, 1985.
 
-Brus, D. J.; Heuvelink, G. B. M. Optimization of sample patterns for universal kriging of environmental 
+Brus, D. J.; Heuvelink, G. B. M. Optimization of sample patterns for universal kriging of environmental
 variables. \emph{Geoderma}, v. 138, p. 86-95, 2007.
 
 Kirkpatrick, S.; Gelatt, C. D.; Vecchi, M. P. Optimization by simulated annealing. \emph{Science}, v. 220,
 p. 671-680, 1983.
 
-Metropolis, N.; Rosenbluth, A. W.; Rosenbluth, M. N.; Teller, A. H.; Teller, E. Equation of state 
+Metropolis, N.; Rosenbluth, A. W.; Rosenbluth, M. N.; Teller, A. H.; Teller, E. Equation of state
 calculations by fast computing machines. \emph{The Journal of Chemical Physics}, v. 21, p. 1087-1092, 1953.
 
-van Groenigen, J.-W.; Stein, A. Constrained optimization of spatial sampling using continuous 
+van Groenigen, J.-W.; Stein, A. Constrained optimization of spatial sampling using continuous
 simulated annealing. \emph{Journal of Environmental Quality}. v. 27, p. 1078-1086, 1998.
 
-Webster, R.; Lark, R. M. \emph{Field sampling for environmental science and management}. London: 
+Webster, R.; Lark, R. M. \emph{Field sampling for environmental science and management}. London:
 Routledge, p. 200, 2013.
 }
 \seealso{

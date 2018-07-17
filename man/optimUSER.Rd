@@ -29,8 +29,8 @@ configuration -- free to move during the optimization.
 have two columns in the following order: \code{[, "x"]}, the projected x-coordinates, and \code{[, "y"]}, 
 the projected y-coordinates.}
 
-\item{fun}{A function defining the objective function that should be used to evaluate the energy state of 
-the system configuration at each random perturbation of a candidate sample point. See \sQuote{Details} for 
+\item{fun}{A function defining the objective function that should be used to evaluate the energy state of
+the system configuration at each random perturbation of a candidate sample point. See \sQuote{Details} for
 more information.}
 
 \item{...}{Other arguments passed to the objective function. See \sQuote{Details} for more information.}
@@ -67,11 +67,11 @@ configuration with details about the optimization.
 Optimize a sample configuration using a user-defined objective function.
 }
 \details{
-The user-defined objective function \code{fun} must be an object of class \code{\link[base]{function}} and 
-include the argument \code{points}. The argument \code{points} is defined in \code{optimUSER} as a matrix 
-with three columns: \code{[, 1]} the identification of each sample point given by the respective row 
-indexes of \code{candi}, \code{[, 2]} the x-coordinates, and \code{[, 3]} the y-coordinates. The 
-identification is useful to retrieve information from any data matrix used by the objective function 
+The user-defined objective function \code{fun} must be an object of class \code{\link[base]{function}} and
+include the argument \code{points}. The argument \code{points} is defined in \code{optimUSER} as a matrix
+with three columns: \code{[, 1]} the identification of each sample point given by the respective row
+indexes of \code{candi}, \code{[, 2]} the x-coordinates, and \code{[, 3]} the y-coordinates. The
+identification is useful to retrieve information from any data matrix used by the objective function
 defined by the user.
 }
 \examples{

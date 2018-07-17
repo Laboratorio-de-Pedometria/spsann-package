@@ -47,6 +47,7 @@ lapply(1:length(fun.name), function (i) autofun::autofun(fun.name[i], read.file[
 rm(fun.name, read.file, write.file)
 
 # check examples and documentation
+# Rcpp::compileAttributes()
 devtools::check_man()
 devtools::run_examples(run = FALSE)
 

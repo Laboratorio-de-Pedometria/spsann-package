@@ -83,21 +83,21 @@ configuration by randomly perturbing the coordinates of a sample point are avail
 \code{\link[spsann]{spJitter}}.
 
 \subsection{Association/Correlation between covariates}{
-The \emph{correlation} between two numeric covariates is measured using the Pearson's \emph{r}, a 
-descriptive statistic that ranges from \eqn{-1} to \eqn{+1}. This statistic is also known as the linear 
+The \emph{correlation} between two numeric covariates is measured using the Pearson's \emph{r}, a
+descriptive statistic that ranges from \eqn{-1} to \eqn{+1}. This statistic is also known as the linear
 correlation coefficient.
 
-When the set of covariates includes factor covariates, all numeric covariates are transformed into factor 
-covariates. The factor levels are defined using the marginal sampling strata created from one of the two 
+When the set of covariates includes factor covariates, all numeric covariates are transformed into factor
+covariates. The factor levels are defined using the marginal sampling strata created from one of the two
 methods available (equal-area or equal-range strata).
 
-The \emph{association} between two factor covariates is measured using the Cramér's \emph{V}, a descriptive 
-statistic that ranges from \eqn{0} to \eqn{+1}. The closer to \eqn{+1} the Cramér's \emph{V} is, the 
+The \emph{association} between two factor covariates is measured using the Cramér's \emph{V}, a descriptive
+statistic that ranges from \eqn{0} to \eqn{+1}. The closer to \eqn{+1} the Cramér's \emph{V} is, the
 stronger the association between two factor covariates.
 
-The main weakness of using the Cramér's \emph{V} is that, while the Pearson's \emph{r} shows the degree 
+The main weakness of using the Cramér's \emph{V} is that, while the Pearson's \emph{r} shows the degree
 and direction of the association between two covariates (negative or positive), the Cramér's \emph{V} only
-measures the degree of association (weak or strong). The effect of replacing the Pearson's \emph{r} with 
+measures the degree of association (weak or strong). The effect of replacing the Pearson's \emph{r} with
 the Cramér's \emph{V} on the spatial modelling outcome still is poorly understood.
 }
 }

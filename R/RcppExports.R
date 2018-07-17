@@ -2,18 +2,18 @@
 # Generator token: 10BE3573-1514-4C36-9D1C-5A225CD40393
 
 .objMSSD <- function(x) {
-    .Call('spsann_objMSSDCpp', PACKAGE = 'spsann', x)
+    .Call('_spsann_objMSSDCpp', PACKAGE = 'spsann', x)
 }
 
 .spJitterCpp <- function(x, y, xmax, xmin, ymax, ymin, idx) {
-    .Call('spsann_spJitterCpp', PACKAGE = 'spsann', x, y, xmax, xmin, ymax, ymin, idx)
+    .Call('_spsann_spJitterCpp', PACKAGE = 'spsann', x, y, xmax, xmin, ymax, ymin, idx)
 }
 
 .updateMSSDCpp <- function(x1, x2, dm, idx) {
-    .Call('spsann_updateMSSDCpp', PACKAGE = 'spsann', x1, x2, dm, idx)
+    .Call('_spsann_updateMSSDCpp', PACKAGE = 'spsann', x1, x2, dm, idx)
 }
 
 .updatePPLCpp <- function(x, dm, idx) {
-    .Call('spsann_updatePPLCpp', PACKAGE = 'spsann', x, dm, idx)
+    .Call('_spsann_updatePPLCpp', PACKAGE = 'spsann', x, dm, idx)
 }
 

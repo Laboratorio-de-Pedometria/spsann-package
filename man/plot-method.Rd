@@ -8,10 +8,10 @@
 \method{plot}{OptimizedSampleConfiguration}(x, which = 1:2, boundary, ...)
 }
 \arguments{
-\item{x}{Object of class \code{OptimizedSampleConfiguration} returned by one of the 
+\item{x}{Object of class \code{OptimizedSampleConfiguration} returned by one of the
 \code{optim}-functions.}
 
-\item{which}{Which plot should be produced: evolution of the energy state (1), optimized sample 
+\item{which}{Which plot should be produced: evolution of the energy state (1), optimized sample
 configuration (2), or both (1:2)? Defaults to \code{which = 1:2}.}
 
 \item{boundary}{Object of class \code{Spatial} defining the boundary of the sampling region.}

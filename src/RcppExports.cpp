@@ -7,7 +7,7 @@ using namespace Rcpp;
 
 // objMSSDCpp
 double objMSSDCpp(NumericMatrix x);
-RcppExport SEXP spsann_objMSSDCpp(SEXP xSEXP) {
+RcppExport SEXP _spsann_objMSSDCpp(SEXP xSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -18,7 +18,7 @@ END_RCPP
 }
 // spJitterCpp
 IntegerVector spJitterCpp(NumericMatrix x, NumericMatrix y, double xmax, double xmin, double ymax, double ymin, int idx);
-RcppExport SEXP spsann_spJitterCpp(SEXP xSEXP, SEXP ySEXP, SEXP xmaxSEXP, SEXP xminSEXP, SEXP ymaxSEXP, SEXP yminSEXP, SEXP idxSEXP) {
+RcppExport SEXP _spsann_spJitterCpp(SEXP xSEXP, SEXP ySEXP, SEXP xmaxSEXP, SEXP xminSEXP, SEXP ymaxSEXP, SEXP yminSEXP, SEXP idxSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -35,7 +35,7 @@ END_RCPP
 }
 // updateMSSDCpp
 NumericMatrix updateMSSDCpp(NumericMatrix x1, NumericMatrix x2, NumericMatrix dm, int idx);
-RcppExport SEXP spsann_updateMSSDCpp(SEXP x1SEXP, SEXP x2SEXP, SEXP dmSEXP, SEXP idxSEXP) {
+RcppExport SEXP _spsann_updateMSSDCpp(SEXP x1SEXP, SEXP x2SEXP, SEXP dmSEXP, SEXP idxSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -49,7 +49,7 @@ END_RCPP
 }
 // updatePPLCpp
 NumericMatrix updatePPLCpp(NumericMatrix x, NumericMatrix dm, int idx);
-RcppExport SEXP spsann_updatePPLCpp(SEXP xSEXP, SEXP dmSEXP, SEXP idxSEXP) {
+RcppExport SEXP _spsann_updatePPLCpp(SEXP xSEXP, SEXP dmSEXP, SEXP idxSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -62,10 +62,10 @@ END_RCPP
 }
 
 static const R_CallMethodDef CallEntries[] = {
-    {"spsann_objMSSDCpp", (DL_FUNC) &spsann_objMSSDCpp, 1},
-    {"spsann_spJitterCpp", (DL_FUNC) &spsann_spJitterCpp, 7},
-    {"spsann_updateMSSDCpp", (DL_FUNC) &spsann_updateMSSDCpp, 4},
-    {"spsann_updatePPLCpp", (DL_FUNC) &spsann_updatePPLCpp, 3},
+    {"_spsann_objMSSDCpp", (DL_FUNC) &_spsann_objMSSDCpp, 1},
+    {"_spsann_spJitterCpp", (DL_FUNC) &_spsann_spJitterCpp, 7},
+    {"_spsann_updateMSSDCpp", (DL_FUNC) &_spsann_updateMSSDCpp, 4},
+    {"_spsann_updatePPLCpp", (DL_FUNC) &_spsann_updatePPLCpp, 3},
     {NULL, NULL, 0}
 };
 

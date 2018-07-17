@@ -93,9 +93,9 @@ configuration with details about the optimization.
 function value.
 }
 \description{
-Optimize a sample configuration for spatial trend identification and estimation. An utility function 
-\emph{U} is defined so that the sample reproduces the bivariate association/correlation between the 
-covariates, as well as their marginal distribution (\bold{ACDC}). The utility function is obtained 
+Optimize a sample configuration for spatial trend identification and estimation. An utility function
+\emph{U} is defined so that the sample reproduces the bivariate association/correlation between the
+covariates, as well as their marginal distribution (\bold{ACDC}). The utility function is obtained
 aggregating two objective functions: \bold{CORR} and \bold{DIST}.
 }
 \details{
@@ -107,7 +107,7 @@ Details about the mechanism used to generate a new sample configuration out of t
 configuration by randomly perturbing the coordinates of a sample point are available in the help page of
 \code{\link[spsann]{spJitter}}.
 
-Visit the help pages of \code{\link[spsann]{optimCORR}} and \code{\link[spsann]{optimDIST}} to see the 
+Visit the help pages of \code{\link[spsann]{optimCORR}} and \code{\link[spsann]{optimDIST}} to see the
 details of the objective functions that compose \bold{ACDC}.
 }
 \note{
@@ -117,8 +117,8 @@ the sample points and candidate locations should not be provided as latitude/lon
 mechanism to check if the coordinates are projected: the user is responsible for making sure that this
 requirement is attained.
 
-This function was derived with modifications from the method known as the \emph{conditioned Latin Hypercube 
-sampling} originally proposed by Minasny and McBratney (2006), and implemented in the R-package 
+This function was derived with modifications from the method known as the \emph{conditioned Latin Hypercube
+sampling} originally proposed by Minasny and McBratney (2006), and implemented in the R-package
 \pkg{\link[clhs]{clhs}} by Pierre Roudier.
 }
 \examples{
@@ -139,7 +139,7 @@ objSPSANN(res) - objACDC(
   use.coords = TRUE, nadir = nadir, utopia = utopia)
 }
 \references{
-Minasny, B.; McBratney, A. B. A conditioned Latin hypercube method for sampling in the presence of 
+Minasny, B.; McBratney, A. B. A conditioned Latin hypercube method for sampling in the presence of
 ancillary information. \emph{Computers & Geosciences}, v. 32, p. 1378-1388, 2006.
 
 Minasny, B.; McBratney, A. B. Conditioned Latin Hypercube Sampling for calibrating soil sensor data to soil
