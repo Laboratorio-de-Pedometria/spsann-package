@@ -408,18 +408,37 @@ objCLHS <-
 # sm: sample matrix
 # id_num: columns of sm containing numeric covariates
 # pcm: population correlation matrix
+# clhs.version: CLHS version
 .objO3 <-
-  function (sm, id_num, pcm) {
-    
-    # Scaling factor
-    n <- length(id_num)
-    n <- n * n / 2 + n
+  function (sm, id_num, pcm, clhs.version) {
     
     # Calculate sample correlation matrix
     scm <- stats::cor(x = sm[, id_num], use = "complete.obs")
     
+    out <- switch (clhs.version,
+      paper = {
+        # Minasny and McBratney (2006)
+        sum(abs(pcm - scm))
+      },
+      fortran = {
+        # The late FORTRAN code of Budiman Minasny -- ca. 2015 -- implements scaling factors so that values
+        # are "more" comparable among objective functions. For O3, the scaling factor is defined as 
+        # n * n / 2 + n. The rationale for this scaling factor is not clear.
+        n <- length(id_num)
+        n <- n * n / 2 + n
+        sum(abs(pcm - scm)) / n
+      },
+      update = {
+        # Dick Brus (Jul 2018) proposes to compute O3 as the mean of the off diagonal elements of the matrix
+        # of absolute differences between sample and population correlation matrices. Defined in this 
+        # alternative way, O3 should be fully comparable with O1 and O2.
+        r_diff <- abs(pcm - scm)
+        mean(r_diff[row(r_diff) != col(r_diff)])
+      })
+    
     # Output
-    return (sum(abs(pcm - scm)) / n)
+    # return(sum(abs(pcm - scm)) / n)
+    return(out)
   }
 # INTERNAL FUNCTION - PREPARE OBJECT TO STORE THE BEST ENERGY STATE ###########################################
 .bestEnergyCLHS <-
