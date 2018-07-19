@@ -1,5 +1,8 @@
+# Version 2.1.0.9003 (2018-07-19)
+* Implements modifications (alternatives) to the way how `optimCLHS` computes objective function values.
+
 # Version 2.1.0.9002 (2018-07-18)
-* Implements modifications to `optimCLHS`.
+* Implements modifications (alternatives) to the way how `optimCLHS` computes objective function values.
 
 # Version 2.1.0.9001 (2018-07-17)
 * Updates package documentation.
@@ -7,7 +10,7 @@
 # Version 2.1.0.9000 (2018-07-16)
 * Adds new badges to README.md: package version and project status.
 * Adds details and improves DESCRIPTION file; authors are reordered based on contributions.
-* Implements modifications to `optimCLHS`.
+* Implements modifications (alternatives) to the way how `optimCLHS` computes objective function values.
 
 # Version 2.1-0 (2017-06-23)
 Now ***spsann*** can be used to augment an existing sample configuration, that is, add new sampling points

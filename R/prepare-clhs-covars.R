@@ -21,7 +21,8 @@ expression(if (use.coords) { covars <- data.frame(covars, candi[, 2:3]) },
       breaks <- lapply(covars[, id_num], stats::quantile, probs, na.rm = TRUE)
       pcm <- stats::cor(x = covars[, id_num], use = "complete.obs")
     }, if (any(covars_type == c("factor", "both"))) {
-      pop_prop <- lapply(covars[, id_fac], function(x) table(x) / n_candi)
+      # pop_prop <- lapply(covars[, id_fac], function(x) table(x) / n_candi)
+      pop_count <- lapply(covars[, id_fac], function(x) table(x))
     })
 }
 

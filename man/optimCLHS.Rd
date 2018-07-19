@@ -41,11 +41,12 @@ the projected y-coordinates.}
 \item{use.coords}{(Optional) Logical value. Should the spatial x- and y-coordinates be used as covariates? 
 Defaults to \code{use.coords = FALSE}.}
 
-\item{clhs.version}{(Optional) Character value setting the CLHS version that should be used when computing
-objective function values. Available options are \code{"paper"}, for using the formulations of \strong{O1}, \strong{O2},
-and \strong{O3} as presented in the original paper by Minasny and McBratney (2006), \code{"fortran"}, for using
-scaling factors for \strong{O1} and \strong{O3} as implemented in the late FORTRAN code by Budiman Minasny (ca. 2015),
-and \code{"update"}, to use the modifications proposed by Dick Brus in July 2018.}
+\item{clhs.version}{(Optional) Character value setting the CLHS version that should be used. Available
+options are: \code{"paper"}, for the formulations of \strong{O1}, \strong{O2}, and \strong{O3} as presented in the original
+paper by Minasny and McBratney (2006); \code{"fortran"}, for the formulations of \strong{O1} and \strong{O3} that include
+a scaling factor as implemented in the late Fortran code by Budiman Minasny (ca. 2015); and \code{"update"}, for
+formulations of \strong{O1}, \strong{O2}, and \strong{O3} that include the modifications proposed the authors of this
+package in 2018 (see below). Defaults to \code{clhs.version = "paper"}.}
 
 \item{schedule}{List with 11 named sub-arguments defining the control parameters of the cooling schedule. 
 See \code{\link[spsann]{scheduleSPSANN}}.}
@@ -77,18 +78,18 @@ objective function to which they apply. The weights must be equal to or larger t
 default option gives equal weights to all objective functions.}
 }
 \value{
-\code{optimCLHS} returns an object of class \code{OptimizedSampleConfiguration}: the optimized sample
-configuration with details about the optimization.
+\code{optimCLHS} returns an object of class \code{OptimizedSampleConfiguration}: the optimized sample configuration
+with details about the optimization.
 
-\code{objCLHS} returns a numeric value: the energy state of the sample configuration -- the objective
-function value.
+\code{objCLHS} returns a numeric value: the energy state of the sample configuration -- the objective function
+value.
 }
 \description{
 Optimize a sample configuration for spatial trend identification and estimation using the method proposed
 by Minasny and McBratney (2006), known as the conditioned Latin hypercube sampling. An utility function
 \emph{U} is defined so that the sample reproduces the marginal distribution and correlation matrix of the
-numeric covariates, and the class proportions of the factor covariates (\bold{CLHS}). The utility function
-is obtained aggregating three objective functions: \bold{O1}, \bold{O2}, and \bold{O3}.
+numeric covariates, and the class proportions of the factor covariates (\strong{CLHS}). The utility function
+is obtained aggregating three objective functions: \strong{O1}, \strong{O2}, and \strong{O3}.
 }
 \details{
 Details about the mechanism used to generate a new sample configuration out of the current sample 
@@ -96,45 +97,49 @@ configuration by randomly perturbing the coordinates of a sample point are avail
 \code{\link[spsann]{spJitter}}.
 
 \subsection{Marginal sampling strata}{
-#' Reproducing the marginal distribution of the numeric covariates depends upon the definition of marginal
-sampling strata. \emph{Equal-area} marginal sampling strata are defined using the sample quantiles
-estimated with \code{\link[stats]{quantile}} using a continuous function (\code{type = 7}), that is, a
-function that interpolates between existing covariate values to estimate the sample quantiles. This is
-the procedure implemented in the method of Minasny and McBratney (2006), which creates breakpoints that do
-not occur in the population of existing covariate values. Depending on the level of discretization of the
+Reproducing the marginal distribution of the numeric covariates depends upon the definition of marginal
+sampling strata. \emph{Equal-area} marginal sampling strata are defined using the sample quantiles estimated
+with \code{\link[stats]{quantile}} using a continuous function (\code{type = 7}), that is, a function that
+interpolates between existing covariate values to estimate the sample quantiles. This is the procedure
+implemented in the original method of Minasny and McBratney (2006), which creates breakpoints that do not
+occur in the population of existing covariate values. Depending on the level of discretization of the
 covariate values, that is, how many significant digits they have, this can create repeated breakpoints,
 resulting in empty marginal sampling strata. The number of empty marginal sampling strata will ultimately
 depend on the frequency distribution of the covariate and on the number of sampling points. The effect of
 these features on the spatial modelling outcome still is poorly understood.
 }
 \subsection{Correlation between numeric covariates}{
-The \emph{correlation} between two numeric covariates is measured using the sample Pearson's \emph{r}, a
-descriptive statistic that ranges from $-1$ to $+1$. This statistic is also known as the sample linear
-correlation coefficient. The effect of ignoring the correlation among factor covariates and between
-factor and numeric covariates on the spatial modelling outcome still is poorly understood.
+The \emph{correlation} between two numeric covariates is measured using the sample Pearson's \emph{r}, a descriptive
+statistic that ranges from -1 to +1. This statistic is also known as the sample linear correlation
+coefficient. The effect of ignoring the correlation among factor covariates and between factor and numeric
+covariates on the spatial modelling outcome still is poorly understood.
 }
 \subsection{Multi-objective combinatorial optimization}{
 A method of solving a multi-objective combinatorial optimization problem (MOCOP) is to aggregate the
-objective functions into a single utility function \emph{U}. In the \pkg{spsann} package, as in the
-original implementation of the CLHS by Minasny and McBratney (2006), the aggregation is performed using
-the \emph{weighted sum method}, which uses weights to incorporate the preferences of the user about the
-relative importance of each objective function. When the user has no preference, the objective functions
+objective functions into a single utility function \emph{U}. In the \strong{spsann} package, as in the original
+implementation of the CLHS by Minasny and McBratney (2006), the aggregation is performed using the
+\strong{weighted sum method}, which uses weights to incorporate the \strong{a priori} preferences of the user about
+the relative importance of each objective function. When the user has no preference, the objective functions
 receive equal weights.
 
 The weighted sum method is affected by the relative magnitude of the different objective function values.
 The objective functions implemented in \code{optimCLHS} have different units and orders of magnitude. The
-consequence is that the objective function with the largest values, generally \bold{O1}, may have a
-numerical dominance during the optimization. In other words, the weights may not express the true
-preferences of the user, resulting that the meaning of the utility function becomes unclear because the
-optimization will favour the objective function which is numerically dominant.
+consequence is that the objective function with the largest values, generally \strong{O1}, may have a numerical
+dominance during the optimization. In other words, the weights may not express the true preferences of the
+user, resulting that the meaning of the utility function becomes unclear because the optimization will
+likely favour the objective function which is numerically dominant.
 
 An efficient solution to avoid numerical dominance is to scale the objective functions so that they are
-constrained to the same approximate range of values, at least in the end of the optimization. However, as
-in the original implementation of the CLHS by Minasny and McBratney (2006), \code{optimCLHS} uses the
-naive aggregation method, which ignores that the three objective functions have different units and orders
-of magnitude. The same aggregation procedure is implemented in the \pkg{clhs} package. The effect of
-ignoring the need to scale the objective functions on the spatial modelling outcome still is poorly
-understood.
+constrained to the same approximate range of values, at least in the end of the optimization. In the
+original implementation of the CLHS by Minasny and McBratney (2006), \code{clhs.version = "paper"}, \code{optimCLHS}
+uses the naive aggregation method, which ignores that the three objective functions have different units
+and orders of magnitude. In a 2015 Fortran implementation of the CLHS, \code{clhs.version = "fortran"}, scaling
+factors were included to make the values of the three objective function more comparable. The effect of
+ignoring the need to scale the objective functions, or using arbitrary scaling factors, on the spatial
+modelling outcome still is poorly understood. Thus, an updated version of \strong{O1}, \strong{O2}, and \strong{O3} has
+been implemented in the \strong{spsann} package. The need formulation aim at making the values returned by the
+objective functions more comparable among themselves without having to resort to arbitrary scaling factors.
+The effect of using these new formulations have not been tested yet.
 }
 }
 \note{
@@ -144,9 +149,9 @@ the sample points and candidate locations should not be provided as latitude/lon
 mechanism to check if the coordinates are projected: the user is responsible for making sure that this
 requirement is attained.
 
-The (only) difference of \code{optimCLHS} to the original Fortran implementation of Minasny and McBratney
-(2006), and to the \code{clhs} function implemented in the \pkg{\link[clhs]{clhs}} package by
-Pierre Roudier, is the annealing schedule.
+The (only?) difference of \code{optimCLHS} to the original Fortran implementation of Minasny and McBratney
+(2006), and to the \code{clhs} function implemented in the \pkg{\link[clhs]{clhs}} package by Pierre Roudier, is
+the annealing schedule.
 }
 \examples{
 data(meuse.grid, package = "sp")
@@ -154,23 +159,19 @@ candi <- meuse.grid[1:1000, 1:2]
 covars <- meuse.grid[1:1000, 5]
 weights <- list(O1 = 0.5, O3 = 0.5)
 schedule <- scheduleSPSANN(
-  chains = 1, initial.temperature = 20, x.max = 1540, y.max = 2060, 
-  x.min = 0, y.min = 0, cellsize = 40)
+  chains = 1, initial.temperature = 20, x.max = 1540, y.max = 2060, x.min = 0, y.min = 0, cellsize = 40)
 set.seed(2001)
 res <- optimCLHS(
-  points = 10, candi = candi, covars = covars, use.coords = TRUE, 
-  weights = weights, schedule = schedule)
-objSPSANN(res) - objCLHS(
-  points = res, candi = candi, covars = covars, use.coords = TRUE, 
-  weights = weights)
+  points = 10, candi = candi, covars = covars, use.coords = TRUE, weights = weights, schedule = schedule)
+objSPSANN(res) - objCLHS(points = res, candi = candi, covars = covars, use.coords = TRUE, weights = weights)
 }
 \references{
 Minasny, B.; McBratney, A. B. A conditioned Latin hypercube method for sampling in the presence of
 ancillary information. \emph{Computers & Geosciences}, v. 32, p. 1378-1388, 2006.
 
 Minasny, B.; McBratney, A. B. Conditioned Latin Hypercube Sampling for calibrating soil sensor data to
-soil properties. Chapter 9. Viscarra Rossel, R. A.; McBratney, A. B.; Minasny, B. (Eds.) \emph{Proximal
-Soil Sensing}. Amsterdam: Springer, p. 111-119, 2010.
+soil properties. Chapter 9. Viscarra Rossel, R. A.; McBratney, A. B.; Minasny, B. (Eds.) \emph{Proximal Soil
+Sensing}. Amsterdam: Springer, p. 111-119, 2010.
 
 Roudier, P.; Beaudette, D.; Hewitt, A. A conditioned Latin hypercube sampling algorithm incorporating
 operational constraints. \emph{5th Global Workshop on Digital Soil Mapping}. Sydney, p. 227-231, 2012.

@@ -139,11 +139,12 @@ optimCLHS <-
     
     # Identify CLHS version
     clhs.version <- match.arg(clhs.version)
-    
+
     # Compute initial energy state
     energy0 <- .objCLHS(
       sm = sm, breaks = breaks, id_num = id_num, pcm = pcm, id_fac = id_fac, n_pts = n_pts + n_fixed_pts, 
-      pop_prop = pop_prop, weights = weights, covars_type = covars_type, clhs.version = clhs.version)
+      pop_count = pop_count, n_candi = n_candi, weights = weights, covars_type = covars_type, 
+      clhs.version = clhs.version)
     
     # Other settings for the simulated annealing algorithm
     old_sm <- sm
@@ -173,7 +174,8 @@ optimCLHS <-
           new_sm[wp, ] <- covars[new_conf[wp, 1], ]
           new_energy <- .objCLHS(
             sm = new_sm, breaks = breaks, id_num = id_num, pcm = pcm, id_fac = id_fac, 
-            n_pts = n_pts + n_fixed_pts, pop_prop = pop_prop, weights = weights, covars_type = covars_type)
+            n_pts = n_pts + n_fixed_pts, pop_count = pop_count, n_candi = n_candi, weights = weights, 
+            covars_type = covars_type, clhs.version = clhs.version)
           
           # Evaluate the new system configuration
           accept <- .acceptSPSANN(old_energy[[1]], new_energy[[1]], actual_temp)
@@ -270,7 +272,7 @@ optimCLHS <-
 # This function is used to calculate the criterion value of CLHS.
 # Aggregation is done using the weighted sum method.
 .objCLHS <-
-  function (sm, breaks, id_num, pcm, id_fac, n_pts, pop_prop, weights, covars_type, clhs.version) {
+  function (sm, breaks, id_num, pcm, id_fac, n_pts, pop_count, n_candi, weights, covars_type, clhs.version) {
     
     # Objective functions
     if (any(covars_type == c("numeric", "both"))) {
@@ -318,8 +320,8 @@ objCLHS <-
     
     # Output energy state
     out <- .objCLHS(
-      sm = sm, breaks = breaks, id_num = id_num, pcm = pcm, id_fac = id_fac, n_pts = n_pts,
-      pop_prop = pop_prop, weights = weights, covars_type = covars_type, clhs.version = clhs.version)
+      sm = sm, breaks = breaks, id_num = id_num, pcm = pcm, id_fac = id_fac, n_pts = n_pts, n_candi = n_candi,
+      pop_count = pop_count, weights = weights, covars_type = covars_type, clhs.version = clhs.version)
     return(out)
   }
 # INTERNAL FUNCTION - CALCULATE THE CRITERION VALUE (O1) ######################################################
