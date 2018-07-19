@@ -279,7 +279,9 @@ optimCLHS <-
     }
     if (any(covars_type == c("factor", "both"))) {
       obj_O2 <- weights$O2 * 
-        .objO2(sm = sm, id_fac = id_fac, n_pts = n_pts, pop_prop = pop_prop, clhs.version = clhs.version)
+        # .objO2(sm = sm, id_fac = id_fac, n_pts = n_pts, pop_prop = pop_prop, clhs.version = clhs.version)
+        .objO2(sm = sm, id_fac = id_fac, n_pts = n_pts, pop_count = pop_count, n_candi = n_candi, 
+               clhs.version = clhs.version)
     }
     
     # Output
@@ -328,9 +330,6 @@ objCLHS <-
 .objO1 <- 
   function (sm, breaks, id_num, clhs.version) {
     
-    # Compute objective function value based on CLHS version
-    # clhs.version <- match.arg(clhs.version)
-    
     # Count the number of points per marginal sampling strata
     sm_count <- sapply(1:length(id_num), function (i) 
       graphics::hist(sm[id_num][, i], breaks[[i]], plot = FALSE)$counts)
@@ -362,12 +361,15 @@ objCLHS <-
 # sm: sample matrix
 # n_pts: number of points
 # id_fac: columns of sm containing factor covariates
-# pop_prop: population class proportions
+# pop_prop: population class proportions (DEPRECATED)
+# pop_count: population class counts
+# n_candi: number of candidate locations (population)
 # clhs.version: CLHS version
 .objO2 <-
-  function (sm, id_fac, n_pts, pop_prop, clhs.version) {
+  # function (sm, id_fac, n_pts, pop_prop, clhs.version) {
+  function (sm, id_fac, n_pts, pop_count, n_candi, clhs.version) {
     
-    # Count the number of points per marginal sampling strata
+    # Count the number of sample points per class
     sm_count <- lapply(sm[, id_fac], function(x) table(x))
     
     # Compute the sample proportions (DEPRECATED)
@@ -381,24 +383,21 @@ objCLHS <-
       paper = {
         # Minasny and McBratney (2006)
         sm_prop <- lapply(sm_count, function (x) x / n_pts)
-        # pop_prop <- ...
-        sm_prop <- sapply(1:length(id_fac), function (i)
-          sum(abs(sm_prop[[i]] - pop_prop[[i]])))
-        sum(sm_prop)
+        pop_prop <- lapply(pop_count, function (x) x / n_candi)
+        sum(sapply(1:length(id_fac), function (i) sum(abs(sm_prop[[i]] - pop_prop[[i]]))))
       },
       fortran = {
         # Minasny and McBratney (2006)
         sm_prop <- lapply(sm_count, function (x) x / n_pts)
-        # pop_prop <- ...
-        sm_prop <- sapply(1:length(id_fac), function (i)
-          sum(abs(sm_prop[[i]] - pop_prop[[i]])))
-        sum(sm_prop)
+        pop_prop <- lapply(pop_count, function (x) x / n_candi)
+        sum(sapply(1:length(id_fac), function (i) sum(abs(sm_prop[[i]] - pop_prop[[i]]))))
       }, 
       update = {
         # Dick Brus (Jul 2018) proposes to compute O2 as the mean of the absolute deviations of marginal
         # stratum sample sizes, defined just like O1 in terms of sample sizes. Defined in this alternative 
         # way O1 and O2 should be fully comparable.
         # mean(abs(n_realized - n_populational)
+        mean(sapply(1:length(id_fac), function (i) abs(pop_count[[i]] - pop_count[[i]])))
       })
     
     # Output

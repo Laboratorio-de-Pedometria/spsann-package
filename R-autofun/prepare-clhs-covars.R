@@ -50,5 +50,6 @@ if (any(covars_type == c("numeric", "both"))) {
 
 # Proportion of population points per marginal factor level
 if (any(covars_type == c("factor", "both"))) {
-  pop_prop <- lapply(covars[, id_fac], function(x) table(x) / n_candi)
+  # pop_prop <- lapply(covars[, id_fac], function(x) table(x) / n_candi)
+  pop_count <- lapply(covars[, id_fac], function(x) table(x))
 }
