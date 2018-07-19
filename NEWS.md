@@ -1,3 +1,6 @@
+# Version 2.1.0.9002 (2018-07-18)
+* Implements modifications to `optimCLHS`.
+
 # Version 2.1.0.9001 (2018-07-17)
 * Updates package documentation.
 
