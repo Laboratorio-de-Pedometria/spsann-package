@@ -3,6 +3,9 @@
   set the weights as to guarantee that s/he is aware of what s/he is doing.
 * Corrects bug related to the naming convetions used with `data.frame`s that store objective function
   values.
+* Allow using a finite set of candidate locations for jittering sample points by setting `cellsize = 0`. When
+  this is done, __spsann__ now checks for neighbouring candidate locations already included in the sample as to
+  avoid duplicated sampling points.
 
 # Version 2.1.0.9003 (2018-07-19)
 * Implements modifications (alternatives) to the way how `optimCLHS` computes objective function values.

@@ -17,7 +17,8 @@
 #' 
 #' @param cellsize Vector with two numeric values defining the horizontal (x) and vertical (y) spacing 
 #' between the candidate locations in \code{candi}. A single value can be used if the spacing in the x- and 
-#' y-coordinates is the same.
+#' y-coordinates is the same. If \code{cellsize = 0} then \pkg{spsann} understands that a finite set of
+#' candidate locations is being used (See Details).
 #' 
 #' @param which.point Integer values defining which point should be perturbed. 
 #' 
@@ -93,46 +94,73 @@
 #' pts1 <- sample(c(1:dim(meuse.grid)[1]), 155)
 #' pts2 <- meuse.grid[pts1, ]
 #' pts3 <- spJitter(points = pts2, candi = meuse.grid, x.min = 40,
-#'                  x.max = 100, y.min = 40, y.max = 100, 
+#'                  x.max = 100, y.min = 40, y.max = 100,
 #'                  which.point = 10, cellsize = 40)
 #' plot(meuse.grid[, 2:3], asp = 1, pch = 15, col = "gray")
 #' points(pts2[, 2:3], col = "red", cex = 0.5)
 #' points(pts3[, 2:3], pch = 19, col = "blue", cex = 0.5)
 #' 
-#' # Cluster of points
+#' #' Cluster of points
 #' pts1 <- c(1:55)
 #' pts2 <- meuse.grid[pts1, ]
 #' pts3 <- spJitter(points = pts2, candi = meuse.grid, x.min = 40,
-#'                 x.max = 80, y.min = 40, y.max = 80, 
+#'                 x.max = 80, y.min = 40, y.max = 80,
 #'                 which.point = 1, cellsize = 40)
 #' plot(meuse.grid[, 2:3], asp = 1, pch = 15, col = "gray")
 #' points(pts2[, 2:3], col = "red", cex = 0.5)
 #' points(pts3[, 2:3], pch = 19, col = "blue", cex = 0.5)
-# FUNCTION #####################################################################
+# FUNCTION ####################################################################################################
 spJitter <-
   function (points, candi, x.max, x.min, y.max, y.min, which.point, cellsize) {
     
-    if (length(cellsize) == 1) { cellsize <- rep(cellsize, 2) }
+    # If a single value has been passed to cellsize it means that candidate locations (grid cells) are 
+    # square-shaped.
+    if (length(cellsize) == 1) { 
+      cellsize <- rep(cellsize, 2) 
+    }
+    
+    # Save point being perturbed
+    pt0 <- points[which.point, ]
     
     # Get candidate locations using Cpp
-    pt1 <- .spJitterCpp(x = points[, 2:3], y = candi[, 2:3], xmax = x.max, 
-                        xmin = x.min, ymax = y.max, ymin = y.min, 
-                        idx = which.point)
-    
-    # Get candidate locations
+    # Returns a vector with the ID of the candidate locations in a neighbourhood defined by x.max, y.max, x.min
+    # and y.min.
+    pt1 <- .spJitterCpp(x = points[, 2:3], y = candi[, 2:3], xmax = x.max, xmin = x.min, ymax = y.max, 
+                        ymin = y.min, idx = which.point)
     pt1 <- pt1[pt1 != 0]
     
-    # Select one candidate location
-    pt2 <- candi[sample(pt1, 1), ]
-    
-    # Compute the new x- and y-coordinates
-    pt3 <- stats::runif(n = 2, min = -0.5, max = 0.5) * cellsize
-    pt2[-1] <- pt2[-1] + pt3
+    # Finite of infinite set of candidate locations?
+    if (all(cellsize == 0)) {
+      
+      # When using a finite set of candidate locations (cellsize = 0) it is necessary to check for candidate 
+      # locations that have already been included in the sample. If there are any, they need to be discarded
+      # from the set of candidate locations.
+      pt1 <- pt1[!pt1 %in% points[, 1]]
+      
+      if (length(pt1) == 0) {
+        # If there is no candidate location left in the neighbourhood, we keep the sample point in its
+        # original location
+        pt2 <- pt0
+        m <- paste('no candidate location left in the neighbourhood of point ', pt0[1], 
+                   '...\nreturnig to original location', sep = '')
+        message(m)
+        
+      } else {
+        # Ramdomly choose one single candidate location and get its coordinates from candi
+        pt2 <- candi[sample(pt1, 1), ]
+      }
+      
+    } else {
+      # Ramdomly choose one single candidate location and get its coordinates from candi
+      pt2 <- candi[sample(pt1, 1), ]
+      
+      # Compute the new x- and y-coordinates
+      pt2[-1] <- pt2[-1] + stats::runif(n = 2, min = -0.5, max = 0.5) * cellsize
+    }
     
     # Output
-    res <- points
-    res[which.point, ] <- pt2
-    return (res)
+    points[which.point, ] <- pt2
+    return (points)
   }
 # spJitterFinite ###############################################################
 # spJitterFinite <-
