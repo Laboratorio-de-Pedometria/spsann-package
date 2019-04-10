@@ -5,8 +5,6 @@
 \alias{countPPL}
 \alias{objPPL}
 \alias{PPL}
-\alias{objPPL}
-\alias{countPPL}
 \title{Optimization of sample configurations for variogram identification and estimation}
 \usage{
 optimPPL(points, candi, lags = 7, lags.type = "exponential",
@@ -14,9 +12,9 @@ optimPPL(points, candi, lags = 7, lags.type = "exponential",
   pairs = FALSE, schedule = scheduleSPSANN(), plotit = FALSE,
   track = FALSE, boundary, progress = "txt", verbose = FALSE)
 
-objPPL(points, candi, lags = 7, lags.type = "exponential", lags.base = 2,
-  cutoff, distri, criterion = "distribution", pairs = FALSE, x.max, x.min,
-  y.max, y.min)
+objPPL(points, candi, lags = 7, lags.type = "exponential",
+  lags.base = 2, cutoff, distri, criterion = "distribution",
+  pairs = FALSE, x.max, x.min, y.max, y.min)
 
 countPPL(points, candi, lags = 7, lags.type = "exponential",
   lags.base = 2, cutoff, pairs = FALSE, x.max, x.min, y.max, y.min)
@@ -28,66 +26,66 @@ countPPL(points, candi, lags = 7, lags.type = "exponential",
 the starting sample configuration.
 \item Integer vector. The row indexes of \code{candi} that correspond to the points that form the starting
 sample configuration. The length of the vector defines the number of points.
-\item Data frame or matrix. An object with three columns in the following order: \code{[, "id"]}, the 
+\item Data frame or matrix. An object with three columns in the following order: \code{[, "id"]}, the
 row indexes of \code{candi} that correspond to each point, \code{[, "x"]}, the projected x-coordinates, and
 \code{[, "y"]}, the projected y-coordinates.
 \item List. An object with two named sub-arguments: \code{fixed}, a data frame or matrix with the projected
-x- and y-coordinates of the existing sample configuration -- kept fixed during the optimization --, and 
+x- and y-coordinates of the existing sample configuration -- kept fixed during the optimization --, and
 \code{free}, an integer value defining the number of points that should be added to the existing sample
 configuration -- free to move during the optimization.
 }}
 
-\item{candi}{Data frame or matrix with the candidate locations for the jittered points. \code{candi} must 
-have two columns in the following order: \code{[, "x"]}, the projected x-coordinates, and \code{[, "y"]}, 
+\item{candi}{Data frame or matrix with the candidate locations for the jittered points. \code{candi} must
+have two columns in the following order: \code{[, "x"]}, the projected x-coordinates, and \code{[, "y"]},
 the projected y-coordinates.}
 
-\item{lags}{Integer value, the number of lag-distance classes. Alternatively, a vector of numeric values 
-with the lower and upper bounds of each lag-distance class, the lowest value being larger than zero 
+\item{lags}{Integer value, the number of lag-distance classes. Alternatively, a vector of numeric values
+with the lower and upper bounds of each lag-distance class, the lowest value being larger than zero
 (e.g. 0.0001). Defaults to \code{lags = 7}.}
 
 \item{lags.type}{Character value, the type of lag-distance classes, with options \code{"equidistant"} and
 \code{"exponential"}. Defaults to \code{lags.type = "exponential"}.}
 
-\item{lags.base}{Numeric value, base of the exponential expression used to create exponentially spaced 
+\item{lags.base}{Numeric value, base of the exponential expression used to create exponentially spaced
 lag-distance classes. Used only when \code{lags.type = "exponential"}. Defaults to \code{lags.base = 2}.}
 
 \item{cutoff}{Numeric value, the maximum distance up to which lag-distance classes are created. Used only
-when \code{lags} is an integer value. If missing, it is set to be equal to the length of the diagonal of 
+when \code{lags} is an integer value. If missing, it is set to be equal to the length of the diagonal of
 the rectangle with sides \code{x.max} and \code{y.max} as defined in \code{\link[spsann]{scheduleSPSANN}}.}
 
-\item{criterion}{Character value, the feature used to describe the energy state of the system 
-configuration, with options \code{"minimum"} and \code{"distribution"}. Defaults to 
+\item{criterion}{Character value, the feature used to describe the energy state of the system
+configuration, with options \code{"minimum"} and \code{"distribution"}. Defaults to
 \code{objective = "distribution"}.}
 
-\item{distri}{Numeric vector, the distribution of points or point-pairs per lag-distance class that should 
-be attained at the end of the optimization. Used only when \code{criterion = "distribution"}. Defaults to 
+\item{distri}{Numeric vector, the distribution of points or point-pairs per lag-distance class that should
+be attained at the end of the optimization. Used only when \code{criterion = "distribution"}. Defaults to
 a uniform distribution.}
 
-\item{pairs}{Logical value. Should the sample configuration be optimized regarding the number of 
+\item{pairs}{Logical value. Should the sample configuration be optimized regarding the number of
 point-pairs per lag-distance class? Defaults to \code{pairs = FALSE}.}
 
-\item{schedule}{List with 11 named sub-arguments defining the control parameters of the cooling schedule. 
+\item{schedule}{List with 11 named sub-arguments defining the control parameters of the cooling schedule.
 See \code{\link[spsann]{scheduleSPSANN}}.}
 
 \item{plotit}{(Optional) Logical for plotting the optimization results, including a) the progress of the
-objective function, and b) the starting (gray circles) and current sample configuration (black dots), and 
-the maximum jitter in the x- and y-coordinates. The plots are updated at each 10 jitters. When adding 
-points to an existing sample configuration, fixed points are indicated using black crosses. Defaults to 
+objective function, and b) the starting (gray circles) and current sample configuration (black dots), and
+the maximum jitter in the x- and y-coordinates. The plots are updated at each 10 jitters. When adding
+points to an existing sample configuration, fixed points are indicated using black crosses. Defaults to
 \code{plotit = FALSE}.}
 
-\item{track}{(Optional) Logical value. Should the evolution of the energy state be recorded and returned 
-along with the result? If \code{track = FALSE} (the default), only the starting and ending energy states 
+\item{track}{(Optional) Logical value. Should the evolution of the energy state be recorded and returned
+along with the result? If \code{track = FALSE} (the default), only the starting and ending energy states
 are returned along with the results.}
 
-\item{boundary}{(Optional) SpatialPolygon defining the boundary of the spatial domain. If missing and 
+\item{boundary}{(Optional) SpatialPolygon defining the boundary of the spatial domain. If missing and
 \code{plotit = TRUE}, \code{boundary} is estimated from \code{candi}.}
 
 \item{progress}{(Optional) Type of progress bar that should be used, with options \code{"txt"}, for a text
 progress bar in the R console, \code{"tk"}, to put up a Tk progress bar widget, and \code{NULL} to omit the
-progress bar. A Tk progress bar widget is useful when using parallel processors. Defaults to 
+progress bar. A Tk progress bar widget is useful when using parallel processors. Defaults to
 \code{progress = "txt"}.}
 
-\item{verbose}{(Optional) Logical for printing messages about the progress of the optimization. Defaults to 
+\item{verbose}{(Optional) Logical for printing messages about the progress of the optimization. Defaults to
 \code{verbose = FALSE}.}
 
 \item{x.max}{Numeric value defining the minimum and maximum quantity of random noise to
@@ -126,7 +124,7 @@ the optimized sample configuration has a given number of points or point-pairs c
 lag-distance class (\bold{PPL}).
 }
 \details{
-Details about the mechanism used to generate a new sample configuration out of the current sample 
+Details about the mechanism used to generate a new sample configuration out of the current sample
 configuration by randomly perturbing the coordinates of a sample point are available in the help page of
 \code{\link[spsann]{spJitter}}.
 
@@ -154,9 +152,9 @@ observed over all lag-distance classes.
 }
 }
 \note{
-The distance between two points is computed as the Euclidean distance between them. This computation 
+The distance between two points is computed as the Euclidean distance between them. This computation
 assumes that the optimization is operating in the two-dimensional Euclidean space, i.e. the coordinates of
-the sample points and candidate locations should not be provided as latitude/longitude. \pkg{spsann} has no 
+the sample points and candidate locations should not be provided as latitude/longitude. \pkg{spsann} has no
 mechanism to check if the coordinates are projected: the user is responsible for making sure that this
 requirement is attained.
 }
@@ -195,11 +193,8 @@ Resources Research}. v. 23, p. 496-500, 1987.
 \author{
 Alessandro Samuel-Rosa \email{alessandrosamuelrosa@gmail.com}
 }
-\concept{
-simulated annealing
-
-variogram
-}
+\concept{simulated annealing}
+\concept{variogram}
 \keyword{iteration}
 \keyword{optimize}
 \keyword{spatial}

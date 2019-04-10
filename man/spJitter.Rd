@@ -117,6 +117,4 @@ sampling from compact geographical strata by k-means. \emph{Computers & Geoscien
 \author{
 Alessandro Samuel-Rosa \email{alessandrosamuelrosa@gmail.com}
 }
-\concept{
-jitter perturb
-}
+\concept{jitter perturb}
