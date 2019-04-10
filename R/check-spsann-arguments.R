@@ -22,28 +22,35 @@ expression(res <- NULL, aa <- c("points", "candi"), bb <- c(missing(points), mis
       }
     }, aa <- objective %in% c("ACDC", "CLHS", "SPAN"), MOOP <- ifelse(aa, TRUE, FALSE), 
     if (MOOP) {
-      aa <- !is.list(weights)
-      bb <- is.null(names(weights))
-      cc <- length(weights) < 2
-      if (aa || bb || cc) {
-        res <- c("'weights' must be a list with named components")
-      } else {
-        aa <- sum(unlist(weights)) != 1
-        if (aa) {
-          res <- c("'weights' must sum to 1")
-        }
+      
+      if (missing(weights) || !is.list(weights) || is.null(names(weights)) || sum(unlist(weights)) != 1) {
+        res <- "'weights' must be a list with named sub-arguments that sum to 1"
+        
+      } else if (length(weights) < 2) {
+        res <- "'weights' must contain more than on sub-arguments"
       }
+      # aa <- !is.list(weights)
+      # bb <- is.null(names(weights))
+      # cc <- length(weights) < 2
+      # if (aa || bb || cc) {
+      #   res <- c("'weights' must be a list with named sub-arguments")
+      # } else {
+      #   aa <- sum(unlist(weights)) != 1
+      #   if (aa) {
+      #     res <- c("'weights' must sum to 1")
+      #   }
+      # }
     }, if (MOOP && objective != "CLHS") {
       aa <- !is.list(utopia)
       bb <- !length(utopia) == 1
       cc <- is.null(names(utopia))
       if (aa || bb || cc) {
-        res <- c("'utopia' must be a list with one named component")
+        res <- c("'utopia' must be a list with one named sub-arguments")
       } else {
         
         aa <- !is.list(nadir)
         if (aa) {
-          res <- c("'nadir' must be a list with named components")
+          res <- c("'nadir' must be a list with named sub-arguments")
         }
         aa <- names(nadir)
         if (length(aa) >= 2) {
@@ -60,13 +67,29 @@ expression(res <- NULL, aa <- c("points", "candi"), bb <- c(missing(points), mis
         }  
       }
     }, if (track || plotit) {
-      if (plotit) { track <- TRUE }
-      if (MOOP) {
+      
+      # If plotting is required, then objective function values MUST be tracked
+      if (plotit) {
+        track <- TRUE
+      }
+      
+      # Are we dealing with a single- or multi-objective optimization problem?
+      if (MOOP && !missing(weights)) {
+        
+        # If multi-objective optimization problem, then the number of columns of the data.frame used to store the 
+        # objective function values is set by the lenght of the weights argument plus one column to store the
+        # weighted sum of the single objective function values.
+        # 2019-03-10: if the used does not set the weights, then optimCLHS sets list(O1 = 1/3, O2 = 1/3, O3 = 1/3)
+        # by default. A four-columns data.frane is created to store the objetive function values. However, if the 
+        # user provides only continuos variables but not the weights, then optimCLHS has no way of guessing that it
+        # should have created a three-columns data.frame. Thus, from now on, the user MUST set the weights to avoid
+        # this issue. Besides, it is important for the user to always set the weights to make sure that s/he is 
+        # aware of what s/he is doing.
         energies <- as.data.frame(matrix(NA_real_, nrow = 1, ncol = length(weights) + 1))
         colnames(energies) <- c("obj", names(weights))
+        
       } else {
         energies <- data.frame(obj = NA_real_)
-        # energies <- vector()
       }
     }, if (!is.null(res)) stop (res, call. = FALSE), rm(aa, bb, cc, res))
 }
