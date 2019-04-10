@@ -29,17 +29,6 @@ expression(res <- NULL, aa <- c("points", "candi"), bb <- c(missing(points), mis
       } else if (length(weights) < 2) {
         res <- "'weights' must contain more than on sub-arguments"
       }
-      # aa <- !is.list(weights)
-      # bb <- is.null(names(weights))
-      # cc <- length(weights) < 2
-      # if (aa || bb || cc) {
-      #   res <- c("'weights' must be a list with named sub-arguments")
-      # } else {
-      #   aa <- sum(unlist(weights)) != 1
-      #   if (aa) {
-      #     res <- c("'weights' must sum to 1")
-      #   }
-      # }
     }, if (MOOP && objective != "CLHS") {
       aa <- !is.list(utopia)
       bb <- !length(utopia) == 1
@@ -86,7 +75,7 @@ expression(res <- NULL, aa <- c("points", "candi"), bb <- c(missing(points), mis
         # this issue. Besides, it is important for the user to always set the weights to make sure that s/he is 
         # aware of what s/he is doing.
         energies <- as.data.frame(matrix(NA_real_, nrow = 1, ncol = length(weights) + 1))
-        colnames(energies) <- c("obj", names(weights))
+        colnames(energies) <- c("obj", sort(names(weights)))
         
       } else {
         energies <- data.frame(obj = NA_real_)

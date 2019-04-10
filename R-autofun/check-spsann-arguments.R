@@ -115,7 +115,7 @@ if (track || plotit) {
     # this issue. Besides, it is important for the user to always set the weights to make sure that s/he is 
     # aware of what s/he is doing.
     energies <- as.data.frame(matrix(NA_real_, nrow = 1, ncol = length(weights) + 1))
-    colnames(energies) <- c("obj", names(weights))
+    colnames(energies) <- c("obj", sort(names(weights)))
     
   } else {
     energies <- data.frame(obj = NA_real_)
