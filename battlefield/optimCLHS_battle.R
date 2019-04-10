@@ -12,17 +12,16 @@ sapply(list.files("src", full.names = TRUE, pattern = ".cpp$"), Rcpp::sourceCpp)
 data(meuse.grid, package = "sp")
 candi <- meuse.grid[1:1000, 1:2]
 covars <- meuse.grid[1:1000, 5]
-weights <- list(O1 = 0.5, O3 = 0.5)
 schedule <- scheduleSPSANN(
   chains = 1, initial.temperature = 20, x.max = 1540, y.max = 2060, 
   x.min = 0, y.min = 0, cellsize = 40)
 set.seed(2001)
 res <- optimCLHS(
   points = 10, candi = candi, covars = covars, use.coords = TRUE,
-  clhs.version = "fortran", weights = weights, schedule = schedule)
+  clhs.version = "fortran", weights = list(O1 = 0.5, O3 = 0.5), schedule = schedule)
 objSPSANN(res) - objCLHS(
   points = res, candi = candi, covars = covars, use.coords = TRUE, 
-  clhs.version = "fortran", weights = weights)
+  clhs.version = "fortran", weights = list(O1 = 0.5, O3 = 0.5))
 
 # 1) FACTOR COVARIATES USING THE COORDINATES AND MANY CHAINS ##################################################
 rm(list = ls())
@@ -36,8 +35,10 @@ schedule <- scheduleSPSANN(chains = 100, initial.temperature = 10)
 set.seed(2001)
 res <- optimCLHS(
   points = 100, candi = candi, covars = covars,  use.coords = TRUE, schedule = schedule, plotit = TRUE, 
-  clhs.version = "fortran")
-objSPSANN(res) - objCLHS(points = res, candi = candi, covars = covars, use.coords = TRUE)
+  clhs.version = "fortran", weights = list(O1 = 1/3, O2 = 1/3, O3 = 1/3))
+objSPSANN(res) - 
+  objCLHS(points = res, candi = candi, covars = covars, use.coords = TRUE, clhs.version = "fortran",
+          weights = rev(list(O1 = 1/3, O2 = 1/3, O3 = 1/3)))
 
 # 2) FACTOR COVARIATES USING THE COORDINATES WITH A FEW POINTS ################################################
 rm(list = ls())
@@ -51,9 +52,10 @@ schedule <- scheduleSPSANN(chains = 1, initial.temperature = 10)
 set.seed(2001)
 res <-  optimCLHS(
   points = 10, candi = candi, covars = covars, use.coords = TRUE, schedule = schedule, plotit = TRUE, 
-  clhs.version = "fortran")
+  clhs.version = "fortran", weights = list(O1 = 1/3, O2 = 1/3, O3 = 1/3))
 objSPSANN(res) - 
-  objCLHS(points = res, candi = candi, covars = covars, use.coords = TRUE, clhs.version = "fortran")
+  objCLHS(points = res, candi = candi, covars = covars, use.coords = TRUE, clhs.version = "fortran",
+          weights = list(O1 = 1/3, O2 = 1/3, O3 = 1/3))
 
 # 3) CATEGORICAL COVARIATES WITH MANY COVARIATES AND MANY POINTS ##############################################
 rm(list = ls())
@@ -67,9 +69,10 @@ schedule <- scheduleSPSANN(chains = 1, initial.temperature = 10)
 set.seed(2001)
 res <- optimCLHS(
   points = 500, candi = candi, covars = covars, use.coords = T, schedule = schedule, plotit = TRUE, 
-  clhs.version = "fortran")
+  clhs.version = "fortran", weights = rev(list(O1 = 1/3, O2 = 1/3, O3 = 1/3)))
 objSPSANN(res) -
-  objCLHS(points = res, candi = candi, covars = covars, use.coords = TRUE, clhs.version = "fortran")
+  objCLHS(points = res, candi = candi, covars = covars, use.coords = TRUE, clhs.version = "fortran",
+          weights = list(O1 = 1/3, O2 = 1/3, O3 = 1/3))
 
 # 4) ADD TEN POINTS TO AN EXISTING SAMPLE CONFIGURATION #######################################################
 rm(list = ls())
@@ -84,10 +87,12 @@ free <- 10
 set.seed(1984)
 id <- sample(1:nrow(candi), 40)
 fixed <- cbind(id, candi[id, ])
-objCLHS(points = fixed, candi = candi, covars = covars, use.coords = TRUE, clhs.version = "fortran")
+objCLHS(points = fixed, candi = candi, covars = covars, use.coords = TRUE, clhs.version = "fortran",
+        weights = list(O1 = 1/3, O2 = 1/3, O3 = 1/3))
 set.seed(2001)
 res <-  optimCLHS(
   points = list(free = free, fixed = fixed), candi = candi, covars = covars, use.coords = TRUE, 
-  schedule = schedule, plotit = TRUE, clhs.version = "fortran")
+  schedule = schedule, plotit = TRUE, clhs.version = "fortran", weights = list(O1 = 1/3, O2 = 1/3, O3 = 1/3))
 objSPSANN(res) -
-  objCLHS(points = res, candi = candi, covars = covars, use.coords = TRUE, clhs.version = "fortran")
+  objCLHS(points = res, candi = candi, covars = covars, use.coords = TRUE, clhs.version = "fortran",
+          weights = list(O1 = 1/3, O2 = 1/3, O3 = 1/3))

@@ -51,15 +51,14 @@
 #' schedule <- scheduleSPSANN(
 #'   chains = 1, initial.temperature = 5, x.max = 1540, y.max = 2060, 
 #'   x.min = 0, y.min = 0, cellsize = 40)
-#' weights <- list(CORR = 0.5, DIST = 0.5)
 #' set.seed(2001)
 #' res <- optimACDC(
-#'   points = 10, candi = candi, covars = covars, nadir = nadir, weights = weights,
-#'   use.coords = TRUE, utopia = utopia, schedule = schedule)
+#'   points = 10, candi = candi, covars = covars, nadir = nadir, use.coords = TRUE, 
+#'   utopia = utopia, schedule = schedule, weights = list(DIST = 1/2, CORR = 1/2))
 #' objSPSANN(res) - objACDC(
-#'   points = res, candi = candi, covars = covars, use.coords = TRUE, 
-#'   weights = weights, nadir = nadir, utopia = utopia)
-# MAIN FUNCTION ################################################################
+#'   points = res, candi = candi, covars = covars, use.coords = TRUE, nadir = nadir, 
+#'   utopia = utopia, weights = list(DIST = 1/2, CORR = 1/2))
+# MAIN FUNCTION ###############################################################################################
 optimACDC <-
   function (points, candi, 
             # DIST and CORR
