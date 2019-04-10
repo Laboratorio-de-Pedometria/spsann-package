@@ -290,17 +290,31 @@ optimCLHS <-
                clhs.version = clhs.version)
     }
     
-    # Output
+    # Prepare output, a data.frame with the weighted sum in the first column followed by the values of the
+    # constituent objective functions (IN ALPHABETICAL ORDER).
     if (covars_type == "both") {
-      obj <- obj_O1 + obj_O2 + obj_O3
-      return (data.frame(obj = obj, O1 = obj_O1, O2 = obj_O2, O3 = obj_O3))
+      res <- data.frame(
+        obj = obj_O1 + obj_O2 + obj_O3, 
+        O1 = obj_O1, 
+        O2 = obj_O2, 
+        O3 = obj_O3)
+    } else if (covars_type == "numeric") {
+      res <- data.frame(
+        obj = obj_O1 + obj_O3, 
+        O1 = obj_O1, 
+        O3 = obj_O3)
     } else {
-      if (covars_type == "numeric") {
-        return (data.frame(obj = obj_O1 + obj_O3, O1 = obj_O1, O3 = obj_O3))
-      } else {
-        return (data.frame(obj = obj_O2))
-      }
+      res <- data.frame(
+        obj = obj_O2)
     }
+    return (res)
+    # } else {
+    #   if (covars_type == "numeric") {
+    #     return (data.frame(obj = obj_O1 + obj_O3, O1 = obj_O1, O3 = obj_O3))
+    #   } else {
+    #     return (data.frame(obj = obj_O2))
+    #   }
+    # }
   }
 # CALCULATE OBJECTIVE FUNCTION VALUE ##########################################################################
 #' @rdname optimCLHS

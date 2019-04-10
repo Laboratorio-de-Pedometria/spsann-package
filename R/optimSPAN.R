@@ -408,10 +408,14 @@ objSPAN <-
     obj_mssd <- (obj_mssd - utopia$MSSD) / (nadir$MSSD - utopia$MSSD)
     obj_mssd <- obj_mssd * weights$MSSD
     
-    # Prepare output
-    res <- data.frame(obj = obj_dist + obj_cor + obj_ppl + obj_mssd, 
-                      CORR = obj_cor, DIST = obj_dist, PPL = obj_ppl,
-                      MSSD = obj_mssd)
+    # Prepare output, a data.frame with the weighted sum in the first column followed by the values of the
+    # constituent objective functions (IN ALPHABETICAL ORDER).
+    res <- data.frame(
+      obj = obj_dist + obj_cor + obj_mssd + obj_ppl, 
+      CORR = obj_cor,
+      DIST = obj_dist,
+      MSSD = obj_mssd,
+      PPL = obj_ppl)
     return(res)
   }
 # INTERNAL FUNCTION - COMPUTE THE NADIR VALUE #################################################################

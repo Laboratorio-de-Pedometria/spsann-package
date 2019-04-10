@@ -375,8 +375,12 @@ optimACDC <-
     obj_cor <- (obj_cor - utopia$CORR) / (nadir$CORR - utopia$CORR)
     obj_cor <- obj_cor * weights$CORR
     
-    # Prepare output
-    res <- data.frame(obj = obj_dist + obj_cor, CORR = obj_cor, DIST = obj_dist)
+    # Prepare output, a data.frame with the weighted sum in the first column followed by the values of the
+    # constituent objective functions (IN ALPHABETICAL ORDER).
+    res <- data.frame(
+      obj = obj_dist + obj_cor, 
+      CORR = obj_cor, 
+      DIST = obj_dist)
     return (res)
   }
 # INTERNAL FUNCTION - PREPARE THE UTOPIA POINT #################################
