@@ -99,11 +99,14 @@
 #' covars <- meuse.grid[1:1000, 5]
 #' weights <- list(O1 = 0.5, O3 = 0.5)
 #' schedule <- scheduleSPSANN(
-#'   chains = 1, initial.temperature = 20, x.max = 1540, y.max = 2060, x.min = 0, y.min = 0, cellsize = 40)
+#'   chains = 1, initial.temperature = 20, x.max = 1540, y.max = 2060, x.min = 0, y.min = 0,
+#'   cellsize = 40)
 #' set.seed(2001)
 #' res <- optimCLHS(
-#'   points = 10, candi = candi, covars = covars, use.coords = TRUE, weights = weights, schedule = schedule)
-#' objSPSANN(res) - objCLHS(points = res, candi = candi, covars = covars, use.coords = TRUE, weights = weights)
+#'   points = 10, candi = candi, covars = covars, use.coords = TRUE, weights = weights, 
+#'   schedule = schedule)
+#' objSPSANN(res) - 
+#'   objCLHS(points = res, candi = candi, covars = covars, use.coords = TRUE, weights = weights)
 # MAIN FUNCTION ###############################################################################################
 optimCLHS <-
   function (points, candi,
@@ -113,7 +116,8 @@ optimCLHS <-
             schedule = scheduleSPSANN(), plotit = FALSE, track = FALSE,
             boundary, progress = "txt", verbose = FALSE,
             # MOOP
-            weights = list(O1 = 1/3, O2 = 1/3, O3 = 1/3)) {
+            weights) {
+            # weights = list(O1 = 1/3, O2 = 1/3, O3 = 1/3)) {
     
     # Objective function name
     objective <- "CLHS"
@@ -302,8 +306,10 @@ optimCLHS <-
 #' @rdname optimCLHS
 #' @export
 objCLHS <-
-  function (points, candi, covars, use.coords = FALSE, clhs.version = c("paper", "fortran", "update"), 
-            weights = list(O1 = 1/3, O2 = 1/3, O3 = 1/3)) {
+  function (points, candi, covars, use.coords = FALSE, 
+            clhs.version = c("paper", "fortran", "update"), 
+            weights) {
+            # weights = list(O1 = 1/3, O2 = 1/3, O3 = 1/3)) {
     
     # Check arguments
     check <- .optimCLHScheck(candi = candi, covars = covars, use.coords = use.coords)

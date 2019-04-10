@@ -4,18 +4,17 @@
 \alias{optimACDC}
 \alias{objACDC}
 \alias{ACDC}
-\alias{objACDC}
 \title{Optimization of sample configurations for spatial trend identification and estimation (III)}
 \usage{
-optimACDC(points, candi, covars, strata.type = "area", use.coords = FALSE,
-  schedule = scheduleSPSANN(), plotit = FALSE, track = FALSE, boundary,
-  progress = "txt", verbose = FALSE, weights = list(CORR = 0.5, DIST =
-  0.5), nadir = list(sim = NULL, seeds = NULL, user = NULL, abs = NULL),
-  utopia = list(user = NULL, abs = NULL))
+optimACDC(points, candi, covars, strata.type = "area",
+  use.coords = FALSE, schedule = scheduleSPSANN(), plotit = FALSE,
+  track = FALSE, boundary, progress = "txt", verbose = FALSE,
+  weights, nadir = list(sim = NULL, seeds = NULL, user = NULL, abs =
+  NULL), utopia = list(user = NULL, abs = NULL))
 
-objACDC(points, candi, covars, strata.type = "area", use.coords = FALSE,
-  weights = list(CORR = 0.5, DIST = 0.5), nadir = list(sim = NULL, seeds =
-  NULL, user = NULL, abs = NULL), utopia = list(user = NULL, abs = NULL))
+objACDC(points, candi, covars, strata.type = "area",
+  use.coords = FALSE, weights, nadir = list(sim = NULL, seeds = NULL,
+  user = NULL, abs = NULL), utopia = list(user = NULL, abs = NULL))
 }
 \arguments{
 \item{points}{Integer value, integer vector, data frame or matrix, or list.
@@ -24,64 +23,63 @@ objACDC(points, candi, covars, strata.type = "area", use.coords = FALSE,
 the starting sample configuration.
 \item Integer vector. The row indexes of \code{candi} that correspond to the points that form the starting
 sample configuration. The length of the vector defines the number of points.
-\item Data frame or matrix. An object with three columns in the following order: \code{[, "id"]}, the 
+\item Data frame or matrix. An object with three columns in the following order: \code{[, "id"]}, the
 row indexes of \code{candi} that correspond to each point, \code{[, "x"]}, the projected x-coordinates, and
 \code{[, "y"]}, the projected y-coordinates.
 \item List. An object with two named sub-arguments: \code{fixed}, a data frame or matrix with the projected
-x- and y-coordinates of the existing sample configuration -- kept fixed during the optimization --, and 
+x- and y-coordinates of the existing sample configuration -- kept fixed during the optimization --, and
 \code{free}, an integer value defining the number of points that should be added to the existing sample
 configuration -- free to move during the optimization.
 }}
 
-\item{candi}{Data frame or matrix with the candidate locations for the jittered points. \code{candi} must 
-have two columns in the following order: \code{[, "x"]}, the projected x-coordinates, and \code{[, "y"]}, 
+\item{candi}{Data frame or matrix with the candidate locations for the jittered points. \code{candi} must
+have two columns in the following order: \code{[, "x"]}, the projected x-coordinates, and \code{[, "y"]},
 the projected y-coordinates.}
 
 \item{covars}{Data frame or matrix with the covariates in the columns.}
 
-\item{strata.type}{(Optional) Character value setting the type of stratification that should be used to 
+\item{strata.type}{(Optional) Character value setting the type of stratification that should be used to
 create the marginal sampling strata (or factor levels) for the numeric covariates. Available options are
 \code{"area"}, for equal-area, and \code{"range"}, for equal-range. Defaults to \code{strata.type = "area"}.}
 
-\item{use.coords}{(Optional) Logical value. Should the spatial x- and y-coordinates be used as covariates? 
+\item{use.coords}{(Optional) Logical value. Should the spatial x- and y-coordinates be used as covariates?
 Defaults to \code{use.coords = FALSE}.}
 
-\item{schedule}{List with 11 named sub-arguments defining the control parameters of the cooling schedule. 
+\item{schedule}{List with 11 named sub-arguments defining the control parameters of the cooling schedule.
 See \code{\link[spsann]{scheduleSPSANN}}.}
 
 \item{plotit}{(Optional) Logical for plotting the optimization results, including a) the progress of the
-objective function, and b) the starting (gray circles) and current sample configuration (black dots), and 
-the maximum jitter in the x- and y-coordinates. The plots are updated at each 10 jitters. When adding 
-points to an existing sample configuration, fixed points are indicated using black crosses. Defaults to 
+objective function, and b) the starting (gray circles) and current sample configuration (black dots), and
+the maximum jitter in the x- and y-coordinates. The plots are updated at each 10 jitters. When adding
+points to an existing sample configuration, fixed points are indicated using black crosses. Defaults to
 \code{plotit = FALSE}.}
 
-\item{track}{(Optional) Logical value. Should the evolution of the energy state be recorded and returned 
-along with the result? If \code{track = FALSE} (the default), only the starting and ending energy states 
+\item{track}{(Optional) Logical value. Should the evolution of the energy state be recorded and returned
+along with the result? If \code{track = FALSE} (the default), only the starting and ending energy states
 are returned along with the results.}
 
-\item{boundary}{(Optional) SpatialPolygon defining the boundary of the spatial domain. If missing and 
+\item{boundary}{(Optional) SpatialPolygon defining the boundary of the spatial domain. If missing and
 \code{plotit = TRUE}, \code{boundary} is estimated from \code{candi}.}
 
 \item{progress}{(Optional) Type of progress bar that should be used, with options \code{"txt"}, for a text
 progress bar in the R console, \code{"tk"}, to put up a Tk progress bar widget, and \code{NULL} to omit the
-progress bar. A Tk progress bar widget is useful when using parallel processors. Defaults to 
+progress bar. A Tk progress bar widget is useful when using parallel processors. Defaults to
 \code{progress = "txt"}.}
 
-\item{verbose}{(Optional) Logical for printing messages about the progress of the optimization. Defaults to 
+\item{verbose}{(Optional) Logical for printing messages about the progress of the optimization. Defaults to
 \code{verbose = FALSE}.}
 
 \item{weights}{List with named sub-arguments. The weights assigned to each one of the objective functions
-that form the multi-objective combinatorial optimization problem. They must be named after the respective 
-objective function to which they apply. The weights must be equal to or larger than 0 and sum to 1. The 
-default option gives equal weights to all objective functions.}
+that form the multi-objective combinatorial optimization problem. They must be named after the respective
+objective function to which they apply. The weights must be equal to or larger than 0 and sum to 1.}
 
-\item{nadir}{List with named sub-arguments. Three options are available: 1) \code{sim} -- the number of 
+\item{nadir}{List with named sub-arguments. Three options are available: 1) \code{sim} -- the number of
 simulations that should be used to estimate the nadir point, and \code{seeds} -- vector defining the random
 seeds for each simulation; 2) \code{user} -- a list of user-defined nadir values named after the respective
-objective functions to which they apply; 3) \code{abs} -- logical for calculating the nadir point 
+objective functions to which they apply; 3) \code{abs} -- logical for calculating the nadir point
 internally (experimental).}
 
-\item{utopia}{List with named sub-arguments. Two options are available: 1) \code{user} -- a list of 
+\item{utopia}{List with named sub-arguments. Two options are available: 1) \code{user} -- a list of
 user-defined values named after the respective objective functions to which they apply; 2) \code{abs} --
 logical for calculating the utopia point internally (experimental).}
 }
@@ -103,7 +101,7 @@ The help page of \code{\link[spsann]{minmaxPareto}} contains details on how \pkg
 multi-objective combinatorial optimization problem of finding a globally optimum sample configuration that
 meets multiple, possibly conflicting, sampling objectives.
 
-Details about the mechanism used to generate a new sample configuration out of the current sample 
+Details about the mechanism used to generate a new sample configuration out of the current sample
 configuration by randomly perturbing the coordinates of a sample point are available in the help page of
 \code{\link[spsann]{spJitter}}.
 
@@ -111,9 +109,9 @@ Visit the help pages of \code{\link[spsann]{optimCORR}} and \code{\link[spsann]{
 details of the objective functions that compose \bold{ACDC}.
 }
 \note{
-The distance between two points is computed as the Euclidean distance between them. This computation 
+The distance between two points is computed as the Euclidean distance between them. This computation
 assumes that the optimization is operating in the two-dimensional Euclidean space, i.e. the coordinates of
-the sample points and candidate locations should not be provided as latitude/longitude. \pkg{spsann} has no 
+the sample points and candidate locations should not be provided as latitude/longitude. \pkg{spsann} has no
 mechanism to check if the coordinates are projected: the user is responsible for making sure that this
 requirement is attained.
 
@@ -130,13 +128,14 @@ covars <- meuse.grid[1:1000, 5]
 schedule <- scheduleSPSANN(
   chains = 1, initial.temperature = 5, x.max = 1540, y.max = 2060, 
   x.min = 0, y.min = 0, cellsize = 40)
+weights <- list(CORR = 0.5, DIST = 0.5)
 set.seed(2001)
 res <- optimACDC(
-  points = 10, candi = candi, covars = covars, nadir = nadir,
+  points = 10, candi = candi, covars = covars, nadir = nadir, weights = weights,
   use.coords = TRUE, utopia = utopia, schedule = schedule)
 objSPSANN(res) - objACDC(
-  points = res, candi = candi, covars = covars, 
-  use.coords = TRUE, nadir = nadir, utopia = utopia)
+  points = res, candi = candi, covars = covars, use.coords = TRUE, 
+  weights = weights, nadir = nadir, utopia = utopia)
 }
 \references{
 Minasny, B.; McBratney, A. B. A conditioned Latin hypercube method for sampling in the presence of
@@ -155,11 +154,8 @@ operational constraints. \emph{5th Global Workshop on Digital Soil Mapping}. Syd
 \author{
 Alessandro Samuel-Rosa \email{alessandrosamuelrosa@gmail.com}
 }
-\concept{
-simulated annealing
-
-spatial trend
-}
+\concept{simulated annealing}
+\concept{spatial trend}
 \keyword{iteration}
 \keyword{optimize}
 \keyword{spatial}

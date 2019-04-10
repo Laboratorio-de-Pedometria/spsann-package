@@ -51,13 +51,14 @@
 #' schedule <- scheduleSPSANN(
 #'   chains = 1, initial.temperature = 5, x.max = 1540, y.max = 2060, 
 #'   x.min = 0, y.min = 0, cellsize = 40)
+#' weights <- list(CORR = 0.5, DIST = 0.5)
 #' set.seed(2001)
 #' res <- optimACDC(
-#'   points = 10, candi = candi, covars = covars, nadir = nadir,
+#'   points = 10, candi = candi, covars = covars, nadir = nadir, weights = weights,
 #'   use.coords = TRUE, utopia = utopia, schedule = schedule)
 #' objSPSANN(res) - objACDC(
-#'   points = res, candi = candi, covars = covars, 
-#'   use.coords = TRUE, nadir = nadir, utopia = utopia)
+#'   points = res, candi = candi, covars = covars, use.coords = TRUE, 
+#'   weights = weights, nadir = nadir, utopia = utopia)
 # MAIN FUNCTION ################################################################
 optimACDC <-
   function (points, candi, 
@@ -67,7 +68,8 @@ optimACDC <-
             schedule = scheduleSPSANN(), plotit = FALSE, track = FALSE,
             boundary, progress = "txt", verbose = FALSE,
             # MOOP
-            weights = list(CORR = 0.5, DIST = 0.5),
+            weights,
+            # weights = list(CORR = 0.5, DIST = 0.5),
             nadir = list(sim = NULL, seeds = NULL, user = NULL, abs = NULL),
             utopia = list(user = NULL, abs = NULL)) {
     
@@ -396,7 +398,8 @@ objACDC <-
             # DIST and CORR
             covars, strata.type = "area", use.coords = FALSE,
             # MOOP
-            weights = list(CORR = 0.5, DIST = 0.5),
+            weights,
+            # weights = list(CORR = 0.5, DIST = 0.5),
             nadir = list(sim = NULL, seeds = NULL, user = NULL, abs = NULL),
             utopia = list(user = NULL, abs = NULL)) {
     

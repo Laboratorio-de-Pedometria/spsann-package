@@ -47,12 +47,14 @@
 #' schedule <- scheduleSPSANN(chains = 1, initial.temperature = 1,
 #'                            x.max = 1540, y.max = 2060, x.min = 0, 
 #'                            y.min = 0, cellsize = 40)
+#' weights <- list(CORR = 1/6, DIST = 1/6, PPL = 1/3, MSSD = 1/3)
 #' set.seed(2001)
-#' res <- optimSPAN(points = 10, candi = candi, covars = covars, nadir = nadir,
-#'                  use.coords = TRUE, utopia = utopia, schedule = schedule)
+#' res <- optimSPAN(
+#'   points = 10, candi = candi, covars = covars, nadir = nadir, weights = weights,
+#'     use.coords = TRUE, utopia = utopia, schedule = schedule)
 #' objSPSANN(res) -
 #'   objSPAN(points = res, candi = candi, covars = covars, nadir = nadir,
-#'           use.coords = TRUE, utopia = utopia)
+#'             use.coords = TRUE, utopia = utopia, weights = weights)
 #' }
 # MAIN FUNCTION ################################################################
 optimSPAN <-
@@ -66,7 +68,8 @@ optimSPAN <-
            schedule = scheduleSPSANN(), plotit = FALSE, track = FALSE,
            boundary, progress = "txt", verbose = FALSE,
            # MOOP
-           weights = list(CORR = 1/6, DIST = 1/6, PPL = 1/3, MSSD = 1/3),
+           weights,
+           # weights = list(CORR = 1/6, DIST = 1/6, PPL = 1/3, MSSD = 1/3),
            nadir = list(sim = NULL, seeds = NULL, user = NULL, abs = NULL),
            utopia = list(user = NULL, abs = NULL)) {
     
@@ -314,7 +317,8 @@ objSPAN <-
            # SPSANN
            x.max, x.min, y.max, y.min,
            # MOOP
-           weights = list(CORR = 1/6, DIST = 1/6, PPL = 1/3, MSSD = 1/3),
+           weights,
+           # weights = list(CORR = 1/6, DIST = 1/6, PPL = 1/3, MSSD = 1/3),
            nadir = list(sim = NULL, seeds = NULL, user = NULL, abs = NULL),
            utopia = list(user = NULL, abs = NULL)) {
     
