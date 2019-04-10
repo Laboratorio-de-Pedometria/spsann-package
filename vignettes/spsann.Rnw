@@ -310,5 +310,31 @@ countPPL(res, candi = candi, lags = lags)
 plot(res, boundary = boundary)
 @
 
+% Thinning
+
+<<>>=
+# library(magrittr)
+# 
+# # Load existing sampling grid
+# data(meuse, package = "sp")
+# meuse <- sf::st_as_sf(meuse, coords = c('x', 'y'))
+# 
+# # Set control parameters
+# bb <- sf::st_bbox(meuse)
+# x.max <- diff(bb[c('xmin', 'xmax')])
+# y.max <- diff(bb[c('ymin', 'ymax')])
+# schedule <- 
+#   spsann::scheduleSPSANN(
+#     initial.temperature = 100000, chains = 500,
+#     # x.max = x.max, y.max = y.max, x.min = 0, y.min = 0, 
+#     cellsize = 0)
+# 
+# # Execute the simulated annealing algorithm
+# n <- round(nrow(meuse) / 4)
+# res <- spsann::optimMSSD(
+#   points = n, 
+#   candi = sf::st_coordinates(meuse) %>% `colnames<-`(c('x', 'y')),
+#   schedule = schedule, plotit = TRUE)
+@
 
 \end{document}
