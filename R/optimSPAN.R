@@ -56,7 +56,7 @@
 #'   objSPAN(points = res, candi = candi, covars = covars, nadir = nadir,
 #'             use.coords = TRUE, utopia = utopia, weights = weights)
 #' }
-# MAIN FUNCTION ################################################################
+# MAIN FUNCTION ###############################################################################################
 optimSPAN <-
   function(points, candi,
            # DIST and CORR
