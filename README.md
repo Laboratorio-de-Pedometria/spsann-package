@@ -1,7 +1,7 @@
 # Optimization of Sample Configurations using Spatial Simulated Annealing
 
 [![Project Status: Active – The project has reached a stable, usable state and is being actively developed.](http://www.repostatus.org/badges/latest/active.svg)](http://www.repostatus.org/#active)
-[![packageversion](https://img.shields.io/badge/devel%20version-2.1.0.9003-firebrick.svg?style=flat-square)](commits/master)
+[![packageversion](https://img.shields.io/badge/devel%20version-2.1.0.9004-firebrick.svg?style=flat-square)](commits/master)
 [![Build Status](https://travis-ci.org/samuel-rosa/spsann.svg?branch=master)](https://travis-ci.org/samuel-rosa/spsann)
 [![CRAN](https://www.r-pkg.org/badges/version/spsann)](https://cran.r-project.org/package=spsann)
 [![Rdoc](http://www.rdocumentation.org/badges/version/spsann)](http://www.rdocumentation.org/packages/spsann)
