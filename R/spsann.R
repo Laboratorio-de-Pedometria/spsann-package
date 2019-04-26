@@ -95,9 +95,9 @@
 #' 2015 EGU General Assembly in Vienna, Austria.
 #' 
 #' A few small solutions were adopted from the packages \pkg{SpatialTools}, authored by Joshua French 
-#' \email{joshua.french@@ucdenver.edu}, \pkg{clhs}, authored by Pierre Roudier 
-#' \email{roudierp@@landcareresearch.co.nz}, and \pkg{spcosa}, authored by Dennis Walvoort 
-#' \email{dennis.Walvoort@@wur.nl}, Dick Brus \email{dick.brus@@wur.nl}, and Jaap de Gruijter 
+#' \email{joshua.french@@ucdenver.edu}, __[clhs](https://CRAN.R-project.org/package=clhs)__, 
+#' authored by Pierre Roudier \email{roudierp@@landcareresearch.co.nz}, and \pkg{spcosa}, authored by Dennis 
+#' Walvoort \email{dennis.Walvoort@@wur.nl}, Dick Brus \email{dick.brus@@wur.nl}, and Jaap de Gruijter 
 #' \email{Jaap.degruijter@@wur.nl}.
 #' 
 #' Major conceptual contributions were made by Gerard Heuvelink \email{gerard.heuvelink@@wur.nl}, Dick Brus 

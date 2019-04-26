@@ -25,7 +25,7 @@
 #' @note
 #' This function was derived with modifications from the method known as the \emph{conditioned Latin Hypercube 
 #' sampling} originally proposed by Minasny and McBratney (2006), and implemented in the R-package 
-#' \pkg{\link[clhs]{clhs}} by Pierre Roudier.
+#' __[clhs](https://CRAN.R-project.org/package=clhs)__ by Pierre Roudier.
 #' 
 #' @references
 #' Minasny, B.; McBratney, A. B. A conditioned Latin hypercube method for sampling in the presence of 
@@ -39,7 +39,7 @@
 #' operational constraints. \emph{5th Global Workshop on Digital Soil Mapping}. Sydney, p. 227-231, 2012.
 #' 
 #' @author Alessandro Samuel-Rosa \email{alessandrosamuelrosa@@gmail.com}
-#' @seealso \code{\link[clhs]{clhs}}, \code{\link[pedometrics]{cramer}}
+#' @seealso \code{\link[pedometrics]{cramer}}
 #' @aliases optimACDC objACDC ACDC
 #' @export
 #' @examples

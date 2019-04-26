@@ -40,7 +40,8 @@ y-coordinates, respectively.}
 
 \item{cellsize}{Vector with two numeric values defining the horizontal (x) and vertical (y) spacing
 between the candidate locations in \code{candi}. A single value can be used if the spacing in the x- and
-y-coordinates is the same.}
+y-coordinates is the same. If \code{cellsize = 0} then \pkg{spsann} understands that a finite set of
+candidate locations is being used (See Details).}
 }
 \value{
 A list with a set of control parameters of the annealing schedule.

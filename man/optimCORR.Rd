@@ -129,7 +129,7 @@ Everitt, B. S. \emph{The Cambridge dictionary of statistics}. Cambridge: Cambrid
 2006.
 }
 \seealso{
-\code{\link[clhs]{clhs}}, \code{\link[pedometrics]{cramer}}, \code{\link[spsann]{optimACDC}}
+\code{\link[pedometrics]{cramer}}, \code{\link[spsann]{optimACDC}}
 }
 \author{
 Alessandro Samuel-Rosa \email{alessandrosamuelrosa@gmail.com}

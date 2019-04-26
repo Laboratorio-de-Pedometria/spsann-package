@@ -24,7 +24,8 @@ x- and y-coordinates. If missing, they are estimated from \code{candi}.}
 
 \item{cellsize}{Vector with two numeric values defining the horizontal (x) and vertical (y) spacing
 between the candidate locations in \code{candi}. A single value can be used if the spacing in the x- and
-y-coordinates is the same.}
+y-coordinates is the same. If \code{cellsize = 0} then \pkg{spsann} understands that a finite set of
+candidate locations is being used (See Details).}
 }
 \value{
 A matrix with the jittered projected coordinates of the points.

@@ -117,7 +117,7 @@ requirement is attained.
 
 This function was derived with modifications from the method known as the \emph{conditioned Latin Hypercube
 sampling} originally proposed by Minasny and McBratney (2006), and implemented in the R-package
-\pkg{\link[clhs]{clhs}} by Pierre Roudier.
+\strong{\href{https://CRAN.R-project.org/package=clhs}{clhs}} by Pierre Roudier.
 }
 \examples{
 data(meuse.grid, package = "sp")
@@ -148,7 +148,7 @@ Roudier, P.; Beaudette, D.; Hewitt, A. A conditioned Latin hypercube sampling al
 operational constraints. \emph{5th Global Workshop on Digital Soil Mapping}. Sydney, p. 227-231, 2012.
 }
 \seealso{
-\code{\link[clhs]{clhs}}, \code{\link[pedometrics]{cramer}}
+\code{\link[pedometrics]{cramer}}
 }
 \author{
 Alessandro Samuel-Rosa \email{alessandrosamuelrosa@gmail.com}

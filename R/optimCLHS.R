@@ -85,11 +85,12 @@
 #'
 #' @note
 #' The (only?) difference of `optimCLHS` to the original Fortran implementation of Minasny and McBratney
-#' (2006), and to the `clhs` function implemented in the \pkg{\link[clhs]{clhs}} package by Pierre Roudier, is
+#' (2006), and to the `clhs` function implemented in the former 
+#' __[clhs](https://CRAN.R-project.org/package=clhs)__ package by Pierre Roudier, is
 #' the annealing schedule.
-#'
+#' 
 #' @author Alessandro Samuel-Rosa \email{alessandrosamuelrosa@@gmail.com}
-#' @seealso \code{\link[clhs]{clhs}}, \code{\link[spsann]{optimACDC}}
+#' @seealso \code{\link[spsann]{optimACDC}}
 #' @concept spatial trend
 #' @aliases optimCLHS objCLHS CLHS
 #' @export
