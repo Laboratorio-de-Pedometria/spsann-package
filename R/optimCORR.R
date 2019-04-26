@@ -42,7 +42,7 @@
 #' 2006.
 #'
 #' @author Alessandro Samuel-Rosa \email{alessandrosamuelrosa@@gmail.com}
-#' @seealso \code{\link[clhs]{clhs}}, \code{\link[pedometrics]{cramer}}, \code{\link[spsann]{optimACDC}}
+#' @seealso \code{\link[pedometrics]{cramer}}, \code{\link[spsann]{optimACDC}}
 #' @aliases optimCORR objCORR CORR
 #' @export
 #' @examples

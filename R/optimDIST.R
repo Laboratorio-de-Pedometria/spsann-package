@@ -57,7 +57,7 @@
 #' 2006.
 #' 
 #' @author Alessandro Samuel-Rosa \email{alessandrosamuelrosa@@gmail.com}
-#' @seealso \code{\link[clhs]{clhs}}, \code{\link[spsann]{optimACDC}}
+#' @seealso \code{\link[spsann]{optimACDC}}
 #' @aliases optimDIST objDIST DIST
 #' @import Rcpp
 #' @export

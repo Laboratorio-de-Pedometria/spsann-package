@@ -147,7 +147,8 @@ mechanism to check if the coordinates are projected: the user is responsible for
 requirement is attained.
 
 The (only?) difference of \code{optimCLHS} to the original Fortran implementation of Minasny and McBratney
-(2006), and to the \code{clhs} function implemented in the \pkg{\link[clhs]{clhs}} package by Pierre Roudier, is
+(2006), and to the \code{clhs} function implemented in the former
+\strong{\href{https://CRAN.R-project.org/package=clhs}{clhs}} package by Pierre Roudier, is
 the annealing schedule.
 }
 \examples{
@@ -177,7 +178,7 @@ Roudier, P.; Beaudette, D.; Hewitt, A. A conditioned Latin hypercube sampling al
 operational constraints. \emph{5th Global Workshop on Digital Soil Mapping}. Sydney, p. 227-231, 2012.
 }
 \seealso{
-\code{\link[clhs]{clhs}}, \code{\link[spsann]{optimACDC}}
+\code{\link[spsann]{optimACDC}}
 }
 \author{
 Alessandro Samuel-Rosa \email{alessandrosamuelrosa@gmail.com}

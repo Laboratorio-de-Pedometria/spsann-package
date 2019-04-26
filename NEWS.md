@@ -10,7 +10,9 @@ solution.
 
 # Version 2.1.0.9005 (2019-04-26)
 * Accounts for the fact that the __[clhs](https://cran.r-project.org/web/packages/clhs/index.html)__ package 
-by Pierre Roudier is not on CRAN any more.
+  by Pierre Roudier is not on CRAN any more.
+* Corrects a bug in `plot.OptimizedSampleConfiguration` related to the selection of the information to be 
+  displayed.
 
 # Version 2.1.0.9004 (2019-04-10)
 * Argument `weights` of `optimCLHS`, `optimACDC` and `optimSPAM` now is mandatory. The user is now required to 

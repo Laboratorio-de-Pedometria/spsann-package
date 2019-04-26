@@ -144,7 +144,7 @@ Everitt, B. S. \emph{The Cambridge dictionary of statistics}. Cambridge: Cambrid
 2006.
 }
 \seealso{
-\code{\link[clhs]{clhs}}, \code{\link[spsann]{optimACDC}}
+\code{\link[spsann]{optimACDC}}
 }
 \author{
 Alessandro Samuel-Rosa \email{alessandrosamuelrosa@gmail.com}

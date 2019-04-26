@@ -70,7 +70,8 @@ plot.OptimizedSampleConfiguration <-
     }
     
     # Plot optimized sample configuration
-    if (which == 1:2 || which == 2) {
+    if (all(which == 1:2) || which == 2) {
+    # if (which == 1:2 || which == 2) {
       if (!missing(boundary)) {
         bb <- sp::bbox(boundary)
         if (all(x$points$free == 1)) {
