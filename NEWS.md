@@ -1,7 +1,21 @@
+# Version 2.2.0 (2019-04-26)
+The new version of the __spsann__ package includes some bug fixes and a few modifications. Users now can 
+choose how `optimCLHS` computes objective function values: as in the original paper or as in the FORTRAN 
+implementation. Users now also must inform the `weights` passed to `optimCLHS` as to guarantee that s/he is 
+aware of what s/he is doing. The same apples to other functions that deal with multi-objective optimization 
+problems: `optimACDC` and `optimSPAM`. Another important modification in the current version of __spsann__ is 
+the possibility to use a finite set of candidate locations by setting `cellsize = 0`. This is useful when 
+optimizing sample points only in the feature space and should reduce the computation time needed to find the
+solution.
+
+# Version 2.1.0.9005 (2019-04-26)
+* Accounts for the fact that the __[clhs](https://cran.r-project.org/web/packages/clhs/index.html)__ package 
+by Pierre Roudier is not on CRAN any more.
+
 # Version 2.1.0.9004 (2019-04-10)
 * Argument `weights` of `optimCLHS`, `optimACDC` and `optimSPAM` now is mandatory. The user is now required to 
   set the weights as to guarantee that s/he is aware of what s/he is doing.
-* Corrects bug related to the naming convetions used with `data.frame`s that store objective function
+* Corrects bug related to the naming conventions used with `data.frame`s that store objective function
   values.
 * Allow using a finite set of candidate locations for jittering sample points by setting `cellsize = 0`. When
   this is done, __spsann__ now checks for neighbouring candidate locations already included in the sample as to
