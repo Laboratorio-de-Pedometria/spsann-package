@@ -13,3 +13,4 @@ src/*.so
 R-autofun/
 ^\.travis\.yml$
 ^cran-comments\.md$
+README.Rmd
