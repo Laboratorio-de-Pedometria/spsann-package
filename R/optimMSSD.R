@@ -25,7 +25,7 @@
 #' @note
 #' This function was derived with modifications from the method known as \emph{spatial coverage sampling} 
 #' originally proposed by Brus, de Gruijter and van Groenigen (2006), and implemented in the R-package 
-#' \pkg{\link[spcosa]{spcosa}} by Dennis Walvoort, Dick Brus and Jaap de Gruijter.
+#' __[spcosa](https://CRAN.R-project.org/package=spcosa)__ by Dennis Walvoort, Dick Brus and Jaap de Gruijter.
 #' 
 #' @references
 #' Brus, D. J.; de Gruijter, J. J.; van Groenigen, J.-W. Designing spatial coverage samples using the k-means
@@ -42,7 +42,8 @@
 #' @author
 #' Alessandro Samuel-Rosa \email{alessandrosamuelrosa@@gmail.com}
 #' @seealso
-#' \code{\link[raster]{distanceFromPoints}}, \code{\link[spcosa]{stratify}}.
+#' \code{[distanceFromPoints](https://CRAN.R-project.org/package=raster)},
+#' \code{[stratify](https://CRAN.R-project.org/package=spcosa)}.
 #' @aliases optimMSSD objMSSD MSSD
 #' @concept spatial interpolation
 #' @export

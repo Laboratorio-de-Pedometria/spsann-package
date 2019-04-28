@@ -1,7 +1,5 @@
 ---
-output:
-  md_document:
-    variant: gfm
+output: md_document
 html_preview: false
 ---
 
@@ -10,10 +8,11 @@ html_preview: false
 # Optimization of Sample Configurations using Spatial Simulated Annealing
 
 ```{r, echo=FALSE}
-pkg.info <- drop(
-    read.dcf(file = system.file("DESCRIPTION", package = "spsann"), fields = c("Title", "Version","Date")))
+library(magrittr)
+pkg.info <- 
+  read.dcf(file = "DESCRIPTION", fields = c("Title", "Version", "Date")) %>% 
+  drop()
 ```
-
 
 [![Project Status: Active – The project has reached a stable, usable state and is being actively developed.](http://www.repostatus.org/badges/latest/active.svg)](http://www.repostatus.org/#active)
 [![packageversion](https://img.shields.io/badge/devel%20version-`r pkg.info["Version"]`-firebrick.svg?style=flat-square)](commits/master)

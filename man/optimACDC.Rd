@@ -91,10 +91,10 @@ configuration with details about the optimization.
 function value.
 }
 \description{
-Optimize a sample configuration for spatial trend identification and estimation. An utility function
-\emph{U} is defined so that the sample reproduces the bivariate association/correlation between the
-covariates, as well as their marginal distribution (\bold{ACDC}). The utility function is obtained
-aggregating two objective functions: \bold{CORR} and \bold{DIST}.
+Optimize a sample configuration for spatial trend identification and estimation. An utility function \emph{U} is
+defined so that the sample reproduces the bivariate association/correlation between the covariates, as well
+as their marginal distribution (\strong{ACDC}). The utility function is obtained aggregating two objective
+functions: \strong{CORR} and \strong{DIST}.
 }
 \details{
 The help page of \code{\link[spsann]{minmaxPareto}} contains details on how \pkg{spsann} solves the
@@ -106,7 +106,7 @@ configuration by randomly perturbing the coordinates of a sample point are avail
 \code{\link[spsann]{spJitter}}.
 
 Visit the help pages of \code{\link[spsann]{optimCORR}} and \code{\link[spsann]{optimDIST}} to see the
-details of the objective functions that compose \bold{ACDC}.
+details of the objective functions that compose \strong{ACDC}.
 }
 \note{
 The distance between two points is computed as the Euclidean distance between them. This computation
@@ -125,7 +125,7 @@ candi <- meuse.grid[1:1000, 1:2]
 nadir <- list(sim = 10, seeds = 1:10)
 utopia <- list(user = list(DIST = 0, CORR = 0))
 covars <- meuse.grid[1:1000, 5]
-schedule <- scheduleSPSANN(
+schedule <- spsann::scheduleSPSANN(
   chains = 1, initial.temperature = 5, x.max = 1540, y.max = 2060, 
   x.min = 0, y.min = 0, cellsize = 40)
 set.seed(2001)
@@ -141,8 +141,8 @@ Minasny, B.; McBratney, A. B. A conditioned Latin hypercube method for sampling 
 ancillary information. \emph{Computers & Geosciences}, v. 32, p. 1378-1388, 2006.
 
 Minasny, B.; McBratney, A. B. Conditioned Latin Hypercube Sampling for calibrating soil sensor data to soil
-properties. Chapter 9. Viscarra Rossel, R. A.; McBratney, A. B.; Minasny, B. (Eds.) \emph{Proximal Soil
-Sensing}. Amsterdam: Springer, p. 111-119, 2010.
+properties. Chapter 9. Viscarra Rossel, R. A.; McBratney, A. B.; Minasny, B. (Eds.) \emph{Proximal Soil Sensing}.
+Amsterdam: Springer, p. 111-119, 2010.
 
 Roudier, P.; Beaudette, D.; Hewitt, A. A conditioned Latin hypercube sampling algorithm incorporating
 operational constraints. \emph{5th Global Workshop on Digital Soil Mapping}. Sydney, p. 227-231, 2012.

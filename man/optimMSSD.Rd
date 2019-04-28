@@ -87,7 +87,7 @@ requirement is attained.
 
 This function was derived with modifications from the method known as \emph{spatial coverage sampling}
 originally proposed by Brus, de Gruijter and van Groenigen (2006), and implemented in the R-package
-\pkg{\link[spcosa]{spcosa}} by Dennis Walvoort, Dick Brus and Jaap de Gruijter.
+\strong{\href{https://CRAN.R-project.org/package=spcosa}{spcosa}} by Dennis Walvoort, Dick Brus and Jaap de Gruijter.
 }
 \examples{
 require(sp)
@@ -114,7 +114,8 @@ sampling from compact geographical strata by k-means. \emph{Computers and Geosci
 1261-1267, 2010.
 }
 \seealso{
-\code{\link[raster]{distanceFromPoints}}, \code{\link[spcosa]{stratify}}.
+\code{[distanceFromPoints](https://CRAN.R-project.org/package=raster)},
+\code{[stratify](https://CRAN.R-project.org/package=spcosa)}.
 }
 \author{
 Alessandro Samuel-Rosa \email{alessandrosamuelrosa@gmail.com}

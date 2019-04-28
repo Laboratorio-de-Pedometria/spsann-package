@@ -58,7 +58,8 @@ occupied by another point. If a solution is not found in a reasonable time, the 
 jittered is kept in its original location. Such a procedure clearly is suboptimal.
 
 \pkg{spsann} uses a more elegant method which is based on using a finite set of candidate locations coupled
-with a form of \emph{two-stage random sampling} as implemented in \code{\link[spcosa]{spsample}}. Because
+with a form of \emph{two-stage random sampling} as implemented in
+\code{[spsample](https://CRAN.R-project.org/package=spcosa)}. Because
 the candidate locations are placed on a finite regular grid, they can be seen as the centre nodes of
 a finite set of grid cells (or pixels of a raster image). In the first stage, one of the \dQuote{grid
 cells} is selected with replacement, i.e. independently of already being occupied by another sample point.
@@ -113,7 +114,7 @@ sampling from compact geographical strata by k-means. \emph{Computers & Geoscien
 }
 \seealso{
 \code{ssaOptim}, \code{\link[sp]{zerodist}}, \code{\link[base]{jitter}},
-\code{\link[geoR]{jitter2d}}.
+\code{[jitter2d](https://CRAN.R-project.org/package=geoR)}.
 }
 \author{
 Alessandro Samuel-Rosa \email{alessandrosamuelrosa@gmail.com}
