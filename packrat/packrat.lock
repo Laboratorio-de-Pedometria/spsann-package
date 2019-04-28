@@ -1,0 +1,183 @@
+PackratFormat: 1.4
+PackratVersion: 0.5.0
+RVersion: 3.4.4
+Repos: CRAN=https://cloud.r-project.org
+
+Package: FNN
+Source: CRAN
+Version: 1.1.3
+Hash: ad1a8aaa36a3ad406ef960e5b37984d0
+
+Package: Formula
+Source: CRAN
+Version: 1.2-3
+Hash: 9772da3bc51603a19a2b75f008fd63e3
+
+Package: RColorBrewer
+Source: CRAN
+Version: 1.1-2
+Hash: c0d56cd15034f395874c870141870c25
+
+Package: Rcpp
+Source: CRAN
+Version: 1.0.1
+Hash: 390ed5b5da840cec3e6f5c90c6ab23f7
+
+Package: RcppArmadillo
+Source: CRAN
+Version: 0.9.200.7.0
+Hash: cfdadeab4dc3ca5b3d105563b088bb77
+Requires: Rcpp
+
+Package: SpatialTools
+Source: CRAN
+Version: 1.0.4
+Hash: a3d94a7824bb4383f794277aee27172c
+Requires: Rcpp, RcppArmadillo, spBayes
+
+Package: abind
+Source: CRAN
+Version: 1.4-5
+Hash: 1ceb86ef5ebe776ed4753ab6165eb6d7
+
+Package: coda
+Source: CRAN
+Version: 0.19-2
+Hash: e0d016096b2ba2fc99e9ad8d168697dd
+Requires: lattice
+
+Package: evaluate
+Source: CRAN
+Version: 0.13
+Hash: 1853557a0ea0db2daebf597c7ce58d70
+
+Package: glue
+Source: CRAN
+Version: 1.3.1
+Hash: 660bbbe3803c7cf7c9489a7d99a9c0ed
+
+Package: gstat
+Source: CRAN
+Version: 1.1-6
+Hash: ce7c61250ba98f6ea45a56a002c41d7f
+Requires: FNN, lattice, sp, spacetime, zoo
+
+Package: highr
+Source: CRAN
+Version: 0.8
+Hash: 16aa2cc98d7b68c9d148c263c8dcdbcd
+
+Package: intervals
+Source: CRAN
+Version: 0.15.1
+Hash: 26e23563c50548f8588a112a4baaa297
+
+Package: knitr
+Source: CRAN
+Version: 1.22
+Hash: d7581079d36fa69f84ff721384355734
+Requires: evaluate, highr, markdown, stringr, xfun, yaml
+
+Package: lattice
+Source: CRAN
+Version: 0.20-38
+Hash: 45211081d39bb6d5a89fd789105901aa
+
+Package: latticeExtra
+Source: CRAN
+Version: 0.6-28
+Hash: efdf3a10a129129f7b8f4ae5a0d7ec3d
+Requires: RColorBrewer, lattice
+
+Package: magic
+Source: CRAN
+Version: 1.5-9
+Hash: c6ce9ffc529f67649bb0ff07ba08337a
+Requires: abind
+
+Package: magrittr
+Source: CRAN
+Version: 1.5
+Hash: bdc4d48c3135e8f3b399536ddf160df4
+
+Package: markdown
+Source: CRAN
+Version: 0.9
+Hash: 730f688930cef3223d59bd8aef679ab9
+Requires: mime
+
+Package: mime
+Source: CRAN
+Version: 0.6
+Hash: 2ed8f98b8284ad733f3907fc6e2f1334
+
+Package: packrat
+Source: CRAN
+Version: 0.5.0
+Hash: 498643e765d1442ba7b1160a1df3abf9
+
+Package: pedometrics
+Source: github
+Version: 0.6-6.9008
+Hash: 1166dc57b608f98dc2746a36a17e8244
+Requires: Rcpp, lattice, latticeExtra
+GithubRepo: pedometrics
+GithubUsername: samuel-rosa
+GithubRef: master
+GithubSha1: 3eaa52b1793814146497ba36aed99e290f3ed349
+RemoteHost: api.github.com
+RemoteRepo: pedometrics
+RemoteUsername: samuel-rosa
+RemoteRef: master
+RemoteSha: 3eaa52b1793814146497ba36aed99e290f3ed349
+
+Package: sp
+Source: CRAN
+Version: 1.3-1
+Hash: 01decf1327caff54d7822434d07fa959
+Requires: lattice
+
+Package: spBayes
+Source: CRAN
+Version: 0.4-1
+Hash: bff08e591cd36e83d519300583ac2125
+Requires: Formula, abind, coda, magic
+
+Package: spacetime
+Source: CRAN
+Version: 1.2-2
+Hash: f4041341e1db8b4c1a8a0a04ae4996c1
+Requires: intervals, lattice, sp, xts, zoo
+
+Package: stringi
+Source: CRAN
+Version: 1.4.3
+Hash: ed2a82fc7cc668c1345223d938cdfaf2
+
+Package: stringr
+Source: CRAN
+Version: 1.4.0
+Hash: 67da32dbb2a7a16f2ef124336358e54a
+Requires: glue, magrittr, stringi
+
+Package: xfun
+Source: CRAN
+Version: 0.6
+Hash: 73da552325e6d8a92cf3f85a1463f6ff
+
+Package: xts
+Source: CRAN
+Version: 0.11-2
+Hash: e28685a8b1b8d159a8a335f1c4f1c4d0
+Requires: zoo
+
+Package: yaml
+Source: CRAN
+Version: 2.2.0
+Hash: a5ad5616d83d89f8d84cbf3cf4034e13
+
+Package: zoo
+Source: CRAN
+Version: 1.8-4
+Hash: 9cab6bfac22671b8cbdecbb94585f07c
+Requires: lattice

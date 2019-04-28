@@ -13,3 +13,5 @@ Rprof.out
 # Cpp files
 src/*.o
 src/*.so
+packrat/lib*/
+packrat/src/

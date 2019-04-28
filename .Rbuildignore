@@ -14,3 +14,5 @@ R-autofun/
 ^\.travis\.yml$
 ^cran-comments\.md$
 README.Rmd
+^packrat/
+^\.Rprofile$
