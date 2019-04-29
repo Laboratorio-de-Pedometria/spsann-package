@@ -16,3 +16,4 @@ R-autofun/
 README.Rmd
 ^packrat/
 ^\.Rprofile$
+^CRAN-RELEASE$
