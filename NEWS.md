@@ -9,7 +9,7 @@ optimizing sample points only in the feature space and should reduce the computa
 solution.
 
 # Version 2.1.0.9005 (2019-04-26)
-* Accounts for the fact that the __[clhs](https://cran.r-project.org/web/packages/clhs/index.html)__ package 
+* Accounts for the fact that the __[clhs](https://CRAN.R-project.org/package=clhs)__ package 
   by Pierre Roudier is not on CRAN any more.
 * Corrects a bug in `plot.OptimizedSampleConfiguration` related to the selection of the information to be 
   displayed.
