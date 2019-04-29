@@ -59,6 +59,13 @@ devtools::run_examples(run = FALSE)
 # spelling::update_wordlist()
 devtools::check_rhub()
 
+# Deal with the following warning:
+# * checking compilation flags used ... WARNING
+# Compilation used the following non-portable flag(s):
+#   ‘-Wdate-time’ ‘-Werror=format-security’ ‘-Wformat’
+# usethis::edit_r_makevars()
+# https://stackoverflow.com/a/52100124/3365410
+
 # check the package for Linux and Windows
 devtools::check(document = TRUE, manual = TRUE, force_suggests = TRUE, run_dont_test = TRUE)
 
