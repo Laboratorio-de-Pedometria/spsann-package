@@ -20,7 +20,10 @@
 #' y-coordinates is the same. If \code{cellsize = 0} then \pkg{spsann} understands that a finite set of
 #' candidate locations is being used (See Details).
 #' 
-#' @param which.point Integer values defining which point should be perturbed. 
+#' @param which.point Integer values defining which point should be perturbed.
+#' 
+#' @param verbose (Optional) Logical for printing messages about the progress of the optimization. Defaults to 
+#' `verbose = FALSE`.
 #' 
 #' @details 
 #' \subsection{Jittering methods}{
@@ -112,7 +115,7 @@
 #' points(pts3[, 2:3], pch = 19, col = "blue", cex = 0.5)
 # FUNCTION ####################################################################################################
 spJitter <-
-  function (points, candi, x.max, x.min, y.max, y.min, which.point, cellsize) {
+  function (points, candi, x.max, x.min, y.max, y.min, which.point, cellsize, verbose = FALSE) {
     
     # If a single value has been passed to cellsize it means that candidate locations (grid cells) are 
     # square-shaped.
@@ -142,9 +145,11 @@ spJitter <-
         # If there is no candidate location left in the neighbourhood, we keep the sample point in its
         # original location
         pt2 <- pt0
-        m <- paste('no candidate location left in the neighbourhood of point ', pt0[1], 
-                   '...\nreturnig to original location', sep = '')
-        message(m)
+        if (verbose) {
+          m <- paste('no candidate location left in the neighbourhood of point ', pt0[1], 
+                     '...\nreturnig to original location', sep = '')
+          message(m)
+        }
         
       } else {
         # Ramdomly choose one single candidate location and get its coordinates from candi

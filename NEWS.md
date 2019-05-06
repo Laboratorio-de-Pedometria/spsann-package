@@ -1,3 +1,9 @@
+# Version 2.2.0.9000 (2019-05-06)
+
+* Improvement:
+    - Adds argument `verbose` to `spJitter()`. The user decides if s/he wants to be warned when there is no
+      candidate location left in the neighbourhood and the sample point is kept in its original location.
+
 # Version 2.2.0 (2019-04-28)
 The new version of the __spsann__ package includes some bug fixes and a few modifications. Users now can 
 choose how `optimCLHS` computes objective function values: as in the original paper or as in the FORTRAN 
