@@ -1,3 +1,8 @@
+# Version 2.2.0.9001 (2019-09-14)
+
+* Improvement:
+  + Function `optimMSSD()` has a new argument called `eval.grid`.
+
 # Version 2.2.0.9000 (2019-05-06)
 
 * Improvement:

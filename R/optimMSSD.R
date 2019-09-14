@@ -6,6 +6,7 @@
 # @inheritParams spJitter
 #' @template spSANN_doc
 #' @template spJitter_doc
+#' @eval.grid In construction
 #' 
 #' @details 
 #' \subsection{Spatial coverage sampling}{
@@ -58,9 +59,9 @@
 #' res <- optimMSSD(points = 10, candi = candi, schedule = schedule)
 #' objSPSANN(res) - objMSSD(candi = candi, points = res)
 #' 
-# FUNCTION - MAIN ##############################################################
+# FUNCTION - MAIN #############################################################################################
 optimMSSD <-
-  function (points, candi,
+  function (points, candi, eval.grid,
             # SPSANN
             schedule = scheduleSPSANN(), plotit = FALSE, track = FALSE, 
             boundary, progress = "txt", verbose = FALSE) {
