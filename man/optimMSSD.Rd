@@ -6,10 +6,11 @@
 \alias{MSSD}
 \title{Optimization of sample configurations for spatial interpolation (I)}
 \usage{
-optimMSSD(points, candi, schedule = scheduleSPSANN(), plotit = FALSE,
-  track = FALSE, boundary, progress = "txt", verbose = FALSE)
+optimMSSD(points, candi, eval.grid, schedule = scheduleSPSANN(),
+  plotit = FALSE, track = FALSE, boundary, progress = "txt",
+  verbose = FALSE)
 
-objMSSD(points, candi)
+objMSSD(points, candi, eval.grid)
 }
 \arguments{
 \item{points}{Integer value, integer vector, data frame or matrix, or list.
@@ -30,6 +31,8 @@ configuration -- free to move during the optimization.
 \item{candi}{Data frame or matrix with the candidate locations for the jittered points. \code{candi} must
 have two columns in the following order: \code{[, "x"]}, the projected x-coordinates, and \code{[, "y"]},
 the projected y-coordinates.}
+
+\item{eval.grid}{In construction}
 
 \item{schedule}{List with 11 named sub-arguments defining the control parameters of the cooling schedule.
 See \code{\link[spsann]{scheduleSPSANN}}.}
@@ -60,22 +63,32 @@ progress bar. A Tk progress bar widget is useful when using parallel processors.
 configuration with details about the optimization.
 
 \code{objMSSD} returns a numeric value: the energy state of the sample configuration -- the objective
-function value.
+function value in square map units, generaly m^2^ or km^2^.
 }
 \description{
-Optimize a sample configuration for spatial interpolation. The criterion used is the mean squared shortest
-distance (\bold{MSSD}) between sample points and prediction points.
+Optimize a sample configuration for spatial interpolation, e.g. simple and ordinary (co)kriging. The
+criterion used is the mean squared shortest distance (\strong{MSSD}) between sample locations and prediction
+locations.
 }
 \details{
 Details about the mechanism used to generate a new sample configuration out of the current sample
 configuration by randomly perturbing the coordinates of a sample point are available in the help page of
 \code{\link[spsann]{spJitter}}.
 
-\subsection{Spatial coverage sampling}{
-Spatial coverage sampling is based on the knowledge that the kriging variance depends upon the distance
-between sample points. As such, the better the spread of the sample points in the spatial domain, the
-smaller the kriging variance. This is similar to using a regular grid of sample points. However,
-a regular grid usually is suboptimal for irregularly shaped areas.
+\subsection{Mean squared shortest distance}{
+This objective function is based on the knowledge that the simple and ordinary (co)kriging prediction error
+variance only depends upon the separation distance between sample locations: the larger the distance, the
+larger the prediction error variance. As such, the better the spread of the sample locations in the spatial
+domain, the smaller the simple/ordinary (co)kriging prediction error variance. This is the purpose of using
+a regular grid of sample locations. However, a regular grid usually is suboptimal, especially if the spatial
+domain is irregularly shaped. Thus the need for optimization, that is based on measuring the goodness of the
+spread of sample locations in the spatial domain. To measure this spread we can compute the distance from
+every sample location to each of the prediction locations placed on a fine grid covering the entire spatial
+domain. Next, for every prediction location we find the closest sample point and record its distance. The
+mean of these squared distances over all prediction location will measure the spread of the sample points.
+During the optimization, we try to reduce this measure -- the mean squared shortest distance -- between
+sample and prediction locations. (This is also know as \emph{spatial coverage sampling}, see the R-package
+\strong{\href{https://CRAN.R-project.org/package=spcosa}{spcosa}}.)
 }
 }
 \note{
@@ -85,11 +98,17 @@ the sample points and candidate locations should not be provided as latitude/lon
 mechanism to check if the coordinates are projected: the user is responsible for making sure that this
 requirement is attained.
 
-This function was derived with modifications from the method known as \emph{spatial coverage sampling}
-originally proposed by Brus, de Gruijter and van Groenigen (2006), and implemented in the R-package
-\strong{\href{https://CRAN.R-project.org/package=spcosa}{spcosa}} by Dennis Walvoort, Dick Brus and Jaap de Gruijter.
+\subsection{Sample configuration for spatial interpolation}{
+A sample configuration optimized for spatial interpolation such as simple and ordinary (co)kriging is not
+necessarily appropriate for estimating the parameters of the spatial prediction model, in this case, the
+parameters of the variogram model. See \code{\link[spsann]{optimPPL}} for more information on the
+optimization of sample configurations for variogram identification and estimation.
+}
 }
 \examples{
+###################################################################################
+# This is just an example and the settings below are unlikely to meet your needs. #
+###################################################################################
 require(sp)
 data(meuse.grid)
 candi <- meuse.grid[, 1:2]
@@ -103,8 +122,8 @@ objSPSANN(res) - objMSSD(candi = candi, points = res)
 }
 \references{
 Brus, D. J.; de Gruijter, J. J.; van Groenigen, J.-W. Designing spatial coverage samples using the k-means
-clustering algorithm. In: P. Lagacherie,A. M.; Voltz, M. (Eds.) \emph{Digital soil mapping -- an
-introductory perspective}. Elsevier, v. 31, p. 183-192, 2006.
+clustering algorithm. In: P. Lagacherie,A. M.; Voltz, M. (Eds.) \emph{Digital soil mapping -- an introductory
+perspective}. Elsevier, v. 31, p. 183-192, 2006.
 
 de Gruijter, J. J.; Brus, D.; Bierkens, M.; Knotters, M. \emph{Sampling for natural resource monitoring}.
 Berlin: Springer, p. 332, 2006.

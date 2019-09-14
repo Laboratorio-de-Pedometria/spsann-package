@@ -1,19 +1,31 @@
 #' Optimization of sample configurations for spatial interpolation (I)
 #'
-#' Optimize a sample configuration for spatial interpolation. The criterion used is the mean squared shortest 
-#' distance (\bold{MSSD}) between sample points and prediction points.
+#' Optimize a sample configuration for spatial interpolation, e.g. simple and ordinary (co)kriging. The
+#' criterion used is the mean squared shortest distance (__MSSD__) between sample locations and prediction
+#' locations.
 #'
 # @inheritParams spJitter
 #' @template spSANN_doc
 #' @template spJitter_doc
-#' @eval.grid In construction
+#' @param eval.grid Data frame or matrix with the objective function evaluation locations. Like `candi`, 
+#' `eval.grid` must have two columns in the following order: `[, "x"]`, the projected x-coordinates, and 
+#' `[, "y"]`, the projected y-coordinates.
 #' 
 #' @details 
-#' \subsection{Spatial coverage sampling}{
-#' Spatial coverage sampling is based on the knowledge that the kriging variance depends upon the distance 
-#' between sample points. As such, the better the spread of the sample points in the spatial domain, the 
-#' smaller the kriging variance. This is similar to using a regular grid of sample points. However, 
-#' a regular grid usually is suboptimal for irregularly shaped areas.
+#' \subsection{Mean squared shortest distance}{
+#' This objective function is based on the knowledge that the simple and ordinary (co)kriging prediction error 
+#' variance only depends upon the separation distance between sample locations: the larger the distance, the
+#' larger the prediction error variance. As such, the better the spread of the sample locations in the spatial
+#' domain, the smaller the simple/ordinary (co)kriging prediction error variance. This is the purpose of using
+#' a regular grid of sample locations. However, a regular grid usually is suboptimal, especially if the spatial
+#' domain is irregularly shaped. Thus the need for optimization, that is based on measuring the goodness of the
+#' spread of sample locations in the spatial domain. To measure this spread we can compute the distance from
+#' every sample location to each of the prediction locations placed on a fine grid covering the entire spatial
+#' domain. Next, for every prediction location we find the closest sample point and record its distance. The
+#' mean of these squared distances over all prediction location will measure the spread of the sample points.
+#' During the optimization, we try to reduce this measure -- the mean squared shortest distance -- between
+#' sample and prediction locations. (This is also know as _spatial coverage sampling_, see the R-package
+#' __[spcosa](https://CRAN.R-project.org/package=spcosa)__.)
 #' }
 #'
 #' @return
@@ -21,23 +33,26 @@
 #' configuration with details about the optimization.
 #'
 #' \code{objMSSD} returns a numeric value: the energy state of the sample configuration -- the objective
-#' function value.
+#' function value in square map units, generaly m^2^ or km^2^.
 #' 
 #' @note
-#' This function was derived with modifications from the method known as \emph{spatial coverage sampling} 
-#' originally proposed by Brus, de Gruijter and van Groenigen (2006), and implemented in the R-package 
-#' __[spcosa](https://CRAN.R-project.org/package=spcosa)__ by Dennis Walvoort, Dick Brus and Jaap de Gruijter.
+#' \subsection{Sample configuration for spatial interpolation}{
+#' A sample configuration optimized for spatial interpolation such as simple and ordinary (co)kriging is not
+#' necessarily appropriate for estimating the parameters of the spatial prediction model, in this case, the
+#' parameters of the variogram model. See \code{\link[spsann]{optimPPL}} for more information on the 
+#' optimization of sample configurations for variogram identification and estimation.
+#' }
 #' 
 #' @references
 #' Brus, D. J.; de Gruijter, J. J.; van Groenigen, J.-W. Designing spatial coverage samples using the k-means
-#' clustering algorithm. In: P. Lagacherie,A. M.; Voltz, M. (Eds.) \emph{Digital soil mapping -- an 
-#' introductory perspective}. Elsevier, v. 31, p. 183-192, 2006.
+#' clustering algorithm. In: P. Lagacherie,A. M.; Voltz, M. (Eds.) _Digital soil mapping -- an introductory
+#' perspective_. Elsevier, v. 31, p. 183-192, 2006.
 #'
-#' de Gruijter, J. J.; Brus, D.; Bierkens, M.; Knotters, M. \emph{Sampling for natural resource monitoring}.
+#' de Gruijter, J. J.; Brus, D.; Bierkens, M.; Knotters, M. _Sampling for natural resource monitoring_.
 #' Berlin: Springer, p. 332, 2006.
 #'
 #' Walvoort, D. J. J.; Brus, D. J.; de Gruijter, J. J. An R package for spatial coverage sampling and random 
-#' sampling from compact geographical strata by k-means. \emph{Computers and Geosciences}. v. 36, p. 
+#' sampling from compact geographical strata by k-means. _Computers and Geosciences_. v. 36, p. 
 #' 1261-1267, 2010.
 #'
 #' @author
@@ -49,6 +64,9 @@
 #' @concept spatial interpolation
 #' @export
 #' @examples
+#' #####################################################################
+#' # NOTE: The settings below are unlikely to meet your needs.         #
+#' #####################################################################
 #' require(sp)
 #' data(meuse.grid)
 #' candi <- meuse.grid[, 1:2]
@@ -86,9 +104,9 @@ optimMSSD <-
     # 'old_conf' is used instead of 'conf0' because the former holds information on both fixed and free points.
     # dm <- SpatialTools::dist2(candi[, 2:3], conf0[, 2:3])
     if (!missing(eval.grid)) {
-      dm <- SpatialTools::dist2(eval.grid, old_conf[, 2:3])
+      dm <- SpatialTools::dist2(coords1 = eval.grid, coords2 = old_conf[, 2:3])
     } else {
-      dm <- SpatialTools::dist2(candi[, 2:3], old_conf[, 2:3])
+      dm <- SpatialTools::dist2(coords1 = candi[, 2:3], coords2 = old_conf[, 2:3])
     }
     energy0 <- data.frame(obj = .objMSSD(x = dm))
     
