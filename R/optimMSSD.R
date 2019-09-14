@@ -85,7 +85,11 @@ optimMSSD <-
     # The function .objMSSD() does the squaring internaly.
     # 'old_conf' is used instead of 'conf0' because the former holds information on both fixed and free points.
     # dm <- SpatialTools::dist2(candi[, 2:3], conf0[, 2:3])
-    dm <- SpatialTools::dist2(candi[, 2:3], old_conf[, 2:3])
+    if (!missing(eval.grid)) {
+      dm <- SpatialTools::dist2(eval.grid, old_conf[, 2:3])
+    } else {
+      dm <- SpatialTools::dist2(candi[, 2:3], old_conf[, 2:3])
+    }
     energy0 <- data.frame(obj = .objMSSD(x = dm))
     
     # Other settings for the simulated annealing algorithm
@@ -113,8 +117,11 @@ optimMSSD <-
           
           # Update the matrix of distances and calculate the new energy state
           x2 <- matrix(new_conf[wp, 2:3], nrow = 1)
-          new_dm <- .updateMSSDCpp(x1 = candi[, 2:3], x2 = x2, dm = old_dm, 
-                                   idx = wp)
+          if (!missing(eval.grid)) {
+            new_dm <- .updateMSSDCpp(x1 = eval.grid, x2 = x2, dm = old_dm, idx = wp)
+          } else {
+            new_dm <- .updateMSSDCpp(x1 = candi[, 2:3], x2 = x2, dm = old_dm, idx = wp)
+          }
           new_energy <- data.frame(obj = .objMSSD(new_dm))
           
           # Update the matrix of distances and calculate the new energy state
@@ -179,8 +186,7 @@ optimMSSD <-
           # }
         }
         if (verbose) {
-          cat("\n", no_change, "chain(s) with no improvement... stops at",
-              schedule$stopping, "\n")
+          cat("\n", no_change, "chain(s) with no improvement... stops at", schedule$stopping, "\n")
         }
       } else {
         no_change <-  0
@@ -197,17 +203,21 @@ optimMSSD <-
     eval(.prepare_output())
     return (res)
   }
-# FUNCTION - CALCULATE THE CRITERION VALUE #####################################
+# FUNCTION - CALCULATE THE CRITERION VALUE ####################################################################
 #' @rdname optimMSSD
 #' @export
 objMSSD <-
-  function (points, candi) {
+  function (points, candi, eval.grid) {
     
     # Prepare points and candi
     eval(.prepare_points())
     
     # Compute the matrix of distances
-    dm <- SpatialTools::dist2(coords1 = candi[, 2:3], coords2 = points[, 2:3])
+    if (!missing(eval.grid)) {
+      dm <- SpatialTools::dist2(coords1 = eval.grid, coords2 = points[, 2:3])
+    } else {
+      dm <- SpatialTools::dist2(coords1 = candi[, 2:3], coords2 = points[, 2:3])
+    }
     
     # Calculate the energy state
     res <- .objMSSD(dm)
@@ -215,7 +225,7 @@ objMSSD <-
     # Output
     return (res)
   }
-# INTERNAL FUNCTION - NEAREST POINT ############################################
+# INTERNAL FUNCTION - NEAREST POINT ###########################################################################
 # Function to identify the nearest point.
 .nearestPoint <-
   function (dist.mat, which.pts) {
@@ -223,14 +233,13 @@ objMSSD <-
       stop ("'dist.mat' should be a n x n matrix")
     }
     if (!is.vector(which.pts) || length(which.pts) >= dim(dist.mat)[2]) {
-      stop (paste("'which.pts' should be a vector of length smaller than ",
-                  dim(dist.mat)[2], sep = ""))
+      stop (paste("'which.pts' should be a vector of length smaller than ", dim(dist.mat)[2], sep = ""))
     }
     sub_dm <- dist.mat[, which.pts]
     min_dist_id <- apply(sub_dm, MARGIN = 1, FUN = which.min)
     return (min_dist_id)
   }
-# 
+# INTERNAL FUNCTION ###########################################################################################
 .subsetCandi <-
   function (candi, cellsize) {
     x <- seq(min(candi[, 1]), max(candi[, 1]), by = cellsize * 2)
