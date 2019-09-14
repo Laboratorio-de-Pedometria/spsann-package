@@ -10,16 +10,13 @@ using namespace Rcpp;
 
 // [[Rcpp::export(".updateMSSDCpp")]]
 
-NumericMatrix updateMSSDCpp(NumericMatrix x1, NumericMatrix x2, 
-                            NumericMatrix dm, int idx) {
-  int ncolx1 = x1.ncol(), nrowx1 = x1.nrow(), ncoldm = dm.ncol(), 
-      nrowdm = dm.nrow();
+NumericMatrix updateMSSDCpp(NumericMatrix x1, NumericMatrix x2, NumericMatrix dm, int idx) {
+  int ncolx1 = x1.ncol(), nrowx1 = x1.nrow(), ncoldm = dm.ncol(), nrowdm = dm.nrow();
   NumericVector d(nrowx1, 0.0000);
   NumericMatrix res(nrowdm, ncoldm);
   
   // Get the data of the distance matrix
-  // This is needed so that the object passed to 'dm' is not replaced in the 
-  // global environment.
+  // This is needed so that the object passed to 'dm' is not replaced in the global environment.
   for (int i = 0; i < nrowdm; i++) {
     for (int j = 0; j < ncoldm; j++) {
       res(i, j) = dm(i, j);
