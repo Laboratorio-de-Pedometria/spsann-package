@@ -30,7 +30,7 @@ data(meuse.grid, package = 'sp')
 candi <- meuse.grid[, 1:2]
 covars <- as.data.frame(meuse.grid)
 vgm <- gstat::vgm(psill = 10, model = "Exp", range = 500, nugget = 8)
-schedule <- scheduleSPSANN(initial.temperature = 0.001, initial.acceptance = 0, chains = 1)
+schedule <- scheduleSPSANN(initial.temperature = 0.001, initial.acceptance = 0, chains = 1, cellsize = 40)
 set.seed(2001)
 res <- optimMKV(
   points = 100, candi = candi, covars = covars, vgm = vgm, eqn = z ~ dist, schedule = schedule, plotit = TRUE, 
@@ -47,7 +47,7 @@ data(meuse.grid, package = 'sp')
 candi <- meuse.grid[, 1:2]
 covars <- as.data.frame(meuse.grid)
 vgm <- gstat::vgm(psill = 10, model = "Exp", range = 500, nugget = 8)
-schedule <- scheduleSPSANN(initial.temperature = 0.001, initial.acceptance = 0, chains = 1)
+schedule <- scheduleSPSANN(initial.temperature = 0.001, initial.acceptance = 0, chains = 1, cellsize = 40)
 set.seed(2001)
 res <- optimMKV(
   points = 100, candi = candi, covars = covars, vgm = vgm, eqn = z ~ dist, schedule = schedule, plotit = TRUE, 
@@ -67,7 +67,7 @@ data(meuse.grid, package = "sp")
 candi <- meuse.grid[, 1:2]
 covars <- as.data.frame(meuse.grid)
 vgm <- gstat::vgm(psill = 10, model = "Exp", range = 500, nugget = 8)
-schedule <- scheduleSPSANN(initial.temperature = 10, chains = 1)
+schedule <- scheduleSPSANN(initial.temperature = 10, chains = 1, cellsize = 40)
 set.seed(2001)
 res <- optimMKV(
   points = 100, candi = candi, covars = covars, vgm = vgm, eqn = z ~ dist + soil + ffreq, plotit = TRUE, 
@@ -80,9 +80,6 @@ data.frame(
 )
 
 # 4) ORDINARY KRIGING #########################################################################################
-# Close to the end of the optimization, the algorithm restarts with the previously best configuration.
-# Perhaps this is the reason why the objective value returned by objSPSANN() is not equal to that computed
-# with objMKV().
 rm(list = ls())
 gc()
 sapply(list.files("R", full.names = TRUE, pattern = ".R$"), source)
@@ -90,7 +87,7 @@ sapply(list.files("src", full.names = TRUE, pattern = ".cpp$"), Rcpp::sourceCpp)
 data(meuse.grid, package = "sp")
 candi <- meuse.grid[, 1:2]
 vgm <- gstat::vgm(psill = 10, model = "Exp", range = 500, nugget = 8)
-schedule <- scheduleSPSANN(chains = 500, initial.temperature = 5)
+schedule <- scheduleSPSANN(chains = 500, initial.temperature = 5, cellsize = 40)
 set.seed(2001)
 res <- optimMKV(points = 10, candi = candi, eqn = z ~ 1, vgm = vgm, nmax = 50, plotit = TRUE, 
                 schedule = schedule)
@@ -109,7 +106,7 @@ data(meuse.grid, package = "sp")
 candi <- meuse.grid[, 1:2]
 covars <- as.data.frame(meuse.grid[, c("soil", "dist")])
 vgm <- gstat::vgm(psill = 10, model = "Exp", range = 100, nugget = 5)
-schedule <- scheduleSPSANN(initial.temperature = 10^200, chains = 10)
+schedule <- scheduleSPSANN(initial.temperature = 10^200, chains = 10, cellsize = 40)
 free <- 10
 set.seed(1984)
 id <- sample(1:nrow(candi), 90)
