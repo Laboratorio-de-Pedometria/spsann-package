@@ -1,28 +1,29 @@
 #' Optimization of sample configurations for spatial interpolation (II)
 #'
-#' Optimize a sample configuration for spatial interpolation with a known linear model. A criterion is defined 
-#' so that the sample configuration minimizes the mean or maximum kriging variance (\bold{MKV}).
+#' Optimize a sample configuration for spatial interpolation with a 'known' linear mixed model, e.g. universal 
+#' (external drift) kriging and regression-kriging with a linear regression model. A criterion is defined so
+#' that the sample configuration minimizes the mean or maximum kriging prediciton error variance (\bold{MKV}).
 #'
-# @inheritParams spJitter
 #' @template spSANN_doc
 #' @template spJitter_doc
 #' 
 #' @inheritParams optimMSSD
 #' 
-#' @param covars Data frame or matrix with the covariates in the columns.
+#' @param covars Data frame or matrix with the covariates in the columns. The number of rows of `covars` must 
+#' match exactly that of `candi` -- or `eval.grid`, in case a coarser evaluation grid is used.
 #' 
-#' @param eqn Formula string that defines the dependent variable \code{z} as a linear model of the independent 
-#' variables contained in \code{covars}. Defaults to \code{eqn = z ~ 1}, that is, ordinary kriging. See the 
-#' argument \code{formula} in the function \code{\link[gstat]{krige}} for more information.
+#' @param eqn Formula string that defines the dependent variable `z` as a linear function of the independent 
+#' variables (covariates) contained in `covars`. Defaults to `eqn = z ~ 1`, that is, ordinary kriging. See the 
+#' argument `formula` in the function `\link[gstat]{krige}` for more information.
 #'
-#' @param vgm Object of class \code{variogramModel}. See the argument \code{model} in the function 
-#' \code{\link[gstat]{krige}} for more information.
+#' @param vgm Object of class `variogramModel`. See the argument `model` in the function `\link[gstat]{krige}`
+#' for more information.
 #'
 #' @param krige.stat Character value defining the statistic that should be used to summarize the kriging 
-#' variance. Available options are \code{"mean"} and \code{"max"} for the mean and maximum kriging variance, 
-#' respectively. Defaults to \code{krige.stat = "mean"}.
+#' prediction error variance. Available options are `"mean"` and `"max"` for the mean and maximum kriging  
+#' prediction error variance, respectively. Defaults to `krige.stat = "mean"`.
 #' 
-#' @param ... further arguments passed to \code{\link[gstat]{krige}}.
+#' @param ... further arguments passed to `\link[gstat]{krige}`. (Use with caution.)
 #'
 #' @return
 #' \code{optimMKV} returns an object of class \code{OptimizedSampleConfiguration}: the optimized sample
