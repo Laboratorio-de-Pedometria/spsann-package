@@ -66,6 +66,9 @@
 #' \code{\link[spsann]{optimSPAN}}, \code{\link[spsann]{optimUSER}}.
 #' @export
 #' @examples
+#' #####################################################################
+#' # NOTE: The settings below are unlikely to meet your needs.         #
+#' #####################################################################
 #' schedule <- scheduleSPSANN()
 # FUNCTION #####################################################################
 scheduleSPSANN <-

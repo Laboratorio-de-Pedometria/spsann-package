@@ -36,6 +36,9 @@
 #' @aliases optimSPAN objSPAN SPAN
 #' @export
 #' @examples
+#' #####################################################################
+#' # NOTE: The settings below are unlikely to meet your needs.         #
+#' #####################################################################
 #' \dontrun{
 #' # This example takes more than 5 seconds to run!
 #' require(sp)

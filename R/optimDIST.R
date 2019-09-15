@@ -62,6 +62,9 @@
 #' @import Rcpp
 #' @export
 #' @examples
+#' #####################################################################
+#' # NOTE: The settings below are unlikely to meet your needs.         #
+#' #####################################################################
 #' require(sp)
 #' data(meuse.grid)
 #' candi <- meuse.grid[, 1:2]

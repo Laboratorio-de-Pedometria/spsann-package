@@ -28,6 +28,9 @@
 #' @aliases optimUSER USER
 #' @export
 #' @examples
+#' #####################################################################
+#' # NOTE: The settings below are unlikely to meet your needs.         #
+#' #####################################################################
 #' \dontrun{
 #' # This example takes more than 5 seconds
 #' require(sp)

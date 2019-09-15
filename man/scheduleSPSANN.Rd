@@ -50,6 +50,9 @@ A list with a set of control parameters of the annealing schedule.
 Set the control parameters for the annealing schedule of \pkg{spsann} functions.
 }
 \examples{
+#####################################################################
+# NOTE: The settings below are unlikely to meet your needs.         #
+#####################################################################
 schedule <- scheduleSPSANN()
 }
 \references{

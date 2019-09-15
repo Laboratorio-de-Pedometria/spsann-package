@@ -46,6 +46,9 @@
 #' @aliases optimCORR objCORR CORR
 #' @export
 #' @examples
+#' #####################################################################
+#' # NOTE: The settings below are unlikely to meet your needs.         #
+#' #####################################################################
 #' data(meuse.grid, package = "sp")
 #' candi <- meuse.grid[1:1000, 1:2]
 #' covars <- meuse.grid[1:1000, 5]
