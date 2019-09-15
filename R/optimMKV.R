@@ -13,8 +13,8 @@
 #' match exactly that of `candi` -- or `eval.grid`, in case a coarser evaluation grid is used.
 #' 
 #' @param eqn Formula string that defines the dependent variable `z` as a linear function of the independent 
-#' variables (covariates) contained in `covars`. Defaults to `eqn = z ~ 1`, that is, ordinary kriging. See the 
-#' argument `formula` in the function `\link[gstat]{krige}` for more information.
+#' variables (covariates) contained in `covars`. See the argument `formula` in the function 
+#' `\link[gstat]{krige}` for more information.
 #'
 #' @param vgm Object of class `variogramModel`. See the argument `model` in the function `\link[gstat]{krige}`
 #' for more information.
@@ -66,14 +66,14 @@
 #'   points = 10, candi = candi, covars = covars, eqn = z ~ dist, 
 #'   vgm = vgm, schedule = schedule)
 #' objSPSANN(res) - objMKV(
-#'   points = res, candi = candi, covars = covars,  eqn = z ~ dist, 
+#'   points = res, candi = candi, covars = covars, eqn = z ~ dist, 
 #'   vgm = vgm)
 #' }
 # FUNCTION - MAIN #############################################################################################
 optimMKV <-
   function (points, candi, eval.grid,
             # MKV
-            covars, eqn = z ~ 1, vgm, krige.stat = "mean", ...,
+            covars, eqn, vgm, krige.stat = "mean", ...,
             # SPSANN
             schedule = scheduleSPSANN(), plotit = FALSE, track = FALSE,
             boundary, progress = "txt", verbose = FALSE) {
@@ -89,7 +89,8 @@ optimMKV <-
     eval(.check_spsann_arguments())
     
     # Check other arguments
-    check <- .checkMKV(covars = covars, eqn = eqn, vgm = vgm, krige.stat = krige.stat, candi = candi)
+    check <- .checkMKV(
+      covars = covars, eqn = eqn, vgm = vgm, krige.stat = krige.stat, candi = candi, eval.grid = eval.grid)
     if (!is.null(check)) stop (check, call. = FALSE)
     
     # Set plotting options
@@ -303,21 +304,33 @@ optimMKV <-
   }
 # INTERNAL FUNCTION - CHECK ARGUMENTS #########################################################################
 .checkMKV <-
-  function (covars, eqn, vgm, krige.stat, candi) {
+  function (covars, eqn, vgm, krige.stat, candi, eval.grid) {
     
-    # covars
+    # 'covars' compared to 'candi' e 'eval.grid'
     if (!missing(covars)) {
-      if (is.vector(covars)) {
-        if (nrow(candi) != length(covars)) {
-          res <- "'candi' and 'covars' must have the same number of rows"
+      covars_rows <- ifelse(is.vector(covars), length(covars), nrow(covars))
+      if (!missing(eval.grid)) {
+        if (covars_rows != nrow(eval.grid)) {
+          res <- "'covars' and 'eval.grid' must have the same number of rows"
           return (res)
         }
       } else {
-        if (nrow(candi) != nrow(covars)) {
-          res <- "'candi' and 'covars' must have the same number of rows"
+        if (covars_rows != nrow(candi)) {
+          res <- "'covars' and 'candi' must have the same number of rows"
           return (res)
         }
       }
+      # if (is.vector(covars)) {
+      #   if (nrow(candi) != length(covars)) {
+      #     res <- "'candi' and 'covars' must have the same number of rows"
+      #     return (res)
+      #   }
+      # } else {
+      #   if (nrow(candi) != nrow(covars)) {
+      #     res <- "'candi' and 'covars' must have the same number of rows"
+      #     return (res)
+      #   }
+      # }
     }
     
     # eqn
@@ -349,7 +362,7 @@ optimMKV <-
 objMKV <-
   function (points, candi, eval.grid,
             # MKV
-            covars, eqn = z ~ 1, vgm, krige.stat = "mean", ...) {
+            covars, eqn, vgm, krige.stat = "mean", ...) {
     
     # Check suggests
     pkg <- c("gstat")
