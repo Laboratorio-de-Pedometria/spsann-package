@@ -1,7 +1,24 @@
 # Version 2.2.0.9001 (2019-09-14)
 
-* Improvement:
-  + Function `optimMSSD()` has a new argument called `eval.grid`.
+* Improvements:
+  + Functions `optimMSSD()`, `objMSSD()`, `optimMKV()` and `objMKV()` have a new argument called `eval.grid`.
+    With this argument, we can use a grid that is coarser than `candi` to compute the objective function value
+    (energy state). This is important in large areas to speed up computations. With this new argument we can
+    also thin an existing sample configuration. To do this, the existing sample configuration has to be passed
+    to `candi`. If one passes a matrix to `eval.grid`, then jittering parameters are estimated from `eval.grid`
+    instead of `candi`.
+  + A note has been added to the examples of all functions. Is says: 'The settings below are unlikely to meet
+    your needs.' This is an attempt to warn new and uneducated users of the need to study the function and set
+    function arguments according to their use cases.
+  + Argument `eqn` of function `optimMKV()` and `objMKV()` has no default anymore. The previous default --
+    `eqn = z ~ 1` -- represented an ordinary kriging system, while the function was primarily designed for 
+    universal kriging. The default was useful as an example, but has confused new and uneducated users, thus 
+    the decision for its removal.
+  + Argument `stopping` of function `scheduleSPSANN()` is now set to be equal to ten percent the maximum
+    number of chains by using `ceiling(chains * 0.1)`. The previous default value of `stopping = 10` was being
+    misused by new and uneducated users, thus the decision for its modification. With the default settings,
+    `chain = 500` and thus `stopping = 50`, which should give more stable results.
+  + The documentation of various functions has been revised and improved wherever necessary.
 
 # Version 2.2.0.9000 (2019-05-06)
 
