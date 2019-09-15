@@ -23,10 +23,10 @@ x- and y-coordinates. If missing, they are estimated from \code{candi}.}
 
 \item{which.point}{Integer values defining which point should be perturbed.}
 
-\item{cellsize}{Vector with two numeric values defining the horizontal (x) and vertical (y) spacing
-between the candidate locations in \code{candi}. A single value can be used if the spacing in the x- and
-y-coordinates is the same. If \code{cellsize = 0} then \strong{spsann} understands that a finite set of candidate
-locations is being used (See Details).}
+\item{cellsize}{Vector with two positive numeric values defining the spacing in the x- and y-coordinates
+between the candidate locations in \code{candi}, i.e. the grid resolution. A single value can be used if the
+spacing in the x- and y-coordinates is the same. If \code{cellsize = 0} then a finite set of candidate locations
+is used (See Details).}
 
 \item{verbose}{(Optional) Logical for printing messages about the progress of the optimization. Defaults to
 \code{verbose = FALSE}.}

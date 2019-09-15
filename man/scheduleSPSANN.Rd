@@ -24,10 +24,10 @@ y-coordinates. If missing, they are estimated from \code{candi} -- or \code{eval
 grid is used --, \code{x.min} and \code{y.min} being set to zero, and \code{x.max} and \code{y.max} being set to half the
 maximum distance in the x- and y-coordinates, respectively.}
 
-\item{cellsize}{Vector with two numeric values defining the horizontal (x) and vertical (y) spacing
-between the candidate locations in \code{candi}. A single value can be used if the spacing in the x- and
-y-coordinates is the same. If \code{cellsize = 0} then \strong{spsann} understands that a finite set of candidate
-locations is being used (See Details).}
+\item{cellsize}{Vector with two positive numeric values defining the spacing in the x- and y-coordinates
+between the candidate locations in \code{candi}, i.e. the grid resolution. A single value can be used if the
+spacing in the x- and y-coordinates is the same. If \code{cellsize = 0} then a finite set of candidate locations
+is used (See Details).}
 
 \item{stopping}{Integer value defining the maximum allowable number of Markov chains without improvement of
 the objective function value. Defaults to \code{stopping = ceiling(chains * 0.1)}, i.e. ten percent the maximum
