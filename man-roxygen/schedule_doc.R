@@ -1,13 +1,10 @@
 #  Template documentation for the cooling schedule
 ###############################################################################################################
-#' @section Annealing schedule:
-#' 
-#' The \emph{annealing schedule} 
-#' 
-#' \subsection{Search graph}{
-#' The \emph{search graph} corresponds to the set of effective candidate locations for a point selected to be
+#' @details
+#' \subsection{Annealing schedule}{
+#' The _search graph_ corresponds to the set of effective candidate locations for a point selected to be
 #' jittered. The size of the search graph, i.e. area within which a point can be moved around, is correlated 
-#' with the concept of \emph{temperature}. A larger search graph is equivalent to higher temperatures, which
+#' with the concept of _temperature_. A larger search graph is equivalent to higher temperatures, which
 #' potentially result in more movement or \sQuote{agitation} of the set of points or \sQuote{particles}.
 #' 
 #' The current version of the \pkg{spsann}-package uses a linear cooling schedule which depends upon the 
