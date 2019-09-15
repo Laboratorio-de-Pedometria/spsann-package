@@ -7,6 +7,8 @@
 # @inheritParams spJitter
 #' @template spSANN_doc
 #' @template spJitter_doc
+#' @template schedule_doc
+#' 
 #' @param eval.grid Data frame or matrix with the objective function evaluation locations. Like `candi`, 
 #' `eval.grid` must have two columns in the following order: `[, "x"]`, the projected x-coordinates, and 
 #' `[, "y"]`, the projected y-coordinates.
@@ -16,13 +18,16 @@
 #' This objective function is based on the knowledge that the simple and ordinary (co)kriging prediction error 
 #' variance only depends upon the separation distance between sample locations: the larger the distance, the
 #' larger the prediction error variance. As such, the better the spread of the sample locations in the spatial
-#' domain, the smaller the simple/ordinary (co)kriging prediction error variance. This is the purpose of using
-#' a regular grid of sample locations. However, a regular grid usually is suboptimal, especially if the spatial
-#' domain is irregularly shaped. Thus the need for optimization, that is based on measuring the goodness of the
-#' spread of sample locations in the spatial domain. To measure this spread we can compute the distance from
-#' every sample location to each of the prediction locations placed on a fine grid covering the entire spatial
-#' domain. Next, for every prediction location we find the closest sample point and record its distance. The
-#' mean of these squared distances over all prediction location will measure the spread of the sample points.
+#' domain, the smaller the overall simple/ordinary (co)kriging prediction error variance. This is the purpose 
+#' of using a regular grid of sample locations.
+#' 
+#' However, a regular grid usually is suboptimal, especially if the spatial domain is irregularly shaped. Thus
+#' the need for optimization, that is based on measuring the goodness of the spread of sample locations in the
+#' spatial domain. To measure this spread we can compute the distance from every sample location to each of the
+#' prediction locations placed on a fine grid covering the entire spatial domain. Next, for every prediction
+#' location we find the closest sample location and record its distance. The mean of these squared distances
+#' over all prediction location will measure the spread of the sample locations.
+#' 
 #' During the optimization, we try to reduce this measure -- the mean squared shortest distance -- between
 #' sample and prediction locations. (This is also know as _spatial coverage sampling_, see the R-package
 #' __[spcosa](https://CRAN.R-project.org/package=spcosa)__.)
@@ -33,7 +38,7 @@
 #' configuration with details about the optimization.
 #'
 #' \code{objMSSD} returns a numeric value: the energy state of the sample configuration -- the objective
-#' function value in square map units, generaly m^2^ or km^2^.
+#' function value in square map units, generally m^2 or km^2.
 #' 
 #' @note
 #' \subsection{Sample configuration for spatial interpolation}{

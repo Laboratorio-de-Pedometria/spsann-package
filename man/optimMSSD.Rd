@@ -15,45 +15,46 @@ objMSSD(points, candi, eval.grid)
 \arguments{
 \item{points}{Integer value, integer vector, data frame or matrix, or list.
 \itemize{
-\item Integer value. The number of points. These points will be randomly sampled from \code{candi} to form
-the starting sample configuration.
-\item Integer vector. The row indexes of \code{candi} that correspond to the points that form the starting
-sample configuration. The length of the vector defines the number of points.
-\item Data frame or matrix. An object with three columns in the following order: \code{[, "id"]}, the
-row indexes of \code{candi} that correspond to each point, \code{[, "x"]}, the projected x-coordinates, and
-\code{[, "y"]}, the projected y-coordinates.
-\item List. An object with two named sub-arguments: \code{fixed}, a data frame or matrix with the projected
-x- and y-coordinates of the existing sample configuration -- kept fixed during the optimization --, and
-\code{free}, an integer value defining the number of points that should be added to the existing sample
-configuration -- free to move during the optimization.
+\item Integer value. The sample size. The starting sample configuration will be randomly sampled from
+\code{candi}.
+\item Integer vector. The row indexes of \code{candi} that correspond to the samples that form the starting
+sample configuration. The length of the vector defines the number of samples.
+\item Data frame or matrix. An object with three columns in the following order: \code{[, "id"]}, the row indexes
+of \code{candi} that correspond to each sample, \code{[, "x"]}, the projected x-coordinates, and \code{[, "y"]},
+the projected y-coordinates.
+\item List. An object with two named sub-arguments: \code{fixed}, a data frame or matrix with the projected x-
+and y-coordinates of the existing sample configuration -- kept fixed during the optimization --,
+and \code{free}, an integer value defining the number of samples that should be added to the existing
+sample configuration -- free to move during the optimization.
 }}
 
-\item{candi}{Data frame or matrix with the candidate locations for the jittered points. \code{candi} must
-have two columns in the following order: \code{[, "x"]}, the projected x-coordinates, and \code{[, "y"]},
-the projected y-coordinates.}
+\item{candi}{Data frame or matrix with the candidate locations for the jittered samples. \code{candi} must have
+two columns in the following order: \code{[, "x"]}, the projected x-coordinates, and \code{[, "y"]}, the projected
+y-coordinates.}
 
-\item{eval.grid}{In construction}
+\item{eval.grid}{Data frame or matrix with the objective function evaluation locations. Like \code{candi},
+\code{eval.grid} must have two columns in the following order: \code{[, "x"]}, the projected x-coordinates, and
+\code{[, "y"]}, the projected y-coordinates.}
 
-\item{schedule}{List with 11 named sub-arguments defining the control parameters of the cooling schedule.
+\item{schedule}{List with named sub-arguments defining the control parameters of the cooling schedule.
 See \code{\link[spsann]{scheduleSPSANN}}.}
 
 \item{plotit}{(Optional) Logical for plotting the optimization results, including a) the progress of the
 objective function, and b) the starting (gray circles) and current sample configuration (black dots), and
 the maximum jitter in the x- and y-coordinates. The plots are updated at each 10 jitters. When adding
-points to an existing sample configuration, fixed points are indicated using black crosses. Defaults to
+samples to an existing sample configuration, fixed samples are indicated using black crosses. Defaults to
 \code{plotit = FALSE}.}
 
 \item{track}{(Optional) Logical value. Should the evolution of the energy state be recorded and returned
-along with the result? If \code{track = FALSE} (the default), only the starting and ending energy states
-are returned along with the results.}
+along with the result? If \code{track = FALSE} (the default), only the starting and ending energy states are
+returned along with the results.}
 
 \item{boundary}{(Optional) SpatialPolygon defining the boundary of the spatial domain. If missing and
 \code{plotit = TRUE}, \code{boundary} is estimated from \code{candi}.}
 
 \item{progress}{(Optional) Type of progress bar that should be used, with options \code{"txt"}, for a text
-progress bar in the R console, \code{"tk"}, to put up a Tk progress bar widget, and \code{NULL} to omit the
-progress bar. A Tk progress bar widget is useful when using parallel processors. Defaults to
-\code{progress = "txt"}.}
+progress bar in the R console, \code{"tk"}, to put up a Tk progress bar widget, and \code{NULL} to omit the progress
+bar. A Tk progress bar widget is useful when using parallel processors. Defaults to \code{progress = "txt"}.}
 
 \item{verbose}{(Optional) Logical for printing messages about the progress of the optimization. Defaults to
 \code{verbose = FALSE}.}
@@ -63,7 +64,7 @@ progress bar. A Tk progress bar widget is useful when using parallel processors.
 configuration with details about the optimization.
 
 \code{objMSSD} returns a numeric value: the energy state of the sample configuration -- the objective
-function value in square map units, generaly m^2^ or km^2^.
+function value in square map units, generally m^2 or km^2.
 }
 \description{
 Optimize a sample configuration for spatial interpolation, e.g. simple and ordinary (co)kriging. The
@@ -71,32 +72,92 @@ criterion used is the mean squared shortest distance (\strong{MSSD}) between sam
 locations.
 }
 \details{
-Details about the mechanism used to generate a new sample configuration out of the current sample
-configuration by randomly perturbing the coordinates of a sample point are available in the help page of
-\code{\link[spsann]{spJitter}}.
+\subsection{Generating mechanism}{
+There are multiple mechanism to generate a new sample configuration out of an existing one. The main step
+consists of randomly perturbing the coordinates of a single sample, a process known as \sQuote{jittering}.
+These mechanisms can be classified based on how the set of candidate locations for the samples is defined.
+For example, one could use an \emph{infinite} set of candidate locations, that is, any location in the spatial
+domain can be selected as a new sample location after a sample is jittered. All that is needed is a
+polygon indicating the boundary of the spatial domain. This method is more computationally demanding
+because every time an existing sample is jittered, it is necessary to check if the new sample location
+falls in spatial domain.
+
+Another approach consists of using a \emph{finite} set of candidate locations for the samples. A finite set of
+candidate locations is created by discretising the spatial domain, that is, creating a fine (regular) grid
+of points that serve as candidate locations for the jittered sample. This is a less computationally
+demanding jittering method because, by definition, the new sample location will always fall in the spatial
+domain.
+
+Using a finite set of candidate locations has two important inconveniences. First, not all locations in
+the spatial domain can be selected as the new location for a jittered sample. Second, when a sample is
+jittered, it may be that the new location already is occupied by another sample. If this happens, another
+location has to be iteratively sought for, say, as many times as the size of the sample configuration. In
+general, the larger the size of the sample configuration, the more likely it is that the new location
+already is occupied by another sample. If a solution is not found in a reasonable time, the the sample
+selected to be jittered is kept in its original location. Such a procedure clearly is suboptimal.
+
+\strong{spsann} uses a more elegant method which is based on using a finite set of candidate locations coupled
+with a form of \emph{two-stage random sampling} as implemented in the R-package
+\code{[spsample](https://CRAN.R-project.org/package=spcosa)}. Because the candidate locations are placed on
+a finite regular grid, they can be taken as the centre nodes of a finite set of grid cells (or pixels of a
+raster image). In the first stage, one of the \dQuote{grid cells} is selected with replacement, i.e.
+independently of already being occupied by another sample. The new location for the sample chosen to be
+jittered is selected within that \dQuote{grid cell} by simple random sampling. This method guarantees that
+virtually any location in the spatial can be selected. It also discards the need to check if the new
+location already is occupied by another sample, speeding up the computations when compared to the first two
+approaches.
+}
+
+\subsection{Annealing schedule}{
+The \emph{search graph} corresponds to the set of effective candidate locations for a point selected to be
+jittered. The size of the search graph, i.e. area within which a point can be moved around, is correlated
+with the concept of \emph{temperature}. A larger search graph is equivalent to higher temperatures, which
+potentially result in more movement or \sQuote{agitation} of the set of points or \sQuote{particles}.
+
+The current version of the \pkg{spsann}-package uses a linear cooling schedule which depends upon the
+number of jitters to control the size of the search graph. The equations are
+
+\eqn{x_max = x_max0 - (chains_i / chains) * (x_max0 - x_min) + x_cellsize}
+
+and
+
+\eqn{y_max = y_max0 - (chains_i / chains) * (y_max0 - y_min) + y_cellsize},
+
+where $x_max0$ and $y_max0$ are the maximum allowed shifts in the x- and y-coordinates in the first chain,
+$x_min$ and $y_min$ are the minimum required shifts in the x- and y-coordinates, $x_max$ and $y_max$ are
+the maximum allowed shifts in the x- and y-coordinates during the next chain, $chains$ and $chain_i$ are
+the total and current chains, and $x_cellsize$ and $y_cellsize$ are the grid spacing in the x- and
+y-coordinates.
+}
 
 \subsection{Mean squared shortest distance}{
 This objective function is based on the knowledge that the simple and ordinary (co)kriging prediction error
 variance only depends upon the separation distance between sample locations: the larger the distance, the
 larger the prediction error variance. As such, the better the spread of the sample locations in the spatial
-domain, the smaller the simple/ordinary (co)kriging prediction error variance. This is the purpose of using
-a regular grid of sample locations. However, a regular grid usually is suboptimal, especially if the spatial
-domain is irregularly shaped. Thus the need for optimization, that is based on measuring the goodness of the
-spread of sample locations in the spatial domain. To measure this spread we can compute the distance from
-every sample location to each of the prediction locations placed on a fine grid covering the entire spatial
-domain. Next, for every prediction location we find the closest sample point and record its distance. The
-mean of these squared distances over all prediction location will measure the spread of the sample points.
+domain, the smaller the overall simple/ordinary (co)kriging prediction error variance. This is the purpose
+of using a regular grid of sample locations.
+
+However, a regular grid usually is suboptimal, especially if the spatial domain is irregularly shaped. Thus
+the need for optimization, that is based on measuring the goodness of the spread of sample locations in the
+spatial domain. To measure this spread we can compute the distance from every sample location to each of the
+prediction locations placed on a fine grid covering the entire spatial domain. Next, for every prediction
+location we find the closest sample location and record its distance. The mean of these squared distances
+over all prediction location will measure the spread of the sample locations.
+
 During the optimization, we try to reduce this measure -- the mean squared shortest distance -- between
 sample and prediction locations. (This is also know as \emph{spatial coverage sampling}, see the R-package
 \strong{\href{https://CRAN.R-project.org/package=spcosa}{spcosa}}.)
 }
 }
 \note{
-The distance between two points is computed as the Euclidean distance between them. This computation
-assumes that the optimization is operating in the two-dimensional Euclidean space, i.e. the coordinates of
-the sample points and candidate locations should not be provided as latitude/longitude. \pkg{spsann} has no
-mechanism to check if the coordinates are projected: the user is responsible for making sure that this
-requirement is attained.
+\subsection{Distance between two points}{
+\strong{spsann} always computes the distance between two locations (points) as the
+\href{https://en.wikipedia.org/wiki/Euclidean_distance}{Euclidean distance} between them. This computation
+requires the optimization to operate in the two-dimensional Euclidean space, i.e. the coordinates of
+the sample, candidate and evaluation locations must be planar coordinates, generally in metres or
+kilometres. \strong{spsann} has no mechanism to check if the coordinates are planar: you are the sole responsible
+for making sure that this requirement is attained.
+}
 
 \subsection{Sample configuration for spatial interpolation}{
 A sample configuration optimized for spatial interpolation such as simple and ordinary (co)kriging is not
@@ -106,9 +167,9 @@ optimization of sample configurations for variogram identification and estimatio
 }
 }
 \examples{
-###################################################################################
-# This is just an example and the settings below are unlikely to meet your needs. #
-###################################################################################
+#####################################################################
+# NOTE: The settings below are unlikely to meet your needs.         #
+#####################################################################
 require(sp)
 data(meuse.grid)
 candi <- meuse.grid[, 1:2]

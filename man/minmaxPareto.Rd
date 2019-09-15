@@ -11,9 +11,9 @@ minmaxPareto(osc, candi, covars)
 be named after the objective function with which it has been optimized. For example,
 \code{osc = list(CORR = osc_corr, DIST = osc_dist)}.}
 
-\item{candi}{Data frame or matrix with the candidate locations for the jittered points. \code{candi} must
-have two columns in the following order: \code{[, "x"]}, the projected x-coordinates, and \code{[, "y"]},
-the projected y-coordinates.}
+\item{candi}{Data frame or matrix with the candidate locations for the jittered samples. \code{candi} must have
+two columns in the following order: \code{[, "x"]}, the projected x-coordinates, and \code{[, "y"]}, the projected
+y-coordinates.}
 
 \item{covars}{Data frame or matrix with the covariates in the columns.}
 }
@@ -92,6 +92,9 @@ CORR             \tab 6.4              \tab 0.3  \cr
 }
 }
 \examples{
+#####################################################################
+# NOTE: The settings below are unlikely to meet your needs.         #
+#####################################################################
 \dontrun{
 # This example takes more than 5 seconds
 require(sp)
