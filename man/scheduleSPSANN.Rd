@@ -55,7 +55,7 @@ Set the control parameters for the annealing schedule of \pkg{spsann} functions.
 #####################################################################
 # NOTE: The settings below are unlikely to meet your needs.         #
 #####################################################################
-schedule <- scheduleSPSANN()
+schedule <- scheduleSPSANN(initial.temperature = 100, cellsize = 30)
 }
 \references{
 Aarts, E. H. L.; Korst, J. H. M. Boltzmann machines for travelling salesman problems. _European Journal of

@@ -70,7 +70,7 @@
 #' #####################################################################
 #' # NOTE: The settings below are unlikely to meet your needs.         #
 #' #####################################################################
-#' schedule <- scheduleSPSANN()
+#' schedule <- scheduleSPSANN(initial.temperature = 100, cellsize = 30)
 # FUNCTION #####################################################################
 scheduleSPSANN <-
   function (initial.temperature = 0.001, chains = 500,
