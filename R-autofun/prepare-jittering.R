@@ -4,39 +4,36 @@
 # eval(.prepare_jittering())
 # 
 # SUMMARY
-# 1. If needed, estimate 'x.min', 'x.max', 'y.min', and 'y.max' from 'candi';
+# 1. If needed, estimate 'x.min', 'x.max', 'y.min', 'y.max' and 'cellseze' from 'candi' or 'eval.grid';
 # 2. Set 'x_max0' and 'y_max0';
-# 3. FUTURE FEATURE: Determine 'cellsize', the x- and y- dimensions of the
-#    individual elements of 'candi'.
 #
 # NOTES
-# 1. Estimating 'x.min', 'x.max', 'y.min', and 'y.max' from 'candi' is very
+# 1. Estimating 'x.min', 'x.max', 'y.min', 'y.max' and 'cellsize' from 'candi' or 'eval.grid' is very 
 #    expensive. An alternative should be seek.
-# 2. A function should be developed so that 'SpatialTools::dist1()' would no
-#    longer be a dependency of 'spsann'.
-# 3. 'cellsize' will be used in the future when the use of an infinite set of
-#    candidate locations will be enabled. The idea is to use the same strategy
-#    used in 'spcosa::spsample()'.
-#
+# 2. A function should be developed so that 'SpatialTools::dist1()' would no longer be a dependency of 
+#   'spsann'.
 
 x.min <- schedule$x.min
 y.min <- schedule$y.min
-
-aa <- is.null(schedule$x.max)
-bb <- is.null(schedule$y.max)
-cc <- is.null(schedule$cellsize)
-if (any(c(aa, bb, cc) == TRUE)) {
-  
-  message("estimating jittering parameters from 'candi'...")
-  x <- SpatialTools::dist1(as.matrix(candi[, "x"]))
-  id <- x > 0
-  x.max <- ifelse(aa, max(x) / 2, schedule$x.max)
-  if (cc) { cellsize <- min(x[id]) } else { cellsize <- schedule$cellsize }
-  
-  y <- SpatialTools::dist1(as.matrix(candi[, "y"]))
-  id <- y > 0
-  y.max <- ifelse(bb, max(y) / 2, schedule$y.max)
-  if (cc) { cellsize <- c(cellsize, min(y[id])) }
+is_null_x_max <- is.null(schedule$x.max)
+is_null_y_max <- is.null(schedule$y.max)
+is_null_cellsize <- is.null(schedule$cellsize)
+if (any(c(is_null_x_max, is_null_y_max, is_null_cellsize) == TRUE)) {
+  if (!missing(eval.grid)) {
+    message("estimating jittering parameters from 'eval.grid'...")
+    x <- SpatialTools::dist1(as.matrix(eval.grid[, "x"]))
+    y <- SpatialTools::dist1(as.matrix(eval.grid[, "y"]))
+  } else {
+    message("estimating jittering parameters from 'candi'...")
+    x <- SpatialTools::dist1(as.matrix(candi[, "x"]))
+    y <- SpatialTools::dist1(as.matrix(candi[, "y"]))
+  }
+  x.max <- ifelse(is_null_x_max, max(x) / 2, schedule$x.max)
+  cellsize <- ifelse(is_null_cellsize, min(x[x > 0]), schedule$cellsize)
+  y.max <- ifelse(is_null_y_max, max(y) / 2, schedule$y.max)
+  if (is_null_cellsize) { 
+    cellsize <- c(cellsize, min(y[y > 0]))
+  }
   
 } else {
   

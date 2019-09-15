@@ -2,19 +2,23 @@
 # Please edit source code in R-autofun/prepare-jittering.R
 .prepare_jittering<-function(...){
 expression(x.min <- schedule$x.min, y.min <- schedule$y.min, 
-    aa <- is.null(schedule$x.max), bb <- is.null(schedule$y.max), 
-    cc <- is.null(schedule$cellsize), if (any(c(aa, bb, cc) == TRUE)) {
-      
-      message("estimating jittering parameters from 'candi'...")
-      x <- SpatialTools::dist1(as.matrix(candi[, "x"]))
-      id <- x > 0
-      x.max <- ifelse(aa, max(x) / 2, schedule$x.max)
-      if (cc) { cellsize <- min(x[id]) } else { cellsize <- schedule$cellsize }
-      
-      y <- SpatialTools::dist1(as.matrix(candi[, "y"]))
-      id <- y > 0
-      y.max <- ifelse(bb, max(y) / 2, schedule$y.max)
-      if (cc) { cellsize <- c(cellsize, min(y[id])) }
+    is_null_x_max <- is.null(schedule$x.max), is_null_y_max <- is.null(schedule$y.max), 
+    is_null_cellsize <- is.null(schedule$cellsize), if (any(c(is_null_x_max, is_null_y_max, is_null_cellsize) == TRUE)) {
+      if (!missing(eval.grid)) {
+        message("estimating jittering parameters from 'eval.grid'...")
+        x <- SpatialTools::dist1(as.matrix(eval.grid[, "x"]))
+        y <- SpatialTools::dist1(as.matrix(eval.grid[, "y"]))
+      } else {
+        message("estimating jittering parameters from 'candi'...")
+        x <- SpatialTools::dist1(as.matrix(candi[, "x"]))
+        y <- SpatialTools::dist1(as.matrix(candi[, "y"]))
+      }
+      x.max <- ifelse(is_null_x_max, max(x) / 2, schedule$x.max)
+      cellsize <- ifelse(is_null_cellsize, min(x[x > 0]), schedule$cellsize)
+      y.max <- ifelse(is_null_y_max, max(y) / 2, schedule$y.max)
+      if (is_null_cellsize) { 
+        cellsize <- c(cellsize, min(y[y > 0]))
+      }
       
     } else {
       
