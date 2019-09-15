@@ -119,7 +119,7 @@ set.seed(2001)
 res <- optimMSSD(
   points = 50, candi = candi, eval.grid = eval.grid, schedule = schedule, plotit = TRUE, boundary = boundary)
 data.frame(
-  expected = 21855.24,
+  expected = 22940.84,
   objSPSANN = objSPSANN(res),
   objMSSD = objMSSD(points = res, eval.grid = eval.grid)
 )

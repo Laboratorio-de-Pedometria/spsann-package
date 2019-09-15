@@ -5,7 +5,7 @@ gc()
 sapply(list.files("R", full.names = TRUE, pattern = ".R$"), source)
 sapply(list.files("src", full.names = TRUE, pattern = ".cpp$"), Rcpp::sourceCpp)
 
-# 0) DEFAULT EXAMPLE ###########################################################
+# 0) DEFAULT EXAMPLE ##########################################################################################
 data(meuse.grid, package = "sp")
 candi <- meuse.grid[1:1000, 1:2]
 covars <- as.data.frame(meuse.grid)[1:1000, ]
@@ -17,11 +17,16 @@ set.seed(2001)
 res <- optimMKV(
   points = 10, candi = candi, covars = covars, eqn = z ~ dist, 
   vgm = vgm, schedule = schedule)
-objSPSANN(res) - 
-  objMKV(points = res, candi = candi, covars = covars,  eqn = z ~ dist, vgm = vgm)
+data.frame(
+  expected = 15.37137,
+  objSPSANN = objSPSANN(res),
+  objMKV = objMKV(
+    points = res, candi = candi, covars = covars, eqn = z ~ dist, vgm = vgm)
+)
 
 # 1) GREEDY ALGORITHM WITH TOO SMALL NEIGHBOURHOOD SIZE (500 M) ###############################################
 # skipped 'singular matrix' error in 'krige'-function
+# In this case we have too few samples at some locations to compute the kriging prediction error variance
 rm(list = ls())
 gc()
 sapply(list.files("R", full.names = TRUE, pattern = ".R$"), source)
@@ -35,8 +40,11 @@ set.seed(2001)
 res <- optimMKV(
   points = 100, candi = candi, covars = covars, vgm = vgm, eqn = z ~ dist, schedule = schedule, plotit = TRUE, 
   maxdist = 500)
-objSPSANN(res) - 
-  objMKV(points = res, candi = candi, covars = covars, eqn = z ~ dist, vgm = vgm, maxdist = 500)
+data.frame(
+  expected = 12.8364, 
+  objSPSANN = objSPSANN(res),
+  objMKV = objMKV(points = res, candi = candi, covars = covars, eqn = z ~ dist, vgm = vgm, maxdist = 500)
+)
 
 # 2) GREEDY ALGORITHM WITH NEIGHBOURHOOD SET USING NMAX #######################################################
 rm(list = ls())
