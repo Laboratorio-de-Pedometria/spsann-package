@@ -1,7 +1,11 @@
 # Version 2.2.0.9002 (2019-09-15)
 
-
-
+* Improvements:
+  + Testing `optimMKV()` as a greedy algorithm with (1) a too small neighbourhood size and (2) with a 
+    neighbourhood set using `nmax`. The first throws an error: `skipped 'singular matrix' error in 'krige'-
+    function`
+  + Argument `eval.grid` flaged as experimental.
+    
 # Version 2.2.0.9001 (2019-09-14)
 
 * Improvements:
