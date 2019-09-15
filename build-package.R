@@ -51,8 +51,10 @@ write.file <- c("R/check-spsann-arguments.R",
 lapply(1:length(fun.name), function (i) autofun::autofun(fun.name[i], read.file[i], write.file[i]))
 rm(fun.name, read.file, write.file)
 
-# check examples and documentation
 # Rcpp::compileAttributes()
+
+# check examples and documentation
+roxygen2::roxygenise()
 devtools::check_man()
 devtools::run_examples(run = FALSE)
 # spelling::spell_check_package()
