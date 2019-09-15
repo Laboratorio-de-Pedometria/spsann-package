@@ -6,12 +6,11 @@
 \alias{MKV}
 \title{Optimization of sample configurations for spatial interpolation (II)}
 \usage{
-optimMKV(points, candi, eval.grid, covars, eqn, vgm, krige.stat = "mean",
-  ..., schedule = scheduleSPSANN(), plotit = FALSE, track = FALSE,
+optimMKV(points, candi, covars, eqn, vgm, krige.stat = "mean", ...,
+  schedule = scheduleSPSANN(), plotit = FALSE, track = FALSE,
   boundary, progress = "txt", verbose = FALSE)
 
-objMKV(points, candi, eval.grid, covars, eqn, vgm, krige.stat = "mean",
-  ...)
+objMKV(points, candi, covars, eqn, vgm, krige.stat = "mean", ...)
 }
 \arguments{
 \item{points}{Integer value, integer vector, data frame or matrix, or list.
@@ -32,10 +31,6 @@ sample configuration -- free to move during the optimization.
 \item{candi}{Data frame or matrix with the candidate locations for the jittered samples. \code{candi} must have
 two columns in the following order: \code{[, "x"]}, the projected x-coordinates, and \code{[, "y"]}, the projected
 y-coordinates.}
-
-\item{eval.grid}{(Experimental) Data frame or matrix with the objective function evaluation locations. Like
-\code{candi}, \code{eval.grid} must have two columns in the following order: \code{[, "x"]}, the projected x-coordinates,
-and \code{[, "y"]}, the projected y-coordinates.}
 
 \item{covars}{Data frame or matrix with the covariates in the columns. The number of rows of \code{covars} must
 match exactly that of \code{candi} -- or \code{eval.grid}, in case a coarser evaluation grid is used.}
@@ -176,9 +171,12 @@ set.seed(2001)
 res <- optimMKV(
   points = 10, candi = candi, covars = covars, eqn = z ~ dist, 
   vgm = vgm, schedule = schedule)
-objSPSANN(res) - objMKV(
-  points = res, candi = candi, covars = covars, eqn = z ~ dist, 
-  vgm = vgm)
+data.frame(
+  expected = 15.37137,
+  objSPSANN = objSPSANN(res),
+  objMKV = objMKV(
+    points = res, candi = candi, covars = covars, eqn = z ~ dist, vgm = vgm)
+)
 }
 }
 \references{

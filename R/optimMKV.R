@@ -66,13 +66,17 @@
 #' res <- optimMKV(
 #'   points = 10, candi = candi, covars = covars, eqn = z ~ dist, 
 #'   vgm = vgm, schedule = schedule)
-#' objSPSANN(res) - objMKV(
-#'   points = res, candi = candi, covars = covars, eqn = z ~ dist, 
-#'   vgm = vgm)
+#' data.frame(
+#'   expected = 15.37137,
+#'   objSPSANN = objSPSANN(res),
+#'   objMKV = objMKV(
+#'     points = res, candi = candi, covars = covars, eqn = z ~ dist, vgm = vgm)
+#' )
 #' }
 # FUNCTION - MAIN #############################################################################################
 optimMKV <-
-  function (points, candi, eval.grid,
+  function (points, candi, 
+            # eval.grid,
             # MKV
             covars, eqn, vgm, krige.stat = "mean", ...,
             # SPSANN
@@ -91,7 +95,9 @@ optimMKV <-
     
     # Check other arguments
     check <- .checkMKV(
-      covars = covars, eqn = eqn, vgm = vgm, krige.stat = krige.stat, candi = candi, eval.grid = eval.grid)
+      covars = covars, eqn = eqn, vgm = vgm, krige.stat = krige.stat, 
+      # eval.grid = eval.grid,
+      candi = candi)
     if (!is.null(check)) stop (check, call. = FALSE)
     
     # Set plotting options
@@ -104,11 +110,11 @@ optimMKV <-
     eval(.prepare_jittering())
     
     # Prepare prediction grid (covars) and starting sample matrix (sm)
-    if (!missing(eval.grid)) { # Use coarser prediction (evaluation) grid
-      covars <- .covarsMKV(eqn = eqn, pred.grid = eval.grid, covars = covars)
-    } else { # Use candi as prediction (evaluation) grid
+    # if (!missing(eval.grid)) { # Use coarser prediction (evaluation) grid
+      # covars <- .covarsMKV(eqn = eqn, pred.grid = eval.grid, covars = covars)
+    # } else { # Use candi as prediction (evaluation) grid
       covars <- .covarsMKV(eqn = eqn, pred.grid = candi[, 2:3], covars = covars)
-    }
+    # }
     sm <- .smMKV(n_pts = n_pts + n_fixed_pts, eqn = eqn, pts = points, covars = covars)
     
     # Initial energy state
@@ -368,7 +374,8 @@ optimMKV <-
 #' @export
 #' @rdname optimMKV
 objMKV <-
-  function (points, candi, eval.grid,
+  function (points, candi, 
+            # eval.grid,
             # MKV
             covars, eqn, vgm, krige.stat = "mean", ...) {
     
@@ -378,18 +385,20 @@ objMKV <-
     
     # Check other arguments
     check <- .checkMKV(
-      covars = covars, eqn = eqn, vgm = vgm, krige.stat = krige.stat, candi = candi, eval.grid = eval.grid)
+      covars = covars, eqn = eqn, vgm = vgm, krige.stat = krige.stat,
+      # eval.grid = eval.grid, 
+      candi = candi)
     if (!is.null(check)) stop (check, call. = FALSE)
     
     # Prepare points and candi
     eval(.prepare_points())
     
     # Prepare prediction grid with covars
-    if (!missing(eval.grid)) { # Use coarser prediction (evaluation) grid
-      covars <- .covarsMKV(eqn = eqn, pred.grid = eval.grid, covars = covars)
-    } else { # Use candi as prediction (evaluation) grid
+    # if (!missing(eval.grid)) { # Use coarser prediction (evaluation) grid
+      # covars <- .covarsMKV(eqn = eqn, pred.grid = eval.grid, covars = covars)
+    # } else { # Use candi as prediction (evaluation) grid
       covars <- .covarsMKV(eqn = eqn, pred.grid = candi[, c(2:3)], covars = covars)
-    }
+    # }
     sm <- .smMKV(n_pts = n_pts, eqn = eqn, pts = points, covars = covars)
     
     # Energy state
