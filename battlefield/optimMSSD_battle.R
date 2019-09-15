@@ -1,8 +1,6 @@
 # Initial settings
 rm(list = ls())
 gc()
-require(pedometrics)
-require(SpatialTools)
 require(magrittr)
 sapply(list.files("R", full.names = TRUE, pattern = ".R$"), source)
 sapply(list.files("src", full.names = TRUE, pattern = ".cpp$"), Rcpp::sourceCpp)
@@ -32,7 +30,7 @@ sp::coordinates(boundary) <- c("x", "y")
 sp::gridded(boundary) <- TRUE
 boundary <- rgeos::gUnaryUnion(as(boundary, "SpatialPolygons"))
 candi <- meuse.grid[, 1:2]
-schedule <- scheduleSPSANN(initial.acceptance = 0, initial.temperature = 0.01)
+schedule <- scheduleSPSANN(initial.acceptance = 0, initial.temperature = 0.01, cellsize = 40)
 set.seed(2001)
 res <- optimMSSD(points = 30, candi = candi, schedule = schedule, plotit = TRUE, boundary = boundary)
 data.frame(

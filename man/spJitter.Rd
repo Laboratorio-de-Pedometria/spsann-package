@@ -24,9 +24,9 @@ x- and y-coordinates. If missing, they are estimated from \code{candi}.}
 \item{which.point}{Integer values defining which point should be perturbed.}
 
 \item{cellsize}{Vector with two numeric values defining the horizontal (x) and vertical (y) spacing
-between the candidate points in \code{candi}. A single value can be used if the spacing in the x- and
+between the candidate locations in \code{candi}. A single value can be used if the spacing in the x- and
 y-coordinates is the same. If \code{cellsize = 0} then \strong{spsann} understands that a finite set of candidate
-points is being used (See Details).}
+locations is being used (See Details).}
 
 \item{verbose}{(Optional) Logical for printing messages about the progress of the optimization. Defaults to
 \code{verbose = FALSE}.}

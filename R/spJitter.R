@@ -3,6 +3,7 @@
 #' Randomly perturb (\sQuote{jitter}) the coordinates of spatial points.
 #' 
 #' @template spJitter_doc
+#' 
 #' @param points Data frame or matrix with three columns in the following order: `[, "id"]` the row indexes
 #' of `candi` that correspond to each point, `[, "x"]` the projected x-coordinates, and `[, "y"]` the
 #' projected y-coordinates. Note that `points` must be a subset of `candi`.
@@ -16,10 +17,10 @@
 #' minimum distance between two neighbouring candidate points. The units are the same as of the projected 
 #' x- and y-coordinates. If missing, they are estimated from `candi`.
 #' 
-#' @param cellsize Vector with two numeric values defining the horizontal (x) and vertical (y) spacing 
-#' between the candidate points in `candi`. A single value can be used if the spacing in the x- and
-#' y-coordinates is the same. If `cellsize = 0` then __spsann__ understands that a finite set of candidate 
-#' points is being used (See Details).
+#' @param cellsize Vector with two positive numeric values defining the spacing in the x- and y-coordinates
+#' between the candidate locations in `candi`, i.e. the grid resolution. A single value can be used if the
+#' spacing in the x- and y-coordinates is the same. If `cellsize = 0` then a finite set of candidate locations
+#' is used (See Details).
 #' 
 #' @param which.point Integer values defining which point should be perturbed.
 #' 

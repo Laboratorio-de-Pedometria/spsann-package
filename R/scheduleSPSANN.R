@@ -95,7 +95,8 @@ scheduleSPSANN <-
     if (missing(y.max)) y.max <- NULL
     # if (missing(y.min)) y.min <- NULL
     if (missing(cellsize)) {
-      cellsize <- NULL
+      stop ("'cellsize' must be a numeric value greater than or equal to zero")
+      # cellsize <- NULL
     } else {
      if (length(cellsize) == 1) {
        cellsize <- rep(cellsize, 2)
