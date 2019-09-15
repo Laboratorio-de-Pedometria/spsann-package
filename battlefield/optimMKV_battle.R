@@ -1,4 +1,5 @@
 # Initial settings
+library(magrittr)
 rm(list = ls())
 gc()
 sapply(list.files("R", full.names = TRUE, pattern = ".R$"), source)
@@ -19,7 +20,8 @@ res <- optimMKV(
 objSPSANN(res) - 
   objMKV(points = res, candi = candi, covars = covars,  eqn = z ~ dist, vgm = vgm)
 
-# 1) GREEDY ALGORITHM #########################################################################################
+# 1) GREEDY ALGORITHM WITH TOO SMALL NEIGHBOURHOOD SIZE (500 M) ###############################################
+# skipped 'singular matrix' error in 'krige'-function
 rm(list = ls())
 gc()
 sapply(list.files("R", full.names = TRUE, pattern = ".R$"), source)
@@ -36,7 +38,27 @@ res <- optimMKV(
 objSPSANN(res) - 
   objMKV(points = res, candi = candi, covars = covars, eqn = z ~ dist, vgm = vgm, maxdist = 500)
 
-# 2) MANY COVARIATES ##########################################################################################
+# 2) GREEDY ALGORITHM WITH NEIGHBOURHOOD SET USING NMAX #######################################################
+rm(list = ls())
+gc()
+sapply(list.files("R", full.names = TRUE, pattern = ".R$"), source)
+sapply(list.files("src", full.names = TRUE, pattern = ".cpp$"), Rcpp::sourceCpp)
+data(meuse.grid, package = 'sp')
+candi <- meuse.grid[, 1:2]
+covars <- as.data.frame(meuse.grid)
+vgm <- gstat::vgm(psill = 10, model = "Exp", range = 500, nugget = 8)
+schedule <- scheduleSPSANN(initial.temperature = 0.001, initial.acceptance = 0, chains = 1)
+set.seed(2001)
+res <- optimMKV(
+  points = 100, candi = candi, covars = covars, vgm = vgm, eqn = z ~ dist, schedule = schedule, plotit = TRUE, 
+  nmax = 5)
+data.frame(
+  expected = 13.06498,
+  objSPSANN = objSPSANN(res),
+  objMKV = objMKV(points = res, candi = candi, covars = covars, eqn = z ~ dist, vgm = vgm, nmax = 5)
+)
+
+# 3) MANY COVARIATES ##########################################################################################
 rm(list = ls())
 gc()
 sapply(list.files("R", full.names = TRUE, pattern = ".R$"), source)
@@ -50,10 +72,14 @@ set.seed(2001)
 res <- optimMKV(
   points = 100, candi = candi, covars = covars, vgm = vgm, eqn = z ~ dist + soil + ffreq, plotit = TRUE, 
   schedule = schedule, nmax = 50)
-objSPSANN(res) - 
-  objMKV(points = res, candi = candi, covars = covars, eqn = z ~ dist + soil + ffreq, vgm = vgm, nmax = 50)
+data.frame(
+  expected = -3.142771e+12,
+  objSPSANN = objSPSANN(res),
+  objMKV = objMKV(
+    points = res, candi = candi, covars = covars, eqn = z ~ dist + soil + ffreq, vgm = vgm, nmax = 50) 
+)
 
-# 3) ORDINARY KRIGING #########################################################################################
+# 4) ORDINARY KRIGING #########################################################################################
 # Close to the end of the optimization, the algorithm restarts with the previously best configuration.
 # Perhaps this is the reason why the objective value returned by objSPSANN() is not equal to that computed
 # with objMKV().
@@ -66,10 +92,15 @@ candi <- meuse.grid[, 1:2]
 vgm <- gstat::vgm(psill = 10, model = "Exp", range = 500, nugget = 8)
 schedule <- scheduleSPSANN(chains = 500, initial.temperature = 5)
 set.seed(2001)
-res <- optimMKV(points = 10, candi = candi, vgm = vgm, nmax = 50, plotit = TRUE, schedule = schedule)
-objSPSANN(res) - objMKV(points = res, candi = candi, vgm = vgm, nmax = 50)
+res <- optimMKV(points = 10, candi = candi, eqn = z ~ 1, vgm = vgm, nmax = 50, plotit = TRUE, 
+                schedule = schedule)
+data.frame(
+  expected = 15.9901,
+  objSPSANN = objSPSANN(res),
+  objMKV = objMKV(points = res, eqn = z ~ 1, candi = candi, vgm = vgm, nmax = 50)
+)
 
-# 4) ADD TEN POINTS TO AN EXISTING SAMPLE CONFIGURATION #######################################################
+# 5) ADD TEN POINTS TO AN EXISTING SAMPLE CONFIGURATION #######################################################
 rm(list = ls())
 gc()
 sapply(list.files("R", full.names = TRUE, pattern = ".R$"), source)
@@ -83,10 +114,13 @@ free <- 10
 set.seed(1984)
 id <- sample(1:nrow(candi), 90)
 fixed <- cbind(id, candi[id, ])
-objMKV(points = fixed, candi = candi, covars = covars, eqn = z ~ soil, vgm = vgm)
 set.seed(2001)
 res <- optimMKV(
   points = list(free = free, fixed = fixed), candi = candi, covars = covars, vgm = vgm, 
   eqn = z ~ soil, plotit = TRUE, schedule = schedule)
-objSPSANN(res) - 
-  objMKV(points = res, candi = candi, covars = covars, eqn = z ~ soil, vgm = vgm)
+data.frame(
+  fixed = objMKV(points = fixed, candi = candi, covars = covars, eqn = z ~ soil, vgm = vgm),
+  expected = 13.62302,
+  objSPSANN = objSPSANN(res),
+  objMKV = objMKV(points = res, candi = candi, covars = covars, eqn = z ~ soil, vgm = vgm)
+)
