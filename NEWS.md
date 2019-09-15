@@ -2,9 +2,16 @@
 
 * Improvements:
   + Testing `optimMKV()` as a greedy algorithm with (1) a too small neighbourhood size and (2) with a 
-    neighbourhood set using `nmax`. The first throws an error: `skipped 'singular matrix' error in 'krige'-
-    function`
-  + Argument `eval.grid` flaged as experimental.
+    neighbourhood set using `nmax`. The first throws an error -- `skipped 'singular matrix' error in 'krige'-
+    function` -- due to the too small number of samples in the neighbourhood.
+  + Argument `eval.grid` temporarily removed from functions `optimMKV()` and `objMKV()` and flagged as 
+    experimental in functions `optimMSSD()` and `objMSSD()`. The reason is that the implementation for 
+    `optimMKV()` and `objMKV()` is less trivial because of the presence of covariates that need to match 
+    `eval.grid`.
+  + Argument `cellsize` of function `scheduleSPSANN` is not estimated from `candi` anymore. This is because 
+    `candi` can also be an existing irregular sample configuration and unexperienced users can be unaware of
+    the need to set `cellsize = 0` in this case. Only `x.max` and `y.max` are still estimated from `candi`. The
+    user now has to inform `cellsize` manually and this should speed up computations.
     
 # Version 2.2.0.9001 (2019-09-14)
 
