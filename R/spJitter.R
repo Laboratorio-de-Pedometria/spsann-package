@@ -3,23 +3,23 @@
 #' Randomly perturb (\sQuote{jitter}) the coordinates of spatial points.
 #' 
 #' @template spJitter_doc
-#' @param points Data frame or matrix with three columns in the following order: \code{[, "id"]} the row 
-#' indexes of \code{candi} that correspond to each point, \code{[, "x"]} the projected x-coordinates, and 
-#' \code{[, "y"]} the projected y-coordinates. Note that \code{points} must be a subset of \code{candi}.
+#' @param points Data frame or matrix with three columns in the following order: `[, "id"]` the row indexes
+#' of `candi` that correspond to each point, `[, "x"]` the projected x-coordinates, and `[, "y"]` the
+#' projected y-coordinates. Note that `points` must be a subset of `candi`.
 #'
-#' @param candi Data frame or matrix with the candidate locations for the jittered points. \code{candi} must 
-#' have two columns in the following order: \code{[, "x"]} the projected x-coordinates, and \code{[, "y"]} the 
-#' projected y-coordinates.
+#' @param candi Data frame or matrix with the candidate locations for the jittered points. `candi` must have
+#' two columns in the following order: `[, "x"]` the projected x-coordinates, and `[, "y"]` the projected
+#' y-coordinates.
 #'
 #' @param x.max,x.min,y.max,y.min Numeric value defining the minimum and maximum quantity of random noise to 
 #' be added to the projected x- and y-coordinates. The minimum quantity should be equal to, at least, the 
-#' minimum distance between two neighbouring candidate locations. The units are the same as of the projected 
-#' x- and y-coordinates. If missing, they are estimated from \code{candi}.
+#' minimum distance between two neighbouring candidate points. The units are the same as of the projected 
+#' x- and y-coordinates. If missing, they are estimated from `candi`.
 #' 
 #' @param cellsize Vector with two numeric values defining the horizontal (x) and vertical (y) spacing 
-#' between the candidate locations in \code{candi}. A single value can be used if the spacing in the x- and 
-#' y-coordinates is the same. If \code{cellsize = 0} then \pkg{spsann} understands that a finite set of
-#' candidate locations is being used (See Details).
+#' between the candidate points in `candi`. A single value can be used if the spacing in the x- and
+#' y-coordinates is the same. If `cellsize = 0` then __spsann__ understands that a finite set of candidate 
+#' points is being used (See Details).
 #' 
 #' @param which.point Integer values defining which point should be perturbed.
 #' 
@@ -31,14 +31,14 @@
 #' 
 #' @references
 #' Edzer Pebesma, Jon Skoien with contributions from Olivier Baume, A. Chorti, D.T. Hristopulos, S.J. Melles 
-#' and G. Spiliopoulos (2013). \emph{intamapInteractive: procedures for automated interpolation - methods 
-#' only to be used interactively, not included in \code{intamap} package.} R package version 1.1-10.
+#' and G. Spiliopoulos (2013). _intamapInteractive: procedures for automated interpolation - methods 
+#' only to be used interactively, not included in `intamap` package._ R package version 1.1-10.
 #' 
-#' van Groenigen, J.-W. \emph{Constrained optimization of spatial sampling: a geostatistical approach.}
+#' van Groenigen, J.-W. _Constrained optimization of spatial sampling: a geostatistical approach._
 #' Wageningen: Wageningen University, p. 148, 1999.
 #' 
 #' Walvoort, D. J. J.; Brus, D. J.; de Gruijter, J. J. An R package for spatial coverage sampling and random 
-#' sampling from compact geographical strata by k-means. \emph{Computers & Geosciences}. v. 36, p. 1261-1267,
+#' sampling from compact geographical strata by k-means. _Computers & Geosciences_. v. 36, p. 1261-1267,
 #' 2010.
 #' 
 #' @author 

@@ -67,9 +67,9 @@ configuration with details about the optimization.
 function value in square map units, generally m^2 or km^2.
 }
 \description{
-Optimize a sample configuration for spatial interpolation, e.g. simple and ordinary (co)kriging. The
-criterion used is the mean squared shortest distance (\strong{MSSD}) between sample locations and prediction
-locations.
+Optimize a sample configuration for spatial interpolation with a 'known' auto- or cross-correlation model,
+e.g. simple and ordinary (co)kriging. The criterion used is the mean squared shortest distance (\strong{MSSD})
+between sample locations and prediction locations.
 }
 \details{
 \subsection{Generating mechanism}{
@@ -161,7 +161,7 @@ for making sure that this requirement is attained.
 
 \subsection{Sample configuration for spatial interpolation}{
 A sample configuration optimized for spatial interpolation such as simple and ordinary (co)kriging is not
-necessarily appropriate for estimating the parameters of the spatial prediction model, in this case, the
+necessarily appropriate for estimating the parameters of the spatial autocorrelation model, i.e. the
 parameters of the variogram model. See \code{\link[spsann]{optimPPL}} for more information on the
 optimization of sample configurations for variogram identification and estimation.
 }

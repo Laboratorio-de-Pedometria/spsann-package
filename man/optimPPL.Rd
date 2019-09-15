@@ -89,22 +89,22 @@ bar. A Tk progress bar widget is useful when using parallel processors. Defaults
 
 \item{x.max}{Numeric value defining the minimum and maximum quantity of random noise to
 be added to the projected x- and y-coordinates. The minimum quantity should be equal to, at least, the
-minimum distance between two neighbouring candidate locations. The units are the same as of the projected
+minimum distance between two neighbouring candidate points. The units are the same as of the projected
 x- and y-coordinates. If missing, they are estimated from \code{candi}.}
 
 \item{x.min}{Numeric value defining the minimum and maximum quantity of random noise to
 be added to the projected x- and y-coordinates. The minimum quantity should be equal to, at least, the
-minimum distance between two neighbouring candidate locations. The units are the same as of the projected
+minimum distance between two neighbouring candidate points. The units are the same as of the projected
 x- and y-coordinates. If missing, they are estimated from \code{candi}.}
 
 \item{y.max}{Numeric value defining the minimum and maximum quantity of random noise to
 be added to the projected x- and y-coordinates. The minimum quantity should be equal to, at least, the
-minimum distance between two neighbouring candidate locations. The units are the same as of the projected
+minimum distance between two neighbouring candidate points. The units are the same as of the projected
 x- and y-coordinates. If missing, they are estimated from \code{candi}.}
 
 \item{y.min}{Numeric value defining the minimum and maximum quantity of random noise to
 be added to the projected x- and y-coordinates. The minimum quantity should be equal to, at least, the
-minimum distance between two neighbouring candidate locations. The units are the same as of the projected
+minimum distance between two neighbouring candidate points. The units are the same as of the projected
 x- and y-coordinates. If missing, they are estimated from \code{candi}.}
 }
 \value{

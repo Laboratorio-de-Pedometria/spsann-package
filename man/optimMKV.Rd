@@ -6,13 +6,12 @@
 \alias{MKV}
 \title{Optimization of sample configurations for spatial interpolation (II)}
 \usage{
-optimMKV(points, candi, eval.grid, covars, eqn = z ~ 1, vgm,
-  krige.stat = "mean", ..., schedule = scheduleSPSANN(),
-  plotit = FALSE, track = FALSE, boundary, progress = "txt",
-  verbose = FALSE)
+optimMKV(points, candi, eval.grid, covars, eqn, vgm, krige.stat = "mean",
+  ..., schedule = scheduleSPSANN(), plotit = FALSE, track = FALSE,
+  boundary, progress = "txt", verbose = FALSE)
 
-objMKV(points, candi, eval.grid, covars, eqn = z ~ 1, vgm,
-  krige.stat = "mean", ...)
+objMKV(points, candi, eval.grid, covars, eqn, vgm, krige.stat = "mean",
+  ...)
 }
 \arguments{
 \item{points}{Integer value, integer vector, data frame or matrix, or list.
@@ -38,20 +37,21 @@ y-coordinates.}
 \code{eval.grid} must have two columns in the following order: \code{[, "x"]}, the projected x-coordinates, and
 \code{[, "y"]}, the projected y-coordinates.}
 
-\item{covars}{Data frame or matrix with the covariates in the columns.}
+\item{covars}{Data frame or matrix with the covariates in the columns. The number of rows of \code{covars} must
+match exactly that of \code{candi} -- or \code{eval.grid}, in case a coarser evaluation grid is used.}
 
-\item{eqn}{Formula string that defines the dependent variable \code{z} as a linear model of the independent
-variables contained in \code{covars}. Defaults to \code{eqn = z ~ 1}, that is, ordinary kriging. See the
-argument \code{formula} in the function \code{\link[gstat]{krige}} for more information.}
-
-\item{vgm}{Object of class \code{variogramModel}. See the argument \code{model} in the function
+\item{eqn}{Formula string that defines the dependent variable \code{z} as a linear function of the independent
+variables (covariates) contained in \code{covars}. See the argument \code{formula} in the function
 \code{\link[gstat]{krige}} for more information.}
 
-\item{krige.stat}{Character value defining the statistic that should be used to summarize the kriging
-variance. Available options are \code{"mean"} and \code{"max"} for the mean and maximum kriging variance,
-respectively. Defaults to \code{krige.stat = "mean"}.}
+\item{vgm}{Object of class \code{variogramModel}. See the argument \code{model} in the function \code{\link[gstat]{krige}}
+for more information.}
 
-\item{...}{further arguments passed to \code{\link[gstat]{krige}}.}
+\item{krige.stat}{Character value defining the statistic that should be used to summarize the kriging
+prediction error variance. Available options are \code{"mean"} and \code{"max"} for the mean and maximum kriging
+prediction error variance, respectively. Defaults to \code{krige.stat = "mean"}.}
+
+\item{...}{further arguments passed to \code{\link[gstat]{krige}}. (Advanced users only!)}
 
 \item{schedule}{List with named sub-arguments defining the control parameters of the cooling schedule.
 See \code{\link[spsann]{scheduleSPSANN}}.}
@@ -84,8 +84,9 @@ configuration with details about the optimization.
 function value.
 }
 \description{
-Optimize a sample configuration for spatial interpolation with a known linear model. A criterion is defined
-so that the sample configuration minimizes the mean or maximum kriging variance (\bold{MKV}).
+Optimize a sample configuration for spatial interpolation with a 'known' linear mixed model, e.g. universal
+(external drift) kriging and regression-kriging with a linear regression model. A criterion is defined so
+that the sample configuration minimizes the mean or maximum kriging prediciton error variance (\bold{MKV}).
 }
 \details{
 \subsection{Generating mechanism}{
@@ -123,6 +124,28 @@ virtually any location in the spatial can be selected. It also discards the need
 location already is occupied by another sample, speeding up the computations when compared to the first two
 approaches.
 }
+
+\subsection{Annealing schedule}{
+The \emph{search graph} corresponds to the set of effective candidate locations for a point selected to be
+jittered. The size of the search graph, i.e. area within which a point can be moved around, is correlated
+with the concept of \emph{temperature}. A larger search graph is equivalent to higher temperatures, which
+potentially result in more movement or \sQuote{agitation} of the set of points or \sQuote{particles}.
+
+The current version of the \pkg{spsann}-package uses a linear cooling schedule which depends upon the
+number of jitters to control the size of the search graph. The equations are
+
+\eqn{x_max = x_max0 - (chains_i / chains) * (x_max0 - x_min) + x_cellsize}
+
+and
+
+\eqn{y_max = y_max0 - (chains_i / chains) * (y_max0 - y_min) + y_cellsize},
+
+where $x_max0$ and $y_max0$ are the maximum allowed shifts in the x- and y-coordinates in the first chain,
+$x_min$ and $y_min$ are the minimum required shifts in the x- and y-coordinates, $x_max$ and $y_max$ are
+the maximum allowed shifts in the x- and y-coordinates during the next chain, $chains$ and $chain_i$ are
+the total and current chains, and $x_cellsize$ and $y_cellsize$ are the grid spacing in the x- and
+y-coordinates.
+}
 }
 \note{
 \subsection{Distance between two points}{
@@ -154,7 +177,7 @@ res <- optimMKV(
   points = 10, candi = candi, covars = covars, eqn = z ~ dist, 
   vgm = vgm, schedule = schedule)
 objSPSANN(res) - objMKV(
-  points = res, candi = candi, covars = covars,  eqn = z ~ dist, 
+  points = res, candi = candi, covars = covars, eqn = z ~ dist, 
   vgm = vgm)
 }
 }

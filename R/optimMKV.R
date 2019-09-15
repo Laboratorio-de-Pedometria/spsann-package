@@ -6,6 +6,7 @@
 #'
 #' @template spSANN_doc
 #' @template spJitter_doc
+#' @template schedule_doc
 #' 
 #' @inheritParams optimMSSD
 #' 
@@ -23,7 +24,7 @@
 #' prediction error variance. Available options are `"mean"` and `"max"` for the mean and maximum kriging  
 #' prediction error variance, respectively. Defaults to `krige.stat = "mean"`.
 #' 
-#' @param ... further arguments passed to `\link[gstat]{krige}`. (Use with caution.)
+#' @param ... further arguments passed to `\link[gstat]{krige}`. (Advanced users only!)
 #'
 #' @return
 #' \code{optimMKV} returns an object of class \code{OptimizedSampleConfiguration}: the optimized sample
