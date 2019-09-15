@@ -9,9 +9,9 @@
 #' @template spJitter_doc
 #' @template schedule_doc
 #' 
-#' @param eval.grid Data frame or matrix with the objective function evaluation locations. Like `candi`, 
-#' `eval.grid` must have two columns in the following order: `[, "x"]`, the projected x-coordinates, and 
-#' `[, "y"]`, the projected y-coordinates.
+#' @param eval.grid (Experimental) Data frame or matrix with the objective function evaluation locations. Like
+#' `candi`, `eval.grid` must have two columns in the following order: `[, "x"]`, the projected x-coordinates,
+#' and `[, "y"]`, the projected y-coordinates.
 #' 
 #' @details 
 #' \subsection{Mean squared shortest distance}{
@@ -72,15 +72,18 @@
 #' #####################################################################
 #' # NOTE: The settings below are unlikely to meet your needs.         #
 #' #####################################################################
-#' require(sp)
-#' data(meuse.grid)
+#' data(meuse.grid, package = 'sp')
 #' candi <- meuse.grid[, 1:2]
-#' schedule <- scheduleSPSANN(chains = 1, initial.temperature = 5000000,
-#'                            x.max = 1540, y.max = 2060, x.min = 0, 
-#'                            y.min = 0, cellsize = 40)
+#' schedule <- scheduleSPSANN(
+#'   chains = 1, initial.temperature = 5000000,
+#'   x.max = 1540, y.max = 2060, x.min = 0, y.min = 0, cellsize = 40)
 #' set.seed(2001)
 #' res <- optimMSSD(points = 10, candi = candi, schedule = schedule)
-#' objSPSANN(res) - objMSSD(candi = candi, points = res)
+#' data.frame(
+#'   expected = 247204.8,
+#'   objSPSANN = objSPSANN(res),
+#'   objMSSD = objMSSD(candi = candi, points = res)
+#' )
 #' 
 # FUNCTION - MAIN #############################################################################################
 optimMSSD <-
