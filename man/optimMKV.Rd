@@ -33,9 +33,9 @@ sample configuration -- free to move during the optimization.
 two columns in the following order: \code{[, "x"]}, the projected x-coordinates, and \code{[, "y"]}, the projected
 y-coordinates.}
 
-\item{eval.grid}{Data frame or matrix with the objective function evaluation locations. Like \code{candi},
-\code{eval.grid} must have two columns in the following order: \code{[, "x"]}, the projected x-coordinates, and
-\code{[, "y"]}, the projected y-coordinates.}
+\item{eval.grid}{(Experimental) Data frame or matrix with the objective function evaluation locations. Like
+\code{candi}, \code{eval.grid} must have two columns in the following order: \code{[, "x"]}, the projected x-coordinates,
+and \code{[, "y"]}, the projected y-coordinates.}
 
 \item{covars}{Data frame or matrix with the covariates in the columns. The number of rows of \code{covars} must
 match exactly that of \code{candi} -- or \code{eval.grid}, in case a coarser evaluation grid is used.}

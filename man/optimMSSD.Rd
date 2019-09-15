@@ -32,9 +32,9 @@ sample configuration -- free to move during the optimization.
 two columns in the following order: \code{[, "x"]}, the projected x-coordinates, and \code{[, "y"]}, the projected
 y-coordinates.}
 
-\item{eval.grid}{Data frame or matrix with the objective function evaluation locations. Like \code{candi},
-\code{eval.grid} must have two columns in the following order: \code{[, "x"]}, the projected x-coordinates, and
-\code{[, "y"]}, the projected y-coordinates.}
+\item{eval.grid}{(Experimental) Data frame or matrix with the objective function evaluation locations. Like
+\code{candi}, \code{eval.grid} must have two columns in the following order: \code{[, "x"]}, the projected x-coordinates,
+and \code{[, "y"]}, the projected y-coordinates.}
 
 \item{schedule}{List with named sub-arguments defining the control parameters of the cooling schedule.
 See \code{\link[spsann]{scheduleSPSANN}}.}
@@ -170,15 +170,18 @@ optimization of sample configurations for variogram identification and estimatio
 #####################################################################
 # NOTE: The settings below are unlikely to meet your needs.         #
 #####################################################################
-require(sp)
-data(meuse.grid)
+data(meuse.grid, package = 'sp')
 candi <- meuse.grid[, 1:2]
-schedule <- scheduleSPSANN(chains = 1, initial.temperature = 5000000,
-                           x.max = 1540, y.max = 2060, x.min = 0, 
-                           y.min = 0, cellsize = 40)
+schedule <- scheduleSPSANN(
+  chains = 1, initial.temperature = 5000000,
+  x.max = 1540, y.max = 2060, x.min = 0, y.min = 0, cellsize = 40)
 set.seed(2001)
 res <- optimMSSD(points = 10, candi = candi, schedule = schedule)
-objSPSANN(res) - objMSSD(candi = candi, points = res)
+data.frame(
+  expected = 247204.8,
+  objSPSANN = objSPSANN(res),
+  objMSSD = objMSSD(candi = candi, points = res)
+)
 
 }
 \references{
