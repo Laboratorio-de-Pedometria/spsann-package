@@ -105,9 +105,9 @@ optimMKV <-
     
     # Prepare prediction grid (covars) and starting sample matrix (sm)
     if (!missing(eval.grid)) { # Use coarser prediction (evaluation) grid
-      covars <- .covarsMKV(eqn = eqn, candi = eval.grid, covars = covars)
+      covars <- .covarsMKV(eqn = eqn, pred.grid = eval.grid, covars = covars)
     } else { # Use candi as prediction (evaluation) grid
-      covars <- .covarsMKV(eqn = eqn, candi = candi, covars = covars)
+      covars <- .covarsMKV(eqn = eqn, pred.grid = candi[, 2:3], covars = covars)
     }
     sm <- .smMKV(n_pts = n_pts + n_fixed_pts, eqn = eqn, pts = points, covars = covars)
     
@@ -152,7 +152,7 @@ optimMKV <-
             new_energy <- old_energy
             new_conf <- old_conf
             new_sm <- old_sm
-            message("skipped 'singular matrix' error in 'krige'-function")
+            message("\nskipped 'singular matrix' error in 'krige'-function")
           }
 
           # Evaluate the new system configuration
@@ -234,6 +234,7 @@ optimMKV <-
 .objMKV <-
   function (eqn, sm, covars, vgm, krige.stat, k, ...) {
     
+    # NOT ANYMORE!!!
     # We use 'set = list(cn_max = 1e10)' to avoid the LDFfactor error,
     # but do not accept the new system configuration.
     # https://stat.ethz.ch/pipermail/r-sig-geo/2009-November/006919.html
@@ -246,8 +247,9 @@ optimMKV <-
     # I do not know the reason for this error, but it comes from using 
     # 'set = list(cn_max = 1e10)' above. I try to solve with 'tryCatch'!
     res <- NA
-    try(res <- gstat::krige(
-      formula = eqn, locations = ~ x + y, data = sm, newdata = covars, model = vgm, ...)$var1.var, 
+    try(
+      res <- gstat::krige(
+        formula = eqn, locations = ~ x + y, data = sm, newdata = covars, model = vgm, ...)$var1.var,
       silent = TRUE)
     
     # Calculate the energy state value
@@ -288,15 +290,15 @@ optimMKV <-
 # candi: prediction (evaluation) locations
 # covars: covariates
 .covarsMKV <-
-  function (eqn, candi, covars) {
+  function (eqn, pred.grid, covars) {
     
     if (stats::terms(eqn)[[3]] == 1) { # Simple and ordinary kriging
-      covars <- data.frame(candi[, 2:3])
+      covars <- data.frame(pred.grid)
       colnames(covars) <- c("x", "y")
       
     } else { # Universal kriging
       covars <- as.data.frame(covars)
-      covars <- data.frame(candi[, 2:3], covars[, all.vars(eqn)[-1]])
+      covars <- data.frame(pred.grid, covars[, all.vars(eqn)[-1]])
       colnames(covars) <- c("x", "y", all.vars(eqn)[-1])
     }
     
@@ -335,11 +337,16 @@ optimMKV <-
     }
     
     # eqn
-    bb <- !inherits(eqn, "formula")
-    cc <- all.vars(eqn)[1] != "z"
-    if (bb || cc) {
+    if (missing(eqn)) {
       res <- "'eqn' must be a formula with dependent variable 'z'"
       return (res)
+    } else {
+      eqn_not_formula <- !inherits(eqn, "formula")
+      eqn_dependent_not_z <- all.vars(eqn)[1] != "z"
+      if (eqn_not_formula || eqn_dependent_not_z) {
+        res <- "'eqn' must be a formula with dependent variable 'z'"
+        return (res)
+      }
     }
     
     # vgm
@@ -369,14 +376,19 @@ objMKV <-
     pkg <- c("gstat")
     eval(.check_suggests())
     
+    # Check other arguments
+    check <- .checkMKV(
+      covars = covars, eqn = eqn, vgm = vgm, krige.stat = krige.stat, candi = candi, eval.grid = eval.grid)
+    if (!is.null(check)) stop (check, call. = FALSE)
+    
     # Prepare points and candi
     eval(.prepare_points())
     
     # Prepare prediction grid with covars
     if (!missing(eval.grid)) { # Use coarser prediction (evaluation) grid
-      covars <- .covarsMKV(eqn = eqn, candi = eval.grid, covars = covars)
+      covars <- .covarsMKV(eqn = eqn, pred.grid = eval.grid, covars = covars)
     } else { # Use candi as prediction (evaluation) grid
-      covars <- .covarsMKV(eqn = eqn, candi = candi, covars = covars)
+      covars <- .covarsMKV(eqn = eqn, pred.grid = candi[, c(2:3)], covars = covars)
     }
     sm <- .smMKV(n_pts = n_pts, eqn = eqn, pts = points, covars = covars)
     
