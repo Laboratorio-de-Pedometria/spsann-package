@@ -7,6 +7,8 @@
 #' @template spSANN_doc
 #' @template spJitter_doc
 #' 
+#' @inheritParams optimMSSD
+#' 
 #' @param covars Data frame or matrix with the covariates in the columns.
 #' 
 #' @param eqn Formula string that defines the dependent variable \code{z} as a linear model of the independent 
@@ -47,6 +49,9 @@
 #' @concept spatial interpolation
 #' @export
 #' @examples
+#' #####################################################################
+#' # NOTE: The settings below are unlikely to meet your needs.         #
+#' #####################################################################
 #' \dontrun{
 #' data(meuse.grid, package = "sp")
 #' candi <- meuse.grid[1:1000, 1:2]
@@ -63,9 +68,9 @@
 #'   points = res, candi = candi, covars = covars,  eqn = z ~ dist, 
 #'   vgm = vgm)
 #' }
-# FUNCTION - MAIN ##############################################################
+# FUNCTION - MAIN #############################################################################################
 optimMKV <-
-  function (points, candi,
+  function (points, candi, eval.grid,
             # MKV
             covars, eqn = z ~ 1, vgm, krige.stat = "mean", ...,
             # SPSANN
@@ -96,7 +101,11 @@ optimMKV <-
     eval(.prepare_jittering())
     
     # Prepare prediction grid (covars) and starting sample matrix (sm)
-    covars <- .covarsMKV(eqn = eqn, candi = candi, covars = covars)
+    if (!missing(eval.grid)) { # Use coarser prediction (evaluation) grid
+      covars <- .covarsMKV(eqn = eqn, candi = eval.grid, covars = covars)
+    } else { # Use candi as prediction (evaluation) grid
+      covars <- .covarsMKV(eqn = eqn, candi = candi, covars = covars)
+    }
     sm <- .smMKV(n_pts = n_pts + n_fixed_pts, eqn = eqn, pts = points, covars = covars)
     
     # Initial energy state
@@ -213,7 +222,7 @@ optimMKV <-
     # Prepare output
     eval(.prepare_output())
   }
-# INTERNAL FUNCTION - CALCULATE THE ENERGY STATE VALUE #########################
+# INTERNAL FUNCTION - CALCULATE THE ENERGY STATE VALUE ########################################################
 # eqn: equation
 # sm: sample matrix
 # covars: covariates
@@ -248,7 +257,7 @@ optimMKV <-
     # Output
     return (res)
   }
-# INTERNAL FUNCTION - PREPARE STARTING SAMPLE MATRIX ###########################
+# INTERNAL FUNCTION - PREPARE STARTING SAMPLE MATRIX ##########################################################
 # n_pts: number of points
 # eqn: equation
 # pts: points
@@ -271,9 +280,9 @@ optimMKV <-
     # Output
     return (sm)
   }
-# INTERNAL FUNCTION - PREPARE THE PREDICITON GRID ##############################
+# INTERNAL FUNCTION - PREPARE THE PREDICITON GRID #############################################################
 # eqn: equation
-# candi: candidate locations
+# candi: prediction (evaluation) locations
 # covars: covariates
 .covarsMKV <-
   function (eqn, candi, covars) {
@@ -291,7 +300,7 @@ optimMKV <-
     # Output
     return (covars)
   }
-# INTERNAL FUNCTION - CHECK ARGUMENTS ##########################################
+# INTERNAL FUNCTION - CHECK ARGUMENTS #########################################################################
 .checkMKV <-
   function (covars, eqn, vgm, krige.stat, candi) {
     
@@ -329,16 +338,15 @@ optimMKV <-
     # krige.stat
     aa <- match(krige.stat, c("mean", "max"))
     if (is.na(aa)) {
-      res <- paste("'krige.stat = ", krige.stat, "' is not supported",
-                   sep = "")
+      res <- paste("'krige.stat = ", krige.stat, "' is not supported", sep = "")
       return (res)
     }
   }
-# FUNCTION - CANCLULATE THE OBJECTIVE FUNCTION VALUE ###########################
+# FUNCTION - CANCLULATE THE OBJECTIVE FUNCTION VALUE ##########################################################
 #' @export
 #' @rdname optimMKV
 objMKV <-
-  function (points, candi,
+  function (points, candi, eval.grid,
             # MKV
             covars, eqn = z ~ 1, vgm, krige.stat = "mean", ...) {
     
@@ -350,7 +358,11 @@ objMKV <-
     eval(.prepare_points())
     
     # Prepare prediction grid with covars
-    covars <- .covarsMKV(eqn = eqn, candi = candi, covars = covars)
+    if (!missing(eval.grid)) { # Use coarser prediction (evaluation) grid
+      covars <- .covarsMKV(eqn = eqn, candi = eval.grid, covars = covars)
+    } else { # Use candi as prediction (evaluation) grid
+      covars <- .covarsMKV(eqn = eqn, candi = candi, covars = covars)
+    }
     sm <- .smMKV(n_pts = n_pts, eqn = eqn, pts = points, covars = covars)
     
     # Energy state
