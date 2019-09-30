@@ -1,3 +1,10 @@
+# Version 2.2.0.9003 (2019-09-30)
+
+* Bug fix:
+  + Avoid points being stuck in the same location at the end of the optimization when using a finite set of 
+    candidate locations. This is done by computing 'x_min0' and 'y_min0'. These are the maximum distance to 
+    the nearest neighbouring candidate location in the x- and y-coordinates.
+
 # Version 2.2.0.9002 (2019-09-15)
 
 * Improvements:
