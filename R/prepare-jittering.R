@@ -27,6 +27,18 @@ expression(x.min <- schedule$x.min, y.min <- schedule$y.min,
       x.max <- schedule$x.max
       y.max <- schedule$y.max
       # cellsize <- schedule$cellsize
-    }, x_max0 <- x.max, y_max0 <- y.max)
+    }, x_max0 <- x.max, y_max0 <- y.max, if (all(cellsize) == 0) {
+      if (!exists(x = 'x')) {
+        x <- SpatialTools::dist1(as.matrix(candi[, "x"]))
+        y <- SpatialTools::dist1(as.matrix(candi[, "y"]))
+      }
+      diag(x) <- Inf
+      diag(y) <- Inf
+      x_min0 <- max(pedometrics::rowMinCpp(x))
+      y_min0 <- max(pedometrics::rowMinCpp(y))
+    } else {
+      x_min0 <- 0
+      y_min0 <- 0
+    })
 }
 
