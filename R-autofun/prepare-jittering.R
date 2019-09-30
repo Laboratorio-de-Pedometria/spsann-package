@@ -48,28 +48,3 @@ if (any(c(is_null_x_max, is_null_y_max) == TRUE)) {
 
 x_max0 <- x.max
 y_max0 <- y.max
-# if (is.null(schedule$x.min) && is.null(schedule$x.max) && 
-#     is.null(schedule$y.min) && is.null(schedule$y.max)) {
-#   message("estimating 'x.min', 'x.max', 'y.min', and 'y.max' from 'candi'")
-#   x <- SpatialTools::dist1(as.matrix(candi[, "x"]))
-#   id <- x > 0
-#   x.min <- min(x[id])
-#   x.max <- max(x) / 2
-#   
-#   y <- SpatialTools::dist1(as.matrix(candi[, "y"]))
-#   id <- y > 0
-#   y.min <- min(y[id])
-#   y.max <- max(y) / 2
-#   
-#   rm(x, id, y)
-# } else {
-#   x.min <- schedule$x.min
-#   x.max <- schedule$x.max
-#   y.min <- schedule$y.min
-#   y.max <- schedule$y.max
-# }
-# x_max0 <- x.max
-# y_max0 <- y.max
-# if (is.null(schedule$cellsize)) {
-#   schedule$cellsize <- c(x.min, y.min)
-# }
