@@ -3,6 +3,8 @@
 #' Set the control parameters for the annealing schedule of \pkg{spsann} functions.
 #' 
 #' @inheritParams spJitter
+#' @template spJitter_doc
+#' @template schedule_doc
 #' 
 #' @param x.max,x.min,y.max,y.min Numeric value defining the minimum and maximum quantity of random noise to 
 #' be added to the projected x- and y-coordinates. The units are the same as of the projected x- and 
@@ -31,7 +33,7 @@
 #' number of samples. Defaults to `chain.length = 1`, i.e. one time the number of samples.
 #' 
 #' @param stopping Integer value defining the maximum allowable number of Markov chains without improvement of 
-#' the objective function value. Defaults to `stopping = ceiling(chains * 0.1)`, i.e. ten percent the maximum
+#' the objective function value. Defaults to `stopping = ceiling(chains * 0.5)`, i.e. fifty percent the maximum
 #' number of chains.
 #' 
 #' @return
@@ -75,7 +77,7 @@
 scheduleSPSANN <-
   function (initial.temperature = 0.001, chains = 500,
             x.max, x.min = 0, y.max, y.min = 0, cellsize,
-            stopping = ceiling(chains * 0.1),
+            stopping = ceiling(chains * 0.5),
             chain.length = 1, temperature.decrease = 0.95, initial.acceptance = 0.95) {
     
     if (initial.acceptance > 1 || initial.acceptance < 0)
