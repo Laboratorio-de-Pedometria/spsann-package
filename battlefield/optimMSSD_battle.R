@@ -79,8 +79,7 @@ sp::gridded(boundary) <- TRUE
 boundary <- rgeos::gUnaryUnion(as(boundary, "SpatialPolygons"))
 candi <- meuse.grid[, 1:2]
 schedule <- scheduleSPSANN(
-  chains = 100, initial.temperature = 500000, x.max = 1540, y.max = 2060, x.min = 0, y.min = 0, cellsize = 40,
-  stopping = 10)
+  chains = 100, initial.temperature = 500000, x.max = 1540, y.max = 2060, cellsize = 40, stopping = 10)
 set.seed(2001)
 res_candi <- optimMSSD(
   points = 30, candi = candi, schedule = schedule, plotit = TRUE, boundary = boundary)
@@ -110,8 +109,7 @@ boundary <- meuse.grid
 sp::coordinates(boundary) <- c("x", "y")
 sp::gridded(boundary) <- TRUE
 boundary <- rgeos::gUnaryUnion(as(boundary, "SpatialPolygons"))
-schedule <- scheduleSPSANN(
-  chains = 100, initial.temperature = 10000, x.max = 1540, y.max = 2060, x.min = 0, y.min = 0, cellsize = 0)
+schedule <- scheduleSPSANN(chains = 100, initial.temperature = 20000, x.max = 1540, y.max = 2060, cellsize = 0)
 eval.grid <- meuse.grid[, 1:2] %>% as.matrix()
 candi <- sp::spsample(x = boundary, n = 100, type = 'regular') %>% sp::coordinates()
 colnames(candi) <- c('x', 'y')
@@ -119,7 +117,7 @@ set.seed(2001)
 res <- optimMSSD(
   points = 50, candi = candi, eval.grid = eval.grid, schedule = schedule, plotit = TRUE, boundary = boundary)
 data.frame(
-  expected = 22940.84,
+  expected = 21620.19,
   objSPSANN = objSPSANN(res),
   objMSSD = objMSSD(points = res, eval.grid = eval.grid)
 )
