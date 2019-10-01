@@ -1,3 +1,11 @@
+# Version 2.2.0.9004 (2019-10-01)
+
+* Improvements:
+  + Cleans up code used to estimate jittering parameters.
+  + Improves documentation to accomodate latest changes/fixes.
+  + Argument `stopping` of function `scheduleSPSANN()` is now set to be equal to fifty percent the maximum
+    number of chains by using `ceiling(chains * 0.5)`.
+
 # Version 2.2.0.9003 (2019-09-30)
 
 * Bug fix:

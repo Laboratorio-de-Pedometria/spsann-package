@@ -2,7 +2,7 @@
 library(magrittr)
 
 # Dependencies
-remotes::package_deps("febr") %>% update()
+remotes::package_deps("spsann") %>% update()
 remotes::package_deps(packages = "devtools") %>% update()
 
 # Reverse dependency tools
