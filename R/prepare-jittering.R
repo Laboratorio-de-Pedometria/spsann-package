@@ -2,40 +2,15 @@
 # Please edit source code in R-autofun/prepare-jittering.R
 .prepare_jittering<-function(...){
 expression(x.min <- schedule$x.min, y.min <- schedule$y.min, 
-    cellsize <- schedule$cellsize, is_null_x_max <- is.null(schedule$x.max), 
-    is_null_y_max <- is.null(schedule$y.max), if (any(c(is_null_x_max, is_null_y_max) == TRUE)) {
-      # if (!missing(eval.grid)) {
-        # message("estimating jittering parameters from 'eval.grid'...")
-        # x <- SpatialTools::dist1(as.matrix(eval.grid[, "x"]))
-        # y <- SpatialTools::dist1(as.matrix(eval.grid[, "y"]))
-      # } else {
-        # message("estimating jittering parameters from 'candi'...")
-        message("estimating 'x.max' and 'y.max' from 'candi'...")
-        x <- SpatialTools::dist1(as.matrix(candi[, "x"]))
-        y <- SpatialTools::dist1(as.matrix(candi[, "y"]))
-      # }
-      x.max <- ifelse(is_null_x_max, max(x) / 2, schedule$x.max)
-      # cellsize <- ifelse(is_null_cellsize, min(x[x > 0]), schedule$cellsize)
-      y.max <- ifelse(is_null_y_max, max(y) / 2, schedule$y.max)
-      # if (is_null_cellsize) { 
-        # cellsize <- c(cellsize, min(y[y > 0]))
-      # }
-      
-    } else {
-      
-      # If nothing is missing...
-      x.max <- schedule$x.max
-      y.max <- schedule$y.max
-      # cellsize <- schedule$cellsize
-    }, x_max0 <- x.max, y_max0 <- y.max, if (all(cellsize) == 0) {
-      if (!exists(x = 'x')) {
-        x <- SpatialTools::dist1(as.matrix(candi[, "x"]))
-        y <- SpatialTools::dist1(as.matrix(candi[, "y"]))
-      }
-      diag(x) <- Inf
-      diag(y) <- Inf
-      x_min0 <- max(pedometrics::rowMinCpp(x))
-      y_min0 <- max(pedometrics::rowMinCpp(y))
+    cellsize <- schedule$cellsize, x.max <- ifelse(test = is.null(schedule$x.max), yes = range(candi[, 'x']) / 2, no = schedule$x.max), 
+    y.max <- ifelse(test = is.null(schedule$y.max), yes = range(candi[, 'y']) / 2, no = schedule$y.max), 
+    x_max0 <- x.max, y_max0 <- y.max, if (all(cellsize == 0)) {
+      x_min0 <- SpatialTools::dist1(as.matrix(candi[, "x"]))
+      y_min0 <- SpatialTools::dist1(as.matrix(candi[, "y"]))
+      diag(x_min0) <- Inf
+      diag(y_min0) <- Inf
+      x_min0 <- max(pedometrics::rowMinCpp(x_min0))
+      y_min0 <- max(pedometrics::rowMinCpp(y_min0))
     } else {
       x_min0 <- 0
       y_min0 <- 0
