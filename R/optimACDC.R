@@ -225,9 +225,10 @@ optimACDC <-
       }
       
       # Update control parameters
+      # Testing new parametes 'x_min0' and 'y_min0' (used with finite 'candi')
       actual_temp <- actual_temp * schedule$temperature.decrease
-      x.max <- x_max0 - (i / schedule$chains) * (x_max0 - x.min) + cellsize[1]
-      y.max <- y_max0 - (i / schedule$chains) * (y_max0 - y.min) + cellsize[2]
+      x.max <- x_max0 - (i / schedule$chains) * (x_max0 - x.min) + cellsize[1] + x_min0
+      y.max <- y_max0 - (i / schedule$chains) * (y_max0 - y.min) + cellsize[2] + y_min0
       
     } # End the annealing schedule
     
