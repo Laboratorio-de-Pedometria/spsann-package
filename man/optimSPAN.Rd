@@ -167,7 +167,7 @@ a finite regular grid, they can be taken as the centre nodes of a finite set of 
 raster image). In the first stage, one of the \dQuote{grid cells} is selected with replacement, i.e.
 independently of already being occupied by another sample. The new location for the sample chosen to be
 jittered is selected within that \dQuote{grid cell} by simple random sampling. This method guarantees that
-virtually any location in the spatial can be selected. It also discards the need to check if the new
+virtually any location in the spatial domain can be selected. It also discards the need to check if the new
 location already is occupied by another sample, speeding up the computations when compared to the first two
 approaches.
 }
