@@ -5,8 +5,8 @@ if (getRversion() >= "2.15.1") {
   utils::globalVariables(
     names = c("covars.type", "sm", "n_pts", "n_cov", "n_candi", "wp", "conf0", 
               "pre.distri", "pop.prop", "id_fac", "id_num", "probs", "breaks",
-              "pcm", "pop_prop", "covars_type", "x_max0", "x.min", "cellsize",
-              "y_max0", "y.min", "x_max0", "best_sm", "best_old_sm", "i", 
+              "pcm", "pop_prop", "covars_type", "x_max0", "x.min", "x_min0", "cellsize",
+              "y_max0", "y.min", "y_min0", "x_max0", "best_sm", "best_old_sm", "i", 
               "res", "n_fixed_pts", 'pop_count'))
 }
 
