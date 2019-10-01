@@ -105,7 +105,7 @@ spJitter <-
         # original location
         pt2 <- pt0
         if (verbose) {
-          m <- paste('no candidate location left in the neighbourhood of point ', pt0[1], 
+          m <- paste('no candidate location left in the neighbourhood of sample ', pt0[1], 
                      '...\nreturnig to original location', sep = '')
           message(m)
         }
