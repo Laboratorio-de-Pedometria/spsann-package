@@ -1,8 +1,18 @@
+# Version 2.2.0.9005 (2020-07-24)
+
+* Improvements:
+    + Function `scheduleSPSANN`: Argument `initial.acceptance` now requires
+    a numeric vector of length two defining the minimum and maximum initial
+    acceptance probability, with default `c(0.95, 0.99)`. This was needed
+    so that users have more confidence choosing the `initial.temperature`.
+    Some were using unnecessarily high initial temperature values.
+    + Improves documentation to accommodate changes.
+
 # Version 2.2.0.9004 (2019-10-01)
 
 * Improvements:
   + Cleans up code used to estimate jittering parameters.
-  + Improves documentation to accomodate latest changes/fixes.
+  + Improves documentation to accommodate latest changes/fixes.
   + Argument `stopping` of function `scheduleSPSANN()` is now set to be equal to fifty percent the maximum
     number of chains by using `ceiling(chains * 0.5)`.
 
