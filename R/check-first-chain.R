@@ -3,11 +3,21 @@
 .check_first_chain<-function(...){
 expression(if (i == 1) {
   x <- round(n_accept / c(n_pts * schedule$chain.length), 2)
-  if (x < schedule$initial.acceptance) {
-    cat("\nlow temperature: ", round(x * 100, 2), "% of acceptance in the 1st chain\n", sep = "")
+  if (x < schedule$initial.acceptance[1]) {
+    cat(
+      "\nthe initial temperature is too low: ", round(x * 100, 2),
+      "% of acceptance in the 1st Markov chain\n", sep = "")
+    break
+  } else if (x > schedule$initial.acceptance[2]) {
+    cat(
+      "\nthe initial temperature is too high: more than ",
+      round(schedule$initial.acceptance[2] * 100, 2),
+      "% of acceptance in the 1st Markov chain\n", sep = "")
     break
   } else {
-    cat("\n", round(x * 100, 2), "% of acceptance in the 1st chain\n", sep = "")
+    cat(
+      "\n", round(x * 100, 2),
+      "% of acceptance in the 1st Markov chain\n", sep = "")
   }
 })
 }
