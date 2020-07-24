@@ -6,6 +6,7 @@ man-roxygen
 battlefield
 build-package.R
 Rprof.out
+TODO.md
 
 # Cpp files
 src/*.o
