@@ -5,9 +5,18 @@
 \alias{USER}
 \title{Optimization of sample configurations using a user-defined objective function}
 \usage{
-optimUSER(points, candi, fun, ..., schedule = scheduleSPSANN(),
-  plotit = FALSE, track = FALSE, boundary, progress = "txt",
-  verbose = FALSE)
+optimUSER(
+  points,
+  candi,
+  fun,
+  ...,
+  schedule = scheduleSPSANN(),
+  plotit = FALSE,
+  track = FALSE,
+  boundary,
+  progress = "txt",
+  verbose = FALSE
+)
 }
 \arguments{
 \item{points}{Integer value, integer vector, data frame or matrix, or list.
@@ -16,8 +25,8 @@ optimUSER(points, candi, fun, ..., schedule = scheduleSPSANN(),
 \code{candi}.
 \item Integer vector. The row indexes of \code{candi} that correspond to the samples that form the starting
 sample configuration. The length of the vector defines the number of samples.
-\item Data frame or matrix. An object with three columns in the following order: \code{[, "id"]}, the row indexes
-of \code{candi} that correspond to each sample, \code{[, "x"]}, the projected x-coordinates, and \code{[, "y"]},
+\item Data frame or matrix. An object with three columns in the following order: \verb{[, "id"]}, the row indexes
+of \code{candi} that correspond to each sample, \verb{[, "x"]}, the projected x-coordinates, and \verb{[, "y"]},
 the projected y-coordinates.
 \item List. An object with two named sub-arguments: \code{fixed}, a data frame or matrix with the projected x-
 and y-coordinates of the existing sample configuration -- kept fixed during the optimization --,
@@ -26,7 +35,7 @@ sample configuration -- free to move during the optimization.
 }}
 
 \item{candi}{Data frame or matrix with the candidate locations for the jittered samples. \code{candi} must have
-two columns in the following order: \code{[, "x"]}, the projected x-coordinates, and \code{[, "y"]}, the projected
+two columns in the following order: \verb{[, "x"]}, the projected x-coordinates, and \verb{[, "y"]}, the projected
 y-coordinates.}
 
 \item{fun}{A function defining the objective function that should be used to evaluate the energy state of
@@ -36,7 +45,7 @@ more information.}
 \item{...}{Other arguments passed to the objective function. See \sQuote{Details} for more information.}
 
 \item{schedule}{List with named sub-arguments defining the control parameters of the cooling schedule.
-See \code{\link[spsann]{scheduleSPSANN}}.}
+See \verb{\link[spsann]\{scheduleSPSANN\}}.}
 
 \item{plotit}{(Optional) Logical for plotting the optimization results, including a) the progress of the
 objective function, and b) the starting (gray circles) and current sample configuration (black dots), and

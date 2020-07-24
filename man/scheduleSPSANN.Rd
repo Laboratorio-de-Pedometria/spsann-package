@@ -4,10 +4,19 @@
 \alias{scheduleSPSANN}
 \title{\pkg{spsann} annealing schedule}
 \usage{
-scheduleSPSANN(initial.temperature = 0.001, chains = 500, x.max,
-  x.min = 0, y.max, y.min = 0, cellsize, stopping = ceiling(chains *
-  0.5), chain.length = 1, temperature.decrease = 0.95,
-  initial.acceptance = 0.95)
+scheduleSPSANN(
+  initial.temperature = 0.001,
+  chains = 500,
+  x.max,
+  x.min = 0,
+  y.max,
+  y.min = 0,
+  cellsize,
+  stopping = ceiling(chains * 0.5),
+  chain.length = 1,
+  temperature.decrease = 0.95,
+  initial.acceptance = c(0.95, 0.99)
+)
 }
 \arguments{
 \item{initial.temperature}{Numeric value larger than 0 defining the initial temperature of the system. A
@@ -40,10 +49,13 @@ number of samples. Defaults to \code{chain.length = 1}, i.e. one time the number
 temperature at the end of each Markov chain. Defaults to \code{temperature.decrease = 0.95}. (Advanced users
 only!)}
 
-\item{initial.acceptance}{Numeric value between 0 and 1 defining the initial acceptance probability, i.e.
-the proportion of proposed system configurations that should be accepted in the first Markov chain. The
-optimization is stopped and a warning is issued if this value is not attained. Defaults to
-\code{initial.acceptance = 0.95}. (Advanced users only!)}
+\item{initial.acceptance}{(Optional) Vector with two positive numeric
+values between 0 and 1 defining the minimum and maximum initial acceptance
+probabilities. The initial acceptance probability is the proportion of
+candidate spatial sample configurations that should be accepted in the
+first Markov chain. The optimization is stopped and a warning is issued
+if the value is not within the predefined range. Defaults to
+\code{initial.acceptance = c(0.95, 0.99)}. (Advanced users only!)}
 }
 \value{
 A list with a set of control parameters of the annealing schedule.

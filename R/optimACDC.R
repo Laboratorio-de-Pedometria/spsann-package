@@ -52,7 +52,7 @@
 #' utopia <- list(user = list(DIST = 0, CORR = 0))
 #' covars <- meuse.grid[1:1000, 5]
 #' schedule <- scheduleSPSANN(
-#'   chains = 1, initial.temperature = 5, x.max = 1540, y.max = 2060, 
+#'   chains = 1, initial.temperature = 5, x.max = 1540, y.max = 2060,
 #'   x.min = 0, y.min = 0, cellsize = 40)
 #' set.seed(2001)
 #' res <- optimACDC(

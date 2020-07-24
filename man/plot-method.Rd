@@ -5,8 +5,7 @@
 \alias{plot}
 \title{Plot an optimized sample configuration}
 \usage{
-\method{plot}{OptimizedSampleConfiguration}(x, which = 1:2, boundary,
-  ...)
+\method{plot}{OptimizedSampleConfiguration}(x, which = 1:2, boundary, ...)
 }
 \arguments{
 \item{x}{Object of class \code{OptimizedSampleConfiguration} returned by one of the

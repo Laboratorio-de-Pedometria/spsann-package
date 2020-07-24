@@ -7,9 +7,9 @@
 #' @template spSANN_doc
 #' @template spJitter_doc
 #' @template schedule_doc
-#' 
-#' @inheritParams optimMSSD
-#' 
+#'
+# @inheritParams optimMSSD
+#'
 #' @param covars Data frame or matrix with the covariates in the columns. The number of rows of `covars` must 
 #' match exactly that of `candi` -- or `eval.grid`, in case a coarser evaluation grid is used.
 #' 

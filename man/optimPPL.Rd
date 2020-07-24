@@ -7,17 +7,53 @@
 \alias{PPL}
 \title{Optimization of sample configurations for variogram identification and estimation}
 \usage{
-optimPPL(points, candi, lags = 7, lags.type = "exponential",
-  lags.base = 2, cutoff, criterion = "distribution", distri,
-  pairs = FALSE, schedule = scheduleSPSANN(), plotit = FALSE,
-  track = FALSE, boundary, progress = "txt", verbose = FALSE)
+optimPPL(
+  points,
+  candi,
+  lags = 7,
+  lags.type = "exponential",
+  lags.base = 2,
+  cutoff,
+  criterion = "distribution",
+  distri,
+  pairs = FALSE,
+  schedule = scheduleSPSANN(),
+  plotit = FALSE,
+  track = FALSE,
+  boundary,
+  progress = "txt",
+  verbose = FALSE
+)
 
-objPPL(points, candi, lags = 7, lags.type = "exponential",
-  lags.base = 2, cutoff, distri, criterion = "distribution",
-  pairs = FALSE, x.max, x.min, y.max, y.min)
+objPPL(
+  points,
+  candi,
+  lags = 7,
+  lags.type = "exponential",
+  lags.base = 2,
+  cutoff,
+  distri,
+  criterion = "distribution",
+  pairs = FALSE,
+  x.max,
+  x.min,
+  y.max,
+  y.min
+)
 
-countPPL(points, candi, lags = 7, lags.type = "exponential",
-  lags.base = 2, cutoff, pairs = FALSE, x.max, x.min, y.max, y.min)
+countPPL(
+  points,
+  candi,
+  lags = 7,
+  lags.type = "exponential",
+  lags.base = 2,
+  cutoff,
+  pairs = FALSE,
+  x.max,
+  x.min,
+  y.max,
+  y.min
+)
 }
 \arguments{
 \item{points}{Integer value, integer vector, data frame or matrix, or list.
@@ -26,8 +62,8 @@ countPPL(points, candi, lags = 7, lags.type = "exponential",
 \code{candi}.
 \item Integer vector. The row indexes of \code{candi} that correspond to the samples that form the starting
 sample configuration. The length of the vector defines the number of samples.
-\item Data frame or matrix. An object with three columns in the following order: \code{[, "id"]}, the row indexes
-of \code{candi} that correspond to each sample, \code{[, "x"]}, the projected x-coordinates, and \code{[, "y"]},
+\item Data frame or matrix. An object with three columns in the following order: \verb{[, "id"]}, the row indexes
+of \code{candi} that correspond to each sample, \verb{[, "x"]}, the projected x-coordinates, and \verb{[, "y"]},
 the projected y-coordinates.
 \item List. An object with two named sub-arguments: \code{fixed}, a data frame or matrix with the projected x-
 and y-coordinates of the existing sample configuration -- kept fixed during the optimization --,
@@ -36,7 +72,7 @@ sample configuration -- free to move during the optimization.
 }}
 
 \item{candi}{Data frame or matrix with the candidate locations for the jittered samples. \code{candi} must have
-two columns in the following order: \code{[, "x"]}, the projected x-coordinates, and \code{[, "y"]}, the projected
+two columns in the following order: \verb{[, "x"]}, the projected x-coordinates, and \verb{[, "y"]}, the projected
 y-coordinates.}
 
 \item{lags}{Integer value, the number of lag-distance classes. Alternatively, a vector of numeric values
@@ -65,7 +101,7 @@ a uniform distribution.}
 point-pairs per lag-distance class? Defaults to \code{pairs = FALSE}.}
 
 \item{schedule}{List with named sub-arguments defining the control parameters of the cooling schedule.
-See \code{\link[spsann]{scheduleSPSANN}}.}
+See \verb{\link[spsann]\{scheduleSPSANN\}}.}
 
 \item{plotit}{(Optional) Logical for plotting the optimization results, including a) the progress of the
 objective function, and b) the starting (gray circles) and current sample configuration (black dots), and

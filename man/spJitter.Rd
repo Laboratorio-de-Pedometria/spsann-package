@@ -4,16 +4,25 @@
 \alias{spJitter}
 \title{Random perturbation of spatial points}
 \usage{
-spJitter(points, candi, x.max, x.min, y.max, y.min, which.point, cellsize,
-  verbose = FALSE)
+spJitter(
+  points,
+  candi,
+  x.max,
+  x.min,
+  y.max,
+  y.min,
+  which.point,
+  cellsize,
+  verbose = FALSE
+)
 }
 \arguments{
-\item{points}{Data frame or matrix with three columns in the following order: \code{[, "id"]} the row indexes
-of \code{candi} that correspond to each point, \code{[, "x"]} the projected x-coordinates, and \code{[, "y"]} the
+\item{points}{Data frame or matrix with three columns in the following order: \verb{[, "id"]} the row indexes
+of \code{candi} that correspond to each point, \verb{[, "x"]} the projected x-coordinates, and \verb{[, "y"]} the
 projected y-coordinates. Note that \code{points} must be a subset of \code{candi}.}
 
 \item{candi}{Data frame or matrix with the candidate locations for the jittered points. \code{candi} must have
-two columns in the following order: \code{[, "x"]} the projected x-coordinates, and \code{[, "y"]} the projected
+two columns in the following order: \verb{[, "x"]} the projected x-coordinates, and \verb{[, "y"]} the projected
 y-coordinates.}
 
 \item{x.max, x.min, y.max, y.min}{Numeric value defining the minimum and maximum quantity of random noise to

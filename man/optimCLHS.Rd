@@ -6,13 +6,29 @@
 \alias{CLHS}
 \title{Optimization of sample configurations for spatial trend identification and estimation (IV)}
 \usage{
-optimCLHS(points, candi, covars, use.coords = FALSE,
+optimCLHS(
+  points,
+  candi,
+  covars,
+  use.coords = FALSE,
   clhs.version = c("paper", "fortran", "update"),
-  schedule = scheduleSPSANN(), plotit = FALSE, track = FALSE,
-  boundary, progress = "txt", verbose = FALSE, weights)
+  schedule = scheduleSPSANN(),
+  plotit = FALSE,
+  track = FALSE,
+  boundary,
+  progress = "txt",
+  verbose = FALSE,
+  weights
+)
 
-objCLHS(points, candi, covars, use.coords = FALSE,
-  clhs.version = c("paper", "fortran", "update"), weights)
+objCLHS(
+  points,
+  candi,
+  covars,
+  use.coords = FALSE,
+  clhs.version = c("paper", "fortran", "update"),
+  weights
+)
 }
 \arguments{
 \item{points}{Integer value, integer vector, data frame or matrix, or list.
@@ -21,8 +37,8 @@ objCLHS(points, candi, covars, use.coords = FALSE,
 \code{candi}.
 \item Integer vector. The row indexes of \code{candi} that correspond to the samples that form the starting
 sample configuration. The length of the vector defines the number of samples.
-\item Data frame or matrix. An object with three columns in the following order: \code{[, "id"]}, the row indexes
-of \code{candi} that correspond to each sample, \code{[, "x"]}, the projected x-coordinates, and \code{[, "y"]},
+\item Data frame or matrix. An object with three columns in the following order: \verb{[, "id"]}, the row indexes
+of \code{candi} that correspond to each sample, \verb{[, "x"]}, the projected x-coordinates, and \verb{[, "y"]},
 the projected y-coordinates.
 \item List. An object with two named sub-arguments: \code{fixed}, a data frame or matrix with the projected x-
 and y-coordinates of the existing sample configuration -- kept fixed during the optimization --,
@@ -31,7 +47,7 @@ sample configuration -- free to move during the optimization.
 }}
 
 \item{candi}{Data frame or matrix with the candidate locations for the jittered samples. \code{candi} must have
-two columns in the following order: \code{[, "x"]}, the projected x-coordinates, and \code{[, "y"]}, the projected
+two columns in the following order: \verb{[, "x"]}, the projected x-coordinates, and \verb{[, "y"]}, the projected
 y-coordinates.}
 
 \item{covars}{Data frame or matrix with the covariates in the columns.}
@@ -47,7 +63,7 @@ formulations of \strong{O1}, \strong{O2}, and \strong{O3} that include the modif
 package in 2018 (see below). Defaults to \code{clhs.version = "paper"}.}
 
 \item{schedule}{List with named sub-arguments defining the control parameters of the cooling schedule.
-See \code{\link[spsann]{scheduleSPSANN}}.}
+See \verb{\link[spsann]\{scheduleSPSANN\}}.}
 
 \item{plotit}{(Optional) Logical for plotting the optimization results, including a) the progress of the
 objective function, and b) the starting (gray circles) and current sample configuration (black dots), and

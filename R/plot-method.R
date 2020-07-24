@@ -1,9 +1,9 @@
 #' Plot an optimized sample configuration
 #' 
 #' Plot the evolution of the energy state and the optimized sample configuration
-#' 
-#' @inheritParams optimACDC
-#' 
+#'
+# @inheritParams optimACDC
+#'
 #' @param x Object of class \code{OptimizedSampleConfiguration} returned by one of the 
 #' \code{optim}-functions.
 #' 

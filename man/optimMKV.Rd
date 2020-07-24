@@ -6,9 +6,21 @@
 \alias{MKV}
 \title{Optimization of sample configurations for spatial interpolation (II)}
 \usage{
-optimMKV(points, candi, covars, eqn, vgm, krige.stat = "mean", ...,
-  schedule = scheduleSPSANN(), plotit = FALSE, track = FALSE,
-  boundary, progress = "txt", verbose = FALSE)
+optimMKV(
+  points,
+  candi,
+  covars,
+  eqn,
+  vgm,
+  krige.stat = "mean",
+  ...,
+  schedule = scheduleSPSANN(),
+  plotit = FALSE,
+  track = FALSE,
+  boundary,
+  progress = "txt",
+  verbose = FALSE
+)
 
 objMKV(points, candi, covars, eqn, vgm, krige.stat = "mean", ...)
 }
@@ -19,8 +31,8 @@ objMKV(points, candi, covars, eqn, vgm, krige.stat = "mean", ...)
 \code{candi}.
 \item Integer vector. The row indexes of \code{candi} that correspond to the samples that form the starting
 sample configuration. The length of the vector defines the number of samples.
-\item Data frame or matrix. An object with three columns in the following order: \code{[, "id"]}, the row indexes
-of \code{candi} that correspond to each sample, \code{[, "x"]}, the projected x-coordinates, and \code{[, "y"]},
+\item Data frame or matrix. An object with three columns in the following order: \verb{[, "id"]}, the row indexes
+of \code{candi} that correspond to each sample, \verb{[, "x"]}, the projected x-coordinates, and \verb{[, "y"]},
 the projected y-coordinates.
 \item List. An object with two named sub-arguments: \code{fixed}, a data frame or matrix with the projected x-
 and y-coordinates of the existing sample configuration -- kept fixed during the optimization --,
@@ -29,7 +41,7 @@ sample configuration -- free to move during the optimization.
 }}
 
 \item{candi}{Data frame or matrix with the candidate locations for the jittered samples. \code{candi} must have
-two columns in the following order: \code{[, "x"]}, the projected x-coordinates, and \code{[, "y"]}, the projected
+two columns in the following order: \verb{[, "x"]}, the projected x-coordinates, and \verb{[, "y"]}, the projected
 y-coordinates.}
 
 \item{covars}{Data frame or matrix with the covariates in the columns. The number of rows of \code{covars} must
@@ -37,19 +49,19 @@ match exactly that of \code{candi} -- or \code{eval.grid}, in case a coarser eva
 
 \item{eqn}{Formula string that defines the dependent variable \code{z} as a linear function of the independent
 variables (covariates) contained in \code{covars}. See the argument \code{formula} in the function
-\code{\link[gstat]{krige}} for more information.}
+\verb{\link[gstat]\{krige\}} for more information.}
 
-\item{vgm}{Object of class \code{variogramModel}. See the argument \code{model} in the function \code{\link[gstat]{krige}}
+\item{vgm}{Object of class \code{variogramModel}. See the argument \code{model} in the function \verb{\link[gstat]\{krige\}}
 for more information.}
 
 \item{krige.stat}{Character value defining the statistic that should be used to summarize the kriging
 prediction error variance. Available options are \code{"mean"} and \code{"max"} for the mean and maximum kriging
 prediction error variance, respectively. Defaults to \code{krige.stat = "mean"}.}
 
-\item{...}{further arguments passed to \code{\link[gstat]{krige}}. (Advanced users only!)}
+\item{...}{further arguments passed to \verb{\link[gstat]\{krige\}}. (Advanced users only!)}
 
 \item{schedule}{List with named sub-arguments defining the control parameters of the cooling schedule.
-See \code{\link[spsann]{scheduleSPSANN}}.}
+See \verb{\link[spsann]\{scheduleSPSANN\}}.}
 
 \item{plotit}{(Optional) Logical for plotting the optimization results, including a) the progress of the
 objective function, and b) the starting (gray circles) and current sample configuration (black dots), and
