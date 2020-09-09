@@ -281,12 +281,18 @@ objPPL <-
     eval(.prepare_points())
     
     # Prepare cutoff and lags
-    if (missing(cutoff) || length(lags) == 1) {
+    # If the cutoff is missing and only the number of lags is informed, then 
+    # the boundaries of the lag-distance classes need to be computed internally
+    if (missing(cutoff) & length(lags) == 1) {
+    # if (missing(cutoff) || length(lags) == 1) {
       schedule <- scheduleSPSANN()
       eval(.prepare_jittering())
       cutoff <- .cutoffPPL(cutoff = cutoff, x.max = x.max, y.max = y.max)
-      lags <- .lagsPPL(lags = lags, lags.type = lags.type, cutoff = cutoff, 
-                       lags.base = lags.base)
+      lags <- .lagsPPL(
+        lags = lags,
+        lags.type = lags.type,
+        cutoff = cutoff,
+        lags.base = lags.base)
     }
     n_lags <- length(lags) - 1
     
