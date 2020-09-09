@@ -183,17 +183,11 @@ minmaxPareto <-
       osc[[i]]$points, covars = covars, candi = candi, strata.type = strata.type, use.coords = use.coords))
 
     if (all(c("PPL", "MSSD") %in% names(osc))) {
-
-      # Get objective function parameters
+      # Compute objective function values
+      # PPL
       lags <- osc$PPL$objective$lags
       criterion <- osc$PPL$objective$criterion
       pairs <- osc$PPL$objective$pairs
-      # x.max <- osc$PPL@spsann$jitter$x[2]
-      # x.min <- osc$PPL@spsann$jitter$x[1]
-      # y.max <- osc$PPL@spsann$jitter$y[2]
-      # y.min <- osc$PPL@spsann$jitter$y[1]
-
-      # Compute objective function values
       obj_ppl <- sapply(1:length(osc), function(i) {
         objPPL(
           points = osc[[i]]$points,
@@ -202,8 +196,10 @@ minmaxPareto <-
           criterion = criterion,
           pairs = pairs)
       })
-               # ,x.max = x.max, y.max = y.max, x.min = x.min, y.min = y.min
-      obj_mssd <- sapply(1:length(osc), function(i) objMSSD(osc[[i]]$points, candi = candi))
+      # MSSD
+      obj_mssd <- sapply(1:length(osc), function(i) {
+        objMSSD(osc[[i]]$points, candi = candi)
+      })
 
       # Prepare output
       res <- data.frame(
