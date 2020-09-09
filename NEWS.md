@@ -1,4 +1,9 @@
-# Version 2.2.0.9005 (2020-07-24)
+## Version 2.2.0.9006 (2020-08-06)
+
+* Improvements:
+  * Now using a qualitative, colorblind safe color palete based on ColorBrewer (<https://colorbrewer2.org/#type=qualitative&scheme=Paired&n=4>)
+
+## Version 2.2.0.9005 (2020-07-24)
 
 * Improvements:
     + Function `scheduleSPSANN`: Argument `initial.acceptance` now requires
@@ -8,7 +13,7 @@
     Some were using unnecessarily high initial temperature values.
     + Improves documentation to accommodate changes.
 
-# Version 2.2.0.9004 (2019-10-01)
+## Version 2.2.0.9004 (2019-10-01)
 
 * Improvements:
   + Cleans up code used to estimate jittering parameters.
@@ -16,14 +21,14 @@
   + Argument `stopping` of function `scheduleSPSANN()` is now set to be equal to fifty percent the maximum
     number of chains by using `ceiling(chains * 0.5)`.
 
-# Version 2.2.0.9003 (2019-09-30)
+## Version 2.2.0.9003 (2019-09-30)
 
 * Bug fix:
   + Avoid points being stuck in the same location at the end of the optimization when using a finite set of 
     candidate locations. This is done by computing 'x_min0' and 'y_min0'. These are the maximum distance to 
     the nearest neighbouring candidate location in the x- and y-coordinates.
 
-# Version 2.2.0.9002 (2019-09-15)
+## Version 2.2.0.9002 (2019-09-15)
 
 * Improvements:
   + Testing `optimMKV()` as a greedy algorithm with (1) a too small neighbourhood size and (2) with a 
@@ -38,7 +43,7 @@
     the need to set `cellsize = 0` in this case. Only `x.max` and `y.max` are still estimated from `candi`. The
     user now has to inform `cellsize` manually and this should speed up computations.
     
-# Version 2.2.0.9001 (2019-09-14)
+## Version 2.2.0.9001 (2019-09-14)
 
 * Improvements:
   + Functions `optimMSSD()`, `objMSSD()`, `optimMKV()` and `objMKV()` have a new argument called `eval.grid`.
@@ -60,13 +65,14 @@
     `chain = 500` and thus `stopping = 50`, which should give more stable results.
   + The documentation of various functions has been revised and improved wherever necessary.
 
-# Version 2.2.0.9000 (2019-05-06)
+## Version 2.2.0.9000 (2019-05-06)
 
 * Improvement:
     - Adds argument `verbose` to `spJitter()`. The user decides if s/he wants to be warned when there is no
       candidate location left in the neighbourhood and the sample point is kept in its original location.
 
-# Version 2.2.0 (2019-04-28)
+## Version 2.2.0 (2019-04-28)
+
 The new version of the __spsann__ package includes some bug fixes and a few modifications. Users now can 
 choose how `optimCLHS` computes objective function values: as in the original paper or as in the FORTRAN 
 implementation. Users now also must inform the `weights` passed to `optimCLHS` as to guarantee that s/he is 
@@ -76,13 +82,15 @@ the possibility to use a finite set of candidate locations by setting `cellsize 
 optimizing sample points only in the feature space and should reduce the computation time needed to find the
 solution.
 
-# Version 2.1.0.9005 (2019-04-26)
+## Version 2.1.0.9005 (2019-04-26)
+
 * Accounts for the fact that the __[clhs](https://CRAN.R-project.org/package=clhs)__ package 
   by Pierre Roudier is not on CRAN any more.
 * Corrects a bug in `plot.OptimizedSampleConfiguration` related to the selection of the information to be 
   displayed.
 
-# Version 2.1.0.9004 (2019-04-10)
+## Version 2.1.0.9004 (2019-04-10)
+
 * Argument `weights` of `optimCLHS`, `optimACDC` and `optimSPAM` now is mandatory. The user is now required to 
   set the weights as to guarantee that s/he is aware of what s/he is doing.
 * Corrects bug related to the naming conventions used with `data.frame`s that store objective function
@@ -91,21 +99,26 @@ solution.
   this is done, __spsann__ now checks for neighbouring candidate locations already included in the sample as to
   avoid duplicated sampling points.
 
-# Version 2.1.0.9003 (2018-07-19)
+## Version 2.1.0.9003 (2018-07-19)
+
 * Implements modifications (alternatives) to the way how `optimCLHS` computes objective function values.
 
-# Version 2.1.0.9002 (2018-07-18)
+## Version 2.1.0.9002 (2018-07-18)
+
 * Implements modifications (alternatives) to the way how `optimCLHS` computes objective function values.
 
-# Version 2.1.0.9001 (2018-07-17)
+## Version 2.1.0.9001 (2018-07-17)
+
 * Updates package documentation.
 
-# Version 2.1.0.9000 (2018-07-16)
+## Version 2.1.0.9000 (2018-07-16)
+
 * Adds new badges to README.md: package version and project status.
 * Adds details and improves DESCRIPTION file; authors are reordered based on contributions.
 * Implements modifications (alternatives) to the way how `optimCLHS` computes objective function values.
 
-# Version 2.1-0 (2017-06-23)
+## Version 2.1-0 (2017-06-23)
+
 Now ***spsann*** can be used to augment an existing sample configuration, that is, add new sampling points
 to a spatial sample configuration generated using ***spsann*** or any other means. To do so, when using one 
 of the functions from the family of `optim...()` functions, the user must pass to the function argument 
@@ -114,7 +127,8 @@ coordinates of the existing sample configuration -- kept fixed during the optimi
 the number of sample points that should be added to the existing sample configuration -- free to move around
 during the optimization.
 
-# Version 2.0-0 (2016-03-14)
+## Version 2.0-0 (2016-03-14)
+
 This is a major release of package ***spsann*** that includes several conceptual changes. Despite our efforts, 
 it was not possible to guarantee the compatibility with previous versions. We have decided not to deprecate 
 functions and function arguments because (1) this would require deprecating a lot of code and (2) you should 
@@ -151,24 +165,29 @@ start using it. This is a summary of the changes:
 * Finally, bugs were fixed, warning messages were improved, and a faster code was implemented whenever 
   possible.
 
-# Version 1.0-2.9013 (2016-03-14)
+## Version 1.0-2.9013 (2016-03-14)
+
 * `devel` branch was merged into `master` branch. 
 
-# Version 1.0-2.9012 (2016-03-14)
+## Version 1.0-2.9012 (2016-03-14)
+
 * Package documentation was expanded. It now includes a vignette that gives a short description of the
   package and its structure. The vignette also contains a few examples on how to use the package. `knitr` is
   the engine used to produce the package vignette.
 
-# Version 1.0-2.9011 (2016-03-11)
+## Version 1.0-2.9011 (2016-03-11)
+
 * Documentation was expanded.
 
-# Version 1.0-2.9010 (2016-03-10)
+## Version 1.0-2.9010 (2016-03-10)
+
 * Created S3 methods for extracting the objective function value and plotting an object of class 
   `OptimizedSampleConfiguration`.
 * The class `OptimizedSampleConfiguration` is no longer exported.
 * Documentation was expanded.
 
-# Version 1.0-2.9009 (2015-11-30)
+## Version 1.0-2.9009 (2015-11-30)
+
 * FIX: the computation of the number of point-pairs per lag-distance class in
   `optimPPL` was incorrect because it neglected the fact that, in a full 
   distance matrix, two points *a* and *b* form two pairs, i.e. *ab* and *ba*. 
@@ -177,10 +196,12 @@ start using it. This is a summary of the changes:
 * FEATURE: using a faster code to compute the number of points and point-pairs
   per lag-distance class in `optimPPL`.
 
-# Version 1.0-2.9008 (2015-11-19)
+## Version 1.0-2.9008 (2015-11-19)
+
 * Fixed minor bugs.
 
-# Version 1.0-2.9007 (2015-11-18)
+## Version 1.0-2.9007 (2015-11-18)
+
 * Improved the warning message printed when converting numeric covariates into factor covariates.
 * Created a new `autofun` to check the number of accepted jitters in the first
   chain. If the number of accepted jitters is superior to the value passed to
@@ -194,7 +215,8 @@ start using it. This is a summary of the changes:
   functions.
 * Fixed minor bugs.
 
-# Version 1.0-2.9006 (2015-11-17)
+## Version 1.0-2.9006 (2015-11-17)
+
 * The user can now chose the type of progress bar that should be used, with 
   options `"txt"`, for a text progress bar in the R console, `"tk"`, to put
   up a Tk progress bar widget, and `NULL` to omit the progress bar. A Tk 
@@ -202,28 +224,33 @@ start using it. This is a summary of the changes:
   processors. The ***tcltk***-package is now a suggested package.
 * Now we use grey colours to in the plot with the energy states.
 
-# Version 1.0-2.9005 (2015-11-17)
+## Version 1.0-2.9005 (2015-11-17)
+
 * Solved NOTEs produced during CRAN check due to the use of functions from 
   default packages other than `base`, and due to examples that take more than 5
   seconds to run.
 
-# Version 1.0-2.9004 (2015-11-16)
+## Version 1.0-2.9004 (2015-11-16)
+
 * Created a function to plot the optimized sample configuration (`plotOSC()`),
   with options to display the evolution of the energy state and/or the
   optimized sample configuration.
 * The function used to compute the Pareto maximum and minimum values (`minmaxPareto()`) was optimized to be
   used with both ACDC and SPAN.
 
-# Version 1.0-2.9003 (2015-11-15)
+## Version 1.0-2.9003 (2015-11-15)
+
 * Create a class (`OptimizedSampleConfiguration`) to store the output of
   `optim` functions.
 
-# Version 1.0-2.9002 (2015-11-14)
+## Version 1.0-2.9002 (2015-11-14)
+
 * The trick included in the `optimMKV()`-function to avoid errors due to
   the LDLfactor error of the ***gstat***-package had to be reformulated. We are
   now using `try()` with a default value which is returned in case of error.
 
-# Version 1.0-2.9001 (2015-11-13)
+## Version 1.0-2.9001 (2015-11-13)
+
 * A completely new annealing schedule was implemented. The reason for this
   modification is that the former annealing schedule, which was based on the
   ***intamapInteractive***-package, showed to be inefficient during
@@ -248,13 +275,15 @@ start using it. This is a summary of the changes:
 * There also is a new function to compute the Pareto maximum and minimum values of the objective functions 
   that compose a multi-objective optimization problem (MOOP): `minmaxPareto()`.
 
-# Version 1.0-2.9000 (2015-10-27)
+## Version 1.0-2.9000 (2015-10-27)
+
 * Now `x.max` and `y.max` are, by default, set to half of the maximum distance
   in the x- and y-coordinates of `candi`, respectively. In the same manner, the
   argument `cutoff` of `optimPPL()` is set, by default, to half of the diagonal
   of the rectangle of sides `x.max` and `y.max`.
 
-# Version 1.0-2 (2015-10-25)
+## Version 1.0-2 (2015-10-25)
+
 * Corrected a bug in `optimCORR()` that was causing the following error: Error
   in if (new_energy <= old_energy) { : missing value where TRUE/FALSE needed. 
   This bug used to affect `optimACDC()` and `optimSPAN()`.
@@ -266,28 +295,33 @@ start using it. This is a summary of the changes:
   device. This allows for a better visualization and allows the user to focus on
   a single plot if so s/he wishes.
 
-# Version 1.0-1 (2015-07-30)
+## Version 1.0-1 (2015-07-30)
+
 * Improved and updated documentation.
 * ***gstat*** is not a dependence any more.
 * Fixed breaks due to changes in dependencies (***pedometrics***).
 
-# Version 1.0-0 (2015-07-14)
+## Version 1.0-0 (2015-07-14)
+
 * Submission to CRAN.
 
-# Version 0.0.0.9012 (2015-07-14)
+## Version 0.0.0.9012 (2015-07-14)
+
 * An auxiliary function (`objSPSANN()`) was created to retrieve the energy state
   of an optimized sample configuration (OSC) at a given point of the 
   optimization.
 * Long examples are not run any more to avoid overload of `R CMD check`.
 * The authors' list was updated with the respective roles.
 
-# Version 0.0.0.9011 (2015-07-13)
+## Version 0.0.0.9011 (2015-07-13)
+
 * The documentation of all functions was significantly improved.
 * Functions from default packages other than ***base*** are now imported to
   comply with the new change to the CRAN policy described at
   http://developer.r-project.org/blosxom.cgi/R-devel/NEWS/2015/06/29#n2015-06-29.
 
-# Version 0.0.0.9010 (2015-07-05)
+## Version 0.0.0.9010 (2015-07-05)
+
 * Using `utils::globalVariables` to avoid the `R CMD check` note 
   `no visible binding for global variable [variable name]`. Source of the 
   solution: http://stackoverflow.com/a/12429344/3365410.
@@ -297,7 +331,8 @@ start using it. This is a summary of the changes:
   while the last was set to `100`.
 * `optimSPAN()` and `objSPAN()` are now full operational.
 
-# Version 0.0.0.9009 (2015-06-30)
+## Version 0.0.0.9009 (2015-06-30)
+
 * Several internal function were renamed using a pattern that includes the name
   of the respective objective function. For example, `.optimPPLcheck()` was 
   renamed as `.checkPPL()`, and `.getLagBreaks()` was renamed as `.lagsPPL()`.
@@ -306,7 +341,8 @@ start using it. This is a summary of the changes:
   standardization is important to ease the construction of multi-objective
   optimization problems.
 
-# Version 0.0.0.9008 (2015-06-29)
+## Version 0.0.0.9008 (2015-06-29)
+
 * Improvements in the family of ACDC, CORR, and DIST functions.
 * Several pairs of internal function that were originally designed to deal with
   different types of covariates (factor and numeric) were merged. Now a single
@@ -316,7 +352,8 @@ start using it. This is a summary of the changes:
   code.
 * A new `autofun` was created to set-up the covariates (`covar`).
 
-# Version 0.0.0.9007 (2015-06-12)
+## Version 0.0.0.9007 (2015-06-12)
+
 * The ***rgeos*** and ***plyr*** packages are not dependencies any more.
 * The `boundary` of the spatial domain can now be estimated internally. The user 
   should use the ***rgeos*** package if a more precise `boundary` is needed.
@@ -333,40 +370,47 @@ start using it. This is a summary of the changes:
   is equal to 100. The problem seems to disappear if a larger number of
   iterations is used.
 
-# Version 0.0.0.9006 (2015-05-12)
+## Version 0.0.0.9006 (2015-05-12)
+
 * `spJitterFinite()` now tries to find an alternative point if the new point
   already is included in the sample. The number of tries is equal to the total
   number of points included in the sample. Because the more points we have, the
   more likely it is that the candidate point already is included in the sample.
 
-# Version 0.0.0.9005 (2015-04-29)
+## Version 0.0.0.9005 (2015-04-29)
+
 * `spJitterFinite()` now returns the old point if the new point already is in
   the sample. This is to avoid an infinite loop at the end of the optimization
   when the objective function creates a cluster of points.
 
-# Version 0.0.0.9004 (2015-04-24)
+## Version 0.0.0.9004 (2015-04-24)
+
 * New version of `optimACDC()`, including new argument definitions;
 * In the multi-objective optimization problem case, now the graphical display 
   includes the many objective functions being optimized along with the utility
   function.
 
-# Version 0.0.0.9003 (2015-04-20)
+## Version 0.0.0.9003 (2015-04-20)
+
 * Special version designed for the course on Spatial Sampling for Mapping, 
   22 - 24 April 2015, Wageningen University Campus, Wageningen, The Netherlands,
   Under the auspices of the Graduate School for Production Ecology and Resource 
   Conservation (PE&RC).
 
-# Version 0.0.0.9002 (2015-04-19)
+## Version 0.0.0.9002 (2015-04-19)
+
 * new function to enable the user to define his/her own objective function;
 * grammar check and enhanced documentation;
 
-# Version 0.0.0.9001 (2015-02-24)
+## Version 0.0.0.9001 (2015-02-24)
+
 * new functions derived from `optimACDC()`: `optimDIST()` and `optimCORR()`;
 * new objective function: mean/maximum kriging variance;
 * review of the family of PPL functions;
 * using function tailored argument checking.
 
-# Version 0.0.0.9000 (2015-01-08)
+## Version 0.0.0.9000 (2015-01-08)
+
 * in-development package;
 * importing functions from the package ***pedometrics***;
 * preparing documentation.

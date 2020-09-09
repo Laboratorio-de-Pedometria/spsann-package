@@ -150,7 +150,7 @@ optimDIST <-
           # Use 'n_pts + n_fixed_pts' to account for existing fixed points.
           new_sm[wp, ] <- covars[new_conf[wp, 1], ]
           # new_energy <- data.frame(
-            # obj = .objDIST(sm = new_sm, pop.prop = pop_prop, n.pts = n_pts, 
+            # obj = .objDIST(sm = new_sm, pop.prop = pop_prop, n.pts = n_pts,
                            # n.cov = n_cov, covars.type = covars.type))
           new_energy <- data.frame(
             obj = .objDIST(

@@ -8,8 +8,7 @@
 \method{plot}{OptimizedSampleConfiguration}(x, which = 1:2, boundary, ...)
 }
 \arguments{
-\item{x}{Object of class \code{OptimizedSampleConfiguration} returned by one of the
-\code{optim}-functions.}
+\item{x}{Object of class \code{OptimizedSampleConfiguration} returned by one of the \code{optim}-functions.}
 
 \item{which}{Which plot should be produced: evolution of the energy state (1), optimized sample
 configuration (2), or both (1:2)? Defaults to \code{which = 1:2}.}

@@ -13,7 +13,6 @@ expression(if (plotit) {
     x[, 2] <- x[, 2] + d
     y <- as.numeric(rownames(x))
     xy <- cbind(c(x[, 1], x[, 2]), rep(y, 2))
-    
     y <- by(candi[, 2], as.factor(candi[, 1]), FUN = range, simplify = FALSE)
     y <- do.call(rbind, y)
     d <- dist(y)
@@ -22,17 +21,15 @@ expression(if (plotit) {
     y[, 2] <- y[, 2] + d
     x <- as.numeric(rownames(y))
     yx <- cbind(rep(x, 2), c(y[, 1], y[, 2]))
-    
     boundary <- unique(rbind(xy, yx))
     rownames(boundary) <- 1:nrow(boundary)
     boundary <- sp::SpatialPoints(boundary)
-    
     rm(x, d, y, xy, yx)
   }
   # I guess this was the reason for the warning message seen by Alexandre Wadoux.
   # It seems that 'rm' should be inside 'if (missing(boundary)) {...}', not outside!!!
   # rm(x, d, y, xy, yx)
-  
+
   # Open two new plotting devices
   grDevices::dev.new()
   grDevices::dev.new()

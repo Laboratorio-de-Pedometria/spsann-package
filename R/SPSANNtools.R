@@ -32,20 +32,21 @@ objSPSANN.OptimizedSampleConfiguration <-
     return(data.frame(res, row.names = ""))
   }
 # INTERNAL FUNCTION - COMPUTE ACCEPTANCE PROBABILITY ###########################
-.acceptSPSANN <- 
-  function (old.energy, new.energy, actual.temp) {
+.acceptSPSANN <-
+  function(old.energy, new.energy, actual.temp) {
     accept <- min(1, exp((old.energy[[1]] - new.energy[[1]]) / actual.temp))
     accept <- floor(stats::rbinom(n = 1, size = 1, prob = accept))
-    return (accept)
+    return(accept)
   }
 # INTERNAL FUNCTION - PLOTTING #################################################
 .spSANNplot <-
-  function (energy0, energies, k, 
-            # acceptance, accept_probs, 
-            boundary, new_conf, conf0, y_max0, y.max, x_max0, x.max, best.energy, best.k, MOOP, wp) {
-    
+  function(energy0, energies, k,
+          # acceptance, accept_probs,
+          boundary, new_conf, conf0, y_max0, y.max, x_max0, x.max, best.energy,
+          best.k, MOOP, wp) {
+
     # graphics::par(mfrow = c(1, 2))
-    
+
     # PLOT ENERGY STATES
     grDevices::dev.set(grDevices::dev.prev())
     graphics::par(mar = c(5, 4, 4, 4) + 0.1)
@@ -53,18 +54,28 @@ objSPSANN.OptimizedSampleConfiguration <-
     n <- ncol(energy0)
     l <- colnames(energy0)
     a <- rbind(energy0, energies)
-    # col <- c("red", rep("black", n - 1))
-    col <- c("red", grDevices::gray(seq(0, 0.5, length.out = n - 1)))
+    # Palete based on ColorBrewer (qualitative, Paired, colorblind safe)
+    # https://colorbrewer2.org/#type=qualitative&scheme=Paired&n=4
+    col <- c(
+      "#000000", "#1F78B4", "#33A02C", "#E31A1C", "#A6CEE3",
+      "#B2DF8A", "#FB9A99")[1:n]
     graphics::plot(
-      1, type = 'n', xlim = c(0, k), # ylim = c(0, max(a)), 
-      ylim = c(min(a), max(a)), xlab = "jitter", ylab = "energy state")
-    graphics::legend("topright", legend = l, lwd = 1, lty = 1:n, col = col)
-    for(i in 1:ncol(a)) {
-      graphics::lines(a[, i] ~ c(1:k), type = "l", lty = i, col = col[i])
+      1, type = "n", xlim = c(0, k),
+      # ylim = c(0, max(a)),
+      ylim = c(min(a), max(a)),
+      xlab = "Spatial jitter",
+      ylab = "Objective Function Value")
+    graphics::legend(
+      "topright", legend = l, lwd = 1, lty = rep(1, n), col = col)
+    for (i in 1:ncol(a)) {
+      graphics::lines(a[, i] ~ c(1:k), col = col[i])
     }
-    graphics::lines(x = c(-k, 0), y = rep(energy0[1], 2), col = "red")
-    graphics::lines(x = rep(best.k, 2), y = c(-500, best.energy[1]), col = "blue")
-    
+    graphics::lines(x = c(-k, 0), y = rep(energy0[1], 2), col = col[1])
+    graphics::points(
+      x = best.k, y = best.energy[1], col = "#E31A1C", pch = 20)
+    # graphics::lines(
+      # x = rep(best.k, 2), y = c(-500, best.energy[1]), col = "blue")
+
     # PLOT SAMPLE CONFIGURATION
     grDevices::dev.set(grDevices::dev.next())
     bb <- sp::bbox(boundary)
@@ -75,7 +86,8 @@ objSPSANN.OptimizedSampleConfiguration <-
     } else {
       sp::plot(x = boundary)
     }
-    graphics::points(conf0[, 1], conf0[, 2], pch = 1, cex = 0.75, col = "lightgray")
+    graphics::points(
+      conf0[, 1], conf0[, 2], pch = 1, cex = 0.75, col = "lightgray")
     # graphics::points(new_conf[, 1], new_conf[, 2], pch = 20, cex = 0.5)
     pch <- rep(20, nrow(conf0))
     if (nrow(conf0) < nrow(new_conf)) {
@@ -83,34 +95,37 @@ objSPSANN.OptimizedSampleConfiguration <-
     }
     graphics::points(new_conf[, 1], new_conf[, 2], pch = pch, cex = 0.75)
     if (!missing(wp)) {
-      graphics::points(new_conf[wp, 1], new_conf[wp, 2], pch = pch, cex = 1, col = "red")
+      graphics::points(
+        new_conf[wp, 1], new_conf[wp, 2], pch = pch, cex = 1, col = "red")
     }
-    
+
     # plot maximum shift in the x and y coordinates
     x <- c(bb[1, 1], bb[1, 2])
     y <- rep(bb[2, 1], 2) - 0.02 * y_max0
     graphics::lines(x = x, y = y, col = "gray", lwd = 12)
-    
+
     y <- c(bb[2, 1], bb[2, 2])
     x <- rep(bb[1, 1], 2) - 0.02 * x_max0
     graphics::lines(y = y, x = x, col = "gray", lwd = 12)
-    
+
     x <- c(bb[1, 1], bb[1, 1] + x.max)
     y <- rep(bb[2, 1], 2) - 0.02 * y_max0
     graphics::lines(x = x, y = y, col = "orange", lwd = 12)
-    
+
     x <- rep(bb[1, 1], 2) - 0.02 * x_max0
     y <- c(bb[2, 1], bb[2, 1] + y.max)
     graphics::lines(y = y, x = x, col = "orange", lwd = 12)
-    
+
     # plot labels for maximum shift in the x and y coordinates
     x <- bb[1, 1] + (bb[1, 2] - bb[1, 1]) / 2
     y <- bb[2, 1] - 0.02 * y_max0
-    graphics::text(x = x, y = y, labels = "maximum shift in the X axis")
-    
+    graphics::text(
+      x = x, y = y, labels = "maximum shift in the X axis")
+
     x <- bb[1, 1] - 0.02 * x_max0
     y <- bb[2, 1] + (bb[2, 2] - bb[2, 1]) / 2
-    graphics::text(y = y, x = x, srt = 90, labels = "maximum shift in the Y axis")
+    graphics::text(
+      y = y, x = x, srt = 90, labels = "maximum shift in the Y axis")
   }
 # THE ORIGINAL spSANN FUNCTION #################################################
 # .energyState <- 
