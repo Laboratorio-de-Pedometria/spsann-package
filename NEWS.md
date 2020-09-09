@@ -1,3 +1,5 @@
+# NEWS
+
 ## Version 2.2.0.9006 (2020-08-06)
 
 * Improvements:
