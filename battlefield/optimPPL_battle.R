@@ -10,9 +10,12 @@ sapply(list.files("src", full.names = TRUE, pattern = ".cpp$"), Rcpp::sourceCpp)
 require(sp)
 data(meuse.grid)
 candi <- meuse.grid[, 1:2]
-schedule <- scheduleSPSANN(chains = 1, initial.temperature = 30,
-                           x.max = 1540, y.max = 2060, x.min = 0, 
-                           y.min = 0, cellsize = 40)
+schedule <- scheduleSPSANN(
+  chains = 1,
+  initial.acceptance = c(0.9, 0.99),
+  initial.temperature = 6,
+  x.max = 1540, y.max = 2060, x.min = 0,
+  y.min = 0, cellsize = 40)
 set.seed(2001)
 res <- optimPPL(points = 10, candi = candi, schedule = schedule)
 objSPSANN(res) - objPPL(points = res, candi = candi)
