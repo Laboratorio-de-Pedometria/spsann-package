@@ -6,7 +6,7 @@ Optimization of Spatial Samples via Simulated Annealing
 [![Project Status: Active – The project has reached a stable, usable
 state and is being actively
 developed.](https://www.repostatus.org/badges/latest/active.svg)](http://www.repostatus.org/#active)
-[![packageversion](https://img.shields.io/badge/devel%20version-2.2.0.9007-firebrick.svg?style=flat-square)](commits/master)
+[![packageversion](https://img.shields.io/badge/devel%20version-2.2.0.9008-firebrick.svg?style=flat-square)](commits/master)
 [![Build
 Status](https://travis-ci.org/samuel-rosa/spsann.svg?branch=master)](https://travis-ci.org/samuel-rosa/spsann)
 [![CRAN](https://www.r-pkg.org/badges/version/spsann)](https://cran.r-project.org/package=spsann)

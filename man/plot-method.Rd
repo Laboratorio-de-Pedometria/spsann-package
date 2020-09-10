@@ -3,22 +3,26 @@
 \name{plot.OptimizedSampleConfiguration}
 \alias{plot.OptimizedSampleConfiguration}
 \alias{plot}
-\title{Plot an optimized sample configuration}
+\title{Plot an optimized spatial sample configuration}
 \usage{
 \method{plot}{OptimizedSampleConfiguration}(x, which = 1:2, boundary, ...)
 }
 \arguments{
-\item{x}{Object of class \code{OptimizedSampleConfiguration} returned by one of the \code{optim}-functions.}
+\item{x}{Object of class \code{OptimizedSampleConfiguration} returned by one
+of the \code{optim}-functions.}
 
-\item{which}{Which plot should be produced: evolution of the energy state (1), optimized sample
-configuration (2), or both (1:2)? Defaults to \code{which = 1:2}.}
+\item{which}{Which plot should be produced: evolution of the objective
+function value (1), optimized spatial sample configuration (2), or both
+(1:2)? Defaults to \code{which = 1:2}.}
 
-\item{boundary}{Object of class \code{Spatial} defining the boundary of the sampling region.}
+\item{boundary}{Object of class \code{Spatial} defining the boundary of the
+sampling region.}
 
 \item{...}{Other options passed to \code{plot}.}
 }
 \description{
-Plot the evolution of the energy state and the optimized sample configuration
+Plot the evolution of the objective function value and the optimized spatial
+sample configuration
 }
 \examples{
 require(sp)
@@ -26,10 +30,10 @@ data(meuse.grid)
 candi <- meuse.grid[, 1:2]
 covars <- meuse.grid[, 5]
 schedule <- scheduleSPSANN(initial.temperature = 5, chains = 1,
-                           x.max = 1540, y.max = 2060, x.min = 0, 
+                           x.max = 1540, y.max = 2060, x.min = 0,
                            y.min = 0, cellsize = 40)
 set.seed(2001)
-res <- optimCORR(points = 10, candi = candi, covars = covars, 
+res <- optimCORR(points = 10, candi = candi, covars = covars,
                  use.coords = TRUE, schedule = schedule)
 plot(res)
 }

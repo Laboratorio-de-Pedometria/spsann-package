@@ -234,16 +234,19 @@ for making sure that this requirement is attained.
 #####################################################################
 \dontrun{
 # This example takes more than 5 seconds
-require(sp)
-data(meuse.grid)
+data(meuse.grid, package = "sp")
 candi <- meuse.grid[, 1:2]
-schedule <- scheduleSPSANN(chains = 1, initial.temperature = 30,
-                           x.max = 1540, y.max = 2060, x.min = 0, 
-                           y.min = 0, cellsize = 40)
+schedule <- scheduleSPSANN(
+  chains = 1,
+  initial.acceptance = c(0.8, 0.99),
+  initial.temperature = 9.5,
+  x.max = 1540, y.max = 2060, x.min = 0,
+  y.min = 0, cellsize = 40)
 set.seed(2001)
-res <- optimPPL(points = 10, candi = candi, schedule = schedule)
-objSPSANN(res) - objPPL(points = res, candi = candi)
-countPPL(points = res, candi = candi)
+res <- optimPPL(points = 10, candi = candi, schedule = schedule, track = TRUE)
+objPPL(res)
+countPPL(res)
+plot(res)
 }
 }
 \references{

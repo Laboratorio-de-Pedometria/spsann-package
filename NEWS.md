@@ -1,11 +1,21 @@
 # NEWS
 
+## Version 2.2.0.9008 (2020-09-10)
+
+* Improvements:
+  * `optimPPL()`: the optimizes sample configuration now exports both target (`target.distribution`) and final
+    (`final.distribution`) distribution of points or point-pairs per lag-distance class.
+  * `objPPL()`: for a PPL-optimized sample configuration, now returns the stored objective function
+    value—`objSPSANN()` may become useless.
+  * `countPPL()`: for a PPL-optimized sample configuration, now returns the stored final distribution of 
+    points or point-pairs per lag-distance class.
+
 ## Version 2.2.0.9007 (2020-09-09)
 
-* `minmaxPareto()`:
-  * Corrects error: `'cellsize' must be a numeric value greater than or equal
-    to zero`
-  * Updates example in documentation
+* Bug fixes:
+  * `minmaxPareto()`: `'cellsize' must be a numeric value greater than or equal to zero`
+* Improvements:
+  * `minmaxPareto()`: updates example in documentation
 
 ## Version 2.2.0.9006 (2020-08-06)
 
