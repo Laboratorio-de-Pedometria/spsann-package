@@ -57,7 +57,9 @@ expression(if (!is.null(progress)) close(pb), rt <- as.numeric(c(proc.time() - t
       res$objective$lags.base <- lags.base
       res$objective$cutoff <- cutoff
       res$objective$criterion <- criterion
-      res$objective$distri <- distri
+      res$objective$distri <- distri # delete
+      res$objective$target.distribution <- distri
+      res$objective$final.distribution <- ppl
       res$objective$pairs <- pairs
     }, if (objective == "MKV") {
       res$objective$eqn <- eqn
