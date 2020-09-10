@@ -7,11 +7,11 @@ expression(if (!is.null(progress)) {
     pb <- utils::txtProgressBar(min = 1, max = max, style = 3)
   } else {
     if (progress == "tk") {
-      
+
       # Check suggests
       pkg <- c("tcltk")
       eval(.check_suggests())
-      
+
       label <- paste(objective, " with ", n_pts, " points", sep = "")
       pb <- tcltk::tkProgressBar(label = label, min = 1, max = max)
     }
