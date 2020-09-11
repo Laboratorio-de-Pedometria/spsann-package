@@ -1,5 +1,11 @@
 # NEWS
 
+## Version 2.2.0.9009 (2020-09-11)
+
+* Improvements:
+  * PPL-related functions. Improved argument checking using `match.call()`, the code now being cleaner.
+  * `schedule` does not have a default value anymore. This is in line with version 2.2.0.9002.
+
 ## Version 2.2.0.9008 (2020-09-10)
 
 * Improvements:

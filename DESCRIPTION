@@ -1,8 +1,8 @@
 Package: spsann
 Type: Package
 Title: Optimization of Spatial Samples via Simulated Annealing
-Version: 2.2.0.9008
-Date: 2020-09-10
+Version: 2.2.0.9009
+Date: 2020-09-11
 Authors@R: c(
     person("Alessandro", "Samuel-Rosa", role = c("aut", "cre"), 
        email = "alessandrosamuelrosa@gmail.com",
