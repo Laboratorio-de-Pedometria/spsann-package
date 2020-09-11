@@ -26,8 +26,8 @@ cellsize <- schedule$cellsize
 # 'x.max' and 'y.max' ####
 # We check if 'x.max' and 'y.max' are misssing. If they are, then they are set to half the maximum distance in
 # the x- and y-coordinates of candi, respectively.
-x.max <- ifelse(test = is.null(schedule$x.max), yes = range(candi[, 'x']) / 2, no = schedule$x.max)
-y.max <- ifelse(test = is.null(schedule$y.max), yes = range(candi[, 'y']) / 2, no = schedule$y.max)
+x.max <- ifelse(test = is.null(schedule$x.max), yes = diff(range(candi[, 'x'])) / 2, no = schedule$x.max)
+y.max <- ifelse(test = is.null(schedule$y.max), yes = diff(range(candi[, 'y'])) / 2, no = schedule$y.max)
 
 # is_null_x_max <- is.null(schedule$x.max)
 # is_null_y_max <- is.null(schedule$y.max)
