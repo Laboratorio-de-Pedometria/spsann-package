@@ -61,20 +61,18 @@
 #' }
 # MAIN FUNCTION ###############################################################################################
 optimSPAN <-
-  function(points, candi,
-           # DIST and CORR
-           covars, strata.type = "area", use.coords = FALSE,
-           # PPL
-           lags = 7, lags.type = "exponential", lags.base = 2, cutoff, 
-           criterion = "distribution", distri, pairs = FALSE,
-           # SPSANN
-           schedule, plotit = FALSE, track = FALSE,
-           boundary, progress = "txt", verbose = FALSE,
-           # MOOP
-           weights,
-           # weights = list(CORR = 1/6, DIST = 1/6, PPL = 1/3, MSSD = 1/3),
-           nadir = list(sim = NULL, seeds = NULL, user = NULL, abs = NULL),
-           utopia = list(user = NULL, abs = NULL)) {
+  function(
+    points, candi,
+    # DIST and CORR
+    covars, strata.type = "area", use.coords = FALSE,
+    # PPL
+    lags = 7, lags.type = "exponential", lags.base = 2, cutoff, criterion = "distribution", distri, 
+    pairs = FALSE,
+    # SPSANN
+    schedule, plotit = FALSE, track = FALSE, boundary, progress = "txt", verbose = FALSE,
+    # MOOP
+    weights, nadir = list(sim = NULL, seeds = NULL, user = NULL, abs = NULL),
+    utopia = list(user = NULL, abs = NULL)) {
     
     # Objective function name
     objective <- "SPAN"
@@ -110,10 +108,10 @@ optimSPAN <-
     # DIST
     pop_prop <- .strataACDC(
       n.pts = n_pts + n_fixed_pts, strata.type = strata.type, covars = covars, covars.type = covars.type)
+    
     # PPL
-    cutoff <- .cutoffPPL(cutoff = cutoff, x.max = x.max, y.max = y.max)
-    lags <- .lagsPPL(
-      lags = lags, lags.type = lags.type, cutoff = cutoff, lags.base = lags.base)
+    # compute lags (default behavior)
+    lags <- do.call(.compute_variogram_lags, as.list(match.call()[-1]))
     n_lags <- length(lags) - 1
     dm_ppl <- SpatialTools::dist1(old_conf[, 2:3])
     ppl <- .getPPL(
@@ -312,20 +310,18 @@ optimSPAN <-
 #' @rdname optimSPAN
 #' @export
 objSPAN <-
-  function(points, candi, 
-           # DIST and CORR
-           covars, strata.type = "area", use.coords = FALSE,
-           # PPL
-           lags = 7, lags.type = "exponential", lags.base = 2, cutoff, 
-           criterion = "distribution", distri, pairs = FALSE,
-           # SPSANN
-           x.max, x.min, y.max, y.min,
-           # MOOP
-           weights,
-           # weights = list(CORR = 1/6, DIST = 1/6, PPL = 1/3, MSSD = 1/3),
-           nadir = list(sim = NULL, seeds = NULL, user = NULL, abs = NULL),
-           utopia = list(user = NULL, abs = NULL)) {
-    
+  function(
+    points, candi, 
+    # DIST and CORR
+    covars, strata.type = "area", use.coords = FALSE,
+    # PPL
+    lags = 7, lags.type = "exponential", lags.base = 2, cutoff, criterion = "distribution", distri, 
+    pairs = FALSE,
+    # SPSANN
+    x.max, x.min, y.max, y.min,
+    # MOOP
+    weights, nadir = list(sim = NULL, seeds = NULL, user = NULL, abs = NULL), 
+    utopia = list(user = NULL, abs = NULL)) {
     # Check other arguments
     check <- do.call(.check_ppl_arguments, as.list(match.call()[-1]))
     if (!is.null(check)) {
@@ -334,19 +330,10 @@ objSPAN <-
     check <- .optimACDCcheck(
       candi = candi, covars = covars, use.coords = use.coords, strata.type = strata.type)
     if (!is.null(check)) stop(check, call. = FALSE)
-    
     # Prepare points and candi
     eval(.prepare_points())
-    
-    # Prepare for jittering
-    if (missing(cutoff)) {
-      schedule <- scheduleSPSANN()
-      eval(.prepare_jittering())
-    }
-    
     # Prepare 'covars' and create the starting sample matrix 'sm'
     eval(.prepare_acdc_covars())
-    
     # Base data
     # CORR
     pcm <- .corCORR(obj = covars, covars.type = covars.type)
@@ -355,29 +342,25 @@ objSPAN <-
     pop_prop <- .strataACDC(
       n.pts = n_pts, strata.type = strata.type, covars = covars, covars.type = covars.type)
     # PPL
-    cutoff <- .cutoffPPL(cutoff = cutoff, x.max = x.max, y.max = y.max)
-    lags <- .lagsPPL(lags = lags, lags.type = lags.type, cutoff = cutoff, lags.base = lags.base)
+    # compute lags (default behavior)
+    lags <- do.call(.compute_variogram_lags, as.list(match.call()[-1]))
     n_lags <- length(lags) - 1
     dm_ppl <- SpatialTools::dist1(conf0[, 2:3])
     ppl <- .getPPL(lags = lags, n.lags = n_lags, dist.mat = dm_ppl, pairs = pairs)
-    distri <- .distriPPL(
-      n.lags = n_lags, n.pts = n_pts, criterion = criterion, distri = distri, pairs = pairs)
+    distri <- .distriPPL(n.lags = n_lags, n.pts = n_pts, criterion = criterion, distri = distri, pairs = pairs)
     # MSSD
     dm_mssd <- SpatialTools::dist2(candi[, 2:3], conf0[, 2:3])
-    
     # Nadir and utopia points
     nadir <- .nadirSPAN(
       n.pts = n_pts, n.cov = n_cov, n.candi = n_candi, nadir = nadir, candi = candi, covars = covars, 
       pcm = pcm, pop.prop = pop_prop, lags = lags, covars.type = covars.type, n.lags = n_lags, pairs = pairs,
       distri = distri, criterion = criterion)
     utopia <- .utopiaSPAN(utopia = utopia)
-    
     # Energy state
     res <- .objSPAN(
       sm = sm, n.cov = n_cov, nadir = nadir, utopia = utopia, weights = weights, n.pts = n_pts, pcm = pcm, 
       scm = scm, covars.type = covars.type, pop.prop = pop_prop, ppl = ppl, n.lags = n_lags, 
       criterion = criterion, distri = distri, pairs = pairs, dm.mssd = dm_mssd)
-    
     # Output
     return(res)
   }
@@ -391,8 +374,7 @@ objSPAN <-
            pop.prop, ppl, n.lags, criterion, distri, pairs, dm.mssd) {
     
     # DIST
-    obj_dist <- .objDIST(sm = sm, n.pts = n.pts, n.cov = n.cov, 
-                         pop.prop = pop.prop, covars.type = covars.type)
+    obj_dist <- .objDIST(sm = sm, n.pts = n.pts, n.cov = n.cov, pop.prop = pop.prop, covars.type = covars.type)
     obj_dist <- (obj_dist - utopia$DIST) / (nadir$DIST - utopia$DIST)
     obj_dist <- obj_dist * weights$DIST
     
@@ -402,8 +384,8 @@ objSPAN <-
     obj_cor <- obj_cor * weights$CORR
     
     # PPL
-    obj_ppl <- .objPPL(ppl = ppl, n.lags = n.lags, n.pts = n.pts, 
-                       criterion = criterion, distri = distri, pairs = pairs)
+    obj_ppl <- .objPPL(
+      ppl = ppl, n.lags = n.lags, n.pts = n.pts, criterion = criterion, distri = distri, pairs = pairs)
     obj_ppl <- (obj_ppl - utopia$PPL) / (nadir$PPL - utopia$PPL)
     obj_ppl <- obj_ppl * weights$PPL
     

@@ -79,12 +79,10 @@
 #'   x.max = 1540, y.max = 2060, x.min = 0,
 #'   y.min = 0, cellsize = 40)
 #' set.seed(2001)
-#' res <- optimPPL(points = 10, candi = candi, schedule = schedule, track = TRUE)
-#' objPPL(res)
-#' countPPL(res)
-#' plot(res)
+#' res <- optimPPL(points = 10, candi = candi, schedule = schedule)
+#' objSPSANN(res)
 #' }
-# FUNCTION - MAIN ##############################################################
+# FUNCTION - MAIN #############################################################################################
 optimPPL <-
   function (
     points, candi, lags = 7, lags.type = "exponential", lags.base = 2, cutoff, distri,
@@ -111,11 +109,10 @@ optimPPL <-
     # Prepare for jittering
     eval(.prepare_jittering())
     
-    # Prepare cutoff and lags
-    cutoff <- .cutoffPPL(cutoff = cutoff, x.max = x.max, y.max = y.max)
-    lags <- .lagsPPL(lags = lags, lags.type = lags.type, cutoff = cutoff, lags.base = lags.base)
+    # compute lags (default behavior)
+    lags <- do.call(.compute_variogram_lags, as.list(match.call()[-1]))
     n_lags <- length(lags) - 1
-    
+
     # Initial energy state: points or point-pairs
     # Use 'old_conf' instead of 'conf0' because the former has information on any existing fixed points.
     # Use 'n_pts + n_fixed_pts' to account for existing fixed points.
@@ -265,39 +262,28 @@ objPPL <-
   function(
     points, candi, lags = 7, lags.type = "exponential", lags.base = 2, cutoff, distri, 
     criterion = "distribution", pairs = FALSE, x.max, x.min, y.max, y.min) {
-
+    
     # Check arguments
     check <- do.call(.check_ppl_arguments, as.list(match.call()[-1]))
     if (!is.null(check)) {
       stop(check, call. = FALSE)
     }
+    
     # Prepare points and candi
     eval(.prepare_points())
-
-    # Prepare cutoff and lags
-    # If the cutoff is missing and only the number of lags is informed, then 
-    # the boundaries of the lag-distance classes need to be computed internally
-    if (missing(cutoff) & length(lags) == 1) {
-      # if (missing(cutoff) || length(lags) == 1) {
-      schedule <- scheduleSPSANN()
-      eval(.prepare_jittering())
-      cutoff <- .cutoffPPL(cutoff = cutoff, x.max = x.max, y.max = y.max)
-      lags <- .lagsPPL(
-        lags = lags,
-        lags.type = lags.type,
-        cutoff = cutoff,
-        lags.base = lags.base)
-    }
+    
+    # compute lags (default behavior)
+    lags <- do.call(.compute_variogram_lags, as.list(match.call()[-1]))
     n_lags <- length(lags) - 1
     
     # Initial energy state: points or point-pairs
     dm <- SpatialTools::dist1(points[, 2:3])
-    ppl <- .getPPL(
-      lags = lags, n.lags = n_lags, dist.mat = dm, pairs = pairs, n.pts = n_pts)
-    distri <- .distriPPL(n.lags = n_lags, n.pts = n_pts, criterion = criterion,
-                         distri = distri, pairs = pairs)
-    res <- .objPPL(ppl = ppl, n.lags = n_lags, n.pts = n_pts, pairs = pairs,
-                   criterion = criterion, distri = distri)
+    ppl <- .getPPL(lags = lags, n.lags = n_lags, dist.mat = dm, pairs = pairs, n.pts = n_pts)
+    distri <- .distriPPL(
+      n.lags = n_lags, n.pts = n_pts, criterion = criterion, distri = distri, pairs = pairs)
+    res <- .objPPL(
+      ppl = ppl, n.lags = n_lags, n.pts = n_pts, pairs = pairs, criterion = criterion, distri = distri)
+    
     # Output
     return(res)
   }
@@ -317,21 +303,14 @@ countPPL <-
     # Prepare points and candi
     eval(.prepare_points())
 
-    # Prepare cutoff and lags
-    if (missing(cutoff)) {
-      schedule <- scheduleSPSANN()
-      eval(.prepare_jittering())
-    }
-    cutoff <- .cutoffPPL(cutoff = cutoff, x.max = x.max, y.max = y.max)
-    lags <- .lagsPPL(lags = lags, lags.type = lags.type, cutoff = cutoff, 
-                     lags.base = lags.base)
+    # compute lags (default behavior)
+    lags <- do.call(.compute_variogram_lags, as.list(match.call()[-1]))
     n_lags <- length(lags) - 1
     
     # Distance matrix and counts
     dm <- SpatialTools::dist1(points[, 2:3])
     res <- .getPPL(lags = lags, n.lags = n_lags, dist.mat = dm, pairs = pairs, n.pts = n_pts)
     res <- data.frame(lag.lower = lags[-length(lags)], lag.upper = lags[-1], ppl = res)
-    # }
     
     # Output
     return(res)
@@ -342,10 +321,12 @@ countPPL <-
   function(
     lags = 7, lags.type = "exponential", lags.base = 2, cutoff, criterion = "distribution", distri,
     pairs = FALSE, ...) {
+    
     # pairs
     if (!is.logical(pairs)) {
       return(paste0("pairs = '", pairs, "' is not supported"))
     }
+    
     # lags and cutoff
     if (length(lags) > 1) {
       if (!missing(cutoff)) {
@@ -355,18 +336,22 @@ countPPL <-
         return("the lowest lag value must be larger than zero")
       }
     }
+    
     # lags.type
     if (!lags.type %in% c("equidistant", "exponential")) {
       return(paste0("lags.type = '", lags.type, "' is not supported"))
     }
+    
     # lags.base
     if (!is.numeric(lags.base) || length(lags.base) > 1) {
       return("lags.base must be a numeric value")
     }
+    
     # criterion
     if (!criterion %in% c("distribution", "minimum")) {
       return(paste0("criterion = '", criterion, "' is not supported"))
     }
+    
     # distri
     if (!missing(distri)) {
       if (!is.numeric(distri)) {
@@ -380,7 +365,7 @@ countPPL <-
       }
     }
   }
-# INTERNAL FUNCTION - COMPUTE THE DISTRIBUTION #################################
+# INTERNAL FUNCTION - COMPUTE THE DISTRIBUTION ################################################################
 # If required and missing, the wanted distribution of poins (point-pairs) per
 # lag distance class is computed internally.
 .distriPPL <-
@@ -454,31 +439,26 @@ countPPL <-
     
     return (ppl)
   }
-# INTERNAL FUNCTION - BREAKS OF THE LAG-DISTANCE CLASSES #######################
-.lagsPPL <-
-  function (lags, lags.type, cutoff, lags.base) {
-    
+# INTERNAL FUNCTION - BREAKS OF THE LAG-DISTANCE CLASSES ######################################################
+.compute_variogram_lags <-
+  function (lags = 7, lags.type = "exponential", cutoff, lags.base = 2, x.max, y.max, ...) {
     if (length(lags) == 1) {
-      
-      if (lags.type == "equidistant") {
-        lags <- seq(0.0001, cutoff, length.out = lags + 1)
+      if (missing(cutoff)) {
+        if (missing(x.max) & missing(y.max)) {
+          x.max <- diff(range(candi[, 'x'])) / 2
+          y.max <- diff(range(candi[, 'y'])) / 2
+        }
+        cutoff <- sqrt(x.max ^ 2 + y.max ^ 2)
       }
-      
-      if (lags.type == "exponential") {
-        idx <- lags.base ^ c(1:lags - 1)
-        lags <- c(0.0001, rev(cutoff / idx))
-      }
+      switch(
+        lags.type,
+        equidistant = {
+          lags <- seq(0.0001, cutoff, length.out = lags + 1)
+        },
+        exponential = {
+          idx <- lags.base ^ c(1:lags - 1)
+          lags <- c(0.0001, rev(cutoff / idx))
+        })
     }
-    
-    return (lags)
-  }
-# INTERNAL FUNCTION - DETERMINE THE CUTOFF #####################################
-.cutoffPPL <- 
-  function (cutoff, x.max, y.max) {
-    
-    if (missing(cutoff)) {
-      cutoff <- sqrt(x.max ^ 2 + y.max ^ 2)
-    }
-    
-    return (cutoff)
+    return(lags)
   }
