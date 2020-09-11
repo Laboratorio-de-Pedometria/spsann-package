@@ -19,7 +19,7 @@ res <- optimSPAN(
   use.coords = TRUE, utopia = utopia, schedule = schedule)
 objSPSANN(res) - objSPAN(
   points = res, candi = candi, covars = covars, nadir = nadir, weights = weights,
-  use.coords = TRUE, utopia = utopia, cutoff = res$objective$cutoff)
+  use.coords = TRUE, utopia = utopia)
 
 # 1) ADD TEN POINTS TO EXISTING SAMPLE CONFIGURATION ##########################################################
 rm(list = ls())
@@ -40,7 +40,7 @@ id <- sample(1:nrow(candi), 40)
 fixed <- cbind(id, candi[id, ])
 objSPAN(
   points = fixed, candi = candi, covars = covars, nadir = nadir, use.coords = TRUE, utopia = utopia,
-  weights = list(CORR = 1/6, DIST = 1/6, PPL = 1/3, MSSD = 1/3), cutoff = 2572)
+  weights = list(CORR = 1/6, DIST = 1/6, PPL = 1/3, MSSD = 1/3))
 set.seed(2001)
 res <- optimSPAN(
   points = list(free = free, fixed = fixed), candi = candi, covars = covars, nadir = nadir,
@@ -49,4 +49,4 @@ res <- optimSPAN(
 objSPSANN(res) - 
   objSPAN(
   points = res, candi = candi, covars = covars, nadir = nadir, use.coords = TRUE, utopia = utopia,
-  weights = rev(list(CORR = 1/6, DIST = 1/6, PPL = 1/3, MSSD = 1/3)), cutoff = 2572)
+  weights = rev(list(CORR = 1/6, DIST = 1/6, PPL = 1/3, MSSD = 1/3)))
