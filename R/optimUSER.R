@@ -81,7 +81,7 @@ optimUSER <-
             # USER
             fun, ...,
             # SPSANN
-            schedule = scheduleSPSANN(), plotit = FALSE, track = FALSE,
+            schedule, plotit = FALSE, track = FALSE,
             boundary, progress = "txt", verbose = FALSE) {
     
     # Objective function name

@@ -117,7 +117,7 @@ optimCLHS <-
             # O1, O2, and O3
             covars, use.coords = FALSE, clhs.version = c("paper", "fortran", "update"),
             # SPSANN
-            schedule = scheduleSPSANN(), plotit = FALSE, track = FALSE,
+            schedule, plotit = FALSE, track = FALSE,
             boundary, progress = "txt", verbose = FALSE,
             # MOOP
             weights) {
