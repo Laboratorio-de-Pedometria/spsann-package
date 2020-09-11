@@ -59,7 +59,7 @@ if (is.matrix(points) || is.data.frame(points)) { # Data frame or matrix
     }
     if (length(points) == 1) { # Integer value
       points <- sample(1:n_candi, points)
-      points <- candi[points, ] 
+      points <- candi[points, ]
     }
   }
 }
