@@ -10,7 +10,7 @@ optimMSSD(
   points,
   candi,
   eval.grid,
-  schedule = scheduleSPSANN(),
+  schedule,
   plotit = FALSE,
   track = FALSE,
   boundary,

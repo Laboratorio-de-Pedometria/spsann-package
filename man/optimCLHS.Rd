@@ -12,7 +12,7 @@ optimCLHS(
   covars,
   use.coords = FALSE,
   clhs.version = c("paper", "fortran", "update"),
-  schedule = scheduleSPSANN(),
+  schedule,
   plotit = FALSE,
   track = FALSE,
   boundary,

@@ -14,10 +14,10 @@ optimPPL(
   lags.type = "exponential",
   lags.base = 2,
   cutoff,
-  criterion = "distribution",
   distri,
+  criterion = "distribution",
   pairs = FALSE,
-  schedule = scheduleSPSANN(),
+  schedule,
   plotit = FALSE,
   track = FALSE,
   boundary,
@@ -89,13 +89,13 @@ lag-distance classes. Used only when \code{lags.type = "exponential"}. Defaults 
 when \code{lags} is an integer value. If missing, it is set to be equal to the length of the diagonal of
 the rectangle with sides \code{x.max} and \code{y.max} as defined in \code{\link[spsann]{scheduleSPSANN}}.}
 
-\item{criterion}{Character value, the feature used to describe the energy state of the system
-configuration, with options \code{"minimum"} and \code{"distribution"}. Defaults to
-\code{objective = "distribution"}.}
-
 \item{distri}{Numeric vector, the distribution of points or point-pairs per lag-distance class that should
 be attained at the end of the optimization. Used only when \code{criterion = "distribution"}. Defaults to
 a uniform distribution.}
+
+\item{criterion}{Character value, the feature used to describe the energy state of the system
+configuration, with options \code{"minimum"} and \code{"distribution"}. Defaults to
+\code{objective = "distribution"}.}
 
 \item{pairs}{Logical value. Should the sample configuration be optimized regarding the number of
 point-pairs per lag-distance class? Defaults to \code{pairs = FALSE}.}
@@ -243,10 +243,8 @@ schedule <- scheduleSPSANN(
   x.max = 1540, y.max = 2060, x.min = 0,
   y.min = 0, cellsize = 40)
 set.seed(2001)
-res <- optimPPL(points = 10, candi = candi, schedule = schedule, track = TRUE)
-objPPL(res)
-countPPL(res)
-plot(res)
+res <- optimPPL(points = 10, candi = candi, schedule = schedule)
+objSPSANN(res)
 }
 }
 \references{

@@ -20,7 +20,7 @@ optimSPAN(
   criterion = "distribution",
   distri,
   pairs = FALSE,
-  schedule = scheduleSPSANN(),
+  schedule,
   plotit = FALSE,
   track = FALSE,
   boundary,

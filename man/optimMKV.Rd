@@ -14,7 +14,7 @@ optimMKV(
   vgm,
   krige.stat = "mean",
   ...,
-  schedule = scheduleSPSANN(),
+  schedule,
   plotit = FALSE,
   track = FALSE,
   boundary,

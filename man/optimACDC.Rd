@@ -12,7 +12,7 @@ optimACDC(
   covars,
   strata.type = "area",
   use.coords = FALSE,
-  schedule = scheduleSPSANN(),
+  schedule,
   plotit = FALSE,
   track = FALSE,
   boundary,

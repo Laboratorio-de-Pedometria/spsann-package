@@ -10,7 +10,7 @@ optimUSER(
   candi,
   fun,
   ...,
-  schedule = scheduleSPSANN(),
+  schedule,
   plotit = FALSE,
   track = FALSE,
   boundary,
