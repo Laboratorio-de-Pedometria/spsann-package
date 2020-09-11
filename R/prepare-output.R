@@ -55,7 +55,8 @@ expression(if (!is.null(progress)) close(pb), rt <- as.numeric(c(proc.time() - t
       res$objective$lags <- lags
       res$objective$lags.type <- lags.type
       res$objective$lags.base <- lags.base
-      res$objective$cutoff <- cutoff
+      # res$objective$cutoff <- cutoff
+      res$objective$cutoff <- tail(lags, 1)
       res$objective$criterion <- criterion
       res$objective$distri <- distri # delete
       res$objective$target.distribution <- distri
