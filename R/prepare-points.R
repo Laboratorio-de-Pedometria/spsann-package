@@ -38,7 +38,7 @@ expression(if (!missing(candi)) {
         }
         if (length(points) == 1) { # Integer value
           points <- sample(1:n_candi, points)
-          points <- candi[points, ] 
+          points <- candi[points, ]
         }
       }
     }, n_pts <- nrow(points), conf0 <- points, if (exists("fixed_pts")) {
