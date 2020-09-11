@@ -68,7 +68,7 @@ optimSPAN <-
            lags = 7, lags.type = "exponential", lags.base = 2, cutoff, 
            criterion = "distribution", distri, pairs = FALSE,
            # SPSANN
-           schedule = scheduleSPSANN(), plotit = FALSE, track = FALSE,
+           schedule, plotit = FALSE, track = FALSE,
            boundary, progress = "txt", verbose = FALSE,
            # MOOP
            weights,
@@ -83,10 +83,10 @@ optimSPAN <-
     eval(.check_spsann_arguments())
     
     # Check other arguments
-    check <- .checkPPL(lags = lags, lags.type = lags.type, pairs = pairs,
-                       lags.base = lags.base, cutoff = cutoff, 
-                       criterion = criterion, distri = distri, fun = "optimPPL")
-    if (!is.null(check)) stop(check, call. = FALSE)
+    check <- do.call(.check_ppl_arguments, as.list(match.call()[-1]))
+    if (!is.null(check)) {
+      stop(check, call. = FALSE)
+    }
     check <- .optimACDCcheck(candi = candi, covars = covars, 
                              use.coords = use.coords, strata.type = strata.type)
     if (!is.null(check)) stop(check, call. = FALSE)
@@ -327,10 +327,10 @@ objSPAN <-
            utopia = list(user = NULL, abs = NULL)) {
     
     # Check other arguments
-    check <- .checkPPL(
-      lags = lags, lags.type = lags.type, pairs = pairs, lags.base = lags.base, cutoff = cutoff, 
-      criterion = criterion, distri = distri, fun = "optimPPL")
-    if (!is.null(check)) stop(check, call. = FALSE)
+    check <- do.call(.check_ppl_arguments, as.list(match.call()[-1]))
+    if (!is.null(check)) {
+      stop(check, call. = FALSE)
+    }
     check <- .optimACDCcheck(
       candi = candi, covars = covars, use.coords = use.coords, strata.type = strata.type)
     if (!is.null(check)) stop(check, call. = FALSE)

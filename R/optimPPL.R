@@ -86,32 +86,28 @@
 #' }
 # FUNCTION - MAIN ##############################################################
 optimPPL <-
-  function (points, candi,
-            # PPL
-            lags = 7, lags.type = "exponential", lags.base = 2, cutoff, 
-            criterion = "distribution", distri, pairs = FALSE,
-            # SPSANN
-            schedule = scheduleSPSANN(), plotit = FALSE, track = FALSE, 
-            boundary, progress = "txt", verbose = FALSE) {
-    
+  function (
+    points, candi, lags = 7, lags.type = "exponential", lags.base = 2, cutoff, distri,
+    criterion = "distribution", pairs = FALSE, schedule,
+    plotit = FALSE, track = FALSE, boundary, progress = "txt", verbose = FALSE) {
+
     # Objective function name
     objective <- "PPL"
-    
+
     # Check spsann arguments
     eval(.check_spsann_arguments())
-    
+
     # Check other arguments
-    check <- .checkPPL(
-      lags = lags, lags.type = lags.type, pairs = pairs, lags.base = lags.base, cutoff = cutoff, 
-      criterion = criterion, distri = distri, fun = "optimPPL")
-    if (!is.null(check)) stop (check, call. = FALSE)
-    
+    check <- do.call(.check_ppl_arguments, as.list(match.call()[-1]))
+    if (!is.null(check)) {
+      stop(check, call. = FALSE)
+    }
     # Set plotting options
     eval(.plotting_options())
-    
+
     # Prepare points and candi
     eval(.prepare_points())
-    
+
     # Prepare for jittering
     eval(.prepare_jittering())
     
@@ -127,10 +123,10 @@ optimPPL <-
     # dm <- SpatialTools::dist1(conf0[, 2:3])
     # ppl <- .getPPL(lags = lags, n.lags = n_lags, dist.mat = dm, pairs = pairs, n.pts = n_pts)
     # distri <- .distriPPL(
-      # n.lags = n_lags, n.pts = n_pts, criterion = criterion, distri = distri, pairs = pairs)
+    # n.lags = n_lags, n.pts = n_pts, criterion = criterion, distri = distri, pairs = pairs)
     # energy0 <- data.frame(
-      # obj = .objPPL(
-        # ppl = ppl, n.lags = n_lags, n.pts = n_pts, criterion = criterion, distri = distri, pairs = pairs))
+    # obj = .objPPL(
+    # ppl = ppl, n.lags = n_lags, n.pts = n_pts, criterion = criterion, distri = distri, pairs = pairs))
     dm <- SpatialTools::dist1(old_conf[, 2:3])
     ppl <- .getPPL(lags = lags, n.lags = n_lags, dist.mat = dm, pairs = pairs, n.pts = n_pts + n_fixed_pts)
     distri <- .distriPPL(
@@ -179,11 +175,11 @@ optimPPL <-
           # Use 'n_pts + n_fixed_pts' to account for existing fixed points.
           # 
           # ppl <- .getPPL(
-            # lags = lags, n.lags = n_lags, dist.mat = new_dm, pairs = pairs, n.pts = n_pts)
+          # lags = lags, n.lags = n_lags, dist.mat = new_dm, pairs = pairs, n.pts = n_pts)
           # new_energy <- data.frame(
-            # obj = .objPPL(
-              # n.lags = n_lags, n.pts = n_pts, pairs = pairs, criterion = criterion, distri = distri, 
-              # ppl = ppl))
+          # obj = .objPPL(
+          # n.lags = n_lags, n.pts = n_pts, pairs = pairs, criterion = criterion, distri = distri, 
+          # ppl = ppl))
           ppl <- .getPPL(
             lags = lags, n.lags = n_lags, dist.mat = new_dm, pairs = pairs, n.pts = n_pts + n_fixed_pts)
           new_energy <- data.frame(
@@ -232,21 +228,20 @@ optimPPL <-
         no_change <- no_change + 1
         if (no_change > schedule$stopping) {
           # if (new_energy[[1]] > best_energy[[1]] * 1.000001) {
-            # old_conf <- old_conf
-            # new_conf <- best_conf
-            # old_energy <- best_old_energy
-            # new_energy <- best_energy
-            # new_dm <- best_dm
-            # old_dm <- best_old_dm
-            # no_change <- 0
-            # cat("\nrestarting with previously best configuration\n")
+          # old_conf <- old_conf
+          # new_conf <- best_conf
+          # old_energy <- best_old_energy
+          # new_energy <- best_energy
+          # new_dm <- best_dm
+          # old_dm <- best_old_dm
+          # no_change <- 0
+          # cat("\nrestarting with previously best configuration\n")
           # } else { 
-            break 
+          break 
           # }
         }
         if (verbose) {
-          cat("\n", no_change, "chain(s) with no improvement... stops at",
-              schedule$stopping, "\n")
+          cat("\n", no_change, "chain(s) with no improvement... stops at", schedule$stopping, "\n")
         }
       } else {
         no_change <-  0
@@ -263,7 +258,7 @@ optimPPL <-
     # Prepare output
     eval(.prepare_output())
   }
-# FUNCTION - GET OR CALCULATE THE OBJECTIVE FUNCTION VALUE ###############################################################################################################
+# FUNCTION - CALCULATE THE OBJECTIVE FUNCTION VALUE ###########################################################
 #' @rdname optimPPL
 #' @export
 objPPL <-
@@ -271,48 +266,38 @@ objPPL <-
     points, candi, lags = 7, lags.type = "exponential", lags.base = 2, cutoff, distri, 
     criterion = "distribution", pairs = FALSE, x.max, x.min, y.max, y.min) {
 
-    if (inherits(points, "OptimizedSampleConfiguration")) {
-      if (points$objective$name == "PPL") {
-        res <- utils::tail(points$objective$energy, 1)
-        rownames(res) <- ""
-      }
-    } else {
-      
-      # Check arguments
-      check <- .checkPPL(lags = lags, lags.type = lags.type, pairs = pairs, 
-                         lags.base = lags.base, cutoff = cutoff,
-                         criterion = criterion, distri = distri, fun = "objPPL")
-      if (!is.null(check)) stop (check, call. = FALSE)
-      
-      # Prepare points and candi
-      eval(.prepare_points())
-      
-      # Prepare cutoff and lags
-      # If the cutoff is missing and only the number of lags is informed, then 
-      # the boundaries of the lag-distance classes need to be computed internally
-      if (missing(cutoff) & length(lags) == 1) {
-        # if (missing(cutoff) || length(lags) == 1) {
-        schedule <- scheduleSPSANN()
-        eval(.prepare_jittering())
-        cutoff <- .cutoffPPL(cutoff = cutoff, x.max = x.max, y.max = y.max)
-        lags <- .lagsPPL(
-          lags = lags,
-          lags.type = lags.type,
-          cutoff = cutoff,
-          lags.base = lags.base)
-      }
-      n_lags <- length(lags) - 1
-      
-      # Initial energy state: points or point-pairs
-      dm <- SpatialTools::dist1(points[, 2:3])
-      ppl <- .getPPL(
-        lags = lags, n.lags = n_lags, dist.mat = dm, pairs = pairs, n.pts = n_pts)
-      distri <- .distriPPL(n.lags = n_lags, n.pts = n_pts, criterion = criterion,
-                           distri = distri, pairs = pairs)
-      res <- .objPPL(ppl = ppl, n.lags = n_lags, n.pts = n_pts, pairs = pairs,
-                     criterion = criterion, distri = distri)
+    # Check arguments
+    check <- do.call(.check_ppl_arguments, as.list(match.call()[-1]))
+    if (!is.null(check)) {
+      stop(check, call. = FALSE)
     }
+    # Prepare points and candi
+    eval(.prepare_points())
+
+    # Prepare cutoff and lags
+    # If the cutoff is missing and only the number of lags is informed, then 
+    # the boundaries of the lag-distance classes need to be computed internally
+    if (missing(cutoff) & length(lags) == 1) {
+      # if (missing(cutoff) || length(lags) == 1) {
+      schedule <- scheduleSPSANN()
+      eval(.prepare_jittering())
+      cutoff <- .cutoffPPL(cutoff = cutoff, x.max = x.max, y.max = y.max)
+      lags <- .lagsPPL(
+        lags = lags,
+        lags.type = lags.type,
+        cutoff = cutoff,
+        lags.base = lags.base)
+    }
+    n_lags <- length(lags) - 1
     
+    # Initial energy state: points or point-pairs
+    dm <- SpatialTools::dist1(points[, 2:3])
+    ppl <- .getPPL(
+      lags = lags, n.lags = n_lags, dist.mat = dm, pairs = pairs, n.pts = n_pts)
+    distri <- .distriPPL(n.lags = n_lags, n.pts = n_pts, criterion = criterion,
+                         distri = distri, pairs = pairs)
+    res <- .objPPL(ppl = ppl, n.lags = n_lags, n.pts = n_pts, pairs = pairs,
+                   criterion = criterion, distri = distri)
     # Output
     return(res)
   }
@@ -323,113 +308,75 @@ countPPL <-
   function(
     points, candi, lags = 7, lags.type = "exponential", lags.base = 2, cutoff, pairs = FALSE, x.max, x.min, 
     y.max, y.min) {
-    
-    if (inherits(points, "OptimizedSampleConfiguration")) {
-      if (points$objective$name == "PPL") {
-        res <- data.frame(
-          lag.lower = points$objective$lags[-length(points$objective$lags)],
-          lag.upper = points$objective$lags[-1],
-          ppl = points$objective$final.distribution)
-      }
-    } else {
-      # Check arguments
-      check <- .checkPPL(lags = lags, lags.type = lags.type, pairs = pairs,
-                         lags.base = lags.base, cutoff = cutoff, fun = "countPPL")
-      if (!is.null(check)) stop (check, call. = FALSE)
-      
-      # Prepare points and candi
-      eval(.prepare_points())
-      
-      # Prepare cutoff and lags
-      if (missing(cutoff)) {
-        schedule <- scheduleSPSANN()
-        eval(.prepare_jittering())
-      }
-      cutoff <- .cutoffPPL(cutoff = cutoff, x.max = x.max, y.max = y.max)
-      lags <- .lagsPPL(lags = lags, lags.type = lags.type, cutoff = cutoff, 
-                       lags.base = lags.base)
-      n_lags <- length(lags) - 1
-      
-      # Distance matrix and counts
-      dm <- SpatialTools::dist1(points[, 2:3])
-      res <- .getPPL(lags = lags, n.lags = n_lags, dist.mat = dm, pairs = pairs, n.pts = n_pts)
-      res <- data.frame(lag.lower = lags[-length(lags)], lag.upper = lags[-1], ppl = res)
+
+    # Check arguments
+    check <- do.call(.check_ppl_arguments, as.list(match.call()[-1]))
+    if (!is.null(check)) {
+      stop(check, call. = FALSE)
     }
+    # Prepare points and candi
+    eval(.prepare_points())
+
+    # Prepare cutoff and lags
+    if (missing(cutoff)) {
+      schedule <- scheduleSPSANN()
+      eval(.prepare_jittering())
+    }
+    cutoff <- .cutoffPPL(cutoff = cutoff, x.max = x.max, y.max = y.max)
+    lags <- .lagsPPL(lags = lags, lags.type = lags.type, cutoff = cutoff, 
+                     lags.base = lags.base)
+    n_lags <- length(lags) - 1
+    
+    # Distance matrix and counts
+    dm <- SpatialTools::dist1(points[, 2:3])
+    res <- .getPPL(lags = lags, n.lags = n_lags, dist.mat = dm, pairs = pairs, n.pts = n_pts)
+    res <- data.frame(lag.lower = lags[-length(lags)], lag.upper = lags[-1], ppl = res)
+    # }
     
     # Output
     return(res)
   }
-# INTERNAL FUNCTION - CHECK ARGUMENTS ##########################################
-.checkPPL <-
-  function (lags, lags.type, lags.base, cutoff, criterion, distri, pairs, fun) {
-    
-    # Argument 'pairs'
+# INTERNAL FUNCTION - CHECK ARGUMENTS #########################################################################
+# Important: (1) inform default values and (2) allow additional unused arguments
+.check_ppl_arguments <-
+  function(
+    lags = 7, lags.type = "exponential", lags.base = 2, cutoff, criterion = "distribution", distri,
+    pairs = FALSE, ...) {
+    # pairs
     if (!is.logical(pairs)) {
-      res <- c("'pairs' must be a logical value")
-      return (res)
+      return(paste0("pairs = '", pairs, "' is not supported"))
     }
-    
-    # Arguments 'lags' and 'cutoff'
-    if (length(lags) == 1) {
-      #       if (fun != "optimPPL") {
-      #         if (missing(cutoff)) {
-      #           res <- c("'cutoff' is mandatory if the lag intervals are not set")
-      #           return (res)
-      #         }
-      #       }
-    } else {
+    # lags and cutoff
+    if (length(lags) > 1) {
       if (!missing(cutoff)) {
-        res <- c("'cutoff' cannot be used when the lag intervals are set")
-        return (res)
+        return("the cutoff cannot be set when the lag intervals are set too")
       }
       if (lags[1] == 0) {
-        res <- c("lowest lag value must be larger than zero")
-        return (res)
+        return("the lowest lag value must be larger than zero")
       }
     }
-    
-    # Argument 'lags.type'
-    lt <- c("equidistant", "exponential")
-    lt <- is.na(any(match(lt, lags.type)))
-    if (lt) {
-      res <- paste("'lags.type = ", lags.type, "' is not supported", sep = "")
-      return (res)
+    # lags.type
+    if (!lags.type %in% c("equidistant", "exponential")) {
+      return(paste0("lags.type = '", lags.type, "' is not supported"))
     }
-    
-    # Argument 'lags.base'
+    # lags.base
     if (!is.numeric(lags.base) || length(lags.base) > 1) {
-      res <- c("'lags.base' must be a numeric value")
-      return (res)
+      return("lags.base must be a numeric value")
     }
-    
-    if (fun != "countPPL") {
-      
-      # Argument 'criterion'
-      cr <- is.na(any(match(criterion, c("distribution", "minimum"))))
-      if (cr) {
-        res <- paste("'criterion = ", criterion, "' is not supported", sep = "")
-        return (res)
+    # criterion
+    if (!criterion %in% c("distribution", "minimum")) {
+      return(paste0("criterion = '", criterion, "' is not supported"))
+    }
+    # distri
+    if (!missing(distri)) {
+      if (!is.numeric(distri)) {
+        return("distri must be a vector of numeric values")
       }
-      
-      # Argument 'distri'
-      if (!missing(distri)) {
-        if (!is.numeric(distri)) {
-          res <- c("'distri' must be a numeric vector")
-          return (res)
-        }
-        if (length(lags) == 1) {
-          if (length(distri) != lags) {
-            res <- paste("'distri' must be of length ", lags, sep = "")
-            return (res)
-          }
-        }
-        if (length(lags) > 2) {
-          nl <- length(lags) - 1
-          if (length(distri) != nl) {
-            res <- paste("'distri' must be of length ", nl, sep = "")
-            return (res)
-          }
-        }
+      if (length(lags) == 1 & length(distri) != lags) {
+        return(paste0("distri must be a vector of length ", lags))
+      }
+      if (length(lags) > 2 & length(distri) != (length(lags) - 1)) {
+        return(paste0("distri must be a vector of length ", (length(lags) - 1)))
       }
     }
   }
@@ -491,15 +438,15 @@ countPPL <-
     
     if (pairs) { # Point-pairs per lag
       # for (i in 1:n.lags) {
-        # n <- which(dist.mat > lags[i] & dist.mat <= lags[i + 1])
-        # ppl[i] <- length(n)
+      # n <- which(dist.mat > lags[i] & dist.mat <= lags[i + 1])
+      # ppl[i] <- length(n)
       # }
       ppl <- diff(sapply(1:length(lags), function (i) length(which(dist.mat <= lags[i]))) - n.pts) * 0.5
     } else { # Points per lag
       # for (i in 1:n.lags) {
-        # n <- which(
-          # dist.mat > lags[i] & dist.mat <= lags[i + 1], arr.ind = TRUE)
-        # ppl[i] <- length(unique(c(n)))
+      # n <- which(
+      # dist.mat > lags[i] & dist.mat <= lags[i + 1], arr.ind = TRUE)
+      # ppl[i] <- length(unique(c(n)))
       # }
       ppl <- sapply(1:n.lags, function (i)
         length(unique(c(which(dist.mat > lags[i] & dist.mat <= lags[i + 1], arr.ind = TRUE)))))
