@@ -1,12 +1,8 @@
-# Initial settings
+# Default example ##############################################################
 rm(list = ls())
 gc()
-require(pedometrics)
-require(sp)
-sapply(list.files("R", full.names = TRUE, pattern = ".R$"), source)
-sapply(list.files("src", full.names = TRUE, pattern = ".cpp$"), Rcpp::sourceCpp)
-
-# Default example ##############################################################
+devtools::load_all()
+# Example
 require(sp)
 data(meuse.grid)
 candi <- meuse.grid[, 1:2]

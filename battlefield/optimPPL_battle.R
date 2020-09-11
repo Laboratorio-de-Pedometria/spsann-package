@@ -13,8 +13,8 @@ schedule <- scheduleSPSANN(
   y.min = 0, cellsize = 40)
 set.seed(2001)
 res <- optimPPL(points = 10, candi = candi, schedule = schedule, track = TRUE)
-objPPL(res)
-countPPL(res)
+objPPL(res, lags = res$objective$lags) # 41
+countPPL(res, cutoff = res$objective$cutoff)
 plot(res)
 
 # 1) Point pairs with many chains #############################################################################
