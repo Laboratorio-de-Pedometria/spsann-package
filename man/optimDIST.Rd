@@ -23,15 +23,15 @@ optimDIST(
 objDIST(points, candi, covars, strata.type = "area", use.coords = FALSE)
 }
 \arguments{
-\item{points}{Integer value, integer vector, data frame or matrix, or list.
+\item{points}{Integer value, integer vector, data frame or matrix, or list. The number of
+sampling points (sample size) or the starting sample configuration. Four options are available:
 \itemize{
 \item Integer value. The required number of sampling points (sample size). The sample configuration
 used to start the optimization will consist of grid cell centres of \code{candi} selected using
 simple random sampling, i.e. \code{\link[base:sample]{base::sample()}} with \code{x = 1:nrow(candi)} and \code{size = points}.
-\item Integer vector. A set of row indexes between one (1) and \code{nrow(candi)} indicating the grid
+\item Integer vector. A set of row indexes between one (1) and \code{nrow(candi)} identifying the grid
 cell centres of \code{candi} that should be used to form the starting sample configuration for the
-optimization. The length of the integer vector, \code{length(points)}, defines the number of
-sampling points (sample size).
+optimization. The length of the integer vector, \code{length(points)}, is the sample size.
 \item Data frame or matrix. An object with three columns in the following order: \verb{[, "id"]}, the
 row indexes of \code{candi} that correspond to each sample, \verb{[, "x"]}, the projected x-coordinates,
 and \verb{[, "y"]}, the projected y-coordinates.
@@ -59,11 +59,11 @@ options are available:
 }
 
 The first option (\code{"area"}) is equivalent to drawing the frequency histogram of the numerical
-covariates with bins of variable width but equal area. The second, however, would results in a
+covariates with bins of variable width but equal area. The second, however, would result in a
 frequency histogram with bins of equal width but variable area such as when using
-\code{\link[graphics:hist]{graphics::hist()}} with the default options. Marginal sampling strata of equal-area will include
-virtually the same number of individual covariate cells, while equal-range strata aim for the
-same number of individual covariate values.}
+\code{\link[graphics:hist]{graphics::hist()}} with its default options. Marginal sampling strata of equal-area will include
+virtually the same number of individual covariate grid cells, while equal-range strata aim for
+the same number of individual covariate values.}
 
 \item{use.coords}{(Optional) Logical value. Should the projected spatial x- and y-coordinates
 be used as spatially exhaustive covariates? Defaults to \code{use.coords = FALSE}.}

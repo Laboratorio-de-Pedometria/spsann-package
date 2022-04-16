@@ -1,13 +1,13 @@
 #  Template documentation for spatial simulated annealing
 ####################################################################################################
-#' @param points Integer value, integer vector, data frame or matrix, or list.
+#' @param points Integer value, integer vector, data frame or matrix, or list. The number of
+#' sampling points (sample size) or the starting sample configuration. Four options are available:
 #'  * Integer value. The required number of sampling points (sample size). The sample configuration
 #'    used to start the optimization will consist of grid cell centres of `candi` selected using
 #'    simple random sampling, i.e. [base::sample()] with `x = 1:nrow(candi)` and `size = points`.
 #'  * Integer vector. A set of row indexes between one (1) and `nrow(candi)` identifying the grid
 #'    cell centres of `candi` that should be used to form the starting sample configuration for the
-#'    optimization. The length of the integer vector, `length(points)`, defines the number of
-#'    sampling points (sample size).
+#'    optimization. The length of the integer vector, `length(points)`, is the sample size.
 #' 
 #'  * Data frame or matrix. An object with three columns in the following order: `[, "id"]`, the
 #'    row indexes of `candi` that correspond to each sample, `[, "x"]`, the projected x-coordinates,
