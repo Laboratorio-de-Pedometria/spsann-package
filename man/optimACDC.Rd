@@ -73,9 +73,9 @@ options are available:
 The first option (\code{"area"}) is equivalent to drawing the frequency histogram of the numerical
 covariates with bins of variable width but equal area. The second, however, would result in a
 frequency histogram with bins of equal width but variable area such as when using
-\code{\link[graphics:hist]{graphics::hist()}} with its default options. Marginal sampling strata of equal-area will include
-virtually the same number of individual covariate grid cells, while equal-range strata aim for
-the same number of unique covariate values.}
+\code{\link[graphics:hist]{graphics::hist()}} with its default options. Strata of equal area will include virtually the same
+number of individual covariate grid cells per stratum, while equal-range strata aim for the same
+number of unique covariate values in each stratum.}
 
 \item{use.coords}{(Optional) Logical value. Should the projected spatial x- and y-coordinates
 be used as spatially exhaustive covariates? Defaults to \code{use.coords = FALSE}.}

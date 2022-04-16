@@ -9,9 +9,9 @@
 #' The first option (`"area"`) is equivalent to drawing the frequency histogram of the numerical
 #' covariates with bins of variable width but equal area. The second, however, would result in a
 #' frequency histogram with bins of equal width but variable area such as when using
-#' [graphics::hist()] with its default options. Marginal sampling strata of equal-area will include
-#' virtually the same number of individual covariate grid cells, while equal-range strata aim for
-#' the same number of unique covariate values.
+#' [graphics::hist()] with its default options. Strata of equal area will include virtually the same
+#' number of individual covariate grid cells per stratum, while equal-range strata aim for the same
+#' number of unique covariate values in each stratum.
 #'
 #' @param covars Data frame or matrix with the spatially exhaustive covariates in the columns.
 #'
