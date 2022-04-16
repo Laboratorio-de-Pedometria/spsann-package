@@ -68,15 +68,18 @@ devtools::check_man()
 devtools::run_examples(run_dontrun = FALSE)
 # spelling::spell_check_package()
 # spelling::update_wordlist()
-devtools::check_rhub()
 
 # check the package for Linux and Windows
-devtools::check(
-  document = TRUE, manual = TRUE, force_suggests = TRUE, run_dont_test = TRUE)
+devtools::check(document = TRUE, manual = TRUE, run_dont_test = TRUE)
 
 devtools::check_win_devel()
 devtools::check_win_release()
 devtools::check_win_oldrelease()
+
+# check in R-hub ----
+# rhub::validate_email(email = "alessandrosamuelrosa@gmail.com")
+# rhub::check_on_windows()
+devtools::check_rhub()
 
 devtools::build()
 
