@@ -21,22 +21,28 @@ optimUSER(
 \arguments{
 \item{points}{Integer value, integer vector, data frame or matrix, or list.
 \itemize{
-\item Integer value. The sample size. The starting sample configuration will be randomly sampled from
-\code{candi}.
-\item Integer vector. The row indexes of \code{candi} that correspond to the samples that form the starting
-sample configuration. The length of the vector defines the number of samples.
-\item Data frame or matrix. An object with three columns in the following order: \verb{[, "id"]}, the row indexes
-of \code{candi} that correspond to each sample, \verb{[, "x"]}, the projected x-coordinates, and \verb{[, "y"]},
-the projected y-coordinates.
-\item List. An object with two named sub-arguments: \code{fixed}, a data frame or matrix with the projected x-
-and y-coordinates of the existing sample configuration -- kept fixed during the optimization --,
-and \code{free}, an integer value defining the number of samples that should be added to the existing
+\item Integer value. The required number of sampling points (sample size). The sample configuration
+used to start the optimization will consist of grid cell centres of \code{candi} selected using
+simple random sampling, i.e. \code{\link[base:sample]{base::sample()}} with \code{x = 1:nrow(candi)} and \code{size = points}.
+\item Integer vector. A set of row indexes between one (1) and \code{nrow(candi)} indicating the grid
+cell centres of \code{candi} that should be used to form the starting sample configuration for the
+optimization. The length of the integer vector, \code{length(points)}, defines the number of
+sampling points (sample size).
+\item Data frame or matrix. An object with three columns in the following order: \verb{[, "id"]}, the
+row indexes of \code{candi} that correspond to each sample, \verb{[, "x"]}, the projected x-coordinates,
+and \verb{[, "y"]}, the projected y-coordinates.
+\item List. An object with two named arguments:
+\itemize{
+\item \code{fixed}: a data frame or matrix with the projected x- and y-coordinates of the existing
+sample configuration -- kept fixed during the optimization --, and
+\item \code{free}: an integer value defining the number of samples that should be added to the existing
 sample configuration -- free to move during the optimization.
+}
 }}
 
-\item{candi}{Data frame or matrix with the candidate locations for the jittered samples. \code{candi} must have
-two columns in the following order: \verb{[, "x"]}, the projected x-coordinates, and \verb{[, "y"]}, the projected
-y-coordinates.}
+\item{candi}{Data frame or matrix with the candidate locations for the jittered samples. \code{candi}
+must have two columns in the following order: \verb{[, "x"]}, the projected x-coordinates, and
+\verb{[, "y"]}, the projected y-coordinates.}
 
 \item{fun}{A function defining the objective function that should be used to evaluate the energy state of
 the system configuration at each random perturbation of a candidate sample point. See \sQuote{Details} for
@@ -44,28 +50,29 @@ more information.}
 
 \item{...}{Other arguments passed to the objective function. See \sQuote{Details} for more information.}
 
-\item{schedule}{List with named sub-arguments defining the control parameters of the cooling schedule.
-See \verb{\link[spsann]\{scheduleSPSANN\}}.}
+\item{schedule}{List with named sub-arguments defining the control parameters of the cooling
+schedule. See \code{\link[=scheduleSPSANN]{scheduleSPSANN()}}.}
 
-\item{plotit}{(Optional) Logical for plotting the optimization results, including a) the progress of the
-objective function, and b) the starting (gray circles) and current sample configuration (black dots), and
-the maximum jitter in the x- and y-coordinates. The plots are updated at each 10 jitters. When adding
-samples to an existing sample configuration, fixed samples are indicated using black crosses. Defaults to
-\code{plotit = FALSE}.}
+\item{plotit}{(Optional) Logical for plotting the optimization results, including a) the progress
+of the objective function, and b) the starting (gray circles) and current sample configuration
+(black dots), and the maximum jitter in the x- and y-coordinates. The plots are updated at each
+10 jitters. When adding samples to an existing sample configuration, fixed samples are indicated
+using black crosses. Defaults to \code{plotit = FALSE}.}
 
-\item{track}{(Optional) Logical value. Should the evolution of the energy state be recorded and returned
-along with the result? If \code{track = FALSE} (the default), only the starting and ending energy states are
-returned along with the results.}
+\item{track}{(Optional) Logical value. Should the evolution of the energy state be recorded and
+returned along with the result? If \code{track = FALSE} (the default), only the starting and ending
+energy states are returned along with the results.}
 
-\item{boundary}{(Optional) SpatialPolygon defining the boundary of the spatial domain. If missing and
-\code{plotit = TRUE}, \code{boundary} is estimated from \code{candi}.}
+\item{boundary}{(Optional) SpatialPolygon defining the boundary of the spatial domain. If
+missing and \code{plotit = TRUE}, \code{boundary} is estimated from \code{candi}.}
 
-\item{progress}{(Optional) Type of progress bar that should be used, with options \code{"txt"}, for a text
-progress bar in the R console, \code{"tk"}, to put up a Tk progress bar widget, and \code{NULL} to omit the progress
-bar. A Tk progress bar widget is useful when using parallel processors. Defaults to \code{progress = "txt"}.}
+\item{progress}{(Optional) Type of progress bar that should be used, with options \code{"txt"}, for a
+text progress bar in the R console, \code{"tk"}, to put up a Tk progress bar widget, and \code{NULL} to
+omit the progress bar. A Tk progress bar widget is useful when using parallel processors.
+Defaults to \code{progress = "txt"}.}
 
-\item{verbose}{(Optional) Logical for printing messages about the progress of the optimization. Defaults to
-\code{verbose = FALSE}.}
+\item{verbose}{(Optional) Logical for printing messages about the progress of the optimization.
+Defaults to \code{verbose = FALSE}.}
 }
 \value{
 \code{optimUSER} returns an object of class \code{OptimizedSampleConfiguration}: the optimized sample

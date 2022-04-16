@@ -3,18 +3,20 @@
 ## Version 2.2.0.9009 (2020-09-11)
 
 * Improvements:
-  * PPL-related functions. Improved argument checking using `match.call()`, the code now being cleaner.
-  * `schedule` does not have a default value anymore. This is in line with version 2.2.0.9002.
+  * PPL-related functions. Improved argument checking using `match.call()`, the code now being
+    cleaner.
+  * `schedule` does not have a default value any more. This is in line with version 2.2.0.9002.
 
 ## Version 2.2.0.9008 (2020-09-10)
 
 * Improvements:
-  * `optimPPL()`: the optimizes sample configuration now exports both target (`target.distribution`) and final
-    (`final.distribution`) distribution of points or point-pairs per lag-distance class.
+  * `optimPPL()`: the optimizes sample configuration now exports both target
+    (`target.distribution`) and final (`final.distribution`) distribution of points or point-pairs
+    per lag-distance class.
   * `objPPL()`: for a PPL-optimized sample configuration, now returns the stored objective function
     value—`objSPSANN()` may become useless.
-  * `countPPL()`: for a PPL-optimized sample configuration, now returns the stored final distribution of 
-    points or point-pairs per lag-distance class.
+  * `countPPL()`: for a PPL-optimized sample configuration, now returns the stored final
+    distribution of points or point-pairs per lag-distance class.
 
 ## Version 2.2.0.9007 (2020-09-09)
 
@@ -26,69 +28,70 @@
 ## Version 2.2.0.9006 (2020-08-06)
 
 * Improvements:
-  * Now using a qualitative, colorblind safe color palete based on ColorBrewer (<https://colorbrewer2.org/#type=qualitative&scheme=Paired&n=4>)
+  * Now using a qualitative, colour-blind safe colour palette based on ColorBrewer (<https://colorbrewer2.org/#type=qualitative&scheme=Paired&n=4>)
 
 ## Version 2.2.0.9005 (2020-07-24)
 
 * Improvements:
-    + Function `scheduleSPSANN`: Argument `initial.acceptance` now requires
+  * Function `scheduleSPSANN`: Argument `initial.acceptance` now requires
     a numeric vector of length two defining the minimum and maximum initial
     acceptance probability, with default `c(0.95, 0.99)`. This was needed
     so that users have more confidence choosing the `initial.temperature`.
     Some were using unnecessarily high initial temperature values.
-    + Improves documentation to accommodate changes.
+  * Improves documentation to accommodate changes.
 
 ## Version 2.2.0.9004 (2019-10-01)
 
 * Improvements:
-  + Cleans up code used to estimate jittering parameters.
-  + Improves documentation to accommodate latest changes/fixes.
-  + Argument `stopping` of function `scheduleSPSANN()` is now set to be equal to fifty percent the maximum
-    number of chains by using `ceiling(chains * 0.5)`.
+  * Cleans up code used to estimate jittering parameters.
+  * Improves documentation to accommodate latest changes/fixes.
+  * Argument `stopping` of function `scheduleSPSANN()` is now set to be equal to fifty percent the
+    maximum number of chains by using `ceiling(chains * 0.5)`.
 
 ## Version 2.2.0.9003 (2019-09-30)
 
 * Bug fix:
-  + Avoid points being stuck in the same location at the end of the optimization when using a finite set of 
-    candidate locations. This is done by computing 'x_min0' and 'y_min0'. These are the maximum distance to 
-    the nearest neighbouring candidate location in the x- and y-coordinates.
+  * Avoid points being stuck in the same location at the end of the optimization when using a
+    finite set of candidate locations. This is done by computing 'x_min0' and 'y_min0'. These are
+    the maximum distance to the nearest neighbouring candidate location in the x- and y-coordinates.
 
 ## Version 2.2.0.9002 (2019-09-15)
 
 * Improvements:
-  + Testing `optimMKV()` as a greedy algorithm with (1) a too small neighbourhood size and (2) with a 
-    neighbourhood set using `nmax`. The first throws an error -- `skipped 'singular matrix' error in 'krige'-
-    function` -- due to the too small number of samples in the neighbourhood.
-  + Argument `eval.grid` temporarily removed from functions `optimMKV()` and `objMKV()` and flagged as 
-    experimental in functions `optimMSSD()` and `objMSSD()`. The reason is that the implementation for 
-    `optimMKV()` and `objMKV()` is less trivial because of the presence of covariates that need to match 
-    `eval.grid`.
-  + Argument `cellsize` of function `scheduleSPSANN` is not estimated from `candi` anymore. This is because 
-    `candi` can also be an existing irregular sample configuration and unexperienced users can be unaware of
-    the need to set `cellsize = 0` in this case. Only `x.max` and `y.max` are still estimated from `candi`. The
-    user now has to inform `cellsize` manually and this should speed up computations.
-    
+  * Testing `optimMKV()` as a greedy algorithm with (1) a too small neighbourhood size and (2) with
+    a neighbourhood set using `nmax`. The first throws an error -- `skipped 'singular matrix' error
+    in 'krige'-function` -- due to the too small number of samples in the neighbourhood.
+  * Argument `eval.grid` temporarily removed from functions `optimMKV()` and `objMKV()` and flagged
+    as experimental in functions `optimMSSD()` and `objMSSD()`. The reason is that the
+    implementation for `optimMKV()` and `objMKV()` is less trivial because of the presence of
+    covariates that need to match `eval.grid`.
+  * Argument `cellsize` of function `scheduleSPSANN` is not estimated from `candi` any more. This
+    is because `candi` can also be an existing irregular sample configuration and inexperienced
+    users can be unaware of the need to set `cellsize = 0` in this case. Only `x.max` and `y.max`
+    are still estimated from `candi`. The user now has to inform `cellsize` manually and this
+    should speed up computations.
+
 ## Version 2.2.0.9001 (2019-09-14)
 
 * Improvements:
-  + Functions `optimMSSD()`, `objMSSD()`, `optimMKV()` and `objMKV()` have a new argument called `eval.grid`.
+  * Functions `optimMSSD()`, `objMSSD()`, `optimMKV()` and `objMKV()` have a new argument called `eval.grid`.
     With this new argument, one can use a grid that is coarser than `candi` to compute the objective function 
     value (energy state). This is important to speed up computations in large areas. With this new argument one
     can also thin an existing sample configuration. To do this, the existing sample configuration has to be 
     passed to `candi`. If one passes a matrix to `eval.grid`, then jittering parameters are estimated from 
     `eval.grid` instead of `candi`.
-  + A note has been added to the examples of all functions. Is says: 'The settings below are unlikely to meet
-    your needs.' This is an attempt to warn unexperienced users of the need to study each function and set
+  * A note has been added to the examples of all functions. Is says: 'The settings below are unlikely to meet
+    your needs.' This is an attempt to warn inexperienced users of the need to study each function and set
     function arguments according to their use cases.
-  + Argument `eqn` of function `optimMKV()` and `objMKV()` has no default anymore. The previous default --
+  * Argument `eqn` of function `optimMKV()` and `objMKV()` has no default any more. The previous default --
     `eqn = z ~ 1` -- represented an ordinary kriging system, while the function was primarily designed for 
-    universal kriging. The default was useful as an example, but has been causing confusion among unexperienced
+    universal kriging. The default was useful as an example, but has been causing confusion among inexperienced
      users, thus the decision for its removal.
-  + Argument `stopping` of function `scheduleSPSANN()` is now set to be equal to ten percent the maximum
+  * Argument `stopping` of function `scheduleSPSANN()` is now set to be equal to ten percent the maximum
     number of chains by using `ceiling(chains * 0.1)`. The previous default value of `stopping = 10` was being
-    misused by unexperienced users, thus the decision for its modification. With the new default settings,
+    misused by inexperienced users, thus the decision for its modification. With the new default settings,
     `chain = 500` and thus `stopping = 50`, which should give more stable results.
-  + The documentation of various functions has been revised and improved wherever necessary.
+  * The documentation of various functions has been revised and improved wherever necessary.
 
 ## Version 2.2.0.9000 (2019-05-06)
 
@@ -144,8 +147,8 @@ solution.
 
 ## Version 2.1-0 (2017-06-23)
 
-Now ***spsann*** can be used to augment an existing sample configuration, that is, add new sampling points
-to a spatial sample configuration generated using ***spsann*** or any other means. To do so, when using one 
+Now __spsann__ can be used to augment an existing sample configuration, that is, add new sampling points
+to a spatial sample configuration generated using __spsann__ or any other means. To do so, when using one 
 of the functions from the family of `optim...()` functions, the user must pass to the function argument 
 `points` an object of class `list` containing two named sub-arguments: `fixed`, a matrix with the 
 coordinates of the existing sample configuration -- kept fixed during the optimization --, and `free`,
@@ -154,7 +157,7 @@ during the optimization.
 
 ## Version 2.0-0 (2016-03-14)
 
-This is a major release of package ***spsann*** that includes several conceptual changes. Despite our efforts, 
+This is a major release of package __spsann__ that includes several conceptual changes. Despite our efforts, 
 it was not possible to guarantee the compatibility with previous versions. We have decided not to deprecate 
 functions and function arguments because (1) this would require deprecating a lot of code and (2) you should 
 first read the updated package documentation to understand the conceptual changes that we have made before you
@@ -175,7 +178,7 @@ start using it. This is a summary of the changes:
   objective functions that compose the MOCOP needed to scale the objective functions to the same approximate
   range of values.
 * The user can now chose to follow the progress of the optimization using a text progress bar in the R console
-  or a Tk progress bar widget. A Tk progress bar widget is useful when running ***spsann*** in parallel
+  or a Tk progress bar widget. A Tk progress bar widget is useful when running __spsann__ in parallel
   processors.
 * The output of the optimization is now stored in an object of class `OptimizedSampleConfiguration`. This 
   object contains three slots. The first (`points`) holds the coordinates of the optimized sample 
@@ -245,8 +248,8 @@ start using it. This is a summary of the changes:
 * The user can now chose the type of progress bar that should be used, with 
   options `"txt"`, for a text progress bar in the R console, `"tk"`, to put
   up a Tk progress bar widget, and `NULL` to omit the progress bar. A Tk 
-  progress bar widget is useful when running ***spsann*** in parallel
-  processors. The ***tcltk***-package is now a suggested package.
+  progress bar widget is useful when running __spsann__ in parallel
+  processors. The __tcltk__-package is now a suggested package.
 * Now we use grey colours to in the plot with the energy states.
 
 ## Version 1.0-2.9005 (2015-11-17)
@@ -271,17 +274,17 @@ start using it. This is a summary of the changes:
 ## Version 1.0-2.9002 (2015-11-14)
 
 * The trick included in the `optimMKV()`-function to avoid errors due to
-  the LDLfactor error of the ***gstat***-package had to be reformulated. We are
+  the LDLfactor error of the __gstat__-package had to be reformulated. We are
   now using `try()` with a default value which is returned in case of error.
 
 ## Version 1.0-2.9001 (2015-11-13)
 
 * A completely new annealing schedule was implemented. The reason for this
   modification is that the former annealing schedule, which was based on the
-  ***intamapInteractive***-package, showed to be inefficient during
+  __intamapInteractive__-package, showed to be inefficient during
   our tests. The new annealing schedule is the very simple and most-used
   schedule proposed by Kirkpatrick et al. (1983). We have also replaced the 
-  acceptance criterion used in the ***intamapInteractive***-package with the
+  acceptance criterion used in the __intamapInteractive__-package with the
   well-known Metropolis criterion. This new implementation showed to be more
   efficient in our tests than our early implementation.
 * Implementing a new annealing schedule and a new acceptance criterion required
@@ -293,10 +296,10 @@ start using it. This is a summary of the changes:
   algorithm as the centre of grid cells. In the first stage, we select a grid
   cell with replacement. In the second stage, we select a location within that
   grid cell using simple random sampling. This is the sampling method 
-  implemented in the ***spcosa***-package.
+  implemented in the __spcosa__-package.
 * The documentation of all functions has been fine tuned.
 * A trick was included in the `optimMKV()`-function to avoid errors due to
-  the LDLfactor error of the ***gstat***-package.
+  the LDLfactor error of the __gstat__-package.
 * There also is a new function to compute the Pareto maximum and minimum values of the objective functions 
   that compose a multi-objective optimization problem (MOOP): `minmaxPareto()`.
 
@@ -323,8 +326,8 @@ start using it. This is a summary of the changes:
 ## Version 1.0-1 (2015-07-30)
 
 * Improved and updated documentation.
-* ***gstat*** is not a dependence any more.
-* Fixed breaks due to changes in dependencies (***pedometrics***).
+* __gstat__ is not a dependence any more.
+* Fixed breaks due to changes in dependencies (__pedometrics__).
 
 ## Version 1.0-0 (2015-07-14)
 
@@ -341,7 +344,7 @@ start using it. This is a summary of the changes:
 ## Version 0.0.0.9011 (2015-07-13)
 
 * The documentation of all functions was significantly improved.
-* Functions from default packages other than ***base*** are now imported to
+* Functions from default packages other than __base__ are now imported to
   comply with the new change to the CRAN policy described at
   http://developer.r-project.org/blosxom.cgi/R-devel/NEWS/2015/06/29#n2015-06-29.
 
@@ -350,7 +353,7 @@ start using it. This is a summary of the changes:
 * Using `utils::globalVariables` to avoid the `R CMD check` note 
   `no visible binding for global variable [variable name]`. Source of the 
   solution: http://stackoverflow.com/a/12429344/3365410.
-* The package ***fields*** is not a dependency any more.
+* The package __fields__ is not a dependency any more.
 * New default values were attributed to the following arguments: `plotit`, 
   `track`, `verbose`, and `iteration`. The first three were set to `FALSE`, 
   while the last was set to `100`.
@@ -379,9 +382,9 @@ start using it. This is a summary of the changes:
 
 ## Version 0.0.0.9007 (2015-06-12)
 
-* The ***rgeos*** and ***plyr*** packages are not dependencies any more.
+* The __rgeos__ and __plyr__ packages are not dependencies any more.
 * The `boundary` of the spatial domain can now be estimated internally. The user 
-  should use the ***rgeos*** package if a more precise `boundary` is needed.
+  should use the __rgeos__ package if a more precise `boundary` is needed.
 * Now using a directory called 'R-autoFunction', where R code chunks that are 
   used in several functions of both families of `obj...()` and `optim...()`
   functions are included in individual files. These R code chunks are used to
@@ -437,5 +440,5 @@ start using it. This is a summary of the changes:
 ## Version 0.0.0.9000 (2015-01-08)
 
 * in-development package;
-* importing functions from the package ***pedometrics***;
+* importing functions from the package __pedometrics__;
 * preparing documentation.

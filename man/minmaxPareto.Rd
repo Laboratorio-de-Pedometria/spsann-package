@@ -11,11 +11,11 @@ minmaxPareto(osc, candi, covars)
 be named after the objective function with which it has been optimized. For example,
 \code{osc = list(CORR = osc_corr, DIST = osc_dist)}.}
 
-\item{candi}{Data frame or matrix with the candidate locations for the jittered samples. \code{candi} must have
-two columns in the following order: \verb{[, "x"]}, the projected x-coordinates, and \verb{[, "y"]}, the projected
-y-coordinates.}
+\item{candi}{Data frame or matrix with the candidate locations for the jittered samples. \code{candi}
+must have two columns in the following order: \verb{[, "x"]}, the projected x-coordinates, and
+\verb{[, "y"]}, the projected y-coordinates.}
 
-\item{covars}{Data frame or matrix with the covariates in the columns.}
+\item{covars}{Data frame or matrix with the spatially exhaustive covariates in the columns.}
 }
 \value{
 A data frame with the Pareto minimum and maximum values.

@@ -1,8 +1,8 @@
 Package: spsann
 Type: Package
 Title: Optimization of Spatial Samples via Simulated Annealing
-Version: 2.2.0.9009
-Date: 2020-09-11
+Version: 2.2.1
+Date: 2022-04-16
 Authors@R: c(
     person("Alessandro", "Samuel-Rosa", role = c("aut", "cre"), 
        email = "alessandrosamuelrosa@gmail.com",
@@ -49,7 +49,7 @@ Suggests:
     knitr
 LinkingTo: Rcpp
 Encoding: UTF-8
-RoxygenNote: 7.1.1
+RoxygenNote: 7.1.2
 Roxygen: list(markdown = TRUE)
 VignetteBuilder: knitr
 URL: https://github.com/samuel-rosa/spsann/

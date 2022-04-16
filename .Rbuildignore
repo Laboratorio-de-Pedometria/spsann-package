@@ -10,6 +10,7 @@ build-package.R
 Rprof.out
 TODO.md
 spsann.code-workspace
+.vscode
 
 # Cpp files
 src/*.o

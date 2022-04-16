@@ -1,20 +1,14 @@
-# Build package
-library(magrittr)
+# Optimization of Spatial Samples via Simulated Annealing
+# Alessandro Samuel-Rosa
 
+# Test package #####################################################################################
 # Dependencies
-# renv::init()
 update(remotes::package_deps("spsann"))
 update(remotes::package_deps(packages = "devtools"))
-
 # Reverse dependency tools
 devtools::revdep()
-
-# turn on/off development mode
-# devtools::dev_mode()
-
 # Render README
 rmarkdown::render("README.Rmd")
-
 # Automatically build functions
 fun.name <- c(
   ".check_spsann_arguments",
@@ -62,24 +56,30 @@ rm(fun.name, read.file, write.file)
 
 # Rcpp::compileAttributes()
 
-# check examples and documentation
+# check documentation ----
 roxygen2::roxygenise()
 devtools::check_man()
-devtools::run_examples(run_dontrun = FALSE)
-# spelling::spell_check_package()
+devtools::spell_check()
 # spelling::update_wordlist()
 
-# check the package for Linux and Windows
+# check examples ----
+devtools::run_examples(run_dontrun = FALSE)
+
+# check for Linux (local) ----
 devtools::check(document = TRUE, manual = TRUE, run_dont_test = TRUE)
 
-devtools::check_win_devel()
-devtools::check_win_release()
+# check for Windows (remote) ----
 devtools::check_win_oldrelease()
+devtools::check_win_release()
+devtools::check_win_devel()
 
 # check in R-hub ----
 # rhub::validate_email(email = "alessandrosamuelrosa@gmail.com")
 # rhub::check_on_windows()
-devtools::check_rhub()
+# rhub::platforms()
+platforms <- c("fedora-clang-devel",
+  "ubuntu-gcc-release", "debian-clang-devel", "windows-x86_64-devel")
+devtools::check_rhub(platforms = platforms)
 
 devtools::build()
 

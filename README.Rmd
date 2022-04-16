@@ -8,39 +8,54 @@ html_preview: false
 # Optimization of Spatial Samples via Simulated Annealing
 
 ```{r, echo=FALSE}
-library(magrittr)
-pkg.info <- 
-  read.dcf(file = "DESCRIPTION", fields = c("Title", "Version", "Date")) %>% 
-  drop()
+pkg.info <- read.dcf(file = "DESCRIPTION", fields = c("Title", "Version", "Date"))
+pkg.info <- drop(pkg.info)
 ```
 
 [![Project Status: Active – The project has reached a stable, usable state and is being actively developed.](https://www.repostatus.org/badges/latest/active.svg)](http://www.repostatus.org/#active)
 [![packageversion](https://img.shields.io/badge/devel%20version-`r pkg.info["Version"]`-firebrick.svg?style=flat-square)](commits/master)
-[![Build Status](https://travis-ci.org/samuel-rosa/spsann.svg?branch=master)](https://travis-ci.org/samuel-rosa/spsann)
 [![CRAN](https://www.r-pkg.org/badges/version/spsann)](https://cran.r-project.org/package=spsann)
-[![Rdoc](https://www.rdocumentation.org/badges/version/spsann)](http://www.rdocumentation.org/packages/spsann)
+[![cran checks](https://cranchecks.info/badges/worst/spsann)](https://cran.r-project.org/web/checks/check_results_spsann.html)
 [![Downloads](https://cranlogs.r-pkg.org/badges/spsann?color=brightgreen)](http://www.r-pkg.org/pkg/spsann)
+[![Rdoc](https://www.rdocumentation.org/badges/version/spsann)](http://www.rdocumentation.org/packages/spsann)
+
+The __spsann__ package was created to help you designing optimum spatial sample configurations
+using the power of spatial simulated annealing in [R][rproject].
 
 ## Installation
 
-The `spsann` package was created to help you designing optimum spatial sample configurations using the power of spatial simulated annealing. It can be downloaded from [CRAN][cran] using:
+The latest stable version of the __spsann__ package generally can be downloaded from the
+_Comprehensive R Archive Network_ ([CRAN][cran]).
 
 ```R
+# Install the spsann package from CRAN
 install.packages(pkgs = "spsann")
 ```
 
-The development version of `spsann`, available at [GitHub][github], can be downloaded -- using the `devtools` package -- with:
-
-[cran]: https://CRAN.R-project.org/package=spsann
-[github]: https://github.com/samuel-rosa/spsann
+If the installation from CRAN fails, you can install the development version of the __spsann__
+package available on [GitHub][github] using the __remotes__ package. If you are using a
+[Windows][windows] machine, however, you will have to install [Rtools][rtools] first.
 
 ```R
-if (!require(devtools)) {
-  install.packages(pkgs = "devtools")
+# Install the spsann package from GitHub
+if (!require(remotes)) {
+  install.packages(pkgs = "remotes")
 }
-devtools::install_github("samuel-rosa/spsann")
+remotes::install_github(repo = "laboratorio-de-pedometria/spsann")
 ```
 
 ## How to collaborate
 
-We use the *fork & pull* collaborative development model. This means that you are free to make a parallel copy of this repository, change the source code as you see fit, and then *push* the changes to your personal copy of this repository. All this without requiring any authorization. If the changes you've made to your personal copy of this repository are interesting and you're willing to share them with us, then just have them pulled -- *pull request* -- to this repository. After reviewing the changes, we will decide whether they can be merged -- *merge* -- with the source code of this repository.
+We use the _fork & pull_ collaborative development model. This means that you are free to make a
+parallel copy of this repository, change the source code as you see fit, and then _push_ the
+changes to your personal copy of this repository. All this without requiring any authorization. If
+the changes you've made to your personal copy of this repository are interesting and you're willing
+to share them with us, then just have them pulled -- _pull request_ -- to this repository. After
+reviewing the changes, we will decide whether they can be merged -- _merge_ -- with the source code
+of this repository.
+
+[rproject]: https://www.r-project.org/
+[cran]: https://CRAN.R-project.org/package=febr
+[github]: https://github.com/laboratorio-de-pedometria/spsann
+[windows]: https://cran.r-project.org/bin/windows/
+[rtools]: https://cran.r-project.org/bin/windows/Rtools/

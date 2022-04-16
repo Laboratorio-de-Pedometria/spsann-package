@@ -2,7 +2,7 @@
 #'
 #' Optimize a sample configuration for spatial interpolation with a 'known' linear mixed model, e.g. universal 
 #' (external drift) kriging and regression-kriging with a linear regression model. A criterion is defined so
-#' that the sample configuration minimizes the mean or maximum kriging prediciton error variance (\bold{MKV}).
+#' that the sample configuration minimizes the mean or maximum kriging prediction error variance (\bold{MKV}).
 #'
 #' @template spSANN_doc
 #' @template spJitter_doc
@@ -292,7 +292,7 @@ optimMKV <-
     # Output
     return (sm)
   }
-# INTERNAL FUNCTION - PREPARE THE PREDICITON GRID #############################################################
+# INTERNAL FUNCTION - PREPARE THE PREDICTION GRID #############################################################
 # eqn: equation
 # candi: prediction (evaluation) locations
 # covars: covariates

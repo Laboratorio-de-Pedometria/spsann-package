@@ -5,6 +5,7 @@
 		}
 	],
 	"settings": {
-		"r.linting.maxLineLength": 111
+		"r.linting.maxLineLength": 111,
+		"cSpell.language": "pt-BR,en-GB"
 	}
 }

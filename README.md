@@ -6,7 +6,7 @@ Optimization of Spatial Samples via Simulated Annealing
 [![Project Status: Active – The project has reached a stable, usable
 state and is being actively
 developed.](https://www.repostatus.org/badges/latest/active.svg)](http://www.repostatus.org/#active)
-[![packageversion](https://img.shields.io/badge/devel%20version-2.2.0.9009-firebrick.svg?style=flat-square)](commits/master)
+[![packageversion](https://img.shields.io/badge/devel%20version-2.2.1-firebrick.svg?style=flat-square)](commits/master)
 [![Build
 Status](https://travis-ci.org/samuel-rosa/spsann.svg?branch=master)](https://travis-ci.org/samuel-rosa/spsann)
 [![CRAN](https://www.r-pkg.org/badges/version/spsann)](https://cran.r-project.org/package=spsann)
@@ -24,13 +24,13 @@ using:
     install.packages(pkgs = "spsann")
 
 The development version of `spsann`, available at
-[GitHub](https://github.com/samuel-rosa/spsann), can be downloaded –
-using the `devtools` package – with:
+[GitHub](https://github.com/laboratorio-de-pedometria/spsann), can be
+downloaded – using the `devtools` package – with:
 
     if (!require(devtools)) {
       install.packages(pkgs = "devtools")
     }
-    devtools::install_github("samuel-rosa/spsann")
+    devtools::install_github("laboratorio-de-pedometria/spsann")
 
 How to collaborate
 ------------------
