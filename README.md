@@ -7,30 +7,39 @@ Optimization of Spatial Samples via Simulated Annealing
 state and is being actively
 developed.](https://www.repostatus.org/badges/latest/active.svg)](http://www.repostatus.org/#active)
 [![packageversion](https://img.shields.io/badge/devel%20version-2.2.1-firebrick.svg?style=flat-square)](commits/master)
-[![Build
-Status](https://travis-ci.org/samuel-rosa/spsann.svg?branch=master)](https://travis-ci.org/samuel-rosa/spsann)
 [![CRAN](https://www.r-pkg.org/badges/version/spsann)](https://cran.r-project.org/package=spsann)
-[![Rdoc](https://www.rdocumentation.org/badges/version/spsann)](http://www.rdocumentation.org/packages/spsann)
+[![cran
+checks](https://cranchecks.info/badges/worst/spsann)](https://cran.r-project.org/web/checks/check_results_spsann.html)
 [![Downloads](https://cranlogs.r-pkg.org/badges/spsann?color=brightgreen)](http://www.r-pkg.org/pkg/spsann)
+[![Rdoc](https://www.rdocumentation.org/badges/version/spsann)](http://www.rdocumentation.org/packages/spsann)
+
+The **spsann** package was created to help you designing optimum spatial
+sample configurations using the power of spatial simulated annealing in
+[R](https://www.r-project.org/).
 
 Installation
 ------------
 
-The `spsann` package was created to help you designing optimum spatial
-sample configurations using the power of spatial simulated annealing. It
-can be downloaded from [CRAN](https://CRAN.R-project.org/package=spsann)
-using:
+The latest stable version of the **spsann** package generally can be
+downloaded from the *Comprehensive R Archive Network*
+([CRAN](https://CRAN.R-project.org/package=febr)).
 
+    # Install the spsann package from CRAN
     install.packages(pkgs = "spsann")
 
-The development version of `spsann`, available at
-[GitHub](https://github.com/laboratorio-de-pedometria/spsann), can be
-downloaded – using the `devtools` package – with:
+If the installation from CRAN fails, you can install the development
+version of the **spsann** package available on
+[GitHub](https://github.com/laboratorio-de-pedometria/spsann) using the
+**remotes** package. If you are using a
+[Windows](https://cran.r-project.org/bin/windows/) machine, however, you
+will have to install
+[Rtools](https://cran.r-project.org/bin/windows/Rtools/) first.
 
-    if (!require(devtools)) {
-      install.packages(pkgs = "devtools")
+    # Install the spsann package from GitHub
+    if (!require(remotes)) {
+      install.packages(pkgs = "remotes")
     }
-    devtools::install_github("laboratorio-de-pedometria/spsann")
+    remotes::install_github(repo = "laboratorio-de-pedometria/spsann")
 
 How to collaborate
 ------------------
