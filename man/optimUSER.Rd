@@ -28,21 +28,28 @@ simple random sampling, i.e. \code{\link[base:sample]{base::sample()}} with \cod
 \item Integer vector. A set of row indexes between one (1) and \code{nrow(candi)} identifying the grid
 cell centres of \code{candi} that should be used to form the starting sample configuration for the
 optimization. The length of the integer vector, \code{length(points)}, is the sample size.
-\item Data frame or matrix. An object with three columns in the following order: \verb{[, "id"]}, the
-row indexes of \code{candi} that correspond to each sample, \verb{[, "x"]}, the projected x-coordinates,
-and \verb{[, "y"]}, the projected y-coordinates.
-\item List. An object with two named arguments:
+\item Data frame or matrix. The Cartesian x- and y-coordinates of the starting sample configuration.
+\item List. An object with two named sub-arguments:
 \itemize{
-\item \code{fixed}: a data frame or matrix with the projected x- and y-coordinates of the existing
-sample configuration -- kept fixed during the optimization --, and
-\item \code{free}: an integer value defining the number of samples that should be added to the existing
-sample configuration -- free to move during the optimization.
+\item \code{fixed} An integer vector, data frame or matrix specifying an existing sample configuration
+(see options above). This sample configuration is kept as-is (fixed) during the entire
+optimization, being used only to compute the objetive function values.
+\item \code{free} An integer value, integer vector, data frame or matrix (see options above) specifying
+the (number of) sampling points that should be added to the existing sample configuration.
+These new sampling points are free to be moved around (jittered) during the optimization.
 }
-}}
+}
+
+Most users will want to set an integer value simply specifying the required sample size. Using
+an integer vector or data frame (or matrix) will generally be useful to users willing to
+evaluate starting sample configurations, test strategies to speed up the optimization, and
+fine-tune or thin an existing sample configuration. Finally, a list, will generally be used to
+augment a possibly already existing, real-world sample configuration or fine-tune only a subset
+of the existing sampling points.}
 
 \item{candi}{Data frame or matrix with the candidate locations for the jittered samples. \code{candi}
-must have two columns in the following order: \verb{[, "x"]}, the projected x-coordinates, and
-\verb{[, "y"]}, the projected y-coordinates.}
+must have two columns in the following order: \verb{[, "x"]}, the Cartesian x-coordinates, and
+\verb{[, "y"]}, the Cartesian y-coordinates.}
 
 \item{fun}{A function defining the objective function that should be used to evaluate the energy state of
 the system configuration at each random perturbation of a candidate sample point. See \sQuote{Details} for

@@ -6,6 +6,11 @@
 	],
 	"settings": {
 		"r.linting.maxLineLength": 111,
-		"cSpell.language": "pt-BR,en-GB"
+		"cSpell.language": "pt-BR,en-GB",
+		"cSpell.words": [
+			"candi",
+			"Numint",
+			"plotit"
+		]
 	}
 }

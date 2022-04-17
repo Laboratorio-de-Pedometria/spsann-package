@@ -8,19 +8,25 @@
 #'  * Integer vector. A set of row indexes between one (1) and `nrow(candi)` identifying the grid
 #'    cell centres of `candi` that should be used to form the starting sample configuration for the
 #'    optimization. The length of the integer vector, `length(points)`, is the sample size.
-#' 
-#'  * Data frame or matrix. An object with three columns in the following order: `[, "id"]`, the
-#'    row indexes of `candi` that correspond to each sample, `[, "x"]`, the projected x-coordinates,
-#'    and `[, "y"]`, the projected y-coordinates.
-#'  * List. An object with two named arguments:
-#'    * `fixed`: a data frame or matrix with the projected x- and y-coordinates of the existing
-#'      sample configuration -- kept fixed during the optimization --, and
-#'    * `free`: an integer value defining the number of samples that should be added to the existing
-#'      sample configuration -- free to move during the optimization.
+#'  * Data frame or matrix. The Cartesian x- and y-coordinates of the starting sample configuration.
+#'  * List. An object with two named sub-arguments:
+#'    * `fixed` An integer vector, data frame or matrix specifying an existing sample configuration
+#'      (see options above). This sample configuration is kept as-is (fixed) during the entire
+#'      optimization, being used only to compute the objetive function values.
+#'    * `free` An integer value, integer vector, data frame or matrix (see options above) specifying
+#'      the (number of) sampling points that should be added to the existing sample configuration.
+#'      These new sampling points are free to be moved around (jittered) during the optimization.
+#'
+#'  Most users will want to set an integer value simply specifying the required sample size. Using
+#'  an integer vector or data frame (or matrix) will generally be useful to users willing to
+#'  evaluate starting sample configurations, test strategies to speed up the optimization, and
+#'  fine-tune or thin an existing sample configuration. Finally, a list, will generally be used to
+#'  augment a possibly already existing, real-world sample configuration or fine-tune only a subset
+#'  of the existing sampling points.
 #'
 #' @param candi Data frame or matrix with the candidate locations for the jittered samples. `candi`
-#' must have two columns in the following order: `[, "x"]`, the projected x-coordinates, and
-#' `[, "y"]`, the projected y-coordinates.
+#' must have two columns in the following order: `[, "x"]`, the Cartesian x-coordinates, and
+#' `[, "y"]`, the Cartesian y-coordinates.
 #'
 #' @param schedule List with named sub-arguments defining the control parameters of the cooling
 #' schedule. See [spsann::scheduleSPSANN()].

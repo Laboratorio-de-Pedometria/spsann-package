@@ -41,10 +41,9 @@
 #' @note
 #' \subsection{Distance between two points}{
 #' __spsann__ always computes the distance between two locations (points) as the
-#' [Euclidean distance][euclidean] between them. This computation requires the optimization to
-#' operate in the two-dimensional Euclidean space, i.e. the coordinates of the sample, candidate
-#' and evaluation locations must be planar coordinates, generally in metres or kilometres.
-#' __spsann__ has no mechanism to check if the coordinates are planar: you are the sole responsible
-#' for making sure that this requirement is attained.
-#' [euclidean]: https://en.wikipedia.org/wiki/Euclidean_distance
+#' [Euclidean distance](https://en.wikipedia.org/wiki/Euclidean_distance) between them. This
+#' computation requires the optimization to operate in the two-dimensional Euclidean space, i.e. the
+#' coordinates of the sample, candidate and evaluation locations must be Cartesian coordinates,
+#' generally in metres or kilometres. __spsann__ has no mechanism to check if the coordinates are
+#' Cartesian: you are the sole responsible for making sure that this requirement is attained.
 #' }

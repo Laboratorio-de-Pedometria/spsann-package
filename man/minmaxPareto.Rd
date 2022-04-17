@@ -12,8 +12,8 @@ be named after the objective function with which it has been optimized. For exam
 \code{osc = list(CORR = osc_corr, DIST = osc_dist)}.}
 
 \item{candi}{Data frame or matrix with the candidate locations for the jittered samples. \code{candi}
-must have two columns in the following order: \verb{[, "x"]}, the projected x-coordinates, and
-\verb{[, "y"]}, the projected y-coordinates.}
+must have two columns in the following order: \verb{[, "x"]}, the Cartesian x-coordinates, and
+\verb{[, "y"]}, the Cartesian y-coordinates.}
 
 \item{covars}{Data frame or matrix with the spatially exhaustive covariates in the columns.}
 }

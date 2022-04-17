@@ -87,12 +87,11 @@ first two approaches.
 \note{
 \subsection{Distance between two points}{
 \strong{spsann} always computes the distance between two locations (points) as the
-\link[=euclidean]{Euclidean distance} between them. This computation requires the optimization to
-operate in the two-dimensional Euclidean space, i.e. the coordinates of the sample, candidate
-and evaluation locations must be planar coordinates, generally in metres or kilometres.
-\strong{spsann} has no mechanism to check if the coordinates are planar: you are the sole responsible
-for making sure that this requirement is attained.
-\link{euclidean}: https://en.wikipedia.org/wiki/Euclidean_distance
+\href{https://en.wikipedia.org/wiki/Euclidean_distance}{Euclidean distance} between them. This
+computation requires the optimization to operate in the two-dimensional Euclidean space, i.e. the
+coordinates of the sample, candidate and evaluation locations must be Cartesian coordinates,
+generally in metres or kilometres. \strong{spsann} has no mechanism to check if the coordinates are
+Cartesian: you are the sole responsible for making sure that this requirement is attained.
 }
 }
 \examples{
