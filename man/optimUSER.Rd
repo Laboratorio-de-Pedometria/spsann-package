@@ -75,10 +75,11 @@ using black crosses. Defaults to \code{plotit = FALSE}.}
 returned along with the result? If \code{track = FALSE} (the default), only the starting and ending
 energy states are returned along with the results.}
 
-\item{boundary}{(Optional) Object of class SpatialPolygons (see\code{\link[sp:SpatialPolygons]{sp::SpatialPolygons()}}) used to
+\item{boundary}{(Optional) Object of class SpatialPolygons (see \code{\link[sp:SpatialPolygons]{sp::SpatialPolygons()}}) used to
 plot the (starting and current) sample configuration. These SpatialPolygons can depict the the
 outer and inner limits of the spatial sampling domain as described in \code{candi}. If no
-SpatialPolygons are provided and \code{plotit = TRUE}, \code{boundary} is estimated from \code{candi}.}
+SpatialPolygons are provided and \code{plotit = TRUE}, \code{boundary} is approximated using the extreme
+values of \code{candi}.}
 
 \item{progress}{(Optional) Type of progress bar that should be used, with options \code{"txt"}, for a
 text progress bar in the R console, \code{"tk"}, to put up a Tk progress bar widget, and \code{NULL} to

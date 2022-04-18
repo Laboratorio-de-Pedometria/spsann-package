@@ -42,10 +42,11 @@
 #' 10 jitters. When adding samples to an existing sample configuration, fixed samples are indicated
 #' using black crosses. Defaults to `plotit = FALSE`.
 #'
-#' @param boundary (Optional) Object of class SpatialPolygons (see[sp::SpatialPolygons()]) used to
+#' @param boundary (Optional) Object of class SpatialPolygons (see [sp::SpatialPolygons()]) used to
 #' plot the (starting and current) sample configuration. These SpatialPolygons can depict the the
 #' outer and inner limits of the spatial sampling domain as described in `candi`. If no
-#' SpatialPolygons are provided and `plotit = TRUE`, `boundary` is estimated from `candi`.
+#' SpatialPolygons are provided and `plotit = TRUE`, `boundary` is approximated using the extreme
+#' values of `candi`.
 #'
 #' @param progress (Optional) Type of progress bar that should be used, with options `"txt"`, for a
 #' text progress bar in the R console, `"tk"`, to put up a Tk progress bar widget, and `NULL` to
