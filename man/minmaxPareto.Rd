@@ -11,13 +11,13 @@ minmaxPareto(osc, candi, covars)
 be named after the objective function with which it has been optimized. For example,
 \code{osc = list(CORR = osc_corr, DIST = osc_dist)}.}
 
-\item{candi}{Data frame or matrix with the Cartesian x- and y-coordinates (in this order) of the
+\item{candi}{Data frame (or matrix). The Cartesian x- and y-coordinates (in this order) of the
 cell centres of a spatially exhaustive, rectangular grid covering the entire spatial sampling
-domain. The spatial sampling domain can be contiguous or composed of disjoint areas as well as
-contain holes and islands. \code{candi} provides the set of (finite) candidate locations inside the
-spatial sampling domain for a point jittered during the optimization. Usually, \code{candi} will match
-the geometry of the spatial grid containing the prediction locations, e.g. \code{newdata} in
-\code{\link[gstat:krige]{gstat::krige()}}, \code{object} in \code{\link[raster:predict]{raster::predict()}}, and \code{locations} in \code{\link[geoR:krige.conv]{geoR::krige.conv()}}.}
+domain. The spatial sampling domain can be contiguous or composed of disjoint areas and contain
+holes and islands. \code{candi} provides the set of (finite) candidate locations inside the spatial
+sampling domain for a point jittered during the optimization. Usually, \code{candi} will match the
+geometry of the spatial grid containing the prediction locations, e.g. \code{newdata}
+in \code{\link[gstat:krige]{gstat::krige()}}, \code{object} in \code{\link[raster:predict]{raster::predict()}}, and \code{locations} in \code{\link[geoR:krige.conv]{geoR::krige.conv()}}.}
 
 \item{covars}{Data frame or matrix with the spatially exhaustive covariates in the columns.}
 }

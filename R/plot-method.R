@@ -12,8 +12,8 @@
 #' function value (1), optimized spatial sample configuration (2), or both
 #' (1:2)? Defaults to \code{which = 1:2}.
 #'
-#' @param boundary Object of class \code{Spatial} defining the boundary of the
-#' sampling region.
+#' @param boundary (Optional) An object of class SpatialPolygons (see sp::SpatialPolygons()) with
+#' the outer and inner limits of the spatial sampling domain (see `candi`).
 #'
 #' @param ... Other options passed to \code{plot}.
 #'

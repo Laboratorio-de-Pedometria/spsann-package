@@ -15,8 +15,8 @@ of the \code{optim}-functions.}
 function value (1), optimized spatial sample configuration (2), or both
 (1:2)? Defaults to \code{which = 1:2}.}
 
-\item{boundary}{Object of class \code{Spatial} defining the boundary of the
-sampling region.}
+\item{boundary}{(Optional) An object of class SpatialPolygons (see sp::SpatialPolygons()) with
+the outer and inner limits of the spatial sampling domain (see \code{candi}).}
 
 \item{...}{Other options passed to \code{plot}.}
 }

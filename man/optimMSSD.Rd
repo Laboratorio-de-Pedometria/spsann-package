@@ -21,42 +21,42 @@ optimMSSD(
 objMSSD(points, candi, eval.grid)
 }
 \arguments{
-\item{points}{Integer value, integer vector, data frame or matrix, or list. The number of
+\item{points}{Integer value, integer vector, data frame (or matrix), or list. The number of
 sampling points (sample size) or the starting sample configuration. Four options are available:
 \itemize{
 \item Integer value. The required number of sampling points (sample size). The sample configuration
 used to start the optimization will consist of grid cell centres of \code{candi} selected using
 simple random sampling, i.e. \code{\link[base:sample]{base::sample()}} with \code{x = 1:nrow(candi)} and \code{size = points}.
-\item Integer vector. A set of row indexes between one (1) and \code{nrow(candi)} identifying the grid
-cell centres of \code{candi} that should be used to form the starting sample configuration for the
-optimization. The length of the integer vector, \code{length(points)}, is the sample size.
-\item Data frame or matrix. The Cartesian x- and y-coordinates (in this order) of the starting
+\item Integer vector. A set of row indexes between one (1) and \code{nrow(candi)}. These row indexes
+identify the grid cell centres of \code{candi} that will form the starting sample configuration for
+the optimization. The length of the integer vector, \code{length(points)}, is the sample size.
+\item Data frame (or matrix). The Cartesian x- and y-coordinates (in this order) of the starting
 sample configuration.
 \item List. An object with two named sub-arguments:
 \itemize{
-\item \code{fixed} An integer vector, data frame or matrix specifying an existing sample configuration
-(see options above). This sample configuration is kept as-is (fixed) during the entire
-optimization, being used only to compute the objetive function values.
+\item \code{fixed} An integer vector or data frame (or matrix) specifying an existing sample
+configuration (see options above). This sample configuration is kept as-is (fixed) during
+the optimization and is used only to compute the objective function values.
 \item \code{free} An integer value, integer vector, data frame or matrix (see options above) specifying
-the (number of) sampling points that should be added to the existing sample configuration.
-These new sampling points are free to be moved around (jittered) during the optimization.
+the (number of) sampling points to add to the existing sample configuration. These new
+sampling points are free to be moved around (jittered) during the optimization.
 }
 }
 
 Most users will want to set an integer value simply specifying the required sample size. Using
-an integer vector or data frame (or matrix) will generally be useful to users willing to
+an integer vector or data frame (or matrix) will generally be helpful to users willing to
 evaluate starting sample configurations, test strategies to speed up the optimization, and
-fine-tune or thin an existing sample configuration. Finally, a list, will generally be used to
-augment a possibly already existing, real-world sample configuration or fine-tune only a subset
-of the existing sampling points.}
+fine-tune or thin an existing sample configuration. Users interested in augmenting a possibly
+existing real-world sample configuration or fine-tuning only a subset of the existing sampling
+points will want to use a list.}
 
-\item{candi}{Data frame or matrix with the Cartesian x- and y-coordinates (in this order) of the
+\item{candi}{Data frame (or matrix). The Cartesian x- and y-coordinates (in this order) of the
 cell centres of a spatially exhaustive, rectangular grid covering the entire spatial sampling
-domain. The spatial sampling domain can be contiguous or composed of disjoint areas as well as
-contain holes and islands. \code{candi} provides the set of (finite) candidate locations inside the
-spatial sampling domain for a point jittered during the optimization. Usually, \code{candi} will match
-the geometry of the spatial grid containing the prediction locations, e.g. \code{newdata} in
-\code{\link[gstat:krige]{gstat::krige()}}, \code{object} in \code{\link[raster:predict]{raster::predict()}}, and \code{locations} in \code{\link[geoR:krige.conv]{geoR::krige.conv()}}.}
+domain. The spatial sampling domain can be contiguous or composed of disjoint areas and contain
+holes and islands. \code{candi} provides the set of (finite) candidate locations inside the spatial
+sampling domain for a point jittered during the optimization. Usually, \code{candi} will match the
+geometry of the spatial grid containing the prediction locations, e.g. \code{newdata}
+in \code{\link[gstat:krige]{gstat::krige()}}, \code{object} in \code{\link[raster:predict]{raster::predict()}}, and \code{locations} in \code{\link[geoR:krige.conv]{geoR::krige.conv()}}.}
 
 \item{eval.grid}{(Experimental) Data frame or matrix with the objective function evaluation locations. Like
 \code{candi}, \code{eval.grid} must have two columns in the following order: \verb{[, "x"]}, the projected x-coordinates,
@@ -65,21 +65,33 @@ and \verb{[, "y"]}, the projected y-coordinates.}
 \item{schedule}{List with named sub-arguments setting the control parameters of the annealing
 schedule. See \code{\link[=scheduleSPSANN]{scheduleSPSANN()}}.}
 
-\item{plotit}{(Optional) Logical for plotting the optimization results, including a) the progress
-of the objective function, and b) the starting (gray circles) and current sample configuration
-(black dots), and the maximum jitter in the x- and y-coordinates. The plots are updated at each
-10 jitters. When adding samples to an existing sample configuration, fixed samples are indicated
-using black crosses. Defaults to \code{plotit = FALSE}.}
+\item{plotit}{(Optional) Logical for plotting the evolution of the optimization. Plot updates
+occur at each ten (10) spatial jitters. Defaults to \code{plotit = FALSE}. The plot includes two
+panels:
+\enumerate{
+\item The first panel depicts the changes in the objective function value (y-axis) with the
+annealing schedule (x-axis). The objective function values should be high and variable at the
+beginning of the optimization (panel's top left). As the optimization proceeds, the objective
+function values should gradually transition to a monotone decreasing behaviour till they
+become virtually constant. The objective function values constancy suggests the end of the
+optimization (panel's bottom right).
+\item The second panel shows the starting (grey circles) and current spatial sample configuration
+(black dots). Black crosses indicate the fixed (existing) sampling points when a spatial
+sample configuration is augmented. The plot shows the starting sample configuration to assess
+the effects on the optimized spatial sample configuration: the latter generally should be
+independent of the first. The second panel also shows the maximum possible spatial jitter
+applied to a sampling point in the Cartesian x- (x-axis) and y-coordinates (y-axis).
+}}
 
 \item{track}{(Optional) Logical value. Should the evolution of the energy state be recorded and
 returned along with the result? If \code{track = FALSE} (the default), only the starting and ending
-energy states are returned along with the results.}
+energy states return along with the results.}
 
-\item{boundary}{(Optional) Object of class SpatialPolygons (see \code{\link[sp:SpatialPolygons]{sp::SpatialPolygons()}}) used to
-plot the (starting and current) sample configuration. These SpatialPolygons can depict the the
-outer and inner limits of the spatial sampling domain as described in \code{candi}. If no
-SpatialPolygons are provided and \code{plotit = TRUE}, \code{boundary} is approximated using the extreme
-values of \code{candi}.}
+\item{boundary}{(Optional) An object of class SpatialPolygons (see sp::SpatialPolygons()) with
+the outer and inner limits of the spatial sampling domain (see \code{candi}). These SpatialPolygons
+help depict the spatial distribution of the (starting and current) sample configuration inside
+the spatial sampling domain. The outer limits of \code{candi} serve as a rough \code{boundary} when
+\code{plotit = TRUE}, but the SpatialPolygons are missing.}
 
 \item{progress}{(Optional) Type of progress bar that should be used, with options \code{"txt"}, for a
 text progress bar in the R console, \code{"tk"}, to put up a Tk progress bar widget, and \code{NULL} to

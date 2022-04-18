@@ -11,6 +11,7 @@ Rprof.out
 TODO.md
 spsann.code-workspace
 .vscode
+grammarly.md
 
 # Cpp files
 src/*.o
