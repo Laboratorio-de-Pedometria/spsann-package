@@ -44,7 +44,8 @@ simple random sampling, i.e. \code{\link[base:sample]{base::sample()}} with \cod
 \item Integer vector. A set of row indexes between one (1) and \code{nrow(candi)} identifying the grid
 cell centres of \code{candi} that should be used to form the starting sample configuration for the
 optimization. The length of the integer vector, \code{length(points)}, is the sample size.
-\item Data frame or matrix. The Cartesian x- and y-coordinates of the starting sample configuration.
+\item Data frame or matrix. The Cartesian x- and y-coordinates (in this order) of the starting
+sample configuration.
 \item List. An object with two named sub-arguments:
 \itemize{
 \item \code{fixed} An integer vector, data frame or matrix specifying an existing sample configuration
@@ -63,9 +64,13 @@ fine-tune or thin an existing sample configuration. Finally, a list, will genera
 augment a possibly already existing, real-world sample configuration or fine-tune only a subset
 of the existing sampling points.}
 
-\item{candi}{Data frame or matrix with the candidate locations for the jittered samples. \code{candi}
-must have two columns in the following order: \verb{[, "x"]}, the Cartesian x-coordinates, and
-\verb{[, "y"]}, the Cartesian y-coordinates.}
+\item{candi}{Data frame or matrix with the Cartesian x- and y-coordinates (in this order) of the
+cell centres of a spatially exhaustive, rectangular grid covering the entire spatial sampling
+domain. The spatial sampling domain can be contiguous or composed of disjoint areas as well as
+contain holes and islands. \code{candi} provides the set of (finite) candidate locations inside the
+spatial sampling domain for a point jittered during the optimization. Usually, \code{candi} will match
+the geometry of the spatial grid containing the prediction locations, e.g. \code{newdata} in
+\code{\link[gstat:krige]{gstat::krige()}}, \code{object} in \code{\link[raster:predict]{raster::predict()}}, and \code{locations} in \code{\link[geoR:krige.conv]{geoR::krige.conv()}}.}
 
 \item{covars}{Data frame or matrix with the spatially exhaustive covariates in the columns.}
 
@@ -87,7 +92,7 @@ number of unique covariate values in each stratum.}
 \item{use.coords}{(Optional) Logical value. Should the projected spatial x- and y-coordinates
 be used as spatially exhaustive covariates? Defaults to \code{use.coords = FALSE}.}
 
-\item{schedule}{List with named sub-arguments defining the control parameters of the cooling
+\item{schedule}{List with named sub-arguments setting the control parameters of the annealing
 schedule. See \code{\link[=scheduleSPSANN]{scheduleSPSANN()}}.}
 
 \item{plotit}{(Optional) Logical for plotting the optimization results, including a) the progress
@@ -100,8 +105,10 @@ using black crosses. Defaults to \code{plotit = FALSE}.}
 returned along with the result? If \code{track = FALSE} (the default), only the starting and ending
 energy states are returned along with the results.}
 
-\item{boundary}{(Optional) SpatialPolygon defining the boundary of the spatial domain. If
-missing and \code{plotit = TRUE}, \code{boundary} is estimated from \code{candi}.}
+\item{boundary}{(Optional) Object of class SpatialPolygons (see\code{\link[sp:SpatialPolygons]{sp::SpatialPolygons()}}) used to
+plot the (starting and current) sample configuration. These SpatialPolygons can depict the the
+outer and inner limits of the spatial sampling domain as described in \code{candi}. If no
+SpatialPolygons are provided and \code{plotit = TRUE}, \code{boundary} is estimated from \code{candi}.}
 
 \item{progress}{(Optional) Type of progress bar that should be used, with options \code{"txt"}, for a
 text progress bar in the R console, \code{"tk"}, to put up a Tk progress bar widget, and \code{NULL} to

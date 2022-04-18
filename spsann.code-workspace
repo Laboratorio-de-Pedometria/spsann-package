@@ -8,9 +8,21 @@
 		"r.linting.maxLineLength": 111,
 		"cSpell.language": "pt-BR,en-GB",
 		"cSpell.words": [
+			"Aarts",
 			"candi",
+			"cellsize",
+			"Černý",
+			"conv",
+			"Gelatt",
+			"gstat",
+			"Korst",
+			"krige",
+			"newdata",
 			"Numint",
-			"plotit"
+			"plotit",
+			"Rosenbluth",
+			"seealso",
+			"Vecchi"
 		]
 	}
 }

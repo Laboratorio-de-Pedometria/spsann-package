@@ -8,7 +8,8 @@
 #'  * Integer vector. A set of row indexes between one (1) and `nrow(candi)` identifying the grid
 #'    cell centres of `candi` that should be used to form the starting sample configuration for the
 #'    optimization. The length of the integer vector, `length(points)`, is the sample size.
-#'  * Data frame or matrix. The Cartesian x- and y-coordinates of the starting sample configuration.
+#'  * Data frame or matrix. The Cartesian x- and y-coordinates (in this order) of the starting
+#'    sample configuration.
 #'  * List. An object with two named sub-arguments:
 #'    * `fixed` An integer vector, data frame or matrix specifying an existing sample configuration
 #'      (see options above). This sample configuration is kept as-is (fixed) during the entire
@@ -24,11 +25,15 @@
 #'  augment a possibly already existing, real-world sample configuration or fine-tune only a subset
 #'  of the existing sampling points.
 #'
-#' @param candi Data frame or matrix with the candidate locations for the jittered samples. `candi`
-#' must have two columns in the following order: `[, "x"]`, the Cartesian x-coordinates, and
-#' `[, "y"]`, the Cartesian y-coordinates.
+#' @param candi Data frame or matrix with the Cartesian x- and y-coordinates (in this order) of the
+#' cell centres of a spatially exhaustive, rectangular grid covering the entire spatial sampling
+#' domain. The spatial sampling domain can be contiguous or composed of disjoint areas as well as
+#' contain holes and islands. `candi` provides the set of (finite) candidate locations inside the
+#' spatial sampling domain for a point jittered during the optimization. Usually, `candi` will match
+#' the geometry of the spatial grid containing the prediction locations, e.g. `newdata` in
+#' [gstat::krige()], `object` in [raster::predict()], and `locations` in [geoR::krige.conv()].
 #'
-#' @param schedule List with named sub-arguments defining the control parameters of the cooling
+#' @param schedule List with named sub-arguments setting the control parameters of the annealing
 #' schedule. See [spsann::scheduleSPSANN()].
 #'
 #' @param plotit (Optional) Logical for plotting the optimization results, including a) the progress
@@ -37,8 +42,10 @@
 #' 10 jitters. When adding samples to an existing sample configuration, fixed samples are indicated
 #' using black crosses. Defaults to `plotit = FALSE`.
 #'
-#' @param boundary (Optional) SpatialPolygon defining the boundary of the spatial domain. If
-#' missing and `plotit = TRUE`, `boundary` is estimated from `candi`.
+#' @param boundary (Optional) Object of class SpatialPolygons (see[sp::SpatialPolygons()]) used to
+#' plot the (starting and current) sample configuration. These SpatialPolygons can depict the the
+#' outer and inner limits of the spatial sampling domain as described in `candi`. If no
+#' SpatialPolygons are provided and `plotit = TRUE`, `boundary` is estimated from `candi`.
 #'
 #' @param progress (Optional) Type of progress bar that should be used, with options `"txt"`, for a
 #' text progress bar in the R console, `"tk"`, to put up a Tk progress bar widget, and `NULL` to

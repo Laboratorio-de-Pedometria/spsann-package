@@ -2,7 +2,7 @@
 % Please edit documentation in R/scheduleSPSANN.R
 \name{scheduleSPSANN}
 \alias{scheduleSPSANN}
-\title{\pkg{spsann} annealing schedule}
+\title{\strong{spsann} annealing schedule}
 \usage{
 scheduleSPSANN(
   initial.temperature = 0.001,
@@ -19,49 +19,51 @@ scheduleSPSANN(
 )
 }
 \arguments{
-\item{initial.temperature}{Numeric value larger than 0 defining the initial temperature of the system. A
-low \code{initial.temperature}, combined with a low \code{initial.acceptance} result in the algorithm to behave as a
-greedy algorithm, i.e. only better system configurations are accepted. Defaults to
-\code{initial.temperature = 0.001}.}
+\item{initial.temperature}{Numeric value larger than zero (0) defining the initial temperature of
+the system. A low \code{initial.temperature}, combined with a low \code{initial.acceptance} results in the
+optimization algorithm to behave as a greedy optimization algorithm, i.e. only better system
+configurations are accepted. Defaults to \code{initial.temperature = 0.001}.}
 
-\item{chains}{Integer value defining the maximum number of chains, i.e. the number of cycles of jitters at
-which the temperature and the size of the neighbourhood should be kept constant. Defaults to \code{chains = 500}.}
+\item{chains}{Integer value defining the maximum number of Markov chain, i.e. the number of
+cycles of jitters at which the temperature and the size of the neighbourhood should be kept
+constant. Defaults to \code{chains = 500}.}
 
-\item{x.max, x.min, y.max, y.min}{Numeric value defining the minimum and maximum quantity of random noise to
-be added to the projected x- and y-coordinates. The units are the same as of the projected x- and
-y-coordinates. If missing, they are estimated from \code{candi} -- or \code{eval.grid}, in case a coarser evaluation
-grid is used --, \code{x.min} and \code{y.min} being set to zero, and \code{x.max} and \code{y.max} being set to half the
-maximum distance in the x- and y-coordinates, respectively.}
+\item{x.max, x.min, y.max, y.min}{Numeric value defining the minimum and maximum quantity of random
+noise to be added to the Cartesian x- and y-coordinates. The units are the same as of the
+Cartesian x- and y-coordinates. If missing, they are estimated from \code{candi} -- or \code{eval.grid},
+in case a coarser evaluation grid is used --, \code{x.min} and \code{y.min} being set to zero, and \code{x.max}
+and \code{y.max} being set to half the maximum distance in the Cartesian x- and y-coordinates,
+respectively.}
 
 \item{cellsize}{Vector with two positive numeric values defining the spacing in the x- and y-coordinates
 between the candidate locations in \code{candi}, i.e. the grid resolution. A single value can be used if the
 spacing in the x- and y-coordinates is the same. If \code{cellsize = 0} then a finite set of candidate locations
 is used (See Details).}
 
-\item{stopping}{Integer value defining the maximum allowable number of Markov chains without improvement of
-the objective function value. Defaults to \code{stopping = ceiling(chains * 0.5)}, i.e. fifty percent the maximum
-number of chains.}
+\item{stopping}{Integer value defining the maximum allowable number of Markov chains without
+improvement of the objective function value. Defaults to \code{stopping = ceiling(chains * 0.5)}, i.e.
+fifty percent the maximum number of chains.}
 
-\item{chain.length}{Integer value larger than zero defining the length of each Markov chain relative to the
-number of samples. Defaults to \code{chain.length = 1}, i.e. one time the number of samples.}
+\item{chain.length}{Integer value larger than zero (0) defining the length of each Markov chain
+relative to the number of samples. Defaults to \code{chain.length = 1}, i.e. one time the number of
+samples.}
 
-\item{temperature.decrease}{Numeric value between 0 and 1 used as a multiplying factor to decrease the
-temperature at the end of each Markov chain. Defaults to \code{temperature.decrease = 0.95}. (Advanced users
-only!)}
+\item{temperature.decrease}{Numeric value between zero (0) and one (1) used as a multiplying
+factor to decrease the temperature at the end of each Markov chain. Defaults to
+\code{temperature.decrease = 0.95}. (Advanced users only!)}
 
-\item{initial.acceptance}{(Optional) Vector with two positive numeric
-values between 0 and 1 defining the minimum and maximum initial acceptance
-probabilities. The initial acceptance probability is the proportion of
-candidate spatial sample configurations that should be accepted in the
-first Markov chain. The optimization is stopped and a warning is issued
-if the value is not within the predefined range. Defaults to
-\code{initial.acceptance = c(0.95, 0.99)}. (Advanced users only!)}
+\item{initial.acceptance}{(Optional) Vector with two positive numeric values between zero (0) and
+one (1) defining the minimum and maximum initial acceptance probabilities. The initial acceptance
+probability is the proportion of candidate spatial sample configurations that should be accepted
+in the first Markov chain. The optimization is stopped and a warning is issued if the value is
+not within the predefined range. Defaults to \code{initial.acceptance = c(0.95, 0.99)}. (Advanced
+users only!)}
 }
 \value{
 A list with a set of control parameters of the annealing schedule.
 }
 \description{
-Set the control parameters for the annealing schedule of \pkg{spsann} functions.
+Set the control parameters of the annealing schedule.
 }
 \details{
 \subsection{Generating mechanism}{
@@ -143,26 +145,27 @@ Cartesian: you are the sole responsible for making sure that this requirement is
 schedule <- scheduleSPSANN(initial.temperature = 100, cellsize = 30)
 }
 \references{
-Aarts, E. H. L.; Korst, J. H. M. Boltzmann machines for travelling salesman problems. _European Journal of
-Operational Research_S, v. 39, p. 79-95, 1989.
+Aarts, E. H. L.; Korst, J. H. M. Boltzmann machines for travelling salesman problems. _European
+Journal of Operational Research_S, v. 39, p. 79-95, 1989.
 
-Černý, V. Thermodynamical approach to the travelling salesman problem: an efficient simulation algorithm.
-\emph{Journal of Optimization Theory and Applications}, v. 45, p. 41-51, 1985.
+Černý, V. Thermodynamical approach to the travelling salesman problem: an efficient simulation
+algorithm. \emph{Journal of Optimization Theory and Applications}, v. 45, p. 41-51, 1985.
 
-Brus, D. J.; Heuvelink, G. B. M. Optimization of sample patterns for universal kriging of environmental
-variables. \emph{Geoderma}, v. 138, p. 86-95, 2007.
+Brus, D. J.; Heuvelink, G. B. M. Optimization of sample patterns for universal kriging of
+environmental variables. \emph{Geoderma}, v. 138, p. 86-95, 2007.
 
-Kirkpatrick, S.; Gelatt, C. D.; Vecchi, M. P. Optimization by simulated annealing. \emph{Science}, v. 220,
-p. 671-680, 1983.
+Kirkpatrick, S.; Gelatt, C. D.; Vecchi, M. P. Optimization by simulated annealing. \emph{Science}, v.
+220, p. 671-680, 1983.
 
 Metropolis, N.; Rosenbluth, A. W.; Rosenbluth, M. N.; Teller, A. H.; Teller, E. Equation of state
-calculations by fast computing machines. \emph{The Journal of Chemical Physics}, v. 21, p. 1087-1092, 1953.
+calculations by fast computing machines. \emph{The Journal of Chemical Physics}, v. 21, p. 1087-1092,
+1953.
 
 van Groenigen, J.-W.; Stein, A. Constrained optimization of spatial sampling using continuous
 simulated annealing. \emph{Journal of Environmental Quality}. v. 27, p. 1078-1086, 1998.
 
-Webster, R.; Lark, R. M. \emph{Field sampling for environmental science and management}. London: Routledge, p.
-200, 2013.
+Webster, R.; Lark, R. M. \emph{Field sampling for environmental science and management}. London:
+Routledge, p. 200, 2013.
 }
 \seealso{
 \code{\link[spsann]{optimACDC}}, \code{\link[spsann]{optimCORR}},
