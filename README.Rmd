@@ -41,7 +41,7 @@ package available on [GitHub][github] using the __remotes__ package. If you are 
 if (!require(remotes)) {
   install.packages(pkgs = "remotes")
 }
-remotes::install_github(repo = "laboratorio-de-pedometria/spsann")
+remotes::install_github(repo = "laboratorio-de-pedometria/spsann-package")
 ```
 
 ## How to collaborate
@@ -56,6 +56,6 @@ of this repository.
 
 [rproject]: https://www.r-project.org/
 [cran]: https://CRAN.R-project.org/package=febr
-[github]: https://github.com/laboratorio-de-pedometria/spsann
+[github]: https://github.com/laboratorio-de-pedometria/spsann-package
 [windows]: https://cran.r-project.org/bin/windows/
 [rtools]: https://cran.r-project.org/bin/windows/Rtools/
