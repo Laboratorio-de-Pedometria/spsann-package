@@ -84,7 +84,7 @@
 #' }
 # FUNCTION - MAIN #############################################################################################
 optimPPL <-
-  function (
+  function(
     points, candi, lags = 7, lags.type = "exponential", lags.base = 2, cutoff, distri,
     criterion = "distribution", pairs = FALSE, schedule,
     plotit = FALSE, track = FALSE, boundary, progress = "txt", verbose = FALSE) {
@@ -439,14 +439,14 @@ countPPL <-
     
     return (ppl)
   }
-# INTERNAL FUNCTION - BREAKS OF THE LAG-DISTANCE CLASSES ######################################################
+# INTERNAL FUNCTION - BREAKS OF THE LAG-DISTANCE CLASSES ###########################################
 .compute_variogram_lags <-
-  function (lags = 7, lags.type = "exponential", cutoff, lags.base = 2, x.max, y.max, ...) {
+  function(lags = 7, lags.type = "exponential", cutoff, lags.base = 2, x.max, y.max, candi, ...) {
     if (length(lags) == 1) {
       if (missing(cutoff)) {
         if (missing(x.max) & missing(y.max)) {
-          x.max <- diff(range(candi[, 'x'])) / 2
-          y.max <- diff(range(candi[, 'y'])) / 2
+          x.max <- diff(range(candi[, "x"])) / 2
+          y.max <- diff(range(candi[, "y"])) / 2
         }
         cutoff <- sqrt(x.max ^ 2 + y.max ^ 2)
       }
