@@ -78,9 +78,9 @@ devtools::check("spsann-package/",
   remote = TRUE)
 
 # check for Windows (remote) ----
-devtools::check_win_oldrelease()
-devtools::check_win_release()
-devtools::check_win_devel()
+devtools::check_win_oldrelease("spsann-package/")
+devtools::check_win_release("spsann-package/")
+devtools::check_win_devel("spsann-package/")
 
 # check in R-hub ----
 # rhub::validate_email(email = "alessandrosamuelrosa@gmail.com")
@@ -88,7 +88,8 @@ devtools::check_win_devel()
 # rhub::platforms()
 platforms <- c("fedora-clang-devel",
   "ubuntu-gcc-release", "debian-clang-devel", "windows-x86_64-devel")
-devtools::check_rhub(platforms = platforms)
+devtools::check_rhub("spsann-package/",
+  platforms = platforms, interactive = FALSE, env_vars = c(`_R_CHECK_FORCE_SUGGESTS_` = "false"))
 
 devtools::build()
 
