@@ -5,13 +5,13 @@ Optimization of Spatial Samples via Simulated Annealing
 
 [![Project Status: Active – The project has reached a stable, usable
 state and is being actively
-developed.](https://www.repostatus.org/badges/latest/active.svg)](http://www.repostatus.org/#active)
-[![packageversion](https://img.shields.io/badge/devel%20version-2.2.3-firebrick.svg?style=flat-square)](commits/master)
+developed.](https://www.repostatus.org/badges/latest/active.svg)](https://www.repostatus.org/#active)
+[![packageversion](https://img.shields.io/badge/devel%20version-2.2.4-firebrick.svg?style=flat-square)](commits/master)
 [![CRAN](https://www.r-pkg.org/badges/version/spsann)](https://cran.r-project.org/package=spsann)
 [![cran
 checks](https://cranchecks.info/badges/worst/spsann)](https://cran.r-project.org/web/checks/check_results_spsann.html)
-[![Downloads](https://cranlogs.r-pkg.org/badges/spsann?color=brightgreen)](http://www.r-pkg.org/pkg/spsann)
-[![Rdoc](https://www.rdocumentation.org/badges/version/spsann)](http://www.rdocumentation.org/packages/spsann)
+[![Downloads](https://cranlogs.r-pkg.org/badges/spsann?color=brightgreen)](https://www.r-pkg.org/pkg/spsann)
+[![Rdoc](https://api.rdocumentation.org/badges/version/spsann)](https://www.rdocumentation.org/packages/spsann)
 
 The **spsann** package was created to help you designing optimum spatial
 sample configurations using the power of spatial simulated annealing in
@@ -29,8 +29,8 @@ downloaded from the *Comprehensive R Archive Network*
 
 If the installation from CRAN fails, you can install the development
 version of the **spsann** package available on
-[GitHub](https://github.com/laboratorio-de-pedometria/spsann) using the
-**remotes** package. If you are using a
+[GitHub](https://github.com/laboratorio-de-pedometria/spsann-package)
+using the **remotes** package. If you are using a
 [Windows](https://cran.r-project.org/bin/windows/) machine, however, you
 will have to install
 [Rtools](https://cran.r-project.org/bin/windows/Rtools/) first.
@@ -39,7 +39,7 @@ will have to install
     if (!require(remotes)) {
       install.packages(pkgs = "remotes")
     }
-    remotes::install_github(repo = "laboratorio-de-pedometria/spsann")
+    remotes::install_github(repo = "laboratorio-de-pedometria/spsann-package")
 
 How to collaborate
 ------------------

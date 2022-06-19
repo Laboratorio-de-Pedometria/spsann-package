@@ -4,13 +4,16 @@
 # Test package #####################################################################################
 # Dependencies
 update(remotes::package_deps("spsann"))
-update(remotes::package_deps(packages = "devtools"))
+update(remotes::package_deps("devtools"))
+if (!require(autofun)) {
+  remotes::install_github(repo = "samuel-rosa/autofun")
+}
 # Reverse dependency tools
-devtools::revdep()
+devtools::revdep("spsann-package")
 # Render README
-rmarkdown::render("README.Rmd")
+rmarkdown::render("spsann-package/README.Rmd")
 # Automatically build functions
-fun.name <- c(
+fun_name <- c(
   ".check_spsann_arguments",
   ".plotting_options",
   ".prepare_jittering",
@@ -23,50 +26,56 @@ fun.name <- c(
   ".set_progress",
   ".update_progress",
   ".check_first_chain")
-read.file <- c(
-  "R-autofun/check-spsann-arguments.R",
-  "R-autofun/plotting-options.R",
-  "R-autofun/prepare-jittering.R",
-  "R-autofun/prepare-points.R",
-  "R-autofun/plot-and-jitter.R",
-  "R-autofun/prepare-output.R",
-  "R-autofun/prepare-acdc-covars.R",
-  "R-autofun/check-suggests.R",
-  "R-autofun/prepare-clhs-covars.R",
-  "R-autofun/set-progress.R",
-  "R-autofun/update-progress.R",
-  "R-autofun/check-first-chain.R")
-write.file <- c(
-  "R/check-spsann-arguments.R",
-  "R/plotting-options.R",
-  "R/prepare-jittering.R",
-  "R/prepare-points.R",
-  "R/plot-and-jitter.R",
-  "R/prepare-output.R",
-  "R/prepare-acdc-covars.R",
-  "R/check-suggests.R",
-  "R/prepare-clhs-covars.R",
-  "R/set-progress.R",
-  "R/update-progress.R",
-  "R/check-first-chain.R")
-lapply(seq_along(fun.name), function(i) {
-  autofun::autofun(fun.name[i], read.file[i], write.file[i])
+read_file <- c(
+  "check-spsann-arguments.R",
+  "plotting-options.R",
+  "prepare-jittering.R",
+  "prepare-points.R",
+  "plot-and-jitter.R",
+  "prepare-output.R",
+  "prepare-acdc-covars.R",
+  "check-suggests.R",
+  "prepare-clhs-covars.R",
+  "set-progress.R",
+  "update-progress.R",
+  "check-first-chain.R")
+read_file <- paste0("spsann-package/R-autofun/", read_file)
+write_file <- c(
+  "check-spsann-arguments.R",
+  "plotting-options.R",
+  "prepare-jittering.R",
+  "prepare-points.R",
+  "plot-and-jitter.R",
+  "prepare-output.R",
+  "prepare-acdc-covars.R",
+  "check-suggests.R",
+  "prepare-clhs-covars.R",
+  "set-progress.R",
+  "update-progress.R",
+  "check-first-chain.R")
+write_file <- paste0("spsann-package/R/", write_file)
+lapply(seq_along(fun_name), function(i) {
+  autofun::autofun(fun_name[i], read_file[i], write_file[i])
 })
-rm(fun.name, read.file, write.file)
+rm(fun_name, read_file, write_file)
 
 # Rcpp::compileAttributes()
 
 # check documentation ----
-roxygen2::roxygenise()
-devtools::check_man()
-devtools::spell_check()
-# spelling::update_wordlist()
+roxygen2::roxygenise("spsann-package")
+devtools::check_man("spsann-package")
+devtools::spell_check("spsann-package")
+# spelling::update_wordlist("spsann-package")
 
 # check examples ----
-devtools::run_examples(run_dontrun = FALSE)
+devtools::run_examples("spsann-package/")
 
 # check for Linux (local) ----
-devtools::check(document = TRUE, manual = TRUE, run_dont_test = TRUE)
+devtools::check("spsann-package/",
+  env_vars = c(`_R_CHECK_DEPENDS_ONLY_` = TRUE))
+devtools::check("spsann-package/",
+  document = TRUE, manual = TRUE, vignettes = TRUE, force_suggests = TRUE, incoming = TRUE,
+  remote = TRUE)
 
 # check for Windows (remote) ----
 devtools::check_win_oldrelease()
@@ -84,7 +93,7 @@ devtools::check_rhub(platforms = platforms)
 devtools::build()
 
 # Load package
-devtools::load_all()
+devtools::load_all("spsann-package")
 
 # upload to CRAN
 devtools::release(check = FALSE)

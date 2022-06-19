@@ -47,7 +47,8 @@ RC
 Rdoc
 Rosenbluth
 Rossel
-SpatialPolygon
+Rtools
+SpatialPolygons
 Spiliopoulos
 Thermodynamical
 Truong
@@ -62,9 +63,9 @@ cellsize
 clhs
 colorbrewer
 countPPL
+cran
 discretising
 geostatistical
-gray
 gstat
 img
 intamapInteractive
@@ -90,6 +91,7 @@ pedometrics
 plyr
 rgeos
 scheduleSPSANN
+sp
 spJitter
 spcosa
 svg
