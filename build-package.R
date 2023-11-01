@@ -2,13 +2,27 @@
 # Alessandro Samuel-Rosa
 
 # Test package #####################################################################################
-# Dependencies
+# Install the latest version of the spsann package from GitHub if it is not currently installed.
+if (!require(spsann)) {
+  remotes::install_github(repo = "laboratorio-de-pedometria/spsann-package")
+}
+# Install packages mentioned in the documentation: raster, geoR, and spcosa
+if (!require(raster)) {
+  install.packages("raster")
+}
+if (!require(geoR)) {
+  install.packages("geoR")
+}
+if (!require(spcosa)) {
+  install.packages("spcosa")
+}
+# Update package dependencies
 update(remotes::package_deps("spsann"))
 update(remotes::package_deps("devtools"))
 if (!require(autofun)) {
   remotes::install_github(repo = "samuel-rosa/autofun")
 }
-# Reverse dependency tools
+# Check packages that depend on the spsann package
 devtools::revdep("spsann-package")
 # Render README
 rmarkdown::render("spsann-package/README.Rmd")
@@ -72,10 +86,12 @@ devtools::run_examples("spsann-package/")
 
 # check for Linux (local) ----
 devtools::check("spsann-package/",
-  env_vars = c(`_R_CHECK_DEPENDS_ONLY_` = TRUE))
+  env_vars = c(`_R_CHECK_DEPENDS_ONLY_` = TRUE)
+)
 devtools::check("spsann-package/",
   document = TRUE, manual = TRUE, vignettes = TRUE, force_suggests = TRUE, incoming = TRUE,
-  remote = TRUE)
+  remote = TRUE
+)
 
 # check for Windows (remote) ----
 devtools::check_win_oldrelease("spsann-package/")
@@ -91,7 +107,7 @@ platforms <- c("fedora-clang-devel",
 devtools::check_rhub("spsann-package/",
   platforms = platforms, interactive = FALSE, env_vars = c(`_R_CHECK_FORCE_SUGGESTS_` = "false"))
 
-devtools::build()
+# devtools::build("spsann-package/")
 
 # Load package
 devtools::load_all("spsann-package")

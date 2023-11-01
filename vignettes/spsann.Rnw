@@ -7,7 +7,10 @@
 \newcommand{\strong}[1]{{\normalfont\fontseries{b}\selectfont #1}}
 \let\pkg=\strong
 \newcommand{\code}[1]{{\tt #1}}
-\usepackage[english]{babel}
+% \usepackage[english]{babel} % setting the option 'english' was resulting in the following error:
+% Package babel Error: Unknown option 'english'. Either you misspelled it (babel)
+%                      or the language definition file english.ldf was not found.
+\usepackage{babel}
 \usepackage[T1]{fontenc}
 \usepackage[utf8]{inputenc}
 
